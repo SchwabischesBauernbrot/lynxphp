@@ -18,3 +18,5 @@ REST API
 Storage Layer (3rd)
 REST API
 Handles storage in a NoSQL fashion
+
+[Discussion](https://gitgud.io/odilitime/lynxphp/-/issues)
