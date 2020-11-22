@@ -13,7 +13,14 @@ getBoardSettingForm($uri)
 
 
 function getPostsModel($boardUri) {
-  global $db;
+  global $db, $models;
+
+  $res = $db->find($models['board'], array('criteria'=>array(
+      array('uri', '=', $boardUri),
+  )));
+  if (!mysqli_num_rows($res)) {
+    return false;
+  }
   $public_post_model = array(
     'name' => 'board_' . $boardUri . '_public_post',
     //'indexes' => array('boardUri'),
@@ -37,6 +44,53 @@ function getPostsModel($boardUri) {
   );
   $db->autoupdate($public_post_model);
   return $public_post_model;
+}
+
+function getPostFilesModel($boardUri) {
+  global $db, $models;
+
+  $res = $db->find($models['board'], array('criteria'=>array(
+      array('uri', '=', $boardUri),
+  )));
+  if (!mysqli_num_rows($res)) {
+    return false;
+  }
+  $public_post_file_model = array(
+    'name' => 'board_' . $boardUri . '_public_post_file',
+    //'indexes' => array('boardUri'),
+    'fields' => array(
+      'postid' => array('type'=>'int'),
+      'sha256' => array('type'=>'str', 'length'=>255),
+      'path' => array('type'=>'str', 'length'=>255),
+      //'sha512' => array('type'=>'str', 'length'=>255),
+      'browser_type' => array('type'=>'str', 'length'=>255),
+      //'tim' => array('type'=>'int'),
+      'filename' => array('type'=>'str', 'length'=>128),
+      'ext' => array('type'=>'str', 'length'=>128),
+      // b64 encoded
+      //'md5' => array('type'=>'str', 'length'=>24),
+      'w' => array('type'=>'int'),
+      'h' => array('type'=>'int'),
+      //'tn_w' => array('type'=>'int'),
+      //'tn_h' => array('type'=>'int'),
+      'filedeleted' => array('type'=>'bool'),
+      'spoiler' => array('type'=>'bool'),
+      // custom_spoiler
+      // 'replies' => array('type'=>'integer'),
+      // 'images' => array('type'=>'integer'),
+      // 'bumplimit' => array('type'=>'boolean'),
+      // 'imagelimit' => array('type'=>'boolean'),
+      // tag (.swf category)
+      // semantic_url (seo slug)
+      // since4pass
+      //'unique_ips' => array('type'=>'integer'),
+      //'m_img' => array('type'=>'bool'),
+      //'archived' => array('type'=>'bool'),
+      //'archived_on' => array('type'=>'int'),
+    )
+  );
+  $db->autoupdate($public_post_file_model);
+  return $public_post_file_model;
 }
 
 ?>
