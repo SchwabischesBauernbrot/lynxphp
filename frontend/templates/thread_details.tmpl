@@ -9,7 +9,7 @@
 <br>
 <section class="form-wrapper flex-center">
   <form class="form-post" id="postform" action="{{uri}}/post" enctype="multipart/form-data" method="POST">
-    <input type="hidden" name="thread">
+    <input type="hidden" name="thread" value="{{threadNum}}">
     <section class="row jsonly">
       <div class="noselect" id="dragHandle">New Reply</div>
     </section>
@@ -81,14 +81,14 @@
   <div class="post-file">
     <span class="post-file-info">
       <span>
-        <a href="/file/aded631af6ba53f07e5c1525661ef7a7c3fcc289ae7bfa153d2274a70637bdde.jpg" title="Download INTERESTING.jpg" download="INTERESTING.jpg">INTERESTING.jpg</a>
+        <a href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{filename}}</a>
       </span>
       <br/>
-      <span>(9.6KB, 329x306)</span>
+      <span>({{size}}, {{width}}x{{height}})</span>
     </span>
     <div class="post-file-src" data-type="image" data-attachment="false">
-      <a target="_blank" href="/file/aded631af6ba53f07e5c1525661ef7a7c3fcc289ae7bfa153d2274a70637bdde.jpg">
-        <img class="file-thumb" src="/file/thumb-aded631af6ba53f07e5c1525661ef7a7c3fcc289ae7bfa153d2274a70637bdde.jpg" height="232" width="250" loading="lazy"/>
+      <a target="_blank" href="{{path}}">
+        <img class="file-thumb" src="{{path}}" height="232" width="250" loading="lazy"/>
       </a>
     </div>
   </div>
