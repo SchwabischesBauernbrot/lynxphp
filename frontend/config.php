@@ -16,5 +16,5 @@ if (file_exists($localConfig)) {
 // local server config
 // needs to be HTTPS if the backend is not on the same server
 // must have trailing slash
-if (!defined('BACKEND_BASE_URL')) define('BACKEND_BASE_URL', 'http://localhost/');
+if (!defined('BACKEND_BASE_URL')) define('BACKEND_BASE_URL', 'http://localhost/backend/');
 ?>
