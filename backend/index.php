@@ -29,7 +29,9 @@ include 'lib/database_drivers/'.$db_driver.'.php';
 $driver_name = $db_driver . '_driver';
 $db = new $driver_name;
 
-$db->connectDB(DB_HOST, DB_USER, DB_PWD, DB_NAME);
+if (!$db->connectDB(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
+  exit();
+}
 
 include 'lib/lib.board.php';
 
@@ -44,9 +46,17 @@ function boardDBtoAPI(&$row) {
   // decode user_id
 }
 
-function postDBtoAPI(&$row) {
+function postDBtoAPI(&$row, $post_files_model) {
   global $db, $models;
+  $files = array();
+  $res = $db->find($post_files_model, array('criteria'=>array(
+    array('postid', '=', $row['postid']),
+  )));
+  while($frow = mysqli_fetch_assoc($res)) {
+    $files[] = $frow;
+  }
   $row['no'] = $row['postid'];
+  $row['files'] = $files;
   unset($row['postid']);
   unset($row['json']);
   // decode user_id
@@ -87,19 +97,29 @@ function fourChanAPI($path) {
     $threadNum = str_replace('.json', '', $parts[4]);
     if (is_numeric($threadNum)) {
       $posts_model = getPostsModel($boardUri);
+      $post_files_model = getPostFilesModel($boardUri);
+      /*(
+      $posts_model['children'] = array(
+        array(
+          'type' => 'left',
+          'model' => $post_files_model,
+        )
+      );
+      */
+
+      $posts = array();
       $res = $db->find($posts_model, array('criteria'=>array(
         array('postid', '=', $threadNum),
       )));
-      $posts = array();
       $row = mysqli_fetch_assoc($res);
-      postDBtoAPI($row);
+      postDBtoAPI($row, $post_files_model);
       $posts[] = $row;
 
       $res = $db->find($posts_model, array('criteria'=>array(
         array('threadid', '=', $threadNum),
-      )));
+      ), 'order' => 'created_at'));
       while($row = mysqli_fetch_assoc($res)) {
-        postDBtoAPI($row);
+        postDBtoAPI($row, $post_files_model);
         $posts[] = $row;
       }
 
@@ -117,10 +137,13 @@ function fourChanAPI($path) {
         $boardUri = $parts[2];
         // get threads for this page
         $posts_model = getPostsModel($boardUri);
-        $res = $db->find($posts_model);
+        $post_files_model = getPostFilesModel($boardUri);
+        $res = $db->find($posts_model, array('criteria'=>array(
+          array('threadid', '=', 0),
+        )));
         $threads = array();
         while($row = mysqli_fetch_assoc($res)) {
-          postDBtoAPI($row);
+          postDBtoAPI($row, $post_files_model);
           $threads[] = $row;
         }
         echo json_encode($threads);
@@ -182,7 +205,7 @@ function hasPostVars($fields) {
   return true;
 }
 
-function loggedin() {
+function getUserID() {
   global $db, $models;
   $sid = empty($_SERVER['HTTP_SID']) ? '' : $_SERVER['HTTP_SID'];
   $sesRes = $db->find($models['session'], array('criteria' => array(
@@ -190,16 +213,69 @@ function loggedin() {
   )));
   // FIXME
   if (!mysqli_num_rows($sesRes)) {
-    sendResponse(array(), 401, 'Invalid Session');
-    return;
+    return null;
   }
   // FIXME
   $sesRow = mysqli_fetch_assoc($sesRes);
   if (time() > $sesRow['expires']) {
+    return false;
+  }
+  return $sesRow['user_id'];
+}
+
+function loggedIn() {
+  $userid = getUserID();
+  if ($userid === null) {
+    // session does not exist
     sendResponse(array(), 401, 'Invalid Session');
     return;
   }
-  return $sesRow['user_id'];
+  if ($userid === false) {
+    // expired
+    sendResponse(array(), 401, 'Invalid Session');
+    return;
+  }
+  return $userid;
+}
+function getOptionalPostField($field) {
+  return empty($_POST[$field])    ? '' : $_POST[$field];
+}
+
+function processFiles($boardUri, $files_json, $threadid, $postid) {
+  $files = json_decode($files_json, true);
+  if (!is_array($files)) {
+    return;
+  }
+  global $db;
+  $post_files_model = getPostFilesModel($boardUri);
+  foreach($files as $num => $file) {
+    // move file into path
+    $srcPath = 'storage/tmp/'.$file['hash'];
+    if (!file_exists($srcPath)) {
+      continue;
+    }
+    $threadPath = 'storage/boards/' . $boardUri . '/' . $threadid;
+    if (!file_exists($threadPath)) {
+      mkdir($threadPath);
+    }
+    $arr = explode('.', $file['name']);
+    $ext = end($arr);
+    $finalPath = $threadPath . '/' . $postid . '_' . $num . '.' . $ext;
+    // not NFS safe
+    rename($srcPath, $finalPath);
+    $db->insert($post_files_model, array(array(
+      'postid' => $postid,
+      'sha256' => $file['hash'],
+      'path'   => $finalPath,
+      'ext'    => $ext,
+      'browser_type' => $file['type'],
+      'filename'     => $file['name'],
+      'w' => 0,
+      'h' => 0,
+      'filedeleted' => 0,
+      'spoiler' => 0,
+    )));
+  }
 }
 
 function lynxChanAPI($path) {
@@ -214,17 +290,17 @@ function lynxChanAPI($path) {
     )));
     // FIXME
     if (mysqli_num_rows($emRes)) {
-      echo "email already has account";
+      return sendResponse(array(), 403, 'Already has account');
       return;
     }
     $res = $db->find($models['user'], array('criteria' => array(
       array('username', '=', $_POST['login']),
     )));
     if (mysqli_num_rows($res)) {
-      echo "already taken";
+      return sendResponse(array(), 403, 'Already Taken');
       return;
     }
-    echo "Creating<br>\n";
+    //echo "Creating<br>\n";
     $id = $db->insert($models['user'], array(array(
       'username' => $_POST['login'],
       'email'    => $_POST['email'],
@@ -270,7 +346,7 @@ function lynxChanAPI($path) {
   } else
   if (strpos($path, '/createBoard') !== false) {
     // boardUri, boardName, boardDescription, session
-    $user_id = loggedin();
+    $user_id = loggedIn();
     if (!$user_id) {
       return;
     }
@@ -287,23 +363,57 @@ function lynxChanAPI($path) {
     $data = 'ok';
     sendResponse($data);
   } else
+  if (strpos($path, '/files') !== false) {
+    $hash = hash_file('sha256', $_FILES['files']['tmp_name']);
+    move_uploaded_file($_FILES['files']['tmp_name'], 'storage/tmp/'.$hash);
+    $data=array(
+      'type' => $_FILES['files']['type'],
+      'name' => $_FILES['files']['name'],
+      'size' => $_FILES['files']['size'],
+      'hash' => $hash,
+    );
+    sendResponse($data);
+  } else
   if (strpos($path, '/newThread') !== false) {
     if (!hasPostVars(array('boardUri'))) {
       return;
     }
-    $user_id = loggedin();
-    if (!$user_id) {
-      return;
-    }
+    $user_id = (int)getUserID();
     $boardUri = $_POST['boardUri'];
     $posts_model = getPostsModel($boardUri);
     $id = $db->insert($posts_model, array(array(
       // noFlag, email, password, captcha, spoiler, flag
       'threadid' => 0,
       'resto' => 0,
-      'name' => $_POST['name'],
-      'sub'  => $_POST['subject'],
-      'com'  => $_POST['message'],
+      'name' => getOptionalPostField('name'),
+      'sub'  => getOptionalPostField('subject'),
+      'com'  => getOptionalPostField('message'),
+      'sticky' => 0,
+      'closed' => 0,
+      'trip' => '',
+      'capcode' => '',
+      'country' => '',
+    )));
+    processFiles($boardUri, $_POST['files'], $id, $id);
+    $data = $id;
+    sendResponse($data);
+  } else
+  if (strpos($path, '/replyThread') !== false) {
+    if (!hasPostVars(array('boardUri', 'threadId'))) {
+      return;
+    }
+    $user_id = (int)getUserID();
+    $boardUri = $_POST['boardUri'];
+    $posts_model = getPostsModel($boardUri);
+    $threadid = (int)$_POST['threadId'];
+    // make sure threadId exists...
+    $id = $db->insert($posts_model, array(array(
+      // noFlag, email, password, captcha, spoiler, flag
+      'threadid' => $threadid,
+      'resto' => 0,
+      'name' => getOptionalPostField('name'),
+      'sub'  => getOptionalPostField('subject'),
+      'com'  => getOptionalPostField('message'),
       'sticky' => 0,
       'closed' => 0,
       'trip' => '',
@@ -311,6 +421,7 @@ function lynxChanAPI($path) {
       'country' => '',
     )));
     $data = $id;
+    processFiles($boardUri, $_POST['files'], $threadid, $id);
     sendResponse($data);
   } else {
     sendResponse(array(), 404, 'Unknown route');
