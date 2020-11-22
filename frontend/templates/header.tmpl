@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="{{basehref}}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width initial-scale=1">
+  <link rel="stylesheet" href="css/style.css?v=3e2b361">
+  <link id="theme" rel="stylesheet" data-theme="yotsuba-b" href="css/themes/yotsuba-b.css">
+  <link id="codetheme" rel="stylesheet" data-theme="ir-black" href="css/codethemes/ir-black.css">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="144x144" href="/file/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/file/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/file/favicon-16x16.png">
+  <link rel="mask-icon" href="/file/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#00aba9">
+  <meta name="theme-color" content="#ffffff">
+  <noscript><style>
+    .jsonly { display: none!important; }
+  </style></noscript>
+  <!-- script src="/js/all.js?v=3e2b361">
+  </script -->
+  <title></title>
+</head>
+<body id="top">
+  <nav class="navbar">
+    <a class="nav-item" href=".">Home</a>
+    <a class="nav-item" href="boards.php">Boards</a>
+    {{nav}}
+<!-- loop -->
+    <a class="nav-item" href="{{url}}">{{label}}</a>
+<!-- end -->
+    <!-- a class="nav-item" href="overboard.php">Overboard</a -->
+    <a class="nav-item" href="control_panel.php">Account</a>
+    <a class="jsonly nav-item right" id="settings"></a>
+  </nav>
+  <main>
+  <div class="container">
