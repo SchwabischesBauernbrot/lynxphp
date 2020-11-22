@@ -86,6 +86,22 @@ function handleRoute($path) {
         if (is_array($page1)) {
           // valid board name
           // validate results
+          $files = array();
+          if (isset($_FILES)) {
+            if (is_array($_FILES['file']['tmp_name'])) {
+              echo "detected multiple files<br>\n";
+              foreach($_FILES['file']['tmp_name'] as $i=>$path) {
+                $res = sendFile($path, $_FILES['file']['type'][$i], $_FILES['file']['name'][$i]);
+                // check for error?
+                $files[] = $res;
+              }
+            } else {
+              $res = sendFile($_FILES['file']['tmp_name'], $_FILES['file']['type'], $_FILES['file']['name']);
+              // check for error?
+              $files[] = $res;
+            }
+          }
+          //print_r($files);
           // make post...
           if (empty($_POST['thread'])) {
             // new thead
@@ -99,8 +115,10 @@ function handleRoute($path) {
               'password' => $_POST['postpassword'],
               // captcha
               'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
+              'files'    => json_encode($files),
               // flag
             ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => $_COOKIE['session']));
+            echo "json[$json]<Br>\n";
             $result = json_decode($json, true);
             if (is_numeric($result['data'])) {
               // success
@@ -110,14 +128,35 @@ function handleRoute($path) {
             }
           } else {
             // reply
-            echo "Make reply...<br>\n";
+            //echo "boardUri[$boardUri]<br>\n";
+            $json = curlHelper(BACKEND_BASE_URL . 'lynx/replyThread', array(
+              // noFlag
+              'threadId' => $_POST['thread'],
+              'email'    => $_POST['email'],
+              'message'  => $_POST['message'],
+              'subject'  => $_POST['subject'],
+              'boardUri' => $boardUri,
+              'password' => $_POST['postpassword'],
+              // captcha
+              'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
+              // flag
+              'files'    => json_encode($files),
+            ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => $_COOKIE['session']));
+            echo "json[$json]<Br>\n";
+            $result = json_decode($json, true);
+            if (is_numeric($result['data'])) {
+              // success
+              redirectTo(BASE_HREF . $boardUri . '/thread/' . $_POST['thread']);
+            } else {
+              wrapContent('Post Error: ' . print_r($result, 1));
+            }
           }
           return;
         }
         wrapContent('404');
       }
     break;
-    default:
+   default:
     case 'GET':
       if ($path === '') {
         homepage();
