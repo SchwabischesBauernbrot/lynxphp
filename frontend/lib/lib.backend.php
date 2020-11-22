@@ -24,4 +24,12 @@ function getBoardThread($boardUri, $threadNum) {
   return $result['posts'];
 }
 
+function sendFile($tmpfile, $type, $filename) {
+  $json  = curlHelper(BACKEND_BASE_URL . 'lynx/files', array(
+    'files' => curl_file_create($tmpfile, $type, $filename)
+  ), '', '', '', 'POST');
+  $result = json_decode($json, true);
+  return $result['data'];
+}
+
 ?>
