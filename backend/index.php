@@ -206,7 +206,7 @@ function lynxChanAPI($path) {
   global $db, $models;
   //echo "path[$path]<br>\n";
   if (strpos($path, '/registerAccount') !== false) {
-    if (!hasPostVars(array('login', 'passsword', 'email'))) {
+    if (!hasPostVars(array('login', 'password', 'email'))) {
       return;
     }
     $emRes = $db->find($models['user'], array('criteria' => array(
@@ -235,7 +235,7 @@ function lynxChanAPI($path) {
   } else
   if (strpos($path, '/login') !== false) {
     // login, password, remember
-    if (!hasPostVars(array('login', 'passsword'))) {
+    if (!hasPostVars(array('login', 'password'))) {
       return;
     }
     $res = $db->find($models['user'], array('criteria' => array(
@@ -299,6 +299,7 @@ function lynxChanAPI($path) {
     $posts_model = getPostsModel($boardUri);
     $id = $db->insert($posts_model, array(array(
       // noFlag, email, password, captcha, spoiler, flag
+      'threadid' => 0,
       'resto' => 0,
       'name' => $_POST['name'],
       'sub'  => $_POST['subject'],
