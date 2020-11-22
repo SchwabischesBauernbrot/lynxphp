@@ -1,7 +1,7 @@
 <?php
 
 function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='AUTO') {
-  if (is_array($fields)) {
+  if (is_array($fields) && $method === 'AUTO') {
     $fields_string='';
     foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
     $fields_string=rtrim($fields_string, '&');
