@@ -43,7 +43,7 @@ function getBoardPageHandler($boardUri, $pagenum, $pageData = null) {
     $pageData = getBoardPage($boardUri, $pagenum);
   }
   $templates = loadTemplates('thread_listing');
-  echo join(',', array_keys($templates));
+  //echo join(',', array_keys($templates));
 
   $page_template = $templates['loop0'];
   $boardnav_html = $templates['loop1'];
@@ -111,8 +111,15 @@ function getThreadHandler($boardUri, $threadNum) {
     $tmp = str_replace('{{jstime}}', date('c', $post['created_at']), $tmp);
     $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $post['created_at']), $tmp);
     $files_html = '';
+    foreach($post['files'] as $file) {
+      $ftmpl = $templates['loop2'];
+      // disbale images until we can mod...
+      //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
+      $files_html .= $ftmpl;
+    }
     $tmp = str_replace('{{files}}', $files_html, $tmp);
-    $tmp = str_replace('{{replies}}', $files_html, $tmp);
+    $replies_html = '';
+    $tmp = str_replace('{{replies}}', $replies_html, $tmp);
     $posts_html .= $tmp;
   }
 
