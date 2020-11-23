@@ -47,7 +47,9 @@ function getBoardPageHandler($boardUri, $pagenum, $pageData = null) {
 
   $page_template = $templates['loop0'];
   $boardnav_html = $templates['loop1'];
-  $thread_template = $templates['loop3'];
+  $threadhdr_template = $templates['loop3'];
+  $threadftr_template = $templates['loop4'];
+  $thread_template = $templates['loop5'];
 
   // loop 0 goes into this html...
   $pages_html = '';
@@ -64,17 +66,24 @@ function getBoardPageHandler($boardUri, $pagenum, $pageData = null) {
 
   $threads_html = '';
   foreach($pageData as $thread) {
-    $tmp = $thread_template;
-    $tmp = str_replace('{{subject}}', htmlspecialchars($thread['sub']),  $tmp);
-    $tmp = str_replace('{{message}}', htmlspecialchars($thread['com']),  $tmp);
-    $tmp = str_replace('{{name}}',    htmlspecialchars($thread['name']), $tmp);
-    $tmp = str_replace('{{no}}',      $thread['no'],   $tmp);
-    $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-    $tmp = str_replace('{{jstime}}', date('c', $thread['created_at']), $tmp);
-    $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $thread['created_at']), $tmp);
-    $files_html = '';
-    $tmp = str_replace('{{files}}', $files_html, $tmp);
-    $threads_html .= $tmp;
+    $posts = $thread['posts'];
+    //echo "count[", count($posts), "]<br>\n";
+    $threads_html .= $threadhdr_template;
+    foreach($posts as $i => $post) {
+      $tmp = $thread_template;
+      $tmp = str_replace('{{op}}',      $i === 0 ? 'op' : '', $tmp);
+      $tmp = str_replace('{{subject}}', htmlspecialchars($post['sub']),  $tmp);
+      $tmp = str_replace('{{message}}', htmlspecialchars($post['com']),  $tmp);
+      $tmp = str_replace('{{name}}',    htmlspecialchars($post['name']), $tmp);
+      $tmp = str_replace('{{no}}',      $post['no'],   $tmp);
+      $tmp = str_replace('{{uri}}', $boardUri, $tmp);
+      $tmp = str_replace('{{jstime}}', date('c', $post['created_at']), $tmp);
+      $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $post['created_at']), $tmp);
+      $files_html = '';
+      $tmp = str_replace('{{files}}', $files_html, $tmp);
+      $threads_html .= $tmp;
+    }
+    $threads_html .= $threadftr_template;
   }
 
   $tmpl = $templates['header'];
