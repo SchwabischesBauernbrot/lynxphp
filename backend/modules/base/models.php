@@ -9,6 +9,15 @@ $migration_model = array(
 
 // config
 
+$config_model = array(
+  'name'   => 'config',
+  'fields' => array(
+    'category' => array('type' => 'str'),
+    'key'      => array('type' => 'str'),
+    'value'    => array('type' => 'str'),
+  )
+);
+
 $user_model = array(
   'name'   => 'user',
   'fields' => array(
@@ -156,6 +165,7 @@ $db->autoupdate($board_model);
 
 $models = array(
   'migration' => $migration_model,
+  'config'    => $config_model,
   'board'     => $board_model,
   'session'   => $user_session_model,
   'user'      => $user_model,
