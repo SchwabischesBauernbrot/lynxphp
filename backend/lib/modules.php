@@ -10,7 +10,7 @@ class module_registry {
   /** make sure it's a singleton */
   protected function __construct() {
     $this->name  = get_class($this);
-    $this->registry       = array();
+    $this->registry = array();
   }
 
   /** make sure it can't be cloned */
