@@ -11,6 +11,16 @@ getBoardsWith($field, $value)
 getBoardSettingForm($uri)
 */
 
+function getBoardByUri($boardUri) {
+  global $db, $models;
+  $res = $db->find($models['board'], array('criteria'=>array(
+      array('uri', '=', $boardUri),
+  )));
+  if (!$res) return;
+  $row = mysqli_fetch_assoc($res);
+  if ($row['json']) $row['json'] = json_decode($row['json'], true);
+  return $row;
+}
 
 function getPostsModel($boardUri) {
   global $db, $models;
