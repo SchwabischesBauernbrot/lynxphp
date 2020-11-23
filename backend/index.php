@@ -155,10 +155,12 @@ function fourChanAPI($path) {
           $postRes = $db->find($posts_model, array('criteria'=>array(
             array('threadid', '=', $row['no']),
           ), 'order'=>'created_at desc', 'limit' => 10));
+          $resort = array();
           while($prow = $db->get_row($postRes)) {
             postDBtoAPI($prow, $post_files_model);
-            $posts[] = $prow;
+            $resort[] = $prow;
           }
+          $posts = array_merge($posts, array_reverse($resort));
           $threads[] = array('posts' => $posts);
         }
         echo json_encode($threads);
