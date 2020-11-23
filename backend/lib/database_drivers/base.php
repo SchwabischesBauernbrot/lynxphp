@@ -4,10 +4,10 @@ interface database_driver_base {
   // direct
   public function connect($host, $user, $pass, $port = 0);
   // direct
-  public function switchDB($db);
+  public function switch_db($db);
   // easy
   public function autoupdate($model);
-  public function buildWhere($criteria);
+  public function build_where($criteria);
   public function make_constant($value);
   public function insert($rootModel, $recs);
   // options
@@ -16,6 +16,9 @@ interface database_driver_base {
   //              array(field, comparison, field/constant)
   public function find($rootModel, $options = false);
   public function findById($rootModel, $id, $options = false);
+  // result functions
+  public function num_rows($res);
+  public function get_row($res);
 }
 
 class database_driver_base_class {
@@ -24,24 +27,25 @@ class database_driver_base_class {
     $this->modelToSQL = array();
     $this->sqlToModel = array();
   }
-  public function connectDB($host, $user, $pass, $db, $port = 0) {
+  public function connect_db($host, $user, $pass, $db, $port = 0) {
     if (!$this->connect($host, $user, $pass, $port)) {
       return false;
     }
-    return $this->switchDB($db);
+    return $this->switch_db($db);
   }
   public function make_constant($value) {
     return '"'. addslashes($value) . '"';
   }
   // convert array into where clause
-  public function buildWhere($criteria) {
+  public function build_where($criteria, $defAlias = '') {
     // field, comparator, field
     $sets = array();
+    $alias = $defAlias ? $defAlias . '.' : '';
     foreach($criteria as $set) {
       if (is_array($set[2])) {
-        $sets[] = $set[0] . ' ' . $set[1] . ' ' . $set[2][0];
+        $sets[] = $alias . $set[0] . ' ' . $set[1] . ' ' . $set[2][0];
       } else {
-        $sets[] = $set[0] . ' ' . $set[1] . ' ' . $this->make_constant($set[2]);
+        $sets[] = $alias . $set[0] . ' ' . $set[1] . ' ' . $this->make_constant($set[2]);
       }
     }
     return join(' AND ', $sets);

@@ -17,22 +17,24 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $this->conn = mysqli_connect($host, $user, $pass);
     if (!$this->conn) {
       echo "Failed to connect<br>\n";
+    echo "Debugging errno: " . mysqli_connect_errno() . PHP_EOL;
+    echo "Debugging error: " . mysqli_connect_error() . PHP_EOL;
       return false;
     }
     return true;
   }
   // direct
-  public function switchDB($db) {
+  public function switch_db($db) {
     // FIXME check result code
     mysqli_select_db($this->conn, $db);
     return true;
   }
   // easy
-  public function connectDB($host, $user, $pass, $db, $port = 3306) {
+  public function connect_db($host, $user, $pass, $db, $port = 3306) {
     if (!$this->connect($host, $user, $pass, $port)) {
       return false;
     }
-    return $this->switchDB($db);
+    return $this->switch_db($db);
   }
   public function autoupdate($model) {
     // force json field in all models
@@ -172,8 +174,27 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $tableName = modelToTableName($rootModel);
     $fields = '*';
     $sql = 'select '. $fields . ' from ' . $tableName;
+    $joins = array();
+    if (!empty($rootModel['children']) && is_array($rootModel['children'])) {
+      foreach($rootModel['children'] as $join) {
+        $field = modelToId($rootModel);
+        $joinTable = modelToTableName($join['model']);
+        $joins[] = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join ' .
+          $joinTable . ' on ' .
+          $joinTable . '.' . $field . '=' .
+          $tableName . '.' . $field;
+      }
+      if (count($joins)) {
+        $sql .= ' ' . join(' ', $joins);
+      }
+    }
     if (isset($options['criteria'])) {
-      $sql .= ' where ' . $this->buildWhere($options['criteria']);
+      $sql .= ' where ' . $this->build_where($options['criteria'], count($joins) ? $tableName : '');
+    }
+    if (isset($options['order'])) {
+      $defAlias = count($joins) ? $tableName : '';
+      $alias = $defAlias ? $defAlias . '.' : '';
+      $sql .= ' order by ' . $alias . $options['order'];
     }
     //echo "sql[$sql]<br>\n";
     $res = mysqli_query($this->conn, $sql);
@@ -186,6 +207,12 @@ class mysql_driver extends database_driver_base_class implements database_driver
   }
   public function findById($rootModel, $id, $options = false) {
     return mysqli_fetch_assoc(parent::findById($rootModel, $id, $options));
+  }
+  public function num_rows($res) {
+    return mysqli_num_rows($res);
+  }
+  public function get_row($res) {
+    return mysqli_fetch_assoc($res);
   }
 
 }

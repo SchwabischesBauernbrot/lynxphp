@@ -9,18 +9,6 @@
 // read config
 include 'config.php';
 
-// 4chan GET board threads
-// GET random board uri
-// GET board list (pageinated)
-// GET board thread list
-// GET thread
-// GET last X posts from thread
-// POST board search
-// POST thread search
-// POST thread/reply
-
-// how to handle authentication with frontend?
-
 // connect to db
 include 'lib/lib.model.php';
 // FIXME: database type to select driver
@@ -29,7 +17,7 @@ include 'lib/database_drivers/'.$db_driver.'.php';
 $driver_name = $db_driver . '_driver';
 $db = new $driver_name;
 
-if (!$db->connectDB(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
+if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
   exit();
 }
 
@@ -38,6 +26,22 @@ include 'lib/lib.board.php';
 // build modules...
 include 'lib/lib.modules.php';
 enableModulesType('models');
+
+// pipelines
+// boardDB to API
+// thread to API
+// post to API
+// user to API
+// create thread
+// create reply
+// upload file
+// get ip
+// post var processing
+
+// transformations (x => y)
+// access list (remove this, add this)
+// change input, output
+// change processing is a little more sticky...
 
 function boardDBtoAPI(&$row) {
   global $db, $models;
@@ -52,7 +56,7 @@ function postDBtoAPI(&$row, $post_files_model) {
   $res = $db->find($post_files_model, array('criteria'=>array(
     array('postid', '=', $row['postid']),
   )));
-  while($frow = mysqli_fetch_assoc($res)) {
+  while($frow = $db->get_row($res)) {
     $files[] = $frow;
   }
   $row['no'] = $row['postid'];
@@ -68,7 +72,7 @@ function fourChanAPI($path) {
   if (strpos($path, '/boards.json') !== false) {
     $res = $db->find($models['board']);
     $boards = array();
-    while($row = mysqli_fetch_assoc($res)) {
+    while($row = $db->get_row($res)) {
       boardDBtoAPI($row);
       $boards[] = $row;
     }
@@ -111,14 +115,14 @@ function fourChanAPI($path) {
       $res = $db->find($posts_model, array('criteria'=>array(
         array('postid', '=', $threadNum),
       )));
-      $row = mysqli_fetch_assoc($res);
+      $row = $db->get_row($res);
       postDBtoAPI($row, $post_files_model);
       $posts[] = $row;
 
       $res = $db->find($posts_model, array('criteria'=>array(
         array('threadid', '=', $threadNum),
       ), 'order' => 'created_at'));
-      while($row = mysqli_fetch_assoc($res)) {
+      while($row = $db->get_row($res)) {
         postDBtoAPI($row, $post_files_model);
         $posts[] = $row;
       }
@@ -142,7 +146,7 @@ function fourChanAPI($path) {
           array('threadid', '=', 0),
         )));
         $threads = array();
-        while($row = mysqli_fetch_assoc($res)) {
+        while($row = $db->get_row($res)) {
           postDBtoAPI($row, $post_files_model);
           $threads[] = $row;
         }
@@ -156,8 +160,8 @@ function fourChanAPI($path) {
     $res = $db->find($models['board'], array('criteria'=>array(
       array('uri', '=', $board_uri),
     )));
-    if (mysqli_num_rows($res)) {
-      $row = mysqli_fetch_assoc($res);
+    if ($db->num_rows($res)) {
+      $row = $db->get_row($res);
       boardDBtoAPI($row);
       echo json_encode($row);
     } else {
@@ -211,12 +215,10 @@ function getUserID() {
   $sesRes = $db->find($models['session'], array('criteria' => array(
     array('session', '=', $sid),
   )));
-  // FIXME
-  if (!mysqli_num_rows($sesRes)) {
+  if (!$db->num_rows($sesRes)) {
     return null;
   }
-  // FIXME
-  $sesRow = mysqli_fetch_assoc($sesRes);
+  $sesRow = $db->get_row($sesRes);
   if (time() > $sesRow['expires']) {
     return false;
   }
@@ -288,15 +290,14 @@ function lynxChanAPI($path) {
     $emRes = $db->find($models['user'], array('criteria' => array(
       array('email', '=', $_POST['email']),
     )));
-    // FIXME
-    if (mysqli_num_rows($emRes)) {
+    if ($db->num_rows($emRes)) {
       return sendResponse(array(), 403, 'Already has account');
       return;
     }
     $res = $db->find($models['user'], array('criteria' => array(
       array('username', '=', $_POST['login']),
     )));
-    if (mysqli_num_rows($res)) {
+    if ($db->num_rows($res)) {
       return sendResponse(array(), 403, 'Already Taken');
       return;
     }
@@ -317,11 +318,10 @@ function lynxChanAPI($path) {
     $res = $db->find($models['user'], array('criteria' => array(
       array('username', '=', $_POST['login']),
     )));
-    if (!mysqli_num_rows($res)) {
+    if (!$db->num_rows($res)) {
       return sendResponse(array(), 401, 'Incorrect login');
     }
-    // FIXME:
-    $row = mysqli_fetch_assoc($res);
+    $row = $db->get_row($res);
     // password check
     if (!password_verify($_POST['password'], $row['password'])) {
       return sendResponse(array(), 401, 'Incorrect login');
@@ -428,11 +428,12 @@ function lynxChanAPI($path) {
   }
 }
 
-if (strpos($_SERVER['PATH_INFO'], '/4chan/') !== false) {
-  fourChanAPI($_SERVER['PATH_INFO']);
+$path = empty($_SERVER['PATH_INFO']) ? '' : $_SERVER['PATH_INFO'];
+if (strpos($path, '/4chan/') !== false) {
+  fourChanAPI($path);
 }
-if (strpos($_SERVER['PATH_INFO'], '/lynx/') !== false) {
-  lynxChanAPI($_SERVER['PATH_INFO']);
+if (strpos($path, '/lynx/') !== false) {
+  lynxChanAPI($path);
 }
 
 ?>
