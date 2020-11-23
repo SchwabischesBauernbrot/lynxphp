@@ -42,3 +42,8 @@ define('DB_USER', 'x');
 define('DB_PWD', 'y');
 define('DB_NAME', 'lynxphp');
 ```
+
+also you'll need to make these directories and make sure they're web server writable (chown www-data or chmod 777)
+- backend/storage
+- backend/storage/tmp
+- backend/storage/boards
