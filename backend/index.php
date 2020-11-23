@@ -147,8 +147,19 @@ function fourChanAPI($path) {
         )));
         $threads = array();
         while($row = $db->get_row($res)) {
+          $posts = array();
+          // add thread
           postDBtoAPI($row, $post_files_model);
-          $threads[] = $row;
+          $posts[] = $row;
+          // add remaining posts
+          $postRes = $db->find($posts_model, array('criteria'=>array(
+            array('threadid', '=', $row['no']),
+          ), 'order'=>'created_at desc', 'limit' => 10));
+          while($prow = $db->get_row($postRes)) {
+            postDBtoAPI($prow, $post_files_model);
+            $posts[] = $prow;
+          }
+          $threads[] = array('posts' => $posts);
         }
         echo json_encode($threads);
         return;
