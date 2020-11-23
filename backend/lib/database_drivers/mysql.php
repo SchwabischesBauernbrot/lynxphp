@@ -196,6 +196,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
       $alias = $defAlias ? $defAlias . '.' : '';
       $sql .= ' order by ' . $alias . $options['order'];
     }
+    if (isset($options['limit'])) {
+      $sql .= ' limit ' . $options['limit'];
+    }
     //echo "sql[$sql]<br>\n";
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
