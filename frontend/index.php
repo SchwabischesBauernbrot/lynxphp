@@ -194,8 +194,14 @@ function handleRoute($path) {
         if ($dirs === 2) {
           // get board data
           $boardUri = trim($path, '/');
+          // board existence check...
           $page1 = getBoardPage($boardUri, 1);
           if (is_array($page1)) {
+            $parts = explode('/', $path);
+            if ($parts[2] === 'catalog') {
+              $boardUri = $parts[1];
+              return getBoardCatalogHandler($boardUri);
+            }
             // enforce board URIs be a path
             if ($path[strlen($path) - 1] !== '/') {
               redirectTo(BASE_HREF . $path . '/');
