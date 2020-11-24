@@ -18,6 +18,13 @@ function getBoardPage($boardUri, $page = 1) {
   return $page1;
 }
 
+function getBoardCatalog($boardUri) {
+  $json  = curlHelper(BACKEND_BASE_URL . '4chan/' . $boardUri . '/catalog.json');
+  //echo "json[$json]<br>\n";
+  $pages = json_decode($json, true);
+  return $pages;
+}
+
 function getBoardThread($boardUri, $threadNum) {
   $json  = curlHelper(BACKEND_BASE_URL . '4chan/' . $boardUri . '/thread/' . $threadNum . '.json');
   $result = json_decode($json, true);
