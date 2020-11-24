@@ -17,6 +17,8 @@ include 'lib/database_drivers/'.$db_driver.'.php';
 $driver_name = $db_driver . '_driver';
 $db = new $driver_name;
 
+$tpp = 10; // threads per page
+
 if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
   exit();
 }
@@ -81,7 +83,38 @@ function fourChanAPI($path) {
 
   // https://a.4cdn.org/po/catalog.json
   if (strpos($path, '/catalog.json') !== false) {
-    echo "board catalog<br>\n";
+    $parts = explode('/', $path);
+    $boardUri = $parts[2];
+    $board = getBoardByUri($boardUri);
+    if (!$board) {
+      sendResponse(array(), 404, 'Board not found');
+    }
+    // pages, threads
+    // get a list of threads
+    $posts_model = getPostsModel($boardUri);
+    $post_files_model = getPostFilesModel($boardUri);
+    $res = $db->find($posts_model, array('criteria'=>array(
+      array('threadid', '=', 0),
+    )));
+    $page = 1;
+    // FIXME: rewrite to be more memory efficient
+    while($row = $db->get_row($res)) {
+      postDBtoAPI($row, $post_files_model);
+      $threads[$page][] = $row;
+      if (count($threads[$page]) === $tpp) {
+        $page++;
+        $threads[$page] = array();
+      }
+    }
+    $pages = $page; if ($pages === 1) $pages = 2;
+    $res = array();
+    for($i = 1; $i < $pages; $i++) {
+      $res[] = array(
+        'page' => $i,
+        'threads' => $threads[$i],
+      );
+    }
+    echo json_encode($res);
   } else
 
   // https://a.4cdn.org/po/threads.json
