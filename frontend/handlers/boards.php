@@ -63,6 +63,7 @@ function getBoardPageHandler($boardUri, $pagenum, $pageData = null) {
     $pages_html .= $tmp;
 
   $boardnav_html = str_replace('{{pages}}', $pages_html, $boardnav_html);
+  $boardnav_html = str_replace('{{uri}}',   $boardUri,   $boardnav_html);
 
   $threads_html = '';
   foreach($pageData as $thread) {
@@ -138,6 +139,39 @@ function getThreadHandler($boardUri, $threadNum) {
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
   $tmpl = str_replace('{{posts}}', $posts_html, $tmpl);
+  wrapContent($tmpl);
+}
+
+function getBoardCatalogHandler($boardUri) {
+  $catalog = getBoardCatalog($boardUri);
+  //print_r($catalog);
+  $templates = loadTemplates('catalog');
+
+  $tmpl = $templates['header'];
+
+  $boardnav_html = $templates['loop0'];
+  $tile_template = $templates['loop1'];
+
+  $boardnav_html = str_replace('{{pages}}', $pages_html, $boardnav_html);
+  $boardnav_html = str_replace('{{uri}}',   $boardUri,   $boardnav_html);
+
+  $tiles_html = '';
+  foreach($catalog as $page) {
+    foreach($page['threads'] as $thread) {
+      $tmp = $tile_template;
+      $tmp = str_replace('{{subject}}', htmlspecialchars($thread['sub']),  $tmp);
+      $tmp = str_replace('{{message}}', htmlspecialchars($thread['com']),  $tmp);
+      $tmp = str_replace('{{name}}',    htmlspecialchars($thread['name']), $tmp);
+      $tmp = str_replace('{{no}}',      $thread['no'],   $tmp);
+      $tmp = str_replace('{{uri}}', $boardUri, $tmp);
+      $tmp = str_replace('{{jstime}}', date('c', $thread['created_at']), $tmp);
+      $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $thread['created_at']), $tmp);
+      $tiles_html .= $tmp;
+    }
+  }
+
+  $tmpl = str_replace('{{tiles}}', $tiles_html, $tmpl);
+  $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
   wrapContent($tmpl);
 }
 
