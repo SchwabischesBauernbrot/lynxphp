@@ -181,7 +181,19 @@ function handleRoute($path) {
       } else {
         $dirs = substr_count($path, '/');
         //echo "dirs[$dirs]<br>\n";
-        if ($dirs === 3) {
+        if ($dirs === 1) {
+          $parts = explode('/', $path);
+          $boardUri = $parts[1];
+          // enforce board URIs be a path
+          if ($path[strlen($path) - 1] !== '/') {
+            // BASE_HREF ends in /
+            // and path will start with /
+            $adjPath = substr($path, 1);
+            //echo "test[", BASE_HREF . $adjPath . '/', "]<br>\n";
+            redirectTo(BASE_HREF . $adjPath . '/');
+            return;
+          }
+        } else if ($dirs === 3) {
           $parts = explode('/', $path);
           $boardUri = $parts[1];
           if ($parts[2] === 'thread') {
@@ -201,11 +213,6 @@ function handleRoute($path) {
             if ($parts[2] === 'catalog') {
               $boardUri = $parts[1];
               return getBoardCatalogHandler($boardUri);
-            }
-            // enforce board URIs be a path
-            if ($path[strlen($path) - 1] !== '/') {
-              redirectTo(BASE_HREF . $path . '/');
-              return;
             }
             return getBoardPageHandler($boardUri, 1, $page1);
           }
