@@ -166,6 +166,32 @@ class mysql_driver extends database_driver_base_class implements database_driver
     return mysqli_insert_id($this->conn);
 
   }
+  public function update($rootModel, $urow, $options) {
+    $tableName = modelToTableName($rootModel);
+    $date = time();
+    $urow['updated_at'] = $date;
+    $sets = array();
+    foreach($urow as $f=>$v) {
+      if (is_array($v)) {
+        $val = $v;
+      } else {
+        $val = $this->make_constant($v);
+      }
+      $sets[] = $f . '=' . $val;
+    }
+    $sql = 'update ' .$tableName . ' set '. join(', ', $sets);
+    if (isset($options['criteria'])) {
+      $sql .= ' where ' . $this->build_where($options['criteria']);
+    }
+    //echo "sql[$sql]<br>\n";
+    $res = mysqli_query($this->conn, $sql);
+    $err = mysqli_error($this->conn);
+    if ($err) {
+      echo "err[$err]<br>\n";
+      return false;
+    }
+    return true;
+  }
   // options
   //   fields = if not set, give all fields, else expect an array
   //   criteria = if set, an array
