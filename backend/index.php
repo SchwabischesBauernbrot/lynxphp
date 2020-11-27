@@ -56,6 +56,14 @@ function boardDBtoAPI(&$row) {
   unset($row['boardid']);
   unset($row['json']);
   // decode user_id
+  /*
+  $res = $db->find($models['user'], array('criteria'=>array(
+    array('userid', '=', $row['userid']),
+  )));
+  $urow = $db->get_row($res)
+  $row['user'] = $urpw['username'];
+  */
+  unset($row['userid']);
 }
 
 function postDBtoAPI(&$row, $post_files_model) {
@@ -86,7 +94,6 @@ function fourChanAPI($path) {
     }
     echo json_encode($boards);
   } else
-
   // https://a.4cdn.org/po/catalog.json
   if (strpos($path, '/catalog.json') !== false) {
     global $tpp;
@@ -175,7 +182,8 @@ function fourChanAPI($path) {
   // https://a.4cdn.org/po/2.json
   if (strpos($path, '.json') !== false) {
     $parts = explode('/', $path);
-    if (count($parts) === 5) {
+    //echo "paths count[", count($parts), "] [", print_r($parts, 1), "]<br>\n";
+    if (count($parts) === 4) {
       $page = str_replace('.json', '', $parts[3]);
       if (is_numeric($page)) {
         global $tpp;
@@ -378,12 +386,12 @@ function lynxChanAPI($path) {
       array('username', '=', $_POST['login']),
     )));
     if (!$db->num_rows($res)) {
-      return sendResponse(array(), 401, 'Incorrect login');
+      return sendResponse(array(), 401, 'Incorrect login - no username');
     }
     $row = $db->get_row($res);
     // password check
     if (!password_verify($_POST['password'], $row['password'])) {
-      return sendResponse(array(), 401, 'Incorrect login');
+      return sendResponse(array(), 401, 'Incorrect login - bad pass');
     }
     // we should create a session token for this user
     $session = md5(uniqid());
@@ -483,17 +491,72 @@ function lynxChanAPI($path) {
     $data = $id;
     processFiles($boardUri, $_POST['files'], $threadid, $id);
     sendResponse($data);
+  } else
+  if (strpos($path, '/account') !== false) {
+    $user_id = loggedIn();
+    if (!$user_id) {
+      return;
+    }
+    $userRes = $db->findById($models['user'], $user_id);
+
+    $res = $db->find($models['board'], array('criteria'=>array(
+      array('owner_id', '=', $user_id),
+    )));
+    $ownedBoards = array();
+    while($row = $db->get_row($res)) {
+      boardDBtoAPI($row);
+      $ownedBoards[] = $row;
+    }
+    echo json_encode(array(
+      'noCaptchaBan' => false,
+      'login' => $userRes['username'],
+      'email' => $userRes['email'],
+      'globalRole' => 99,
+      //'disabledLatestPostings'
+      //'volunteeredBoards'
+      'boardCreationAllowed' => true,
+      'ownedBoards' => $ownedBoards,
+      //'settings'
+      'reportFilter' => array(), // category filters for e-mail notifications
+    ));
   } else {
     sendResponse(array(), 404, 'Unknown route');
+  }
+}
+
+function optAPI($path) {
+  // is session still valid
+  if (strpos($path, '/session') !== false) {
+    $user_id = loggedIn();
+    if (!$user_id) {
+      return;
+    }
+    sendResponse(array('session' => 'ok'));
+  } else
+  if (strpos($path, '/myBoards') !== false) {
+    $user_id = loggedIn();
+    if (!$user_id) {
+      return;
+    }
+    $res = $db->find($models['board']);
+    $boards = array();
+    while($row = $db->get_row($res)) {
+      boardDBtoAPI($row);
+      $boards[] = $row;
+    }
+    echo json_encode($boards);
   }
 }
 
 $path = empty($_SERVER['PATH_INFO']) ? '' : $_SERVER['PATH_INFO'];
 if (strpos($path, '/4chan/') !== false) {
   fourChanAPI($path);
-}
+} else
 if (strpos($path, '/lynx/') !== false) {
   lynxChanAPI($path);
+} else
+if (strpos($path, '/opt/') !== false) {
+  optAPI($path);
 }
 
 ?>
