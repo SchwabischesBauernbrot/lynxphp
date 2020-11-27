@@ -2,12 +2,16 @@
 
 // REST API
 
+// read backend config
+include 'config.php';
+
 // if OPTIONS do CORS
 
 // message queue
 
-// read config
-include 'config.php';
+include '../common/router.php';
+include '../common/post_vars.php';
+$router = new Router;
 
 // connect to db
 include 'lib/lib.model.php';
@@ -86,6 +90,46 @@ function postDBtoAPI(&$row, $post_files_model) {
   // decode user_id
 }
 
+function boardPage($boardUri, $page = 1) {
+  global $db;
+  global $tpp;
+  $lastXreplies = 10;
+  // get threads for this page
+  $posts_model = getPostsModel($boardUri);
+  if ($posts_model === false) {
+    // this board does not exist
+    sendResponse(array(), 404, 'Board not found');
+    return;
+  }
+  $post_files_model = getPostFilesModel($boardUri);
+  $limitPage = $page - 1;
+  $res = $db->find($posts_model, array('criteria'=>array(
+      array('threadid', '=', 0),
+    ),
+    'order'=>'updated_at desc',
+    'limit' => $tpp . ($limitPage ? ',' . $limitPage : '')
+  ));
+  $threads = array();
+  while($row = $db->get_row($res)) {
+    $posts = array();
+    // add thread
+    postDBtoAPI($row, $post_files_model);
+    $posts[] = $row;
+    // add remaining posts
+    $postRes = $db->find($posts_model, array('criteria'=>array(
+      array('threadid', '=', $row['no']),
+    ), 'order'=>'created_at desc', 'limit' => $lastXreplies));
+    $resort = array();
+    while($prow = $db->get_row($postRes)) {
+      postDBtoAPI($prow, $post_files_model);
+      $resort[] = $prow;
+    }
+    $posts = array_merge($posts, array_reverse($resort));
+    $threads[] = array('posts' => $posts);
+  }
+  return $threads;
+}
+
 function fourChanAPI($path) {
   global $db, $models;
   //https://a.4cdn.org/boards.json
@@ -111,7 +155,7 @@ function fourChanAPI($path) {
     // get a list of threads
     $posts_model = getPostsModel($boardUri);
     $post_files_model = getPostFilesModel($boardUri);
-    $res = $db->find($posts_model, array('criteria'=>array(
+    $res = $db->find($posts_model, array('criteria' => array(
       array('threadid', '=', 0),
     ), 'order'=>'updated_at desc'));
     $page = 1;
@@ -124,9 +168,9 @@ function fourChanAPI($path) {
         $threads[$page] = array();
       }
     }
-    $pages = $page; if ($pages === 1) $pages = 2;
+    $pages = $page;
     $res = array();
-    for($i = 1; $i < $pages; $i++) {
+    for($i = 1; $i <= $pages; $i++) {
       $res[] = array(
         'page' => $i,
         'threads' => $threads[$i],
@@ -190,42 +234,8 @@ function fourChanAPI($path) {
     if (count($parts) === 4) {
       $page = str_replace('.json', '', $parts[3]);
       if (is_numeric($page)) {
-        global $tpp;
-        $lastXreplies = 10;
         $boardUri = $parts[2];
-        // get threads for this page
-        $posts_model = getPostsModel($boardUri);
-        if ($posts_model === false) {
-          // this board does not exist
-          sendResponse(array(), 404, 'Board not found');
-          return;
-        }
-        $post_files_model = getPostFilesModel($boardUri);
-        $limitPage = $page - 1;
-        $res = $db->find($posts_model, array('criteria'=>array(
-            array('threadid', '=', 0),
-          ),
-          'order'=>'updated_at desc',
-          'limit' => $tpp . ($limitPage ? ',' . $limitPage : '')
-        ));
-        $threads = array();
-        while($row = $db->get_row($res)) {
-          $posts = array();
-          // add thread
-          postDBtoAPI($row, $post_files_model);
-          $posts[] = $row;
-          // add remaining posts
-          $postRes = $db->find($posts_model, array('criteria'=>array(
-            array('threadid', '=', $row['no']),
-          ), 'order'=>'created_at desc', 'limit' => $lastXreplies));
-          $resort = array();
-          while($prow = $db->get_row($postRes)) {
-            postDBtoAPI($prow, $post_files_model);
-            $resort[] = $prow;
-          }
-          $posts = array_merge($posts, array_reverse($resort));
-          $threads[] = array('posts' => $posts);
-        }
+        $threads = boardPage($boardUri, $page);
         echo json_encode($threads);
         return;
       }
@@ -254,15 +264,6 @@ $response_template = array(
   ),
 );
 
-function getip() {
-  $ip = empty($_SERVER['REMOTE_ADDR'])?'':$_SERVER['REMOTE_ADDR'];
-  // cloudflare support
-  if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-  }
-  return $ip;
-}
-
 function sendResponse($data, $code = 200, $err = '') {
   global $response_template;
   $resp = $response_template;
@@ -272,16 +273,6 @@ function sendResponse($data, $code = 200, $err = '') {
     $resp['meta']['err'] = $err;
   }
   echo json_encode($resp);
-  return true;
-}
-
-function hasPostVars($fields) {
-  foreach($fields as $field) {
-    if (empty($_POST[$field])) {
-      sendResponse(array(), 400, 'Field "' . $field . '" required');
-      return false;
-    }
-  }
   return true;
 }
 
@@ -314,9 +305,6 @@ function loggedIn() {
     return;
   }
   return $userid;
-}
-function getOptionalPostField($field) {
-  return empty($_POST[$field])    ? '' : $_POST[$field];
 }
 
 function processFiles($boardUri, $files_json, $threadid, $postid) {
@@ -549,6 +537,7 @@ function lynxChanAPI($path) {
 }
 
 function optAPI($path) {
+  global $db, $models;
   // is session still valid
   if (strpos($path, '/session') !== false) {
     $user_id = loggedIn();
@@ -558,7 +547,37 @@ function optAPI($path) {
     sendResponse(array('session' => 'ok'));
   } else
   if (strpos($path, '/boards/') !== false) {
-    //
+    global $tpp;
+    $parts = explode('/', $path);
+    $boardUri = $parts[3];
+    $pageNum = $parts[4];
+
+    $res = $db->find($models['board'], array('criteria'=>array(
+      array('uri', '=', $boardUri),
+    )));
+    if (!$db->num_rows($res)) {
+      return sendResponse(array(), 404, 'Board does not exist');
+    }
+
+    $posts_model = getPostsModel($boardUri);
+    if ($posts_model === false) {
+      // this board does not exist
+      sendResponse(array(), 404, 'Board not found');
+      return;
+    }
+    $threadCount = $db->count($posts_model, array('criteria'=>array(
+        array('threadid', '=', 0),
+      ),
+      'order'=>'updated_at desc',
+    ));
+
+    $threads = boardPage($boardUri, $pageNum);
+    echo json_encode(array(
+      'page1' => $threads,
+      'threadsPerPage'   => $tpp,
+      'threadCount' => $threadCount,
+      'pageCount' => ceil($threadCount/$tpp),
+    ));
   } else
   if (strpos($path, '/myBoards') !== false) {
     $user_id = loggedIn();
@@ -575,7 +594,7 @@ function optAPI($path) {
   }
 }
 
-$path = empty($_SERVER['PATH_INFO']) ? '' : $_SERVER['PATH_INFO'];
+$path = getServerField('PATH_INFO');
 if (strpos($path, '/4chan/') !== false) {
   fourChanAPI($path);
 } else
