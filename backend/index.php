@@ -29,6 +29,7 @@ include 'lib/lib.board.php';
 include 'lib/lib.modules.php';
 enableModulesType('models');
 
+include 'lib/modules.php';
 // pipelines
 // boardDB to API
 // thread to API
@@ -39,6 +40,11 @@ enableModulesType('models');
 // upload file
 // get ip
 // post var processing
+$pipelines['boardData'] = new pipeline_registry;
+$pipelines['postData'] = new pipeline_registry;
+$pipelines['userData'] = new pipeline_registry;
+$pipelines['post'] = new pipeline_registry;
+$pipelines['file'] = new pipeline_registry;
 
 // transformations (x => y)
 // access list (remove this, add this)
@@ -83,6 +89,7 @@ function fourChanAPI($path) {
 
   // https://a.4cdn.org/po/catalog.json
   if (strpos($path, '/catalog.json') !== false) {
+    global $tpp;
     $parts = explode('/', $path);
     $boardUri = $parts[2];
     $board = getBoardByUri($boardUri);
@@ -168,12 +175,18 @@ function fourChanAPI($path) {
   // https://a.4cdn.org/po/2.json
   if (strpos($path, '.json') !== false) {
     $parts = explode('/', $path);
-    if (isset($parts[3])) {
+    if (count($parts) === 5) {
       $page = str_replace('.json', '', $parts[3]);
       if (is_numeric($page)) {
+        global $tpp;
         $boardUri = $parts[2];
         // get threads for this page
         $posts_model = getPostsModel($boardUri);
+        if ($posts_model === false) {
+          // this board does not exist
+          sendResponse(array(), 404, 'Board not found');
+          return;
+        }
         $post_files_model = getPostFilesModel($boardUri);
         $res = $db->find($posts_model, array('criteria'=>array(
           array('threadid', '=', 0),
@@ -187,7 +200,7 @@ function fourChanAPI($path) {
           // add remaining posts
           $postRes = $db->find($posts_model, array('criteria'=>array(
             array('threadid', '=', $row['no']),
-          ), 'order'=>'created_at desc', 'limit' => 10));
+          ), 'order'=>'created_at desc', 'limit' => $tpp . ',' . $page));
           $resort = array();
           while($prow = $db->get_row($postRes)) {
             postDBtoAPI($prow, $post_files_model);
@@ -421,7 +434,8 @@ function lynxChanAPI($path) {
     sendResponse($data);
   } else
   if (strpos($path, '/newThread') !== false) {
-    if (!hasPostVars(array('boardUri'))) {
+    // require image with each thread
+    if (!hasPostVars(array('boardUri', 'files'))) {
       return;
     }
     $user_id = (int)getUserID();
