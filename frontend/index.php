@@ -24,6 +24,9 @@ include 'config.php';
 
 // serve site
 
+include '../common/router.php';
+$router = new Router;
+
 // frontend libraries
 include 'lib/lib.cache.php';
 include 'lib/lib.http.php';
@@ -64,164 +67,146 @@ function hasPostVars($fields) {
   return true;
 }
 
-function handleRoute($path) {
-  //print_r($_SERVER);
-  switch($_SERVER['REQUEST_METHOD']) {
-    case 'POST':
-      echo "frontend POST $path<br>\n";
-      if ($path === '/login.php') {
-        postLogin();
-      } else
-      if ($path === '/signup.php') {
-        postSignup();
-      } else
-      if ($path === '/create_board.php') {
-        postCreateBoard();
-      } else {
-        // get board data
-        $parts = explode('/', $path);
-        $boardUri = $parts[1];
-        //echo "boardUri[$boardUri]<br>\n";
-        $page1 = getBoardPage($boardUri, 1);
-        if (is_array($page1)) {
-          // valid board name
-          // validate results
-          $files = array();
-          if (isset($_FILES)) {
-            if (is_array($_FILES['file']['tmp_name'])) {
-              echo "detected multiple files<br>\n";
-              foreach($_FILES['file']['tmp_name'] as $i=>$path) {
-                $res = sendFile($path, $_FILES['file']['type'][$i], $_FILES['file']['name'][$i]);
-                // check for error?
-                $files[] = $res;
-              }
-            } else {
-              $res = sendFile($_FILES['file']['tmp_name'], $_FILES['file']['type'], $_FILES['file']['name']);
-              // check for error?
-              $files[] = $res;
-            }
-          }
-          //print_r($files);
-          // make post...
-          if (empty($_POST['thread'])) {
-            // new thead
-            //echo "boardUri[$boardUri]<br>\n";
-            $json = curlHelper(BACKEND_BASE_URL . 'lynx/newThread', array(
-              // noFlag
-              'email'    => $_POST['email'],
-              'message'  => $_POST['message'],
-              'subject'  => $_POST['subject'],
-              'boardUri' => $boardUri,
-              'password' => $_POST['postpassword'],
-              // captcha
-              'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
-              'files'    => json_encode($files),
-              // flag
-            ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => $_COOKIE['session']));
-            echo "json[$json]<Br>\n";
-            $result = json_decode($json, true);
-            if (is_numeric($result['data'])) {
-              // success
-              redirectTo(BASE_HREF . $boardUri . '/');
-            } else {
-              wrapContent('Post Error: ' . print_r($result, 1));
-            }
-          } else {
-            // reply
-            //echo "boardUri[$boardUri]<br>\n";
-            $json = curlHelper(BACKEND_BASE_URL . 'lynx/replyThread', array(
-              // noFlag
-              'threadId' => $_POST['thread'],
-              'email'    => $_POST['email'],
-              'message'  => $_POST['message'],
-              'subject'  => $_POST['subject'],
-              'boardUri' => $boardUri,
-              'password' => $_POST['postpassword'],
-              // captcha
-              'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
-              // flag
-              'files'    => json_encode($files),
-            ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => $_COOKIE['session']));
-            echo "json[$json]<Br>\n";
-            $result = json_decode($json, true);
-            if (is_numeric($result['data'])) {
-              // success
-              redirectTo(BASE_HREF . $boardUri . '/thread/' . $_POST['thread']);
-            } else {
-              wrapContent('Post Error: ' . print_r($result, 1));
-            }
-          }
-          return;
-        }
-        wrapContent('404');
+
+$router->get('', function() {
+  homepage();
+});
+$router->get('/boards.php', function() {
+  getBoardsHandler();
+});
+$router->get('/overboard.php', function() {
+  getOverboardHandler();
+});
+
+$router->get('/:uri/', function($params) {
+  $boardUri = $params['uri'];
+  getBoardPageHandler($boardUri, 1);
+});
+$router->get('/:uri/catalog', function($params) {
+  $boardUri = $params['uri'];
+  getBoardCatalogHandler($boardUri);
+});
+$router->get('/:uri/settings', function($params) {
+  $boardUri = $params['uri'];
+  getBoardSettingsHandler($boardUri);
+});
+$router->get('/:uri/banners', function($params) {
+  $boardUri = $params['uri'];
+  getBoardBannerHandler($boardUri);
+});
+
+$router->get('/:uri/thread/:num', function($params) {
+  $boardUri = $params['uri'];
+  $threadNum = str_replace('.html', '', $params['num']);
+  getThreadHandler($boardUri, $threadNum);
+});
+
+
+$router->post('/:uri/post', function($params) {
+  $boardUri = $params['uri'];
+  // valid board name
+  // validate results
+  $files = array();
+  if (isset($_FILES)) {
+    if (is_array($_FILES['file']['tmp_name'])) {
+      echo "detected multiple files<br>\n";
+      foreach($_FILES['file']['tmp_name'] as $i=>$path) {
+        $res = sendFile($path, $_FILES['file']['type'][$i], $_FILES['file']['name'][$i]);
+        // check for error?
+        $files[] = $res;
       }
-    break;
-   default:
-    case 'GET':
-      if ($path === '') {
-        homepage();
-      } else
-      if ($path === '/login.php') {
-        getLogin();
-      } else
-      if ($path === '/signup.php') {
-        getSignup();
-      } else
-      if ($path === '/control_panel.php') {
-        getControlPanel();
-      } else
-      if ($path === '/create_board.php') {
-        getCreateBoard();
-      } else
-      if ($path === '/boards.php') {
-        getBoardsHandler();
-      } else
-      if ($path === '/overboard.php') {
-        getOverboardHandler();
-      } else {
-        $dirs = substr_count($path, '/');
-        //echo "dirs[$dirs]<br>\n";
-        if ($dirs === 1) {
-          $parts = explode('/', $path);
-          $boardUri = $parts[1];
-          // enforce board URIs be a path
-          if ($path[strlen($path) - 1] !== '/') {
-            // BASE_HREF ends in /
-            // and path will start with /
-            $adjPath = substr($path, 1);
-            //echo "test[", BASE_HREF . $adjPath . '/', "]<br>\n";
-            redirectTo(BASE_HREF . $adjPath . '/');
-            return;
-          }
-        } else if ($dirs === 3) {
-          $parts = explode('/', $path);
-          $boardUri = $parts[1];
-          if ($parts[2] === 'thread') {
-            $threadNum = str_replace('.html', '', $parts[3]);
-            if (is_numeric($threadNum)) {
-              return getThreadHandler($boardUri, $threadNum);
-            }
-          }
-        } else
-        if ($dirs === 2) {
-          // get board data
-          $boardUri = trim($path, '/');
-          // board existence check...
-          $page1 = getBoardPage($boardUri, 1);
-          if (is_array($page1)) {
-            $parts = explode('/', $path);
-            if ($parts[2] === 'catalog') {
-              $boardUri = $parts[1];
-              return getBoardCatalogHandler($boardUri);
-            }
-            return getBoardPageHandler($boardUri, 1, $page1);
-          }
-        }
-        echo "frontend GET $path<br>\n";
-      }
-    break;
+    } else {
+      $res = sendFile($_FILES['file']['tmp_name'], $_FILES['file']['type'], $_FILES['file']['name']);
+      // check for error?
+      $files[] = $res;
+    }
   }
-}
-handleRoute(empty($_SERVER['PATH_INFO']) ? '' : $_SERVER['PATH_INFO']);
+  //print_r($files);
+  // make post...
+  if (empty($_POST['thread'])) {
+    // new thead
+    //echo "boardUri[$boardUri]<br>\n";
+    $json = curlHelper(BACKEND_BASE_URL . 'lynx/newThread', array(
+      // noFlag
+      'email'    => $_POST['email'],
+      'message'  => $_POST['message'],
+      'subject'  => $_POST['subject'],
+      'boardUri' => $boardUri,
+      'password' => $_POST['postpassword'],
+      // captcha
+      'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
+      'files'    => json_encode($files),
+      // flag
+    ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => $_COOKIE['session']));
+    echo "json[$json]<Br>\n";
+    $result = json_decode($json, true);
+    if (is_numeric($result['data'])) {
+      // success
+      redirectTo(BASE_HREF . $boardUri . '/');
+    } else {
+      wrapContent('Post Error: ' . print_r($result, 1));
+    }
+  } else {
+    // reply
+    //echo "boardUri[$boardUri]<br>\n";
+    $json = curlHelper(BACKEND_BASE_URL . 'lynx/replyThread', array(
+      // noFlag
+      'threadId' => $_POST['thread'],
+      'email'    => $_POST['email'],
+      'message'  => $_POST['message'],
+      'subject'  => $_POST['subject'],
+      'boardUri' => $boardUri,
+      'password' => $_POST['postpassword'],
+      // captcha
+      'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
+      // flag
+      'files'    => json_encode($files),
+    ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => $_COOKIE['session']));
+    echo "json[$json]<Br>\n";
+    $result = json_decode($json, true);
+    if (is_numeric($result['data'])) {
+      // success
+      redirectTo(BASE_HREF . $boardUri . '/thread/' . $_POST['thread']);
+    } else {
+      wrapContent('Post Error: ' . print_r($result, 1));
+    }
+  }
+});
+
+
+
+$router->get('/signup.php', function() {
+  getSignup();
+});
+$router->post('/signup.php', function() {
+  postSignup();
+});
+$router->get('/login.php', function() {
+  getLogin();
+});
+$router->post('/login.php', function() {
+  postLogin();
+});
+$router->get('/control_panel.php', function() {
+  getControlPanel();
+});
+$router->get('/logout.php', function() {
+  getLogout();
+});
+$router->get('/create_board.php', function() {
+  getCreateBoard();
+});
+$router->post('/create_board.php', function() {
+  postCreateBoard();
+});
+
+// needs to go last...
+$router->get('/:uri', function($params) {
+  $boardUri = $params['uri'];
+  // maybe only redir if the board exists...
+  redirectTo(BASE_HREF . $boardUri . '/');
+});
+
+$router->exec(empty($_SERVER['REQUEST_METHOD']) ? 'GET' : $_SERVER['REQUEST_METHOD'], empty($_SERVER['PATH_INFO']) ? '' : $_SERVER['PATH_INFO']);
 
 ?>
