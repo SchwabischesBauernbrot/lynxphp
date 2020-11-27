@@ -7,8 +7,7 @@ function getLoginData() {
   return $boards;
 }
 
-function getLogin() {
-  $boards = getLoginData();
+function getLoginForm() {
   $secure_login_link = 'login.php';
   $secure_signup_link = 'signup.php';
   $content = <<< EOB
@@ -23,24 +22,26 @@ function getLogin() {
 </form>
 <a href="$secure_signup_link">create account</a>
 EOB;
-  wrapContent($content);
+  return $content;
+}
+
+function getLogin() {
+  $boards  = getLoginData();
+  wrapContent(getLoginForm());
+}
+
+function getLogout() {
+  setcookie('session', '', 1, '/');
+  wrapContent('You are now logged out');
 }
 
 function postLogin() {
-  $user  = $_POST['username'];
-  $pass  = $_POST['password'];
-  // login, password, email
-  $data = curlHelper(BACKEND_BASE_URL . 'lynx/login', array(
-    'login'    => $user,
-    'password' => $pass,
-  ), array('HTTP_X_FORWARDED_FOR' => getip()));
-  //echo "data[$data]<br>\n";
-  $res = json_decode($data, true);
-  if ($res['data']['session']) {
-    setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
+  $login = backendLogin();
+  if ($login === true) {
     redirectTo('control_panel.php');
   } else {
-    echo "Error<br>\n";
+    $tmpl = "Error: Log In incorrect or other error<br>\n";
+    wrapContent($tmpl . getLoginForm());
   }
 }
 
