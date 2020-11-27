@@ -422,9 +422,17 @@ function lynxChanAPI($path) {
     if (!hasPostVars(array('boardUri', 'boardName', 'boardDescription'))) {
       return;
     }
+    $boardUri = strtolower($_POST['boardUri']);
+    $res = $db->find($models['board'], array('criteria'=>array(
+      array('uri', '=', $boardUri),
+    )));
+    if ($db->num_rows($res)) {
+      return sendResponse(array(), 403, 'Board already exists');
+    }
+
     // FIXME check unique fields...
     $db->insert($models['board'], array(array(
-      'uri'         => $_POST['boardUri'],
+      'uri'         => $boardUri,
       'title'       => $_POST['boardName'],
       'description' => $_POST['boardDescription'],
       'owner_id'    => $user_id,
