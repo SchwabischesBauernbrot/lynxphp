@@ -1,14 +1,24 @@
 <?php
 
 function getControlPanel() {
-  $boards = getBoards();
-  print_r($boards);
-  $tmpl = file_get_contents('templates/accounts.tmpl');
-  $boards_html = '';
-  foreach($boards as $board) {
-    $boards_html .= '<a href="' . $board['uri'] . '">' . $board['uri'] . '</a><br>' . "\n";
+  $check = checkSession();
+  if (isset($check['meta']) && $check['meta']['code'] === 401) {
+    redirectTo(BASE_HREF . 'login.php');
+    return;
   }
-  $tmpl .= $boards_html;
+  $account = backendLynxAccount();
+  //print_r($account);
+  $templates = loadTemplates('account');
+  $tmpl = $templates['header'];
+  $board_html = $templates['loop0'];
+
+  $boards_html = '';
+  foreach($account['ownedBoards'] as $board) {
+    $tmp = $board_html;
+    $tmp = str_replace('{{uri}}', $board['uri'], $tmp);
+    $boards_html .= $tmp;
+  }
+  $tmpl = str_replace('{{ownedBoards}}', $boards_html, $tmpl);
   wrapContent($tmpl);
 }
 
@@ -30,12 +40,7 @@ EOB;
 }
 
 function postCreateBoard() {
-  $data = curlHelper(BACKEND_BASE_URL . 'lynx/createBoard', array(
-    'boardUri'         => $_POST['uri'],
-    'boardName'        => $_POST['title'],
-    'boardDescription' => $_POST['description'],
-    // captcha?
-  ), array('sid' => $_COOKIE['session']));
+  $data = backendCreateBoard();
   echo $data;
 }
 
