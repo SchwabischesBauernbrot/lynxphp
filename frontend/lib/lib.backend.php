@@ -16,6 +16,14 @@ function getBoard($boardUri) {
   return $boardData;
 }
 
+function backendGetBoardThreadListing($boardUri, $pageNum = 1) {
+  $json = curlHelper(BACKEND_BASE_URL . 'opt/boards/' . $boardUri . '/' . $pageNum);
+  //echo "getBoardThreadListing[$json]<br>\n";
+  $threadListing = json_decode($json, true);
+  //print_r($threadListing);
+  return $threadListing;
+}
+
 function getBoardPage($boardUri, $page = 1) {
   $json  = curlHelper(BACKEND_BASE_URL . '4chan/' . $boardUri . '/' . $page . '.json');
   //echo "getBoardPageJson[$json]<br>\n";
