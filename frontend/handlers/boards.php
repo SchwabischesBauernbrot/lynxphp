@@ -21,9 +21,9 @@ function getBoardsHandler() {
 // move into a module...
 function getOverboardHandler() {
   $templates = loadTemplates('thread_listing');
+  $boards_html = '';
   /*
   $boards = getBoards();
-  $boards_html = '';
   foreach($boards as $c=>$b) {
     $tmp = $templates['loop0'];
     $boards_html .= $tmp . "\n";
@@ -32,7 +32,7 @@ function getOverboardHandler() {
   $content = $templates['header'];
   $content = str_replace('{{uri}}', 'overboard', $content);
   $content = str_replace('{{title}}', 'Overboard Index', $content);
-  $content = str_replace('{{description}}', $b['description'], $content);
+  $content = str_replace('{{description}}', 'content from all of our boards', $content);
   $content = str_replace('{{boards}}', $boards_html, $content);
 
   wrapContent($content);
@@ -41,6 +41,14 @@ function getOverboardHandler() {
 function getBoardPageHandler($boardUri, $pagenum, $pageData = null) {
   if ($pageData === null) {
     $pageData = getBoardPage($boardUri, $pagenum);
+  }
+  if (isset($pageData['meta']) && $pageData['meta']['code'] !== 200) {
+    $tmpl = 'Error';
+    if ($pageData['meta']['code'] === 404) {
+      $tmpl = 'Error: Board not found';
+    }
+    wrapContent($tmpl);
+    return;
   }
   $templates = loadTemplates('thread_listing');
   //echo join(',', array_keys($templates));
@@ -67,6 +75,7 @@ function getBoardPageHandler($boardUri, $pagenum, $pageData = null) {
 
   $threads_html = '';
   foreach($pageData as $thread) {
+    if (!isset($thread['posts'])) continue;
     $posts = $thread['posts'];
     //echo "count[", count($posts), "]<br>\n";
     $threads_html .= $threadhdr_template;
@@ -149,10 +158,24 @@ function getBoardCatalogHandler($boardUri) {
 
   $tmpl = $templates['header'];
 
-  $boardnav_html = $templates['loop0'];
-  $tile_template = $templates['loop1'];
+  $boardnav_html  = $templates['loop0'];
+  $tileimage_html = $templates['loop1'];
+  $tile_template  = $templates['loop2'];
+
+  /*
+  // loop 0 goes into this html...
+  $pages_html = '';
+
+  // FIXME: get page count...
+    $tmp = $page_template;
+    $tmp = str_replace('{{uri}}', $boardUri, $tmp);
+    // bold
+    $tmp = str_replace('{{class}}', $pagenum == 1 ? 'bold' : '', $tmp);
+    $tmp = str_replace('{{pagenum}}', 1, $tmp);
+    $pages_html .= $tmp;
 
   $boardnav_html = str_replace('{{pages}}', $pages_html, $boardnav_html);
+  */
   $boardnav_html = str_replace('{{uri}}',   $boardUri,   $boardnav_html);
 
   $tiles_html = '';
@@ -162,15 +185,25 @@ function getBoardCatalogHandler($boardUri) {
       $tmp = str_replace('{{subject}}', htmlspecialchars($thread['sub']),  $tmp);
       $tmp = str_replace('{{message}}', htmlspecialchars($thread['com']),  $tmp);
       $tmp = str_replace('{{name}}',    htmlspecialchars($thread['name']), $tmp);
-      $tmp = str_replace('{{no}}',      $thread['no'],   $tmp);
+      $tmp = str_replace('{{no}}',      $thread['no'], $tmp);
       $tmp = str_replace('{{uri}}', $boardUri, $tmp);
       $tmp = str_replace('{{jstime}}', date('c', $thread['created_at']), $tmp);
       $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $thread['created_at']), $tmp);
+      // FIXME: enable image
+      $tile_image = '';
+      if (0 && count($thread['files'])) {
+        $tile_image = $tile_template;
+        $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
+        $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
+        $tile_image = str_replace('{{file}}', $thread['files'][0]['path'], $tile_image);
+      }
+      $tmp = str_replace('{{tile_image}}', $tile_image, $tmp);
       $tiles_html .= $tmp;
     }
   }
 
-  $tmpl = str_replace('{{tiles}}', $tiles_html, $tmpl);
+  $tmpl = str_replace('{{uri}}',      $boardUri,      $tmpl);
+  $tmpl = str_replace('{{tiles}}',    $tiles_html,    $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
   wrapContent($tmpl);
 }
