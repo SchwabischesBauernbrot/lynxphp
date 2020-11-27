@@ -208,4 +208,9 @@ function getBoardCatalogHandler($boardUri) {
   wrapContent($tmpl);
 }
 
+function getBoardSettingsHandler($boardUri) {
+  $templates = loadTemplates('board_settings');
+  wrapContent($templates['header']);
+}
+
 ?>
