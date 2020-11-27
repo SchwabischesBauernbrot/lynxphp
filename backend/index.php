@@ -187,6 +187,7 @@ function fourChanAPI($path) {
       $page = str_replace('.json', '', $parts[3]);
       if (is_numeric($page)) {
         global $tpp;
+        $lastXreplies = 10;
         $boardUri = $parts[2];
         // get threads for this page
         $posts_model = getPostsModel($boardUri);
@@ -196,9 +197,10 @@ function fourChanAPI($path) {
           return;
         }
         $post_files_model = getPostFilesModel($boardUri);
+        $limitPage = $page - 1;
         $res = $db->find($posts_model, array('criteria'=>array(
           array('threadid', '=', 0),
-        )));
+        ), 'limit' => $tpp . ($limitPage ? ',' . $limitPage : '')));
         $threads = array();
         while($row = $db->get_row($res)) {
           $posts = array();
@@ -208,7 +210,7 @@ function fourChanAPI($path) {
           // add remaining posts
           $postRes = $db->find($posts_model, array('criteria'=>array(
             array('threadid', '=', $row['no']),
-          ), 'order'=>'created_at desc', 'limit' => $tpp . ',' . $page));
+          ), 'order'=>'created_at desc', 'limit' => $lastXreplies));
           $resort = array();
           while($prow = $db->get_row($postRes)) {
             postDBtoAPI($prow, $post_files_model);
