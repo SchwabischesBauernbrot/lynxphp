@@ -38,7 +38,6 @@ $user_session_model = array(
   )
 );
 
-
 $board_model = array(
   'name'   => 'board',
   'fields' => array(
@@ -51,8 +50,6 @@ $board_model = array(
     // super basic settings?
   )
 );
-
-// module:board flags
 
 $public_post_model = array(
   'name' => 'public_post',
@@ -157,8 +154,10 @@ $db->autoupdate($user_model);
 $db->autoupdate($user_session_model);
 $db->autoupdate($board_model);
 
-// for each board set up a posts_model table
-
+// for each board set up:
+// a posts_model table
+// module:board banners
+// module:board flags
 // logs
 // calculated
 // temporary
