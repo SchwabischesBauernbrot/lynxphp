@@ -46,6 +46,10 @@ $pipelines['userData'] = new pipeline_registry;
 $pipelines['post'] = new pipeline_registry;
 $pipelines['file'] = new pipeline_registry;
 
+$pipelines['api_4chan'] = new pipeline_registry;
+$pipelines['api_lynx'] = new pipeline_registry;
+$pipelines['api_opt'] = new pipeline_registry;
+
 // transformations (x => y)
 // access list (remove this, add this)
 // change input, output
@@ -109,7 +113,7 @@ function fourChanAPI($path) {
     $post_files_model = getPostFilesModel($boardUri);
     $res = $db->find($posts_model, array('criteria'=>array(
       array('threadid', '=', 0),
-    )));
+    ), 'order'=>'updated_at desc'));
     $page = 1;
     // FIXME: rewrite to be more memory efficient
     while($row = $db->get_row($res)) {
@@ -199,8 +203,11 @@ function fourChanAPI($path) {
         $post_files_model = getPostFilesModel($boardUri);
         $limitPage = $page - 1;
         $res = $db->find($posts_model, array('criteria'=>array(
-          array('threadid', '=', 0),
-        ), 'limit' => $tpp . ($limitPage ? ',' . $limitPage : '')));
+            array('threadid', '=', 0),
+          ),
+          'order'=>'updated_at desc',
+          'limit' => $tpp . ($limitPage ? ',' . $limitPage : '')
+        ));
         $threads = array();
         while($row = $db->get_row($res)) {
           $posts = array();
@@ -499,6 +506,11 @@ function lynxChanAPI($path) {
       'country' => '',
     )));
     $data = $id;
+    // bump thread
+    $urow = array('updated_at' => '');
+    $db->update($posts_model, $urow, array('criteria'=>array(
+      array('postid', '=', $threadid),
+    )));
     processFiles($boardUri, $_POST['files'], $threadid, $id);
     sendResponse($data);
   } else
@@ -530,6 +542,8 @@ function lynxChanAPI($path) {
       'reportFilter' => array(), // category filters for e-mail notifications
     ));
   } else {
+    global $pipelines;
+    $pipelines['api_lynx']->execute($path);
     sendResponse(array(), 404, 'Unknown route');
   }
 }
@@ -542,6 +556,9 @@ function optAPI($path) {
       return;
     }
     sendResponse(array('session' => 'ok'));
+  } else
+  if (strpos($path, '/boards/') !== false) {
+    //
   } else
   if (strpos($path, '/myBoards') !== false) {
     $user_id = loggedIn();
