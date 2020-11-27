@@ -51,12 +51,12 @@ class database_driver_base_class {
     return join(' AND ', $sets);
   }
   public function findById($rootModel, $id, $options = false) {
-    $tableName = nameToTable($rootModel);
+    $tableName = modelToTableName($rootModel);
     $id = (int)$id;
     $fields = '*';
     $options = array(
       'criteria' => array(
-        array($rootModel.'id' , '=', $id)
+        array(modelToId($rootModel) , '=', $id)
       )
     );
     return $this->find($rootModel, $options);
