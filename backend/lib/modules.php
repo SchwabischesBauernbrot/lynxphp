@@ -12,6 +12,7 @@ class module_registry {
   function __construct() {
     $this->name  = get_class($this);
     $this->registry = array();
+    $this->compiled = false;
   }
 
   /** make sure it can't be cloned */
@@ -209,9 +210,16 @@ class module_registry {
 
   function compile() {
     $this->resolve_all();
+    $this->compile_modules = array();
   }
 
-  function exec() {
+  function execute(&$param) {
+    if (!$this->compiled) {
+      $this->compile();
+    }
+    foreach($this->compile_modules as $mod) {
+      $mod->exec($param);
+    }
   }
 }
 
@@ -229,6 +237,13 @@ class orderable_module {
     $this->dependencies = array();
     $this->preempt      = array();
   }
+  function attach($pipeline, $code) {
+    // deps and preempt are set
+    $this->code = $code;
+  }
+  function exec(&$param) {
+    $this->code($param);
+  }
 }
 
 // public base modules that modules can extend
@@ -237,14 +252,20 @@ class orderable_module {
 // page generation
 class pipeline_module extends orderable_module {
   function __construct($name) {
-    pipeline_registry::singleton()->register($name, $this);
+    $this->name = $name;
+  }
+  function attach($pipeline, $code) {
+    // deps and preempt are set
+    global $pipelines;
+    $pipelines[$pipeline]->register($this->name, $this);
+    $this->code = $code;
   }
 }
 
 // Site/BO/Users options
 class ui_module extends orderable_module {
   function __construct($name) {
-    ui_registry::singleton()->register($name, $this);
+    //ui_registry::singleton()->register($name, $this);
   }
 }
 
