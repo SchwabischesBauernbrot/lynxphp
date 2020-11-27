@@ -234,6 +234,45 @@ class mysql_driver extends database_driver_base_class implements database_driver
     }
     return $res;
   }
+  public function count($rootModel, $options = false) {
+    $tableName = modelToTableName($rootModel);
+    $fields = 'count(*)';
+    $sql = 'select '. $fields . ' from ' . $tableName;
+    $joins = array();
+    if (!empty($rootModel['children']) && is_array($rootModel['children'])) {
+      foreach($rootModel['children'] as $join) {
+        $field = modelToId($rootModel);
+        $joinTable = modelToTableName($join['model']);
+        $joins[] = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join ' .
+          $joinTable . ' on ' .
+          $joinTable . '.' . $field . '=' .
+          $tableName . '.' . $field;
+      }
+      if (count($joins)) {
+        $sql .= ' ' . join(' ', $joins);
+      }
+    }
+    if (isset($options['criteria'])) {
+      $sql .= ' where ' . $this->build_where($options['criteria'], count($joins) ? $tableName : '');
+    }
+    if (isset($options['order'])) {
+      $defAlias = count($joins) ? $tableName : '';
+      $alias = $defAlias ? $defAlias . '.' : '';
+      $sql .= ' order by ' . $alias . $options['order'];
+    }
+    if (isset($options['limit'])) {
+      $sql .= ' limit ' . $options['limit'];
+    }
+    //echo "sql[$sql]<br>\n";
+    $res = mysqli_query($this->conn, $sql);
+    $err = mysqli_error($this->conn);
+    if ($err) {
+      echo "err[$err]<br>\n";
+      return false;
+    }
+    list($cnt) = mysqli_fetch_row($res);
+    return $cnt;
+  }
   public function findById($rootModel, $id, $options = false) {
     return mysqli_fetch_assoc(parent::findById($rootModel, $id, $options));
   }
