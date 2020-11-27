@@ -25,6 +25,7 @@ include 'config.php';
 // serve site
 
 include '../common/router.php';
+include '../common/post_vars.php';
 $router = new Router;
 
 // frontend libraries
@@ -44,29 +45,9 @@ if (!defined('BASE_HREF')) {
   define('BASE_HREF', dirname($_SERVER['SCRIPT_NAME']) . '/');
 }
 
-function getip() {
-  $ip = empty($_SERVER['REMOTE_ADDR'])?'':$_SERVER['REMOTE_ADDR'];
-  // cloudflare support
-  if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-  }
-  return $ip;
-}
-
 // should a handler set a variables (data structure)
 // or define a set of functions
 // functions can be variables...
-
-function hasPostVars($fields) {
-  foreach($fields as $field) {
-    if (empty($_POST[$field])) {
-      wrapContent('Field "' . $field . '" required');
-      return false;
-    }
-  }
-  return true;
-}
-
 
 $router->get('', function() {
   homepage();
@@ -80,8 +61,14 @@ $router->get('/overboard.php', function() {
 
 $router->get('/:uri/', function($params) {
   $boardUri = $params['uri'];
-  getBoardPageHandler($boardUri, 1);
+  getBoardThreadListing($boardUri);
 });
+$router->get('/:uri/page/:page', function($params) {
+  $boardUri = $params['uri'];
+  $page = $params['page'];
+  getBoardThreadListing($boardUri, $page);
+});
+
 $router->get('/:uri/catalog', function($params) {
   $boardUri = $params['uri'];
   getBoardCatalogHandler($boardUri);
