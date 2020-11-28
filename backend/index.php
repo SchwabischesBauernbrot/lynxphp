@@ -61,6 +61,7 @@ include 'interfaces/boards.php';
 include 'interfaces/posts.php';
 include 'interfaces/users.php';
 include 'interfaces/files.php';
+include 'interfaces/sessions.php';
 
 $response_template = array(
   'meta' => array(
@@ -80,37 +81,6 @@ function sendResponse($data, $code = 200, $err = '') {
   }
   echo json_encode($resp);
   return true;
-}
-
-function getUserID() {
-  global $db, $models;
-  $sid = empty($_SERVER['HTTP_SID']) ? '' : $_SERVER['HTTP_SID'];
-  $sesRes = $db->find($models['session'], array('criteria' => array(
-    array('session', '=', $sid),
-  )));
-  if (!$db->num_rows($sesRes)) {
-    return null;
-  }
-  $sesRow = $db->get_row($sesRes);
-  if (time() > $sesRow['expires']) {
-    return false;
-  }
-  return $sesRow['user_id'];
-}
-
-function loggedIn() {
-  $userid = getUserID();
-  if ($userid === null) {
-    // session does not exist
-    sendResponse(array(), 401, 'Invalid Session');
-    return;
-  }
-  if ($userid === false) {
-    // expired
-    sendResponse(array(), 401, 'Invalid Session');
-    return;
-  }
-  return $userid;
 }
 
 $router->all('/4chan/*', $routers['4chan']);
