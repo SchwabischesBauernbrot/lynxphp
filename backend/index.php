@@ -50,6 +50,11 @@ $pipelines['userData'] = new pipeline_registry;
 $pipelines['post'] = new pipeline_registry;
 $pipelines['file'] = new pipeline_registry;
 
+$routers = array();
+$routers['4chan'] = new router;
+$routers['lynx'] = new router;
+$routers['opt'] = new router;
+
 $pipelines['api_4chan'] = new pipeline_registry;
 $pipelines['api_lynx'] = new pipeline_registry;
 $pipelines['api_opt'] = new pipeline_registry;
@@ -59,202 +64,54 @@ $pipelines['api_opt'] = new pipeline_registry;
 // change input, output
 // change processing is a little more sticky...
 
-function boardDBtoAPI(&$row) {
-  global $db, $models;
-  unset($row['boardid']);
-  unset($row['json']);
-  // decode user_id
-  /*
-  $res = $db->find($models['user'], array('criteria'=>array(
-    array('userid', '=', $row['userid']),
-  )));
-  $urow = $db->get_row($res)
-  $row['user'] = $urpw['username'];
-  */
-  unset($row['userid']);
-}
+include 'interfaces/boards.php';
+include 'interfaces/posts.php';
+include 'interfaces/users.php';
 
-function postDBtoAPI(&$row, $post_files_model) {
-  global $db, $models;
-  $files = array();
-  $res = $db->find($post_files_model, array('criteria'=>array(
-    array('postid', '=', $row['postid']),
-  )));
-  while($frow = $db->get_row($res)) {
-    $files[] = $frow;
-  }
-  $row['no'] = $row['postid'];
-  $row['files'] = $files;
-  unset($row['postid']);
-  unset($row['json']);
-  // decode user_id
-}
+// https://a.4cdn.org/boards.json
+$routers['4chan']->get('/boards.json', function($request) {
+  $boards = listBoards();
+  echo json_encode($boards);
+});
 
-function boardPage($boardUri, $page = 1) {
-  global $db;
+// https://a.4cdn.org/po/catalog.json
+$routers['4chan']->get('/:board/catalog.json', function($request) {
   global $tpp;
-  $lastXreplies = 10;
-  // get threads for this page
-  $posts_model = getPostsModel($boardUri);
-  if ($posts_model === false) {
-    // this board does not exist
+  $boardUri = $request['params']['board'];
+  $threads = boardCatalog($boardUri);
+  if (!$threads) {
     sendResponse(array(), 404, 'Board not found');
     return;
   }
-  $post_files_model = getPostFilesModel($boardUri);
-  $limitPage = $page - 1;
-  $res = $db->find($posts_model, array('criteria'=>array(
-      array('threadid', '=', 0),
-    ),
-    'order'=>'updated_at desc',
-    'limit' => $tpp . ($limitPage ? ',' . $limitPage : '')
-  ));
-  $threads = array();
-  while($row = $db->get_row($res)) {
-    $posts = array();
-    // add thread
-    postDBtoAPI($row, $post_files_model);
-    $posts[] = $row;
-    // add remaining posts
-    $postRes = $db->find($posts_model, array('criteria'=>array(
-      array('threadid', '=', $row['no']),
-    ), 'order'=>'created_at desc', 'limit' => $lastXreplies));
-    $resort = array();
-    while($prow = $db->get_row($postRes)) {
-      postDBtoAPI($prow, $post_files_model);
-      $resort[] = $prow;
-    }
-    $posts = array_merge($posts, array_reverse($resort));
-    $threads[] = array('posts' => $posts);
+  $pages = ceil(count($threads) / $tpp);
+  $res = array();
+  for($i = 1; $i <= $pages; $i++) {
+    $res[] = array(
+      'page' => $i,
+      'threads' => $threads[$i],
+    );
   }
-  return $threads;
-}
+  echo json_encode($res);
+});
 
-function fourChanAPI($path) {
-  global $db, $models;
-  //https://a.4cdn.org/boards.json
-  if (strpos($path, '/boards.json') !== false) {
-    $res = $db->find($models['board']);
-    $boards = array();
-    while($row = $db->get_row($res)) {
-      boardDBtoAPI($row);
-      $boards[] = $row;
-    }
-    echo json_encode($boards);
-  } else
-  // https://a.4cdn.org/po/catalog.json
-  if (strpos($path, '/catalog.json') !== false) {
-    global $tpp;
-    $parts = explode('/', $path);
-    $boardUri = $parts[2];
-    $board = getBoardByUri($boardUri);
-    if (!$board) {
-      sendResponse(array(), 404, 'Board not found');
-    }
-    // pages, threads
-    // get a list of threads
-    $posts_model = getPostsModel($boardUri);
-    $post_files_model = getPostFilesModel($boardUri);
-    $res = $db->find($posts_model, array('criteria' => array(
-      array('threadid', '=', 0),
-    ), 'order'=>'updated_at desc'));
-    $page = 1;
-    // FIXME: rewrite to be more memory efficient
-    while($row = $db->get_row($res)) {
-      postDBtoAPI($row, $post_files_model);
-      $threads[$page][] = $row;
-      if (count($threads[$page]) === $tpp) {
-        $page++;
-        $threads[$page] = array();
-      }
-    }
-    $pages = $page;
-    $res = array();
-    for($i = 1; $i <= $pages; $i++) {
-      $res[] = array(
-        'page' => $i,
-        'threads' => $threads[$i],
-      );
-    }
-    echo json_encode($res);
-  } else
+// FIXME: https://a.4cdn.org/po/threads.json
+// FIXME: https://a.4cdn.org/archive.json
 
-  // https://a.4cdn.org/po/threads.json
-  if (strpos($path, '/threads.json') !== false) {
-    echo "board threads<br>\n";
-  } else
+// https://a.4cdn.org/po/thread/570368.json
+$routers['4chan']->get('/:board/thread/:thread', function($request) {
+  $boardUri = $request['params']['board'];
+  $threadNum = (int)str_replace('.json', '', $request['params']['thread']);
+  $posts = getThread($boardUri, $threadNum);
+  echo json_encode(array('posts'=>$posts));
+});
 
-  //https://a.4cdn.org/archive.json
-  if (strpos($path, '/archive.json') !== false) {
-    echo "board threads<br>\n";
-  } else
-
-  // https://a.4cdn.org/po/thread/570368.json
-  if (strpos($path, '/thread/') !== false) {
-    $parts = explode('/', $path);
-    $boardUri = $parts[2];
-    $threadNum = str_replace('.json', '', $parts[4]);
-    if (is_numeric($threadNum)) {
-      $posts_model = getPostsModel($boardUri);
-      $post_files_model = getPostFilesModel($boardUri);
-      /*(
-      $posts_model['children'] = array(
-        array(
-          'type' => 'left',
-          'model' => $post_files_model,
-        )
-      );
-      */
-
-      $posts = array();
-      $res = $db->find($posts_model, array('criteria'=>array(
-        array('postid', '=', $threadNum),
-      )));
-      $row = $db->get_row($res);
-      postDBtoAPI($row, $post_files_model);
-      $posts[] = $row;
-
-      $res = $db->find($posts_model, array('criteria'=>array(
-        array('threadid', '=', $threadNum),
-      ), 'order' => 'created_at'));
-      while($row = $db->get_row($res)) {
-        postDBtoAPI($row, $post_files_model);
-        $posts[] = $row;
-      }
-
-      echo json_encode(array('posts'=>$posts));
-      return;
-    }
-  } else
-
-  // https://a.4cdn.org/po/2.json
-  if (strpos($path, '.json') !== false) {
-    $parts = explode('/', $path);
-    //echo "paths count[", count($parts), "] [", print_r($parts, 1), "]<br>\n";
-    if (count($parts) === 4) {
-      $page = str_replace('.json', '', $parts[3]);
-      if (is_numeric($page)) {
-        $boardUri = $parts[2];
-        $threads = boardPage($boardUri, $page);
-        echo json_encode($threads);
-        return;
-      }
-    }
-    // NON-standard 4chan api
-    // board
-    $board_uri = str_replace('.json', '', $parts[2]);
-    $res = $db->find($models['board'], array('criteria'=>array(
-      array('uri', '=', $board_uri),
-    )));
-    if ($db->num_rows($res)) {
-      $row = $db->get_row($res);
-      boardDBtoAPI($row);
-      echo json_encode($row);
-    } else {
-      print_r($parts);
-    }
-  }
-}
+// https://a.4cdn.org/po/2.json
+$routers['4chan']->get('/:board/:page', function($request) {
+  $boardUri = $request['params']['board'];
+  $page = str_replace('.json', '', $request['params']['page']);
+  $threads = boardPage($boardUri, $page);
+  echo json_encode($threads);
+});
 
 $response_template = array(
   'meta' => array(
@@ -344,265 +201,258 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
   }
 }
 
-function lynxChanAPI($path) {
+//
+// Lynxchan compatible API for lynxphp
+//
+
+$routers['lynx']->post('/registerAccount', function($request) {
   global $db, $models;
-  //echo "path[$path]<br>\n";
-  if (strpos($path, '/registerAccount') !== false) {
-    if (!hasPostVars(array('login', 'password', 'email'))) {
-      return;
-    }
-    $emRes = $db->find($models['user'], array('criteria' => array(
-      array('email', '=', $_POST['email']),
-    )));
-    if ($db->num_rows($emRes)) {
-      return sendResponse(array(), 403, 'Already has account');
-      return;
-    }
-    $res = $db->find($models['user'], array('criteria' => array(
-      array('username', '=', $_POST['login']),
-    )));
-    if ($db->num_rows($res)) {
-      return sendResponse(array(), 403, 'Already Taken');
-      return;
-    }
-    //echo "Creating<br>\n";
-    $id = $db->insert($models['user'], array(array(
-      'username' => $_POST['login'],
-      'email'    => $_POST['email'],
-      'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
-    )));
-    $data = array('id'=>$id);
-    sendResponse($data);
-  } else
-  if (strpos($path, '/login') !== false) {
-    // login, password, remember
-    if (!hasPostVars(array('login', 'password'))) {
-      return;
-    }
-    $res = $db->find($models['user'], array('criteria' => array(
-      array('username', '=', $_POST['login']),
-    )));
-    if (!$db->num_rows($res)) {
-      return sendResponse(array(), 401, 'Incorrect login - no username');
-    }
-    $row = $db->get_row($res);
-    // password check
-    if (!password_verify($_POST['password'], $row['password'])) {
-      return sendResponse(array(), 401, 'Incorrect login - bad pass');
-    }
-    // we should create a session token for this user
-    $session = md5(uniqid());
-    $ttl = time() + 86400; // 1 day from now
-    // FIXME: check to make sure session isn't already used...
-    $db->insert($models['session'], array(array(
-      'session' => $session,
-      'user_id' => $row['userid'],
-      'expires' => $ttl,
-      'ip'      => getip(),
-    )));
-    // and return it
-    $data = array(
-      'username' => $row['username'],
-      'session'  => $session,
-      'ttl'      => $ttl,
-    );
-    sendResponse($data);
-  } else
-  if (strpos($path, '/createBoard') !== false) {
-    // boardUri, boardName, boardDescription, session
-    $user_id = loggedIn();
-    if (!$user_id) {
-      return;
-    }
-    if (!hasPostVars(array('boardUri', 'boardName', 'boardDescription'))) {
-      return;
-    }
-    $boardUri = strtolower($_POST['boardUri']);
-    $res = $db->find($models['board'], array('criteria'=>array(
-      array('uri', '=', $boardUri),
-    )));
-    if ($db->num_rows($res)) {
-      return sendResponse(array(), 403, 'Board already exists');
-    }
-
-    // FIXME check unique fields...
-    $db->insert($models['board'], array(array(
-      'uri'         => $boardUri,
-      'title'       => $_POST['boardName'],
-      'description' => $_POST['boardDescription'],
-      'owner_id'    => $user_id,
-    )));
-    $data = 'ok';
-    sendResponse($data);
-  } else
-  if (strpos($path, '/files') !== false) {
-    $hash = hash_file('sha256', $_FILES['files']['tmp_name']);
-    move_uploaded_file($_FILES['files']['tmp_name'], 'storage/tmp/'.$hash);
-    $data=array(
-      'type' => $_FILES['files']['type'],
-      'name' => $_FILES['files']['name'],
-      'size' => $_FILES['files']['size'],
-      'hash' => $hash,
-    );
-    sendResponse($data);
-  } else
-  if (strpos($path, '/newThread') !== false) {
-    // require image with each thread
-    if (!hasPostVars(array('boardUri', 'files'))) {
-      return;
-    }
-    $user_id = (int)getUserID();
-    $boardUri = $_POST['boardUri'];
-    $posts_model = getPostsModel($boardUri);
-    $id = $db->insert($posts_model, array(array(
-      // noFlag, email, password, captcha, spoiler, flag
-      'threadid' => 0,
-      'resto' => 0,
-      'name' => getOptionalPostField('name'),
-      'sub'  => getOptionalPostField('subject'),
-      'com'  => getOptionalPostField('message'),
-      'sticky' => 0,
-      'closed' => 0,
-      'trip' => '',
-      'capcode' => '',
-      'country' => '',
-    )));
-    processFiles($boardUri, $_POST['files'], $id, $id);
-    $data = $id;
-    sendResponse($data);
-  } else
-  if (strpos($path, '/replyThread') !== false) {
-    if (!hasPostVars(array('boardUri', 'threadId'))) {
-      return;
-    }
-    $user_id = (int)getUserID();
-    $boardUri = $_POST['boardUri'];
-    $posts_model = getPostsModel($boardUri);
-    $threadid = (int)$_POST['threadId'];
-    // make sure threadId exists...
-    $id = $db->insert($posts_model, array(array(
-      // noFlag, email, password, captcha, spoiler, flag
-      'threadid' => $threadid,
-      'resto' => 0,
-      'name' => getOptionalPostField('name'),
-      'sub'  => getOptionalPostField('subject'),
-      'com'  => getOptionalPostField('message'),
-      'sticky' => 0,
-      'closed' => 0,
-      'trip' => '',
-      'capcode' => '',
-      'country' => '',
-    )));
-    $data = $id;
-    // bump thread
-    $urow = array('updated_at' => '');
-    $db->update($posts_model, $urow, array('criteria'=>array(
-      array('postid', '=', $threadid),
-    )));
-    processFiles($boardUri, $_POST['files'], $threadid, $id);
-    sendResponse($data);
-  } else
-  if (strpos($path, '/account') !== false) {
-    $user_id = loggedIn();
-    if (!$user_id) {
-      return;
-    }
-    $userRes = $db->findById($models['user'], $user_id);
-
-    $res = $db->find($models['board'], array('criteria'=>array(
-      array('owner_id', '=', $user_id),
-    )));
-    $ownedBoards = array();
-    while($row = $db->get_row($res)) {
-      boardDBtoAPI($row);
-      $ownedBoards[] = $row;
-    }
-    echo json_encode(array(
-      'noCaptchaBan' => false,
-      'login' => $userRes['username'],
-      'email' => $userRes['email'],
-      'globalRole' => 99,
-      //'disabledLatestPostings'
-      //'volunteeredBoards'
-      'boardCreationAllowed' => true,
-      'ownedBoards' => $ownedBoards,
-      //'settings'
-      'reportFilter' => array(), // category filters for e-mail notifications
-    ));
-  } else {
-    global $pipelines;
-    $pipelines['api_lynx']->execute($path);
-    sendResponse(array(), 404, 'Unknown route');
+  if (!hasPostVars(array('login', 'password', 'email'))) {
+    return;
   }
-}
+  $emRes = $db->find($models['user'], array('criteria' => array(
+    array('email', '=', $_POST['email']),
+  )));
+  if ($db->num_rows($emRes)) {
+    return sendResponse(array(), 403, 'Already has account');
+    return;
+  }
+  $res = $db->find($models['user'], array('criteria' => array(
+    array('username', '=', $_POST['login']),
+  )));
+  if ($db->num_rows($res)) {
+    return sendResponse(array(), 403, 'Already Taken');
+    return;
+  }
+  //echo "Creating<br>\n";
+  $id = $db->insert($models['user'], array(array(
+    'username' => $_POST['login'],
+    'email'    => $_POST['email'],
+    'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
+  )));
+  $data = array('id'=>$id);
+  sendResponse($data);
+});
 
-function optAPI($path) {
+$routers['lynx']->post('/login', function($request) {
   global $db, $models;
-  // is session still valid
-  if (strpos($path, '/session') !== false) {
-    $user_id = loggedIn();
-    if (!$user_id) {
-      return;
-    }
-    sendResponse(array('session' => 'ok'));
-  } else
-  if (strpos($path, '/boards/') !== false) {
-    global $tpp;
-    $parts = explode('/', $path);
-    $boardUri = $parts[3];
-    $pageNum = $parts[4];
-
-    $res = $db->find($models['board'], array('criteria'=>array(
-      array('uri', '=', $boardUri),
-    )));
-    if (!$db->num_rows($res)) {
-      return sendResponse(array(), 404, 'Board does not exist');
-    }
-
-    $posts_model = getPostsModel($boardUri);
-    if ($posts_model === false) {
-      // this board does not exist
-      sendResponse(array(), 404, 'Board not found');
-      return;
-    }
-    $threadCount = $db->count($posts_model, array('criteria'=>array(
-        array('threadid', '=', 0),
-      ),
-      'order'=>'updated_at desc',
-    ));
-
-    $threads = boardPage($boardUri, $pageNum);
-    echo json_encode(array(
-      'page1' => $threads,
-      'threadsPerPage'   => $tpp,
-      'threadCount' => $threadCount,
-      'pageCount' => ceil($threadCount/$tpp),
-    ));
-  } else
-  if (strpos($path, '/myBoards') !== false) {
-    $user_id = loggedIn();
-    if (!$user_id) {
-      return;
-    }
-    $res = $db->find($models['board']);
-    $boards = array();
-    while($row = $db->get_row($res)) {
-      boardDBtoAPI($row);
-      $boards[] = $row;
-    }
-    echo json_encode($boards);
+  // login, password, remember
+  if (!hasPostVars(array('login', 'password'))) {
+    return;
   }
-}
+  $res = $db->find($models['user'], array('criteria' => array(
+    array('username', '=', $_POST['login']),
+  )));
+  if (!$db->num_rows($res)) {
+    return sendResponse(array(), 401, 'Incorrect login - no username');
+  }
+  $row = $db->get_row($res);
+  // password check
+  if (!password_verify($_POST['password'], $row['password'])) {
+    return sendResponse(array(), 401, 'Incorrect login - bad pass');
+  }
+  // we should create a session token for this user
+  $session = md5(uniqid());
+  $ttl = time() + 86400; // 1 day from now
+  // FIXME: check to make sure session isn't already used...
+  $db->insert($models['session'], array(array(
+    'session' => $session,
+    'user_id' => $row['userid'],
+    'expires' => $ttl,
+    'ip'      => getip(),
+  )));
+  // and return it
+  $data = array(
+    'username' => $row['username'],
+    'session'  => $session,
+    'ttl'      => $ttl,
+  );
+  sendResponse($data);
+});
 
-$path = getServerField('PATH_INFO');
-if (strpos($path, '/4chan/') !== false) {
-  fourChanAPI($path);
-} else
-if (strpos($path, '/lynx/') !== false) {
-  lynxChanAPI($path);
-} else
-if (strpos($path, '/opt/') !== false) {
-  optAPI($path);
-}
+$routers['lynx']->post('/createBoard', function($request) {
+  global $db, $models;
+  // boardUri, boardName, boardDescription, session
+  $user_id = loggedIn();
+  if (!$user_id) {
+    return;
+  }
+  if (!hasPostVars(array('boardUri', 'boardName', 'boardDescription'))) {
+    return;
+  }
+  $boardUri = strtolower($_POST['boardUri']);
+  $res = $db->find($models['board'], array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
+  if ($db->num_rows($res)) {
+    return sendResponse(array(), 403, 'Board already exists');
+  }
+
+  // FIXME check unique fields...
+  $db->insert($models['board'], array(array(
+    'uri'         => $boardUri,
+    'title'       => $_POST['boardName'],
+    'description' => $_POST['boardDescription'],
+    'owner_id'    => $user_id,
+  )));
+  $data = 'ok';
+  sendResponse($data);
+});
+
+$routers['lynx']->post('/files', function($request) {
+  $hash = hash_file('sha256', $_FILES['files']['tmp_name']);
+  move_uploaded_file($_FILES['files']['tmp_name'], 'storage/tmp/'.$hash);
+  $data=array(
+    'type' => $_FILES['files']['type'],
+    'name' => $_FILES['files']['name'],
+    'size' => $_FILES['files']['size'],
+    'hash' => $hash,
+  );
+  sendResponse($data);
+});
+
+$routers['lynx']->post('/newThread', function($request) {
+  global $db;
+  // require image with each thread
+  if (!hasPostVars(array('boardUri', 'files'))) {
+    return;
+  }
+  $user_id = (int)getUserID();
+  $boardUri = $_POST['boardUri'];
+  $posts_model = getPostsModel($boardUri);
+  $id = $db->insert($posts_model, array(array(
+    // noFlag, email, password, captcha, spoiler, flag
+    'threadid' => 0,
+    'resto' => 0,
+    'name' => getOptionalPostField('name'),
+    'sub'  => getOptionalPostField('subject'),
+    'com'  => getOptionalPostField('message'),
+    'sticky' => 0,
+    'closed' => 0,
+    'trip' => '',
+    'capcode' => '',
+    'country' => '',
+  )));
+  processFiles($boardUri, $_POST['files'], $id, $id);
+  $data = $id;
+  sendResponse($data);
+});
+
+$routers['lynx']->post('/replyThread', function($request) {
+  global $db;
+  if (!hasPostVars(array('boardUri', 'threadId'))) {
+    return;
+  }
+  $user_id = (int)getUserID();
+  $boardUri = $_POST['boardUri'];
+  $posts_model = getPostsModel($boardUri);
+  $threadid = (int)$_POST['threadId'];
+  // make sure threadId exists...
+  $id = $db->insert($posts_model, array(array(
+    // noFlag, email, password, captcha, spoiler, flag
+    'threadid' => $threadid,
+    'resto' => 0,
+    'name' => getOptionalPostField('name'),
+    'sub'  => getOptionalPostField('subject'),
+    'com'  => getOptionalPostField('message'),
+    'sticky' => 0,
+    'closed' => 0,
+    'trip' => '',
+    'capcode' => '',
+    'country' => '',
+  )));
+  $data = $id;
+  // bump thread
+  $urow = array('updated_at' => '');
+  $db->update($posts_model, $urow, array('criteria'=>array(
+    array('postid', '=', $threadid),
+  )));
+  processFiles($boardUri, $_POST['files'], $threadid, $id);
+  sendResponse($data);
+});
+
+$routers['lynx']->get('/account', function($request) {
+  $user_id = loggedIn();
+  if (!$user_id) {
+    return;
+  }
+  $userRes = getAccount($user_id);
+  $ownedBoards = userBoards($user_id);
+  echo json_encode(array(
+    'noCaptchaBan' => false,
+    'login' => $userRes['username'],
+    'email' => $userRes['email'],
+    'globalRole' => 99,
+    //'disabledLatestPostings'
+    //'volunteeredBoards'
+    'boardCreationAllowed' => true,
+    'ownedBoards' => $ownedBoards,
+    //'settings'
+    'reportFilter' => array(), // category filters for e-mail notifications
+  ));
+});
+
+//
+// Optimized routes for lynxphp
+//
+
+$routers['opt']->get('/session', function($request) {
+  $user_id = loggedIn();
+  if (!$user_id) {
+    return;
+  }
+  sendResponse(array('session' => 'ok'));
+});
+
+$routers['opt']->get('/boards/:uri/:page', function($request) {
+  global $tpp;
+
+  $boardUri = $request['params']['uri'];
+  $pageNum = $request['params']['page'] ? (int)$request['params']['page'] : 1;
+
+  $boardData = getBoard($boardUri);
+  if (!$boardData) {
+    return sendResponse(array(), 404, 'Board does not exist');
+  }
+  boardDBtoAPI($boardData);
+  $threadCount = getThreadCount($boardUri);
+  $threads = boardPage($boardUri, $pageNum);
+  sendResponse(array(
+    'board' => $boardData,
+    'page1' => $threads,
+    'threadsPerPage'   => $tpp,
+    'threadCount' => $threadCount,
+    'pageCount' => ceil($threadCount/$tpp),
+  ));
+});
+
+$routers['opt']->get('/myBoards', function($request) {
+  $user_id = loggedIn();
+  if (!$user_id) {
+    return;
+  }
+  $boards = userBoards($user_id);
+  sendResponse($boards);
+});
+
+// non-standard 4chan api - lets disable for now
+// /opt should have replaced this
+$routers['opt']->get('/:board', function($request) {
+  global $db, $models;
+  $boardUri = str_replace('.json', '', $request['params']['board']);
+  $boardData = getBoard($boardUri);
+  if (!$boardData) {
+    echo '[]';
+    return;
+  }
+  echo json_encode($boardData);
+});
+
+
+$router->all('/4chan/*', $routers['4chan']);
+$router->all('/lynx/*', $routers['lynx']);
+$router->all('/opt/*', $routers['opt']);
+
+$router->exec(getServerField('REQUEST_METHOD', 'GET'), getServerField('PATH_INFO'));
 
 ?>
