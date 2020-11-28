@@ -1,5 +1,12 @@
 <?php
 
+// An API mainly for modules to use to get what they need
+// also interfaces
+
+// posts/post_files are individually tables
+// this keeps these tables small and therefore fast
+// as the cost of easily being able to search across all boards
+
 /*
 getBoardByUri($uri)
 getBoardSetting($field)

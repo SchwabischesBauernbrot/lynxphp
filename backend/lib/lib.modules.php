@@ -1,8 +1,9 @@
 <?php
 
-/**
-  * Ensures only one object of extended class exists to conserve memory
-  */
+// modulization classes and functions
+// provides support for the various modules
+
+// contains logic for compiling pipelines
 class module_registry {
   /** class its providing */
   var $instance;
@@ -263,6 +264,8 @@ class pipeline_module extends orderable_module {
 }
 
 // Site/BO/Users options
+// very similar to pipeline but we're more focused on data
+// where pipeline is more about execution of code
 class ui_module extends orderable_module {
   function __construct($name) {
     //ui_registry::singleton()->register($name, $this);
