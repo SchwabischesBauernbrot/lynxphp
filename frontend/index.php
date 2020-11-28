@@ -59,38 +59,38 @@ $router->get('/overboard.php', function() {
   getOverboardHandler();
 });
 
-$router->get('/:uri/', function($params) {
-  $boardUri = $params['uri'];
+$router->get('/:uri/', function($request) {
+  $boardUri = $request['params']['uri'];
   getBoardThreadListing($boardUri);
 });
-$router->get('/:uri/page/:page', function($params) {
-  $boardUri = $params['uri'];
-  $page = $params['page'];
+$router->get('/:uri/page/:page', function($request) {
+  $boardUri = $request['params']['uri'];
+  $page = $request['params']['page'] ? $request['params']['page'] : 1;
   getBoardThreadListing($boardUri, $page);
 });
 
-$router->get('/:uri/catalog', function($params) {
-  $boardUri = $params['uri'];
+$router->get('/:uri/catalog', function($request) {
+  $boardUri = $request['params']['uri'];
   getBoardCatalogHandler($boardUri);
 });
-$router->get('/:uri/settings', function($params) {
-  $boardUri = $params['uri'];
+$router->get('/:uri/settings', function($request) {
+  $boardUri = $request['params']['uri'];
   getBoardSettingsHandler($boardUri);
 });
-$router->get('/:uri/banners', function($params) {
-  $boardUri = $params['uri'];
+$router->get('/:uri/banners', function($request) {
+  $boardUri = $request['params']['uri'];
   getBoardBannerHandler($boardUri);
 });
 
-$router->get('/:uri/thread/:num', function($params) {
-  $boardUri = $params['uri'];
-  $threadNum = str_replace('.html', '', $params['num']);
+$router->get('/:uri/thread/:num', function($request) {
+  $boardUri = $request['params']['uri'];
+  $threadNum = str_replace('.html', '', $request['params']['num']);
   getThreadHandler($boardUri, $threadNum);
 });
 
 
-$router->post('/:uri/post', function($params) {
-  $boardUri = $params['uri'];
+$router->post('/:uri/post', function($request) {
+  $boardUri = $request['params']['uri'];
   // valid board name
   // validate results
   $files = array();
@@ -115,9 +115,9 @@ $router->post('/:uri/post', function($params) {
     //echo "boardUri[$boardUri]<br>\n";
     $json = curlHelper(BACKEND_BASE_URL . 'lynx/newThread', array(
       // noFlag
-      'email'    => $_POST['email'],
+      'email'    => getOptionalPostField('email'),
       'message'  => $_POST['message'],
-      'subject'  => $_POST['subject'],
+      'subject'  => getOptionalPostField('subject'),
       'boardUri' => $boardUri,
       'password' => $_POST['postpassword'],
       // captcha
@@ -139,9 +139,9 @@ $router->post('/:uri/post', function($params) {
     $json = curlHelper(BACKEND_BASE_URL . 'lynx/replyThread', array(
       // noFlag
       'threadId' => $_POST['thread'],
-      'email'    => $_POST['email'],
+      'email'    => getOptionalPostField('email'),
       'message'  => $_POST['message'],
-      'subject'  => $_POST['subject'],
+      'subject'  => getOptionalPostField('subject'),
       'boardUri' => $boardUri,
       'password' => $_POST['postpassword'],
       // captcha
@@ -188,12 +188,12 @@ $router->post('/create_board.php', function() {
 });
 
 // needs to go last...
-$router->get('/:uri', function($params) {
-  $boardUri = $params['uri'];
+$router->get('/:uri', function($request) {
+  $boardUri = $request['params']['uri'];
   // maybe only redir if the board exists...
   redirectTo(BASE_HREF . $boardUri . '/');
 });
 
-$router->exec(empty($_SERVER['REQUEST_METHOD']) ? 'GET' : $_SERVER['REQUEST_METHOD'], empty($_SERVER['PATH_INFO']) ? '' : $_SERVER['PATH_INFO']);
+$router->exec(getServerField('REQUEST_METHOD', 'GET'), getServerField('PATH_INFO'));
 
 ?>
