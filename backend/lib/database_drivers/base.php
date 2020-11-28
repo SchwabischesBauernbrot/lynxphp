@@ -10,15 +10,18 @@ interface database_driver_base {
   public function build_where($criteria);
   public function make_constant($value);
   public function insert($rootModel, $recs);
+  public function update($rootModel, $urow, $options);
   // options
   //   fields = if not set, give all fields, else expect an array
   //   criteria = if set, an array
   //              array(field, comparison, field/constant)
   public function find($rootModel, $options = false);
+  public function count($rootModel, $options = false);
   public function findById($rootModel, $id, $options = false);
   // result functions
   public function num_rows($res);
   public function get_row($res);
+  public function toArray($res);
 }
 
 class database_driver_base_class {
@@ -61,6 +64,26 @@ class database_driver_base_class {
     );
     return $this->find($rootModel, $options);
   }
+  public function toArray($res) {
+    $arr = array();
+    while($row = $this->getrow($res)) {
+      $arr[] = $row;
+    }
+    return $arr;
+  }
+}
+
+function modelToTableName($model) {
+  return $model['name'].'s';
+}
+function modelToId($model) {
+  $parts = explode('_', $model['name']);
+  $name = array_pop($parts);
+  return $name.'id';
+}
+
+function make_db_field($value) {
+  return array($value);
 }
 
 ?>
