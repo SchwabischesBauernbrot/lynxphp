@@ -282,7 +282,13 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function get_row($res) {
     return mysqli_fetch_assoc($res);
   }
-
+  public function toArray($res) {
+    $arr = array();
+    while($row = mysqli_fetch_assoc($res)) {
+      $arr[] = $row;
+    }
+    return $arr;
+  }
 }
 
 ?>
