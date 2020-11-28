@@ -14,7 +14,6 @@ include '../common/post_vars.php';
 $router = new Router;
 
 // connect to db
-include 'lib/lib.model.php';
 // FIXME: database type to select driver
 $db_driver = 'mysql';
 include 'lib/database_drivers/'.$db_driver.'.php';
@@ -27,8 +26,7 @@ if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
   exit();
 }
 
-include 'lib/lib.modules.php'; // module functions
-include 'lib/modules.php'; // module class
+include 'lib/lib.modules.php'; // module functions and classes
 // pipelines
 // - boardDB to API
 // - thread to API
