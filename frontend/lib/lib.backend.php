@@ -3,45 +3,43 @@
 // is this file going to get huge
 // should we specialize or tie to handler?
 
+function getExpectJson($endpoint) {
+  $json = curlHelper(BACKEND_BASE_URL . $endpoint);
+  $obj = json_decode($json, true);
+  if (!$obj) {
+    wrapContent('Backend error: ' .  $endpoint . ': ' . $json);
+    return;
+  }
+  return $obj;
+}
+
 function getBoards() {
-  $json   = curlHelper(BACKEND_BASE_URL . '4chan/boards.json');
-  $boards = json_decode($json, true);
+  $boards = getExpectJson('4chan/boards.json');
   return $boards;
 }
 
 function getBoard($boardUri) {
-  $json      = curlHelper(BACKEND_BASE_URL . '4chan/' . $boardUri . '.json');
-  //echo "getBoardJson[$json]<br>\n";
-  $boardData = json_decode($json, true);
+  $boardData = getExpectJson('opt/' . $boardUri . '.json');
   return $boardData;
 }
 
 function backendGetBoardThreadListing($boardUri, $pageNum = 1) {
-  $json = curlHelper(BACKEND_BASE_URL . 'opt/boards/' . $boardUri . '/' . $pageNum);
-  //echo "getBoardThreadListing[$json]<br>\n";
-  $threadListing = json_decode($json, true);
-  //print_r($threadListing);
-  return $threadListing;
+  $threadListing = getExpectJson('opt/boards/' . $boardUri . '/' . $pageNum);
+  return $threadListing['data'];
 }
 
 function getBoardPage($boardUri, $page = 1) {
-  $json  = curlHelper(BACKEND_BASE_URL . '4chan/' . $boardUri . '/' . $page . '.json');
-  //echo "getBoardPageJson[$json]<br>\n";
-  $page1 = json_decode($json, true);
-  //print_r($page1);
+  $page1 = getExpectJson('4chan/' . $boardUri . '/' . $page . '.json');
   return $page1;
 }
 
 function getBoardCatalog($boardUri) {
-  $json  = curlHelper(BACKEND_BASE_URL . '4chan/' . $boardUri . '/catalog.json');
-  //echo "json[$json]<br>\n";
-  $pages = json_decode($json, true);
+  $pages = getExpectJson('4chan/' . $boardUri . '/catalog.json');
   return $pages;
 }
 
 function getBoardThread($boardUri, $threadNum) {
-  $json  = curlHelper(BACKEND_BASE_URL . '4chan/' . $boardUri . '/thread/' . $threadNum . '.json');
-  $result = json_decode($json, true);
+  $result = getExpectJson('4chan/' . $boardUri . '/thread/' . $threadNum . '.json');
   return $result['posts'];
 }
 
@@ -59,7 +57,7 @@ function backendAuthedGet($endpoint) {
   if (!isset($_COOKIE['session'])) {
     return json_encode(array('meta'=>array('code'=>401)));
   }
-  $json   = curlHelper(BACKEND_BASE_URL . $endpoint, '',
+  $json = curlHelper(BACKEND_BASE_URL . $endpoint, '',
     array('sid' => $_COOKIE['session']));
   return $json;
 }
@@ -71,8 +69,8 @@ function checkSession() {
 }
 
 function backendLogin() {
-  $user  = $_POST['username'];
-  $pass  = $_POST['password'];
+  $user = $_POST['username'];
+  $pass = $_POST['password'];
   // login, password, email
   $data = curlHelper(BACKEND_BASE_URL . 'lynx/login', array(
     'login'    => $user,
@@ -99,8 +97,10 @@ function backendCreateBoard() {
 }
 
 function backendLynxAccount() {
-  $json   = backendAuthedGet('lynx/account');
+  $json = backendAuthedGet('lynx/account');
+  //echo "json[$json]<br>\n";
   $account = json_decode($json, true);
+  //print_r($account);
   return $account;
 }
 
