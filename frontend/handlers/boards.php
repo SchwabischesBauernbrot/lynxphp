@@ -40,9 +40,10 @@ function getOverboardHandler() {
 
 function getBoardThreadListing($boardUri, $pagenum = 1) {
   $boardThreads = backendGetBoardThreadListing($boardUri, $pagenum);
-  // echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
+  //echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
   $pageData = $boardThreads['page1'];
   $pages = $boardThreads['pageCount'];
+  $boardData = $boardThreads['board'];
 
   $templates = loadTemplates('thread_listing');
   //echo join(',', array_keys($templates));
@@ -91,7 +92,6 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   }
 
   $tmpl = $templates['header'];
-  $boardData = getBoard($boardUri);
   $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
   $tmpl = str_replace('{{title}}', htmlspecialchars($boardData['title']), $tmpl);
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
@@ -264,8 +264,9 @@ function getBoardCatalogHandler($boardUri) {
       $tiles_html .= $tmp;
     }
   }
-
+  $boardData = getBoard($boardUri);
   $tmpl = str_replace('{{uri}}',      $boardUri,      $tmpl);
+  $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
   $tmpl = str_replace('{{tiles}}',    $tiles_html,    $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
   wrapContent($tmpl);
