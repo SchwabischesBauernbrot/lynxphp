@@ -9,9 +9,8 @@ include 'config.php';
 
 // message queue
 
-include '../common/router.php';
+$router = include '../common/router.php';
 include '../common/post_vars.php';
-$router = new Router;
 
 // connect to db
 // FIXME: database type to select driver
@@ -26,7 +25,7 @@ if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
   exit();
 }
 
-include 'lib/lib.modules.php'; // module functions and classes
+include '../common/lib.modules.php'; // module functions and classes
 // pipelines
 // - boardDB to API
 // - thread to API
@@ -44,24 +43,32 @@ $pipelines['post'] = new pipeline_registry;
 $pipelines['file'] = new pipeline_registry;
 
 $routers = array();
-$routers['4chan'] = include 'apis/4chan.php';
-$routers['lynx'] = include 'apis/lynxchan_minimal.php';
-$routers['opt'] = include 'apis/opt.php';
+$routers['4chan'] = include 'routes/4chan.php';
+$routers['lynx']  = include 'routes/lynxchan_minimal.php';
+$routers['opt']   = include 'routes/opt.php';
 
 // transformations (x => y)
 // access list (remove this, add this)
-// change input, output
+// change input, output (aren't these xforms tho)
 // change processing is a little more sticky...
+
+
+// have to be defined before we can enable modules:
+// routers, db options, cache options, pipelines...
 
 // build modules...
 enableModulesType('models'); // bring models online
 
 include 'lib/lib.board.php';
+include 'lib/middlewares.php';
 include 'interfaces/boards.php';
 include 'interfaces/posts.php';
 include 'interfaces/users.php';
 include 'interfaces/files.php';
 include 'interfaces/sessions.php';
+
+include '../common/modules/board/banners/models.php';
+include '../common/modules/board/banners/backend_handlers.php';
 
 $response_template = array(
   'meta' => array(
@@ -81,6 +88,11 @@ function sendResponse($data, $code = 200, $err = '') {
   }
   echo json_encode($resp);
   return true;
+}
+
+// wrapper for now
+function wrapContent($error) {
+  sendResponse(array(), 400, $error);
 }
 
 $router->all('/4chan/*', $routers['4chan']);
