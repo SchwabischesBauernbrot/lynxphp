@@ -3,6 +3,9 @@
 // modulization classes and functions
 // provides support for the various modules
 
+// the singleton could hold all the pipelines
+// but what's the advantage of a singleton vs a global
+
 // contains logic for compiling pipelines
 class module_registry {
   /** class its providing */
@@ -211,23 +214,21 @@ class module_registry {
 
   function compile() {
     $this->resolve_all();
-    $this->compile_modules = array();
+    // FIXME: prereq/prempt handling
+    $this->compile_modules = $this->registry;
   }
 
   function execute(&$param) {
     if (!$this->compiled) {
       $this->compile();
     }
-    foreach($this->compile_modules as $mod) {
+    foreach($this->compile_modules as $name => $mod) {
       $mod->exec($param);
     }
   }
 }
 
 class pipeline_registry extends module_registry {
-}
-
-class ui_registry extends module_registry {
 }
 
 class orderable_module {
@@ -243,7 +244,8 @@ class orderable_module {
     $this->code = $code;
   }
   function exec(&$param) {
-    $this->code($param);
+    $code = $this->code;
+    $code($param);
   }
 }
 
@@ -251,6 +253,7 @@ class orderable_module {
 
 // post validation/transformation
 // page generation
+// data vs code: Site/BO/Users options
 class pipeline_module extends orderable_module {
   function __construct($name) {
     $this->name = $name;
@@ -263,26 +266,50 @@ class pipeline_module extends orderable_module {
   }
 }
 
-// Site/BO/Users options
-// very similar to pipeline but we're more focused on data
-// where pipeline is more about execution of code
-class ui_module extends orderable_module {
-  function __construct($name) {
-    //ui_registry::singleton()->register($name, $this);
+
+// a owner of a collection of pipeline_modules...
+class package {
+  var $ver;
+  function __construct($name, $ver) {
+    $this->ver = $ver;
   }
 }
 
+class backend_package {
+}
+
+class frontend_package {
+  // attach
+  // - backend_resource
+  // - frontend route/handler
+}
+
+class backend_resource {
+  var $endpoint;
+  var $method;
+  // post data
+  // headers
+  var $sendSession;
+  var $sendIP;
+  // response
+  var $expectJson;
+  function __construct($name, $params, $func) {
+    $this->method = 'AUTO';
+  }
+  function use() {
+  }
+}
 
 function getEnabledModules() {
   return array('base');
 }
 
 function enableModule($module){
-  include 'modules/' . $module . '/index.php';
+  include '../common/modules/' . $module . '/index.php';
 }
 
 function enableModuleType($type, $module){
-  $path = 'modules/' . $module . '/' . $type . '.php';
+  $path = '../common/modules/' . $module . '/' . $type . '.php';
   if (file_exists($path)) {
     include $path;
   }
