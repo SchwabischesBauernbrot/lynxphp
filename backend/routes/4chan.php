@@ -12,17 +12,17 @@ $router->get('/boards.json', function($request) {
 $router->get('/:board/catalog.json', function($request) {
   global $tpp;
   $boardUri = $request['params']['board'];
-  $threads = boardCatalog($boardUri);
-  if (!$threads) {
+  $page = boardCatalog($boardUri);
+  if (!$page) {
     sendResponse(array(), 404, 'Board not found');
     return;
   }
-  $pages = ceil(count($threads) / $tpp);
+  $pages = count($page);
   $res = array();
   for($i = 1; $i <= $pages; $i++) {
     $res[] = array(
       'page' => $i,
-      'threads' => $threads[$i],
+      'threads' => $page[$i],
     );
   }
   echo json_encode($res);
