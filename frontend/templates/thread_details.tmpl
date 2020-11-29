@@ -1,5 +1,5 @@
 <div class="board-header">
-  <img class="board-banner" src="/randombanner?board={{uri}}" width="300" height="100" loading="lazy"/>
+  {{banner}}
   <br/>
   <a class="no-decoration" href="/{{uri}}/">
     <h1 class="board-title">/{{uri}}/ - {{title}}</h1>
@@ -27,8 +27,8 @@
     <section class="row">
       <div class="label">
         <span>Files</span>
-        <small>Max 5 files</small>
-        <small>20MB total</small>
+        <small>Max X files</small>
+        <small>Y MB total</small>
       </div>
       <span class="col">
       <label class="jsonly postform-style filelabel" for="file">
@@ -75,9 +75,6 @@
 </div>
 <!-- end -->
 <!-- loop -->
-  <a class="quote" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">&gt;&gt;{{no}}</a>
-<!-- end -->
-<!-- loop -->
   <div class="post-file">
     <span class="post-file-info">
       <span>
@@ -94,12 +91,20 @@
   </div>
 <!-- end -->
 <!-- loop -->
+      <div class="replies mt-5 ml-5">
+        Replies: {{replies}}
+      </div>
+<!-- end -->
+<!-- loop -->
+  <a class="quote" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">&gt;&gt;{{no}}</a>
+<!-- end -->
+<!-- loop -->
   <div class="anchor" id="{{no}}"></div>
-  <div class="post-container op" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="">
+  <div class="post-container op" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
     <div class="post-info">
       <span>
         <label>
-          <input class="post-check" type="checkbox" name="checkedposts" value="21"/>
+          <input class="post-check" type="checkbox" name="checkedposts" value="{{no}}"/>
           <span class="post-name">{{name}}</span>
         </label>
         <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
@@ -107,7 +112,7 @@
       <span class="post-links">
         <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">No.</a>
         <span class="post-quoters">
-          <a class="no-decoration" href="/{{uri}}/thread/{{threadNo}}.html#postform">{{no}}</a>
+          <a class="no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#postform">{{no}}</a>
         </span>
         <select class="jsonly postmenu">
           <option value="single">Hide</option>
@@ -118,9 +123,7 @@
     <div class="post-data">
       <div class="post-files">{{files}}</div>
       <pre class="post-message">{{message}}</pre>
-      <div class="replies mt-5 ml-5">
-        Replies: {{replies}}
-      </div>
+      {{replies}}
     </div>
   </div>
 <!-- end -->
