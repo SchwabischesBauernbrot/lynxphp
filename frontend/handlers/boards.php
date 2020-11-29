@@ -54,6 +54,7 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   $threadftr_template = $templates['loop4'];
   $thread_template = $templates['loop5'];
 
+  /*
   $pages_html = '';
   //echo "pages[", $boardThreads['pageCount'], "]<br>\n";
   for($p = 1; $p <= $boardThreads['pageCount']; $p++) {
@@ -67,6 +68,8 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
 
   $boardnav_html = str_replace('{{pages}}', $pages_html, $boardnav_html);
   $boardnav_html = str_replace('{{uri}}',   $boardUri,   $boardnav_html);
+  */
+  $boardnav_html = renderBoardNav($boardUri, $boardThreads['pageCount'], $pagenum);
 
   $threads_html = '';
   foreach($pageData as $thread) {
@@ -92,6 +95,17 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   }
 
   $tmpl = $templates['header'];
+
+  $p = array(
+    'boardUri' => $boardUri,
+    'tags' => array()
+  );
+  global $pipelines;
+  $pipelines['boardDetailsTmpl']->execute($p);
+  foreach($p['tags'] as $s => $r) {
+    $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
+  }
+
   $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
   $tmpl = str_replace('{{title}}', htmlspecialchars($boardData['title']), $tmpl);
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
@@ -161,6 +175,18 @@ function getBoardPageHandler($boardUri, $pagenum, $pageData = null) {
 
   $tmpl = $templates['header'];
   $boardData = getBoard($boardUri);
+
+  $p = array(
+    'boardUri' => $boardUri,
+    'tags' => array()
+  );
+  global $pipelines;
+  $pipelines['boardDetailsTmpl']->execute($p);
+  print_r($p);
+  foreach($p['tags'] as $s => $r) {
+    $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
+  }
+
   $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
   $tmpl = str_replace('{{title}}', htmlspecialchars($boardData['title']), $tmpl);
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
@@ -174,16 +200,21 @@ function getThreadHandler($boardUri, $threadNum) {
   $threadNum = (int)$threadNum;
   $templates = loadTemplates('thread_details');
   $tmpl = $templates['header'];
-  $boardData = getBoard($boardUri);
 
-  $tmp = $templates['loop0'];
+  $boardNav_template = $templates['loop0'];
+  $file_template = $templates['loop1'];
+  $hasReplies_template = $templates['loop2'];
+  $reply_template = $templates['loop3'];
+  $post_template = $templates['loop4'];
+
+  $tmp = $boardNav_template;
   $tmp = str_replace('{{uri}}', $boardUri, $tmp);
   $boardnav_html = $tmp;
 
   $posts = getBoardThread($boardUri, $threadNum);
   $posts_html = '';
   foreach($posts as $post) {
-    $tmp = $templates['loop3'];
+    $tmp = $post_template;
     $tmp = str_replace('{{subject}}', htmlspecialchars($post['sub']),  $tmp);
     $tmp = str_replace('{{message}}', htmlspecialchars($post['com']),  $tmp);
     $tmp = str_replace('{{name}}',    htmlspecialchars($post['name']), $tmp);
@@ -194,7 +225,7 @@ function getThreadHandler($boardUri, $threadNum) {
     $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $post['created_at']), $tmp);
     $files_html = '';
     foreach($post['files'] as $file) {
-      $ftmpl = $templates['loop2'];
+      $ftmpl = $file_template;
       // disbale images until we can mod...
       //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
       $files_html .= $ftmpl;
@@ -203,6 +234,17 @@ function getThreadHandler($boardUri, $threadNum) {
     $replies_html = '';
     $tmp = str_replace('{{replies}}', $replies_html, $tmp);
     $posts_html .= $tmp;
+  }
+
+  $boardData = getBoard($boardUri);
+  $p = array(
+    'boardUri' => $boardUri,
+    'tags' => array()
+  );
+  global $pipelines;
+  $pipelines['boardDetailsTmpl']->execute($p);
+  foreach($p['tags'] as $s => $r) {
+    $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
   }
 
   $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
@@ -239,7 +281,13 @@ function getBoardCatalogHandler($boardUri) {
 
   $boardnav_html = str_replace('{{pages}}', $pages_html, $boardnav_html);
   */
-  $boardnav_html = str_replace('{{uri}}',   $boardUri,   $boardnav_html);
+  //$boardnav_html = str_replace('{{uri}}',   $boardUri,   $boardnav_html);
+
+  $maxPage = 0;
+  foreach($catalog as $obj) {
+    $maxPage = max($obj['page'], $maxPage);
+  }
+  $boardnav_html = renderBoardNav($boardUri, $maxPage, '[Catalog]');
 
   $tiles_html = '';
   foreach($catalog as $pageNum => $page) {
@@ -265,6 +313,17 @@ function getBoardCatalogHandler($boardUri) {
     }
   }
   $boardData = getBoard($boardUri);
+
+  $p = array(
+    'boardUri' => $boardUri,
+    'tags' => array()
+  );
+  global $pipelines;
+  $pipelines['boardDetailsTmpl']->execute($p);
+  foreach($p['tags'] as $s => $r) {
+    $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
+  }
+
   $tmpl = str_replace('{{uri}}',      $boardUri,      $tmpl);
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
   $tmpl = str_replace('{{tiles}}',    $tiles_html,    $tmpl);
@@ -273,8 +332,17 @@ function getBoardCatalogHandler($boardUri) {
 }
 
 function getBoardSettingsHandler($boardUri) {
+  global $pipelines;
   $templates = loadTemplates('board_settings');
-  wrapContent($templates['header']);
+  $tmpl = $templates['header'];
+  $navItems = array();
+  $pipelines['boardSettingNav']->execute($navItems);
+  $nav_html = getNav($navItems, array(
+    'uri' => $boardUri,
+  ));
+  $tmpl = str_replace('{{nav}}', $nav_html, $tmpl);
+  //$pipelines['boardSettingTmpl']->execute($tmpl);
+  wrapContent($tmpl);
 }
 
 ?>
