@@ -36,6 +36,27 @@ $router->get('/boards/:uri/:page', function($request) {
   ));
 });
 
+/*
+$router->get('/boards/:uri/catalog', function($request) {
+  global $tpp;
+  $boardUri = $request['params']['board'];
+  $threads = boardCatalog($boardUri);
+  if (!$threads) {
+    sendResponse(array(), 404, 'Board not found');
+    return;
+  }
+  $pages = ceil(count($threads) / $tpp);
+  $res = array();
+  for($i = 1; $i <= $pages; $i++) {
+    $res[] = array(
+      'page' => $i,
+      'threads' => $threads[$i],
+    );
+  }
+  echo json_encode($res);
+});
+*/
+
 $router->get('/myBoards', function($request) {
   $user_id = loggedIn();
   if (!$user_id) {
@@ -48,14 +69,16 @@ $router->get('/myBoards', function($request) {
 // non-standard 4chan api - lets disable for now
 // /opt should have replaced this
 $router->get('/:board', function($request) {
-  global $db, $models;
+  global $db, $models, $tpp;
   $boardUri = str_replace('.json', '', $request['params']['board']);
   $boardData = getBoard($boardUri);
   if (!$boardData) {
     echo '[]';
     return;
   }
-  echo json_encode($boardData);
+  $boardData['threadCount'] = getThreadCount($boardUri);
+  $boardData['pageCount'] = ceil($boardData['threadCount']/$tpp);
+  sendResponse($boardData);
 });
 
 return $router;
