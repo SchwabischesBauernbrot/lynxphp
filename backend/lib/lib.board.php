@@ -18,6 +18,7 @@ getBoardsWith($field, $value)
 getBoardSettingForm($uri)
 */
 
+// needs to return ID
 function getBoardByUri($boardUri) {
   global $db, $models;
   $res = $db->find($models['board'], array('criteria'=>array(
@@ -29,13 +30,22 @@ function getBoardByUri($boardUri) {
   return $row;
 }
 
+function boardDealer($connections, $boardUri) {
+  $mc = strlen($boardUri);
+  $v = 0;
+  for($c = 0; $c < $mc; $c++) {
+    $v += ord($boardUri[$c]) - 65;
+  }
+  return $connections[$v % count($connections)];
+}
+
 function getPostsModel($boardUri) {
   global $db, $models;
 
   $res = $db->find($models['board'], array('criteria'=>array(
       array('uri', '=', $boardUri),
   )));
-  if (!mysqli_num_rows($res)) {
+  if (!$db->num_rows($res)) {
     return false;
   }
   $public_post_model = array(
@@ -69,7 +79,7 @@ function getPostFilesModel($boardUri) {
   $res = $db->find($models['board'], array('criteria'=>array(
       array('uri', '=', $boardUri),
   )));
-  if (!mysqli_num_rows($res)) {
+  if (!$db->num_rows($res)) {
     return false;
   }
   $public_post_file_model = array(
