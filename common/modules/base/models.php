@@ -38,6 +38,9 @@ $user_session_model = array(
   )
 );
 
+// kind of a single point of failure
+// we need to make data silos that don't depend on each other
+// usage of ID maybe an issue then...
 $board_model = array(
   'name'   => 'board',
   'fields' => array(
