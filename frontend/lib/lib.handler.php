@@ -1,7 +1,15 @@
 <?php
 
 function loadTemplates($template) {
-  $lines = file('templates/' . $template . '.tmpl');
+  return loadTemplatesFile('templates/' . $template . '.tmpl');
+}
+
+function moduleLoadTemplates($template, $dir) {
+  return loadTemplatesFile($dir . '/' . $template . '.tmpl');
+}
+
+function loadTemplatesFile($path) {
+  $lines = file($path);
   $section = 'header';
   $loop = -1;
   $templates = array('header' => '');
@@ -11,8 +19,10 @@ function loadTemplates($template) {
       $loop++;
       $section = 'loop' . $loop;
       $templates[$section] = '';
+      continue;
     } else if ($tline === '<!-- end -->') {
       $section = 'header';
+      continue;
     }
     $templates[$section] .= $line;
   }
