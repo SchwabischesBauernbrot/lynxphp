@@ -1,5 +1,5 @@
 <div class="board-header">
-  <img class="board-banner" src="/randombanner?board={{uri}}" width="300" height="100" loading="lazy"/>
+  {{banner}}
   <br/>
   <h1 class="board-title">Catalog(<a class="no-decoration" href="/{{uri}}/">/{{uri}}/</a>)</h1>
   <h4 class="board-description">{{description}}</h4>
@@ -71,7 +71,7 @@
     </section>
     <input id="submitpost" type="submit" value="New Thread">
   </form>
-  <a class="toggle-summary no-decoration" href="#postform">[New Thread]</a>
+  <a class="toggle-summary no-decoration" href="{{uri}/catalog#postform">[New Thread]</a>
 </section>
 <br>
 <nav class="stickynav">
