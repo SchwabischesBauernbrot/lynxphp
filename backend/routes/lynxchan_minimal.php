@@ -102,6 +102,7 @@ $router->post('/createBoard', function($request) {
 
 $router->post('/files', function($request) {
   $hash = hash_file('sha256', $_FILES['files']['tmp_name']);
+  // FIXME: make sure tmp is made
   move_uploaded_file($_FILES['files']['tmp_name'], 'storage/tmp/'.$hash);
   $data=array(
     'type' => $_FILES['files']['type'],
