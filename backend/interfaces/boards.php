@@ -3,6 +3,7 @@
 function boardDBtoAPI(&$row) {
   global $db, $models;
   unset($row['boardid']);
+  //if ($row['json']) $row['json'] = json_decode($row['json'], true);
   unset($row['json']);
   // decode user_id
   /*
@@ -81,30 +82,31 @@ function boardPage($boardUri, $page = 1) {
 }
 
 function boardCatalog($boardUri) {
-    global $db, $tpp;
-    $board = getBoardByUri($boardUri);
-    if (!$board) {
-      return false;
+  global $db, $tpp;
+  $board = getBoardByUri($boardUri);
+  if (!$board) {
+    return false;
+  }
+  // pages, threads
+  // get a list of threads
+  $posts_model = getPostsModel($boardUri);
+  $post_files_model = getPostFilesModel($boardUri);
+  // get a list of threads sorted by bump
+  $res = $db->find($posts_model, array('criteria' => array(
+    array('threadid', '=', 0),
+  ), 'order'=>'updated_at desc'));
+  $page = 1;
+  // FIXME: rewrite to be more memory efficient
+  while($row = $db->get_row($res)) {
+    postDBtoAPI($row, $post_files_model);
+    $threads[$page][] = $row;
+    if (count($threads[$page]) === $tpp) {
+      $page++;
+      $threads[$page] = array();
     }
-    // pages, threads
-    // get a list of threads
-    $posts_model = getPostsModel($boardUri);
-    $post_files_model = getPostFilesModel($boardUri);
-    // get a list of threads sorted by bump
-    $res = $db->find($posts_model, array('criteria' => array(
-      array('threadid', '=', 0),
-    ), 'order'=>'updated_at desc'));
-    $page = 1;
-    // FIXME: rewrite to be more memory efficient
-    while($row = $db->get_row($res)) {
-      postDBtoAPI($row, $post_files_model);
-      $threads[$page][] = $row;
-      if (count($threads[$page]) === $tpp) {
-        $page++;
-        $threads[$page] = array();
-      }
-    }
-    return $threads;
+  }
+  //echo "page[$page]<br>\n";
+  return $threads;
 }
 
 // optimization
