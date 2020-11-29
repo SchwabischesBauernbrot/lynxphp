@@ -10,8 +10,16 @@ function hasPostVars($fields) {
   return true;
 }
 
+function getCookie($field, $default = '') {
+  return empty($_COOKIE[$field]) ? $default : $_COOKIE[$field];
+}
+
 function getServerField($field, $default = '') {
   return empty($_SERVER[$field]) ? $default : $_SERVER[$field];
+}
+
+function getQueryField($field) {
+  return empty($_GET[$field]) ? '' : $_GET[$field];
 }
 
 function getOptionalPostField($field) {
