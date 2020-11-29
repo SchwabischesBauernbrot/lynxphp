@@ -1,0 +1,16 @@
+<div class="catalog">
+  <ol>
+{{banners}}
+  </ol>
+</div>
+<!-- loop -->
+<li><img class="board-banner" src="{{backend}}/{{image}}" loading="lazy">
+<!-- end -->
+<!-- loop -->
+<li><img src="{{backend}}/{{image}}"> <a href="{{uri}}/settings/banners/{{id}}/delete">X</a>
+<!-- end -->
+<!-- loop -->
+  <a href="{{uri}}/settings/banners/add">Add banner</a><br>
+  {{banners}}
+  <a href="{{uri}}/settings">Back to settings</a>
+<!-- end -->

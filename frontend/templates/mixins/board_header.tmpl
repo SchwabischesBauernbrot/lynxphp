@@ -1,0 +1,79 @@
+<div class="board-header">
+  {{banner}}<br>
+  <a class="no-decoration" href="/{{uri}}/"><h1 class="board-title">/{{uri}}/ - {{title}}</h1></a>
+  <h4 class="board-description">{{description}}</h4>
+</div>
+<br>
+<section class="form-wrapper flex-center">
+  <form class="form-post" id="postform" action="{{uri}}/post" enctype="multipart/form-data" method="POST">
+    <input type="hidden" name="thread">
+    <section class="row jsonly">
+    <div class="noselect" id="dragHandle">
+    New Thread</div>
+    </section>
+    <section class="row">
+    <div class="label">
+    Name</div>
+    <input class="mr-1" type="text" name="name" placeholder="Anon" maxlength="100">
+    <a class="close postform-style" href="#!">
+    X</a>
+    </section>
+    <section class="row">
+    <div class="label">
+    Sage</div>
+    <label class="postform-style ph-5">
+    <input type="checkbox" name="email" value="sage">
+    </label>
+    </section>
+    <section class="row">
+    <div class="label">
+    <span>
+    Subject</span>
+    </div>
+    <input type="text" name="subject" autocomplete="off" maxlength="150">
+    </section>
+    <section class="row">
+    <div class="label">
+    <span>
+    Message</span>
+    </div>
+    <textarea id="message" name="message" rows="5" autocomplete="off" minlength="0" maxlength="4000">
+    </textarea>
+    </section>
+    <section class="row">
+    <div class="label">
+    <span>
+    Files</span>
+
+     <small>
+    Max X files</small>
+    <small>
+    Y MB total</small>
+    </div>
+    <span class="col">
+    <label class="jsonly postform-style filelabel" for="file">
+     Select/Drop/Paste files</label>
+    <input id="file" type="file" name="file" multiple>
+    <div class="upload-list" data-spoilers="true">
+    </div>
+    </span>
+    <noscript>
+    <label class="postform-style ph-5 ml-1 fh">
+    <input type="checkbox" name="spoiler_all" value="true">
+    Spoiler</label>
+    </noscript>
+    </section>
+    <section class="row">
+    <div class="label">
+    Password</div>
+    <input type="password" name="postpassword" placeholder="Password to delete/spoiler/unlink later" maxlength="50">
+    </section>
+    <input id="submitpost" type="submit" value="New Thread">
+  </form>
+  <a class="toggle-summary no-decoration" href="{{url}}#postform">[New Thread]</a>
+</section>
+<br>
+<nav class="stickynav">
+  <a class="nav-item" href="#bottom">[&#9660;]</a>
+  <a class="nav-item" href="#top">[&#9650;]</a>
+</nav>
