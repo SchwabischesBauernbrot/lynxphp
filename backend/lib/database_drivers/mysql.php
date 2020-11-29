@@ -1,6 +1,7 @@
 <?php
 include 'base.php';
 
+// FIXME: convert to array
 function modelToSQL($type) {
   $sql = '';
   switch($type) {
@@ -26,6 +27,7 @@ function modelToSQL($type) {
   return $sql;
 }
 
+// FIXME: convert to array
 function sqlToType($sqlType) {
   //echo "sqlToType[$sqlType]<br>\n";
   $type = 'true';
@@ -227,6 +229,24 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $sql = 'update ' .$tableName . ' set '. join(', ', $sets);
     if (isset($options['criteria'])) {
       $sql .= ' where ' . $this->build_where($options['criteria']);
+    }
+    //echo "sql[$sql]<br>\n";
+    $res = mysqli_query($this->conn, $sql);
+    $err = mysqli_error($this->conn);
+    if ($err) {
+      echo "err[$err]<br>\n";
+      return false;
+    }
+    return true;
+  }
+  public function delete($rootModel, $options) {
+    $tableName = modelToTableName($rootModel);
+
+    $sql = 'delete from ' .$tableName;
+    if (isset($options['criteria'])) {
+      $sql .= ' where ' . $this->build_where($options['criteria']);
+    //} else {
+      // a warning? or something to prevent total table loss if typo...
     }
     //echo "sql[$sql]<br>\n";
     $res = mysqli_query($this->conn, $sql);
