@@ -1,5 +1,9 @@
 <?php
 
+// FIXME: route names
+// FIXME: route lastMod options
+// decode security options into meaningful easy settings
+
 class Router {
   function __construct() {
     $this->methods = array();
@@ -19,6 +23,9 @@ class Router {
   }
   function post($cond, $func) {
     $this->methods['POST'][$cond] = $func;
+  }
+  function debug() {
+    print_r($this->methods);
   }
   function exec($method, $path) {
     $methods = $this->methods[$method];
@@ -100,5 +107,7 @@ class Router {
     return false;
   }
 }
+
+return new Router;
 
 ?>
