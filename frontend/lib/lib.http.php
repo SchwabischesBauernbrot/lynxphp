@@ -54,4 +54,8 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   return $result;
 }
 
+function make_file($tmpfile, $type, $filename) {
+  return curl_file_create($tmpfile, $type, $filename);
+}
+
 ?>
