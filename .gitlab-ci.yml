@@ -21,10 +21,10 @@ before_script:
 - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
 - echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
 - touch frontend/config_.php
-- echo "check"
-- cat backend/config_.php
+# set up wait for it
+- git clone https://github.com/vishnubob/wait-for-it.git
+- wait-for-it/wait-for-it.sh -t 0 mysql:3306
 - php -v
-- echo "done"
 
 services:
 - mysql/mysql-server:5.7
