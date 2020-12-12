@@ -21,6 +21,9 @@ before_script:
 - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
 - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
 - touch frontend/config_.php
+- echo "check"
+- cat backend/config_.php
+- echo "done"
 
 services:
 - mysql
