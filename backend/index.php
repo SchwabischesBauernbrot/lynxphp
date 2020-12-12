@@ -67,8 +67,12 @@ include 'interfaces/users.php';
 include 'interfaces/files.php';
 include 'interfaces/sessions.php';
 
-include '../common/modules/board/banners/models.php';
-include '../common/modules/board/banners/backend_handlers.php';
+$packages = array();
+registerPackageGroup('board');
+// build routes (and activate backend_handlers.php/models.php)
+foreach($packages as $pkg) {
+  $pkg->buildBackendRoutes();
+}
 
 $response_template = array(
   'meta' => array(
@@ -99,6 +103,20 @@ $router->all('/4chan/*', $routers['4chan']);
 $router->all('/lynx/*', $routers['lynx']);
 $router->all('/opt/*', $routers['opt']);
 
-$router->exec(getServerField('REQUEST_METHOD', 'GET'), getServerField('PATH_INFO'));
+$req_method = getServerField('REQUEST_METHOD', 'GET');
+$req_path   = getServerField('PATH_INFO');
+$res = $router->exec($req_method, $req_path);
+if (!$res) {
+  http_response_code(404);
+  sendResponse(array(
+    'method' => $req_method,
+    'path'   => $req_path,
+    'routes' => $router->debug($req_method),
+  ), 404, 'route not found');
+  //echo "<h1>404 route not found</h1>";
+  //echo "METHOD: ", getServerField('REQUEST_METHOD', 'GET'), "<br>\n";
+  //echo "PATH: ", getServerField('PATH_INFO'), "<br>\n";
+  //die();
+}
 
 ?>
