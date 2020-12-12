@@ -55,3 +55,10 @@ test:php8:mysql:
     - docker
   script:
    - tests/run.sh
+
+test:php8:mysql:
+  image: keinos/php8-jit:latest
+  tags:
+    - docker
+  script:
+   - tests/run.sh
