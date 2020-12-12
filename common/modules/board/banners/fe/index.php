@@ -13,9 +13,13 @@
 
 // could attach to a package handle if we had one here...
 
-$fePkg = new frontend_package();
+// FIXME: pass in $package...
+// or return this, so we can set it...
+//$fePkg = new frontend_package($this);
+$fePkg = $this->makeFrontend();
 
 //$fePkg->addBackendResource('', $beRsrc);
+global $beRrsc_random, $beRrsc_list, $beRrsc_add, $beRrsc_del;
 $beRrsc_random = array(
   'endpoint' => 'lynx/randomBanner',
   'unwrapData' => true,
@@ -52,6 +56,10 @@ $beRrsc_del = array(
   ),
 );
 
+$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
+$fePkg->addHandler('GET', '/:uri/settings/banners', 'settings_list');
+// form: '/:uri/settings/banners/add'
+// form: '/:uri/settings/banners/:id/delete'
 
 // plug into boardSettingsTmpl
 
@@ -68,6 +76,7 @@ $router->get('/:uri/banners/random', function($request) {
 });
 */
 
+/*
 $router->get('/:uri/banners', function($request) {
   $boardUri = $request['params']['uri'];
   global $beRrsc_list;
@@ -98,7 +107,6 @@ $router->get('/:uri/banners', function($request) {
   $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
   $tmpl = str_replace('{{banners}}', $banners_html, $tmpl);
   wrapContent($tmpl);
-
 });
 
 $router->get('/:uri/settings/banners', function($request) {
@@ -136,6 +144,7 @@ $router->get('/:uri/settings/banners', function($request) {
   $tmpl = str_replace('{{banners}}', $banners_html, $tmpl);
   wrapContent($tmpl);
 });
+*/
 
 $router->get('/:uri/settings/banners/add', function($request) {
   // do we own this board?
