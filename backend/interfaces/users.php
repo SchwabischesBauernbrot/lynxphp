@@ -6,7 +6,8 @@
 function userBoards($user_id) {
   global $db, $models;
   $user_id = (int)$user_id;
-  $res = $db->find($models['board'], array('critera'=>array(
+  $res = $db->find($models['board'], array('criteria'=>array(
+//    array('owner_id', '=', $user_id),
     'owner_id' => $user_id
   )));
   $boards = $db->toArray($res);
