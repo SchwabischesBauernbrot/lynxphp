@@ -40,8 +40,20 @@ EOB;
 }
 
 function postCreateBoard() {
-  $data = backendCreateBoard();
-  echo $data;
+  $result = backendCreateBoard();
+  //print_r($result);
+  if ($result['data'] === 'ok') {
+    // maybe not display this?
+    //wrapContent('Board created!');
+    redirectTo('control_panel.php');
+    /*
+    $uri = $_POST['uri'];
+    redirectTo($uri . '/settings');
+    */
+    return;
+  }
+  $tmpl = "Error: Sign up error: " . $result['meta']['err'] . "<br>\n";
+  wrapContent($tmpl . getSignupForm());
 }
 
 ?>
