@@ -26,12 +26,13 @@ before_script:
 - echo "done"
 
 services:
-- mysql
+- mysql/mysql-server:8.0.0
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
-  MYSQL_DATABASE: lynxphp
-  MYSQL_ROOT_PASSWORD: mysql
+  MYSQL_DATABASE: "lynxphp"
+  MYSQL_ROOT_PASSWORD: "mysql"
+  MYSQL_ALLOW_EMPTY_PASSWORD: "1"
 
 # We test PHP5.6 (the default) with MySQL
 test:php56:mysql:
