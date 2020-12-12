@@ -27,7 +27,8 @@ before_script:
 - php -v
 
 services:
-- mysql/mysql-server:5.7
+  - docker:dind
+  - mysql/mysql-server:5.7
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
