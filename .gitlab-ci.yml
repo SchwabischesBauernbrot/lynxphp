@@ -23,6 +23,7 @@ before_script:
 - touch frontend/config_.php
 - echo "check"
 - cat backend/config_.php
+- php -v
 - echo "done"
 
 services:
