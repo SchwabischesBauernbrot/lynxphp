@@ -9,7 +9,7 @@ image: php:5.6-cli
 before_script:
 # Install git, the php image doesn't have installed
 - apt-get update -yqq
-- apt-get install git libcurl-dev -yqq
+- apt-get install git libcurl4-openssl-dev -yqq
 # Install required PHP extensions
 - docker-php-ext-install mysqli 
 - docker-php-ext-install curl
