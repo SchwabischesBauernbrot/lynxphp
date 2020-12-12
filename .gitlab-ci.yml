@@ -14,6 +14,8 @@ before_script:
 - docker-php-ext-install mysqli 
 - docker-php-ext-install curl
 # set up config files
+- pwd
+- cd /builds/odilitime/lynxphp
 - touch backend/config_.php
 - echo "// local config" >> backend/config_.php
 - echo "define('DB_HOST', 'mysql');" >> backend/config_.php
@@ -24,6 +26,7 @@ before_script:
 - echo "check"
 - cat backend/config_.php
 - php -v
+- pwd
 - echo "done"
 
 services:
