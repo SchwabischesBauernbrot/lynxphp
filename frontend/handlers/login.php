@@ -1,21 +1,14 @@
 <?php
 
-function getLoginData() {
-  $data = file_get_contents(BACKEND_BASE_URL . '4chan/boards.json');
-  echo $data;
-  $boards = array();
-  return $boards;
-}
-
 function getLoginForm() {
   $secure_login_link = 'login.php';
   $secure_signup_link = 'signup.php';
   $content = <<< EOB
 <form action="$secure_login_link" method="POST">
   <dl>
-    <dt>
+    <dt>Username:
     <dd><input type=text name="username">
-    <dt>
+    <dt>Password:
     <dd><input type=password name="password">
   </dl>
   <input type=submit value="log in">
@@ -26,7 +19,8 @@ EOB;
 }
 
 function getLogin() {
-  $boards  = getLoginData();
+  // FIXME: are you logged in or not?
+  // if logged in, display log out link instead
   wrapContent(getLoginForm());
 }
 
@@ -36,7 +30,7 @@ function getLogout() {
 }
 
 function postLogin() {
-  $login = backendLogin();
+  $login = backendLogin($_POST['username'], $_POST['password']);
   if ($login === true) {
     redirectTo('control_panel.php');
   } else {
