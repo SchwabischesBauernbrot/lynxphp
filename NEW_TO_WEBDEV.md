@@ -27,8 +27,8 @@ These are common functions that you may want to use on multiple handlers. This c
 ## Router
 Manages the routes
 
-# Frontend
+## Frontend
 Usually code that takes a data source and renders it into HTML, CSS and JS
 
-# Backend
+## Backend
 Usually code that takes a data source, handles the application logic and provides a final data source output for mobile and HTML (frontend) clients
