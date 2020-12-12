@@ -36,6 +36,7 @@ variables:
   MYSQL_DATABASE: "lynxphp"
   MYSQL_ROOT_PASSWORD: "mysql"
   MYSQL_ALLOW_EMPTY_PASSWORD: "1"
+  MYSQL_ROOT_HOST: "%"
 
 # We test PHP5.6 (the default) with MySQL
 #test:php56:mysql:
