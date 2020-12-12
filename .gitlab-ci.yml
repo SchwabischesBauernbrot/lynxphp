@@ -52,12 +52,13 @@ test:php7:mysql:
    - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
-test:php8:mysql:
-  image: php:8.0.0-cli
-  tags:
-    - docker
-  script:
-   - tests/run.sh
+# Latest is php8 rn
+#test:php8:mysql:
+#  image: php:8.0.0-cli
+#  tags:
+#    - docker
+#  script:
+#   - tests/run.sh
 
 test:php-latest:mysql:
   image: php:latest
