@@ -47,10 +47,9 @@ test:php7:mysql:
   script:
    - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
-#  allow_failure: true
 
 test:php8:mysql:
-  image: php:8-cli
+  image: php:8.0.0-cli
   tags:
     - docker
   script:
@@ -62,3 +61,11 @@ test:php8:mysql:
     - docker
   script:
    - tests/run.sh
+
+test:php-latest:mysql:
+  image: php:latest
+  tags:
+    - docker
+  script:
+   - tests/run.sh
+  allow_failure: true
