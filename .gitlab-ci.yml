@@ -9,10 +9,9 @@ image: php:5.6-cli
 before_script:
 # Install git, the php image doesn't have installed
 - apt-get update -yqq
-- apt-get install git -yqq
+- apt-get install git libcurl-dev -yqq
 # Install required PHP extensions
 - docker-php-ext-install mysqli 
-- docker-php-ext-enable mysqli
 - docker-php-ext-install curl
 - docker-php-ext-enable curl
 # set up config files
@@ -23,7 +22,6 @@ before_script:
 - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
 - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
 - touch frontend/config_.php
-- echo "define('BASE_HREF', '/');" >> frontend/config_.php
 
 services:
 - mysql
