@@ -92,8 +92,15 @@ include 'handlers/signup.php';
 include 'handlers/control_panel.php';
 include 'handlers/boards.php';
 
-// FIXME: function('board/banners');
-include '../common/modules/board/banners/frontend_handlers.php';
+$req_method = getServerField('REQUEST_METHOD', 'GET');
+$req_path   = getServerField('PATH_INFO');
+
+$packages = array();
+registerPackageGroup('board');
+// build routes (and activate frontend_handlers.php)
+foreach($packages as $pkg) {
+  $pkg->buildFrontendRoutes($router, $req_method);
+}
 
 // should a handler set a variables (data structure)
 // or define a set of functions
@@ -242,5 +249,9 @@ $router->get('/:uri', function($request) {
   redirectTo(BASE_HREF . $boardUri . '/');
 });
 
-$router->exec(getServerField('REQUEST_METHOD', 'GET'), getServerField('PATH_INFO'));
+$res = $router->exec($req_method, $req_path);
+if (!$res) {
+  http_response_code(404);
+  echo "404 Page not found<br>\n";
+}
 ?>
