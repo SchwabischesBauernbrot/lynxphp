@@ -5,7 +5,8 @@ function loadTemplates($template) {
 }
 
 function moduleLoadTemplates($template, $dir) {
-  return loadTemplatesFile($dir . '/' . $template . '.tmpl');
+  // this will be called from the frontend_handlers dir
+  return loadTemplatesFile($dir . '/../views/' . $template . '.tmpl');
 }
 
 function loadTemplatesFile($path) {
@@ -23,6 +24,32 @@ function loadTemplatesFile($path) {
     } else if ($tline === '<!-- end -->') {
       $section = 'header';
       continue;
+    }
+    $templates[$section] .= $line;
+  }
+  return $templates;
+}
+
+function loadTemplatesFile2($path) {
+  $section = 'header';
+  $templates = array($section => '');
+  $lines = file($path);
+  foreach($lines as $line) {
+    $tline = trim($line);
+    // starts with <!-- section[
+    if (substr(0, 13, $tline) === '<!-- section[') {
+      //echo "Found new layout format<Br>\n";
+      // ends with ] -->
+      $end = strpos($tline, '] -->', 12);
+      $section = substr($tline, 12, $end);
+      if (empty($templates[$section])) $templates[$section]='';
+      continue; // don't include line
+    }
+    if (strtoupper($tline) === '<!-- END -->') {
+      // only count loops, so that loop0 is the first loop
+      $section = 'footer';
+      if (empty($templates[$section])) $templates[$section]='';
+      continue; // don't include line
     }
     $templates[$section] .= $line;
   }
