@@ -13,11 +13,10 @@ before_script:
 # Install required PHP extensions
 - docker-php-ext-install mysqli 
 - docker-php-ext-install curl
-- docker-php-ext-enable curl
 # set up config files
 - touch backend/config_.php
 - echo "// local config" >> backend/config_.php
-- echo "define('DB_HOST', 'localhost');" >> backend/config_.php
+- echo "define('DB_HOST', '127.0.0.1');" >> backend/config_.php
 - echo "define('DB_USER', 'mysql');" >> backend/config_.php
 - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
 - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
