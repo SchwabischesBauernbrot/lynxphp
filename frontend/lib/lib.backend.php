@@ -125,9 +125,7 @@ function checkSession() {
   return $ses;
 }
 
-function backendLogin() {
-  $user = $_POST['username'];
-  $pass = $_POST['password'];
+function backendLogin($user, $pass) {
   // login, password, email
   $data = curlHelper(BACKEND_BASE_URL . 'lynx/login', array(
     'login'    => $user,
@@ -135,7 +133,7 @@ function backendLogin() {
   ), array('HTTP_X_FORWARDED_FOR' => getip()));
   echo "data[$data]<br>\n";
   $res = json_decode($data, true);
-  if (isset($res['data']['session']) && $res['data']['session']) {
+  if (!empty($res['data']['session'])) {
     setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
     //redirectTo('control_panel.php');
     return true;
