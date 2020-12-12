@@ -28,7 +28,8 @@ before_script:
 
 services:
   - docker:dind
-  - mysql/mysql-server:5.7
+  - name: mysql/mysql-server:5.7
+    alias: mysql
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
