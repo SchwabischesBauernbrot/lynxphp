@@ -1,3 +1,0 @@
-hasRole(ROLENAME)
-include_file(file)
-include_cms(slug)
