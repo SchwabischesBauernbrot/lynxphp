@@ -44,11 +44,16 @@ class database_driver_base_class {
     // field, comparator, field
     $sets = array();
     $alias = $defAlias ? $defAlias . '.' : '';
-    foreach($criteria as $set) {
-      if (is_array($set[2])) {
-        $sets[] = $alias . $set[0] . ' ' . $set[1] . ' ' . $set[2][0];
+    foreach($criteria as $k => $set) {
+      if (is_numeric($k)) {
+        if (is_array($set[2])) {
+          $sets[] = $alias . $set[0] . ' ' . $set[1] . ' ' . $set[2][0];
+        } else {
+          $sets[] = $alias . $set[0] . ' ' . $set[1] . ' ' . $this->make_constant($set[2]);
+        }
       } else {
-        $sets[] = $alias . $set[0] . ' ' . $set[1] . ' ' . $this->make_constant($set[2]);
+        // named key
+        $sets[] = $alias . $k . '=' . $set;
       }
     }
     return join(' AND ', $sets);
