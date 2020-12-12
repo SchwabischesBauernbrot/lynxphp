@@ -37,20 +37,20 @@ variables:
   MYSQL_ALLOW_EMPTY_PASSWORD: "1"
 
 # We test PHP5.6 (the default) with MySQL
-test:php56:mysql:
-  tags:
-    - docker
-  script:
-   - tests/run.sh
+#test:php56:mysql:
+#  tags:
+#    - docker
+#  script:
+#   - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 # We test PHP7 with MySQL, but we allow it to fail
-test:php7:mysql:
-  image: php:7-cli
-  tags:
-    - docker
-  script:
-   - tests/run.sh
+#test:php7:mysql:
+#  image: php:7-cli
+#  tags:
+#    - docker
+#  script:
+#   - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 # Latest is php8 rn
