@@ -258,6 +258,7 @@ class pipeline_module extends orderable_module {
   function __construct($name) {
     $this->name = $name;
   }
+  // FIXME: convert to external file
   function attach($pipeline, $code) {
     // deps and preempt are set
     global $pipelines;
@@ -266,24 +267,7 @@ class pipeline_module extends orderable_module {
   }
 }
 
-
-// a owner of a collection of pipeline_modules...
-class package {
-  var $ver;
-  function __construct($name, $ver) {
-    $this->ver = $ver;
-  }
-}
-
-class backend_package {
-}
-
-class frontend_package {
-  // attach
-  // - backend_resource
-  // - frontend route/handler
-}
-
+/*
 class backend_resource {
   var $endpoint;
   var $method;
@@ -298,6 +282,215 @@ class backend_resource {
   }
   function use() {
   }
+}
+*/
+
+// a owner of a collection of pipeline_modules...
+class package {
+  var $ver;
+  var $resources;
+  function __construct($name, $ver, $dir) {
+    $this->ver = $ver;
+    $this->name = $name;
+    // we should understand the path of the module...
+    $this->dir = $dir . '/'; // ends in trailing slash...
+    $this->resources = array();
+    // should we register with something? not now...
+    $this->frontend_packages = array();
+    $this->backend_packages = array();
+  }
+  // should we make a frontend_package/backend_package
+  // no because they're optional and could have more than one
+  // FIXME: rename this... they'll be in a fe/be context and we need to emphasize the pkg part
+  function makeFrontend() {
+    return new frontend_package($this);
+  }
+  function makeBackend() {
+    return new backend_package($this);
+  }
+  // FIXME: These names were meant for client side only, make more universal
+  /**
+   * create resource
+   * options
+   *   general
+   *     endpoint (lynx/bob) REQUIRED
+   *     method (GET, POST, AUTO, etc)
+   *     handlerFile - backend handler file
+   *   post data
+   *     requires - validation
+   *     formData - associative array of key/values
+   *   headers
+   *     sendSession
+   *     sendIP
+   *   middlewares
+   *     boardOwnerMiddleware, boardMiddleware
+   *   response
+   *     expectJson
+   *     unwrapData
+   */
+  function addResource($label, $rsrcArr) {
+    if (!isset($rsrcArr['handlerFile'])) {
+      $rsrcArr['handlerFile'] = $this->dir . 'be/handlers/'. $label . '.php';
+      if (!file_exists($rsrcArr['handlerFile'])) {
+        echo "Failed to setup [", $rsrcArr['handlerFile'], "]<br>\n";
+      }
+    }
+    $this->resources[$label] = $rsrcArr;
+  }
+  function buildBackendRoutes() {
+    global $routers;
+    // we install models...
+    /*
+    if (file_exists($this->dir . 'models.php')) {
+      include $this->dir . 'models.php';
+    }
+    */
+    // activate backend hooks
+    if (file_exists($this->dir . 'be/index.php')) {
+      include $this->dir . 'be/index.php';
+    }
+    // install routes
+    foreach($this->resources as $label => $rsrc) {
+      $endpoint = $rsrc['endpoint'];
+      // figure out which router
+      $router = 'opt';
+      if (substr($endpoint, 0, 6) === '4chan/') {
+        $router = '4chan';
+      } else
+      if (substr($endpoint, 0, 5) === 'lynx/') {
+        $router = 'lynx';
+      }
+      // requires the router name matches the route prefix
+      $rsrc['endpoint'] = str_replace($router, '', $rsrc['endpoint']);
+      //echo "Adding [$label] to [$router]<br>\n";
+      $res = $routers[$router]->fromResource($label, $rsrc);
+      if ($res !== true) {
+        echo "Problem building routes for : $res<br>\n";
+      }
+    }
+  }
+  function buildFrontendRoutes(&$router, $method) {
+    // activate frontend hooks
+    if (file_exists($this->dir . 'fe/index.php')) {
+      include $this->dir . 'fe/index.php';
+    }
+    // build all frontend routes
+    foreach($this->frontend_packages as $fe_pkg) {
+      $fe_pkg->buildRoutes($router, $method);
+    }
+  }
+  function registerFrontendPackage(&$fe_pkg) {
+    $this->frontend_packages[] = &$fe_pkg;
+  }
+  function registerBackendPackage(&$fe_pkg) {
+    $this->backend_packages[] = &$fe_pkg;
+  }
+  function exec($label, $params) {
+  }
+}
+
+class backend_package {
+  function __construct($meta_pkg) {
+    $this->pkg = $meta_pkg;
+    $this->pkg->registerBackendPackage($this);
+  }
+  function addModel($model) {
+    global $db, $models;
+    $name = $model['name'];
+    // FIXME: move this into an activate module step
+    // I think it makes the most to do this check once on start update
+    // or maybe we build a list of tables to check and batch check...
+    $db->autoupdate($model);
+    $models[$name] = $model;
+  }
+}
+
+class frontend_package {
+  // attach
+  // - backend_resource
+  // - frontend route/handler
+  function __construct($meta_pkg) {
+    $this->pkg = $meta_pkg;
+    $this->pkg->registerFrontendPackage($this);
+    $this->handlers = array();
+  }
+  // could make a addCRUD (optional update)
+  // could make an addForm that has a get/post
+  // maybe a list of overrides options (defaults to change behavior)
+  // everything should be memioized (ttl/etag)
+  // ttl is a safe bet...
+  // most data sources are going to be the backend
+  // so we'll need enough set up to talk to it
+  function addHandler($method, $cond, $file, $options = false) {
+    $method = strtoupper($method);
+    if (!isset($this->handlers[$method])) {
+      $this->handlers[$method] = array();
+    }
+    $this->handlers[$method][$cond] = $file;
+  }
+  function buildRoutes(&$router, $method) {
+    // do we have any routes in this method
+    if (empty($this->handlers[$method])) {
+      return;
+    }
+    // only build the routes we need
+    foreach($this->handlers[$method] as $cond => $file) {
+      $path = $this->pkg->dir . 'fe/handlers/' . $file . '.php';
+      $func = function($request) use ($path) {
+        // lastMod function?
+        // well just deep memiozation could work...
+        // middlewares, wrapContent => sendResponse
+        $get = function() {
+          return array();
+        };
+        $intFunc = include $path;
+      };
+      $router->addMethodRoute($method, $cond, $func);
+    }
+  }
+}
+
+//
+// loader functions
+//
+
+function registerPackages() {
+}
+
+$module_base = 'common/modules/';
+
+function registerPackageGroup($group) {
+  global $module_base, $packages;
+  $dir = '../' . $module_base . $group;
+  if (!is_dir($dir)) {
+    // does not exists
+    return false;
+  }
+  $dh = opendir($dir);
+  if (!$dh) {
+    // permissions
+    return false;
+  }
+  $loaded = 0;
+  while (($file = readdir($dh)) !== false) {
+    if ($file[0] === '.') continue;
+    //echo "filename: $file : filetype: " . filetype($dir . $file) . "\n";
+    $path = $dir . '/' . $file;
+    if (is_dir($path)) {
+      $loaded++;
+      $pkg = &registerPackage($group . '/' . $file);
+      $packages[$pkg->name] = $pkg;
+    }
+  }
+  closedir($dh);
+  return $loaded;
+}
+
+function &registerPackage($pkg_path) {
+  global $module_base;
+  $full_pkg_path = '../' . $module_base . $pkg_path . '/';
+  $pkg = include $full_pkg_path . 'index.php';
+  return $pkg;
 }
 
 function getEnabledModules() {
