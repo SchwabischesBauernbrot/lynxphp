@@ -29,7 +29,7 @@ variables:
   MYSQL_ROOT_PASSWORD: mysql
 
 # We test PHP5.6 (the default) with MySQL
-test:mysql:
+test:php56:mysql:
   tags:
     - docker
   script:
@@ -48,5 +48,7 @@ test:php7:mysql:
 
 test:php8:mysql:
   image: php:7
+  tags:
+    - docker
   script:
    - tests/run.sh
