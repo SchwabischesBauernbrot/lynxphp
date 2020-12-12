@@ -30,6 +30,8 @@ variables:
 
 # We test PHP5.6 (the default) with MySQL
 test:mysql:
+  tags:
+    - docker
   script:
    - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
@@ -37,6 +39,8 @@ test:mysql:
 # We test PHP7 with MySQL, but we allow it to fail
 test:php7:mysql:
   image: php:7
+  tags:
+    - docker
   script:
    - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
