@@ -54,7 +54,7 @@ test:php8:mysql:
   script:
    - tests/run.sh
 
-test:php8:mysql:
+test:php8jit:mysql:
   image: keinos/php8-jit:latest
   tags:
     - docker
