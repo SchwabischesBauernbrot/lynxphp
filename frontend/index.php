@@ -73,7 +73,6 @@ $pipelines = array(
 // - logout
 
 // frontend libraries
-include 'lib/lib.cache.php'; // memoization functions
 include 'lib/lib.http.php'; // comms lib
 include 'lib/lib.backend.php'; // comms lib
 include 'lib/lib.handler.php'; // output functions
