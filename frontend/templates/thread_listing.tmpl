@@ -20,7 +20,7 @@
     </section>
     <section class="row">
       <div class="label">Email</div>
-      <input type="text" name="email" autocomplete="off" maxlength="100">
+      <input type="text" name="email" autocomplete="chrome-off" maxlength="100">
     </section>
     <!-- section class="row">
       <div class="label">Sage</div>
@@ -30,11 +30,11 @@
     </section -->
     <section class="row">
       <div class="label"><span>Subject</span></div>
-      <input type="text" name="subject" autocomplete="off" maxlength="150">
+      <input type="text" name="subject" autocomplete="chrome-off" maxlength="150">
     </section>
     <section class="row">
       <div class="label"><span>Message</span></div>
-      <textarea id="message" name="message" rows="5" autocomplete="off" minlength="0" maxlength="4000"></textarea>
+      <textarea id="message" name="message" rows="5" autocomplete="chrome-off" minlength="0" maxlength="4000"></textarea>
     </section>
     <section class="row">
       <div class="label"><span>Files</span><small>Max 5 files</small> <small>50MB total</small></div>
@@ -117,9 +117,9 @@
           <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
         </span>
         <span class="post-links">
-          <a class="noselect no-decoration" href="{{uri}}/thread/{{no}}.html#{{no}}">No.</a>
-          <span class="post-quoters"><a class="no-decoration" href="{{uri}}/thread/{{no}}.html">{{no}}</a>
-            <span class="noselect"><a href="{{uri}}/thread/{{no}}.html#postform">[Reply]</a></span>
+          <a class="noselect no-decoration" href="{{uri}}/thread/{{threadNum}}.html#{{no}}">No.</a>
+          <span class="post-quoters"><a class="no-decoration" href="{{uri}}/thread/{{threadNum}}.html#{{no}}">{{no}}</a>
+            <span class="noselect"><a href="{{uri}}/thread/{{threadNum}}.html#postform">[Reply]</a></span>
           </span>
           <select class="jsonly postmenu">
             <option value="hide">Hide</option>
@@ -153,7 +153,7 @@
   <input class="post-check" type="checkbox" name="spoiler" value="1">
   Spoiler Files</label>
   <label>
-  <input id="password" type="password" name="postpassword" placeholder="Post password" autocomplete="off">
+  <input id="password" type="password" name="postpassword" placeholder="Post password" autocomplete="chrome-off">
   </label>
   <label>
   <input class="post-check" type="checkbox" name="report" value="1">
@@ -162,7 +162,7 @@
   <input class="post-check" type="checkbox" name="global_report" value="1">
   Global Report</label>
   <label>
-  <input id="report" type="text" name="report_reason" placeholder="Report reason" autocomplete="off">
+  <input id="report" type="text" name="report_reason" placeholder="Report reason" autocomplete="chrome-off">
   </label>
   </div>
   <div class="actions">
