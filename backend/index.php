@@ -22,7 +22,7 @@ $db = new $driver_name;
 $tpp = 10; // threads per page
 
 if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
-  exit();
+  exit(1);
 }
 
 include '../common/lib.modules.php'; // module functions and classes

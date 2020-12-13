@@ -1,59 +1,62 @@
-# Select image from https://hub.docker.com/_/php/
-image: php:5.6-cli
-
 # Select what we should cache
 #cache:
 #  paths:
 #  - vendor/
 
-before_script:
-# Install git, the php image doesn't have installed
-- apt-get update -yqq
-- apt-get install git -yqq
-# Install required PHP extensions
-- docker-php-ext-install mysqli 
-- docker-php-ext-enable mysqli
-- docker-php-ext-install curl
-- docker-php-ext-enable curl
-# set up config files
-- touch backend/config_.php
-- echo "// local config" >> backend/config_.php
-- echo "define('DB_HOST', 'localhost');" >> backend/config_.php
-- echo "define('DB_USER', 'mysql')" >> backend/config_.php
-- echo "define('DB_PWD', 'mysql');" >> backend/config_.php
-- echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
-- touch frontend/config_.php
-- echo "define('BASE_HREF', '/');" >> frontend/config_.php
+.default: &default
+  # Install required PHP extensions
+  - docker-php-ext-install -j$(nproc) mysqli curl
+  # set up config files
+  - touch backend/config_.php
+  - echo "<?php // local config" >> backend/config_.php
+  - echo "define('DB_HOST', 'mysql');" >> backend/config_.php
+  - echo "define('DB_USER', 'root');" >> backend/config_.php
+  - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
+  - echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
+  - touch frontend/config_.php
 
-services:
-- mysql
+# Why use debian if alpine is faster? Robustness tests?
+.debian: &debian
+  - apt-get update -yqq
+  - apt-get install git libcurl4-openssl-dev -yqq
+
+.alpine: &alpine
+  - apk add curl-dev
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
-  MYSQL_DATABASE: lynxphp
-  MYSQL_ROOT_PASSWORD: mysql
+  MYSQL_DATABASE: "lynxphp"
+  MYSQL_ROOT_PASSWORD: "mysql"
+  MYSQL_ROOT_HOST: "%"
 
 # We test PHP5.6 (the default) with MySQL
-test:php56:mysql:
-  tags:
-    - docker
-  script:
-   - tests/run.sh
+# Select image from https://hub.docker.com/_/php/
+#test:php56:mysql:
+#  tags:
+#    - docker
+#  script:
+#   - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 # We test PHP7 with MySQL, but we allow it to fail
-test:php7:mysql:
-  image: php:7-cli
-  tags:
-    - docker
-  script:
-   - tests/run.sh
+#test:php7:mysql:
+#  image: php:7-cli
+#  tags:
+#    - docker
+#  script:
+#   - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
-#  allow_failure: true
 
-test:php8:mysql:
-  image: php:8-cli
+test:php-latest:mysql-latest:
+  before_script:
+    - *alpine
+    - *default
+  image: php:8.0.0-cli-alpine
+  services:
+    - name: mysql/mysql-server:latest
+      alias: mysql
   tags:
     - docker
   script:
-   - tests/run.sh
+    - tests/run.sh
+#  allow_failure: true

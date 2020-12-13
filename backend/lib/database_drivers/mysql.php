@@ -63,7 +63,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     }
     $this->conn = mysqli_connect($host, $user, $pass);
     if (!$this->conn) {
-      echo "Failed to connect<br>\n";
+      echo "Failed to connect [$user@$host]<br>\n";
     echo "Debugging errno: " . mysqli_connect_errno() . PHP_EOL;
     echo "Debugging error: " . mysqli_connect_error() . PHP_EOL;
       return false;
