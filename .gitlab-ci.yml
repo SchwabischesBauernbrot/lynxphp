@@ -3,11 +3,17 @@
 #  paths:
 #  - vendor/
 
+# Why use debian if alpine is faster? Robustness tests?
+.debian:
+  before_script:
+  - apt-get update -yqq
+  - apt-get install git libcurl4-openssl-dev -yqq
+
+.alpine:
+  before_script:
+  - apk add curl-dev
+
 before_script:
-# Install git, the php image doesn't have installed
-#- apt-get update -yqq
-#- apt-get install git libcurl4-openssl-dev -yqq
-- apk add curl-dev
 # Install required PHP extensions
 - docker-php-ext-install -j$(nproc) mysqli curl
 # set up config files
@@ -44,6 +50,7 @@ variables:
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 test:php-latest:mysql-latest:
+  extends: .alpine
   image: php:8.0.0-cli-alpine
   services:
     - name: mysql/mysql-server:latest
