@@ -1,5 +1,3 @@
-# Select image from https://hub.docker.com/_/php/
-image: php:5.6-cli
 
 # Select what we should cache
 #cache:
@@ -22,23 +20,19 @@ before_script:
 - echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
 - touch frontend/config_.php
 # set up wait for it
-- git clone https://github.com/vishnubob/wait-for-it.git
-- wait-for-it/wait-for-it.sh -t 0 mysql:3306
+#- git clone https://github.com/vishnubob/wait-for-it.git
+#- wait-for-it/wait-for-it.sh -t 0 mysql:3306
 - php -v
-
-services:
-  - docker:dind
-  - name: mysql/mysql-server:5.7
-    alias: mysql
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
   MYSQL_DATABASE: "lynxphp"
   MYSQL_ROOT_PASSWORD: "mysql"
-  MYSQL_ALLOW_EMPTY_PASSWORD: "1"
+#  MYSQL_ALLOW_EMPTY_PASSWORD: "1"
   MYSQL_ROOT_HOST: "%"
 
 # We test PHP5.6 (the default) with MySQL
+# Select image from https://hub.docker.com/_/php/
 #test:php56:mysql:
 #  tags:
 #    - docker
@@ -63,8 +57,12 @@ variables:
 #  script:
 #   - tests/run.sh
 
-test:php-latest:mysql:
+test:php-latest:mysql-latest:
   image: php:latest
+  services:
+  #  - docker:dind
+    - name: mysql/mysql-server:latest
+      alias: mysql
   tags:
     - docker
   script:
