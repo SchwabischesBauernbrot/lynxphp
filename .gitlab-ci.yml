@@ -9,21 +9,22 @@
   - apt-get update -yqq
   - apt-get install git libcurl4-openssl-dev -yqq
 
-.alpine: &alpine
+.alpine:
   before_script:
   - apk add curl-dev
 
-before_script:
-# Install required PHP extensions
-- docker-php-ext-install -j$(nproc) mysqli curl
-# set up config files
-- touch backend/config_.php
-- echo "<?php // local config" >> backend/config_.php
-- echo "define('DB_HOST', 'mysql');" >> backend/config_.php
-- echo "define('DB_USER', 'root');" >> backend/config_.php
-- echo "define('DB_PWD', 'mysql');" >> backend/config_.php
-- echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
-- touch frontend/config_.php
+.default:
+  before_script:
+  # Install required PHP extensions
+  - docker-php-ext-install -j$(nproc) mysqli curl
+  # set up config files
+  - touch backend/config_.php
+  - echo "<?php // local config" >> backend/config_.php
+  - echo "define('DB_HOST', 'mysql');" >> backend/config_.php
+  - echo "define('DB_USER', 'root');" >> backend/config_.php
+  - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
+  - echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
+  - touch frontend/config_.php
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
@@ -50,7 +51,9 @@ variables:
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 test:php-latest:mysql-latest:
-  <<: *alpine
+  extends:
+    - .alpine
+    - .default
   image: php:8.0.0-cli-alpine
   services:
     - name: mysql/mysql-server:latest
