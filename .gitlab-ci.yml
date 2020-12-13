@@ -5,8 +5,9 @@
 
 before_script:
 # Install git, the php image doesn't have installed
-- apt-get update -yqq
-- apt-get install git libcurl4-openssl-dev -yqq
+#- apt-get update -yqq
+#- apt-get install git libcurl4-openssl-dev -yqq
+- apk install curl-dev
 # Install required PHP extensions
 - docker-php-ext-install mysqli 
 - docker-php-ext-install curl
@@ -44,7 +45,7 @@ variables:
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 test:php-latest:mysql-latest:
-  image: php:latest
+  image: php:8.0.0-cli-alpine
   services:
     - name: mysql/mysql-server:latest
       alias: mysql
