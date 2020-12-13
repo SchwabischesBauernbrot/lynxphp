@@ -3,16 +3,6 @@
 #  paths:
 #  - vendor/
 
-# Why use debian if alpine is faster? Robustness tests?
-.debian:
-  before_script:
-  - apt-get update -yqq
-  - apt-get install git libcurl4-openssl-dev -yqq
-
-.alpine:
-  before_script:
-  - apk add curl-dev
-
 .default:
   before_script:
   # Install required PHP extensions
@@ -25,6 +15,17 @@
   - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
   - echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
   - touch frontend/config_.php
+
+# Why use debian if alpine is faster? Robustness tests?
+.debian:
+  before_script:
+  - apt-get update -yqq
+  - apt-get install git libcurl4-openssl-dev -yqq
+
+.alpine:
+  extends: .default
+  before_script:
+  - apk add curl-dev
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
@@ -51,9 +52,7 @@ variables:
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 test:php-latest:mysql-latest:
-  extends:
-    - .alpine
-    - .default
+  extends: .alpine
   image: php:8.0.0-cli-alpine
   services:
     - name: mysql/mysql-server:latest
