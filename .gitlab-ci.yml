@@ -55,6 +55,6 @@ test:php-latest:mysql-latest:
   tags:
     - docker
   script:
-  - docker build -t phplynx/php-latest -f tests/dockerfiles/Dockerfile --build-arg PHP_IMAGE=php:latest .
+  - docker build -t phplynx/php-latest --build-arg PHP_IMAGE=php:latest .
   - docker run phplynx/php-latest
 #  allow_failure: true
