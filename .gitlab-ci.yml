@@ -3,8 +3,7 @@
 #  paths:
 #  - vendor/
 
-.default:
-  before_script:
+.default: &default
   # Install required PHP extensions
   - docker-php-ext-install -j$(nproc) mysqli curl
   # set up config files
@@ -17,14 +16,11 @@
   - touch frontend/config_.php
 
 # Why use debian if alpine is faster? Robustness tests?
-.debian:
-  before_script:
+.debian: &debian
   - apt-get update -yqq
   - apt-get install git libcurl4-openssl-dev -yqq
 
-.alpine:
-  extends: .default
-  before_script:
+.alpine: &alpine
   - apk add curl-dev
 
 variables:
@@ -52,7 +48,9 @@ variables:
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 test:php-latest:mysql-latest:
-  extends: .alpine
+  before_script:
+    - *alpine
+    - *default
   image: php:8.0.0-cli-alpine
   services:
     - name: mysql/mysql-server:latest
