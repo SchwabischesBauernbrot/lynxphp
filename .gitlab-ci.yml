@@ -44,7 +44,7 @@ variables:
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 test:php-latest:mysql-latest:
-  image: docker:19.03.12-dind
+  image: php:latest
   services:
     - name: mysql/mysql-server:latest
       alias: mysql
