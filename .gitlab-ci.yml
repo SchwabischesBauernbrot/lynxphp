@@ -9,8 +9,7 @@ before_script:
 #- apt-get install git libcurl4-openssl-dev -yqq
 - apk add curl-dev
 # Install required PHP extensions
-- docker-php-ext-install mysqli 
-- docker-php-ext-install curl
+- docker-php-ext-install -j$(nproc) mysqli curl
 # set up config files
 - touch backend/config_.php
 - echo "<?php // local config" >> backend/config_.php
