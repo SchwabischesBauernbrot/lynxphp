@@ -31,7 +31,8 @@ variables:
   MYSQL_ROOT_HOST: "%"
 
 services:
-  - docker:19.03.12-dind
+  - name: docker:19.03.12-dind
+    alias: docker
 
 # We test PHP5.6 (the default) with MySQL
 # Select image from https://hub.docker.com/_/php/
@@ -52,7 +53,7 @@ services:
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 test:php-latest:mysql-latest:
-  image: docker:19
+  image: docker:19.03.12-dind
   services:
     - name: mysql/mysql-server:latest
       alias: mysql
