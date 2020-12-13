@@ -9,7 +9,7 @@
   - apt-get update -yqq
   - apt-get install git libcurl4-openssl-dev -yqq
 
-.alpine:
+.alpine: &alpine
   before_script:
   - apk add curl-dev
 
@@ -50,7 +50,7 @@ variables:
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
 test:php-latest:mysql-latest:
-  extends: .alpine
+  <<: *alpine
   image: php:8.0.0-cli-alpine
   services:
     - name: mysql/mysql-server:latest
