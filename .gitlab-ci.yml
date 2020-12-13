@@ -1,34 +1,32 @@
-
 # Select what we should cache
 #cache:
 #  paths:
 #  - vendor/
 
-before_script:
+#before_script:
 # Install git, the php image doesn't have installed
-- apt-get update -yqq
-- apt-get install git libcurl4-openssl-dev -yqq
+#- apt-get update -yqq
+#- apt-get install git libcurl4-openssl-dev -yqq
 # Install required PHP extensions
-- docker-php-ext-install mysqli 
-- docker-php-ext-install curl
+#- docker-php-ext-install mysqli 
+#- docker-php-ext-install curl
 # set up config files
-- touch backend/config_.php
-- echo "<?php // local config" >> backend/config_.php
-- echo "define('DB_HOST', 'mysql');" >> backend/config_.php
-- echo "define('DB_USER', 'root');" >> backend/config_.php
-- echo "define('DB_PWD', 'mysql');" >> backend/config_.php
-- echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
-- touch frontend/config_.php
+#- touch backend/config_.php
+#- echo "<?php // local config" >> backend/config_.php
+#- echo "define('DB_HOST', 'mysql');" >> backend/config_.php
+#- echo "define('DB_USER', 'root');" >> backend/config_.php
+#- echo "define('DB_PWD', 'mysql');" >> backend/config_.php
+#- echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
+#- touch frontend/config_.php
 # set up wait for it
 #- git clone https://github.com/vishnubob/wait-for-it.git
 #- wait-for-it/wait-for-it.sh -t 0 mysql:3306
-- php -v
+#- php -v
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
   MYSQL_DATABASE: "lynxphp"
   MYSQL_ROOT_PASSWORD: "mysql"
-#  MYSQL_ALLOW_EMPTY_PASSWORD: "1"
   MYSQL_ROOT_HOST: "%"
 
 # We test PHP5.6 (the default) with MySQL
@@ -49,22 +47,14 @@ variables:
 #   - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
-# Latest is php8 rn
-#test:php8:mysql:
-#  image: php:8.0.0-cli
-#  tags:
-#    - docker
-#  script:
-#   - tests/run.sh
-
 test:php-latest:mysql-latest:
-  image: php:latest
+  image: docker:19
   services:
-  #  - docker:dind
     - name: mysql/mysql-server:latest
       alias: mysql
   tags:
     - docker
   script:
-   - tests/run.sh
-  allow_failure: true
+  - docker build -t phplynx/php-latest -f tests/dockerfiles/Dockerfile --build-arg PHP_IMAGE=php:latest .
+  - docker run phplynx/php-latest
+#  allow_failure: true
