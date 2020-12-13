@@ -7,7 +7,7 @@ before_script:
 # Install git, the php image doesn't have installed
 #- apt-get update -yqq
 #- apt-get install git libcurl4-openssl-dev -yqq
-- apk install curl-dev
+- apk add curl-dev
 # Install required PHP extensions
 - docker-php-ext-install mysqli 
 - docker-php-ext-install curl
