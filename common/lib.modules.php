@@ -222,6 +222,7 @@ class module_registry {
     if (!$this->compiled) {
       $this->compile();
     }
+    //print_r(array_keys($this->compile_modules));
     foreach($this->compile_modules as $name => $mod) {
       $mod->exec($param);
     }
@@ -337,6 +338,31 @@ class package {
     }
     $this->resources[$label] = $rsrcArr;
   }
+  function useResource($label, $params) {
+    $rsrc = $this->resources[$label];
+    if (!empty($rsrc['requires'])) {
+      $ok = true;
+      foreach($rsrc['requires'] as $name => $type) {
+        if (empty($params[$name])) {
+          $ok = false;
+          echo "<pre>Cannot call [$label] because [$name] is missing from parameters: ", print_r($params, 1), "</pre>\n";
+          return;
+        }
+        switch($type) {
+          case 'querystring':
+            if (!isset($rsrc['querystring'])) $rsrc['querystring'] = array();
+            $rsrc['querystring'][] = $name . '=' . $params[$name];
+          break;
+          default:
+            echo "Unknown requirement type[$type] on [$name] for [$label]<Br>\n";
+            return;
+          break;
+        }
+      }
+    }
+    $result = consume_beRsrc($rsrc, $params);
+    return $result;
+  }
   function buildBackendRoutes() {
     global $routers;
     // we install models...
@@ -428,6 +454,32 @@ class frontend_package {
     }
     $this->handlers[$method][$cond] = $file;
   }
+  function addForm($cond, $file, $options = false) {
+    if (!isset($options['get_options'])) $options['get_options'] = false;
+    if (!isset($options['post_options'])) $options['post_options'] = false;
+    $this->addHandler('GET', $cond, 'form_'.$file.'_get', $options['get_options']);
+    $this->addHandler('POST', $cond, 'form_'.$file.'_post', $options['post_options']);
+  }
+  function addModule($pipeline_name, $file = false) {
+    $bsn = new pipeline_module($this->pkg->name. '_' . $pipeline_name);
+    if ($file === false) $file = $pipeline_name;
+    $path = strtolower($this->pkg->dir) . 'fe/modules/' . strtolower($file) . '.php';
+    $pkg = &$this->pkg;
+    $bsn->attach($pipeline_name, function(&$io) use ($pipeline_name, $path, $pkg) {
+      $getModule = function() use ($pipeline_name) {
+        //echo "Set up module for [$pipeline_name]<br>\n";
+        return array();
+      };
+      /*
+      if (!file_exists($path)) {
+        echo "This module [$pipeline_name], [$path] is not found<br>\n";
+        return;
+      }
+      */
+      //echo "Running path[$path]<br>\n";
+      include $path;
+    });
+  }
   function buildRoutes(&$router, $method) {
     // do we have any routes in this method
     if (empty($this->handlers[$method])) {
@@ -435,12 +487,12 @@ class frontend_package {
     }
     // only build the routes we need
     foreach($this->handlers[$method] as $cond => $file) {
-      $path = $this->pkg->dir . 'fe/handlers/' . $file . '.php';
+      $path = strtolower($this->pkg->dir) . 'fe/handlers/' . strtolower($file) . '.php';
       $func = function($request) use ($path) {
         // lastMod function?
         // well just deep memiozation could work...
         // middlewares, wrapContent => sendResponse
-        $get = function() {
+        $getHandler = function() {
           return array();
         };
         $intFunc = include $path;
