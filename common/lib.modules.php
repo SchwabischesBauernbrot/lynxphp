@@ -342,22 +342,38 @@ class package {
     $rsrc = $this->resources[$label];
     if (!empty($rsrc['requires'])) {
       $ok = true;
-      foreach($rsrc['requires'] as $name => $type) {
+      foreach($rsrc['requires'] as $name) {
         if (empty($params[$name])) {
           $ok = false;
           echo "<pre>Cannot call [$label] because [$name] is missing from parameters: ", print_r($params, 1), "</pre>\n";
           return;
         }
-        switch($type) {
-          case 'querystring':
-            if (!isset($rsrc['querystring'])) $rsrc['querystring'] = array();
-            $rsrc['querystring'][] = $name . '=' . $params[$name];
-          break;
-          default:
-            echo "Unknown requirement type[$type] on [$name] for [$label]<Br>\n";
-            return;
-          break;
+      }
+    }
+    if (isset($rsrc['params'])) {
+      if (is_array($rsrc['params'])) {
+        if (!isset($rsrc['querystring'])) $rsrc['querystring'] = array();
+        if (!isset($rsrc['formData']))    $rsrc['formData'] = array();
+        $qs = array_flip($rsrc['params']['querystring']);
+        $fd = array_flip($rsrc['params']['formData']);
+        foreach($params as $k=>$v) {
+          if (isset($qs[$k])) {
+            $rsrc['querystring'][] = $k . '=' . urlencode($v);
+          } else if (isset($fd[$k])) {
+            $rsrc['formData'][$k] = $v;
+          } else {
+            echo "Don't know what to do with $k in $label<br>\n";
+          }
         }
+      } else
+      if ($rsrc['params'] === 'querystring') {
+        if (!isset($rsrc['querystring'])) $rsrc['querystring'] = array();
+        foreach($params as $k=>$v) {
+          // should we urlencode k too?
+          $rsrc['querystring'][] = $k . '=' . urlencode($v);
+        }
+      } else {
+        echo "Unknown parameter type[", $params['params'], "]<br>\n";
       }
     }
     $result = consume_beRsrc($rsrc, $params);
@@ -485,10 +501,11 @@ class frontend_package {
     if (empty($this->handlers[$method])) {
       return;
     }
+    $pkg = &$this->pkg;
     // only build the routes we need
     foreach($this->handlers[$method] as $cond => $file) {
       $path = strtolower($this->pkg->dir) . 'fe/handlers/' . strtolower($file) . '.php';
-      $func = function($request) use ($path) {
+      $func = function($request) use ($path, $pkg) {
         // lastMod function?
         // well just deep memiozation could work...
         // middlewares, wrapContent => sendResponse
