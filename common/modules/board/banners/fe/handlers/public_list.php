@@ -1,7 +1,7 @@
 <?php
 
 // FIXME: we need access to package
-$params = $get();
+$params = $getHandler();
 
 // $boardData = boardOwnerMiddleware($request);
 
