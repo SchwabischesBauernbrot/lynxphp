@@ -9,7 +9,7 @@ function renderBoardHeader($boardData) {
     'boardUri' => $boardData['uri'],
     'tags' => array()
   );
-  $pipelines['boardHeaderTmpl']->execute($p);
+  $pipelines['board_header_tmpl']->execute($p);
   foreach($p['tags'] as $s => $r) {
     $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
   }
