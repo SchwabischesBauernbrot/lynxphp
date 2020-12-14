@@ -17,6 +17,8 @@ $package = new package('board_banners', 1, __dir__);
 $package->addResource('random', array(
   'endpoint' => 'lynx/randomBanner',
   'unwrapData' => true,
+  // can't set type like this
+  // we need to be able to set types of non-required fields...
   'requires' => array(
     'boardUri' => 'querystring',
   ),
