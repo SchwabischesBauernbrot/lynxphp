@@ -1,5 +1,7 @@
 <?php
 
+include '../common/post_vars.php';
+
 // load frontend config
 include 'config.php';
 
@@ -13,11 +15,6 @@ include 'config.php';
 // well the backend could...
 
 $router = include '../common/router.php';
-
-include '../common/post_vars.php';
-if (!defined('BASE_HREF')) {
-  define('BASE_HREF', dirname(getServerField('SCRIPT_NAME', __FILE__)) . '/');
-}
 
 // nav, pages
 // routes make a page exist
@@ -40,6 +37,15 @@ if (!defined('BASE_HREF')) {
 //
 
 include '../common/lib.modules.php'; // module functions and classes
+
+$pipelines = array();
+
+function definePipeline($constant, $str) {
+  global $pipelines;
+  define($constant, $str);
+  $pipelines[$str] = new pipeline_registry;
+}
+
 // pipelines...
 // - content page?
 // template pipelines
@@ -55,13 +61,15 @@ include '../common/lib.modules.php'; // module functions and classes
 // - boardListing
 // - board search
 // - boardSettingTmpl
-$pipelines = array(
-  'boardHeaderTmpl' =>new pipeline_registry,
-  'boardNav' => new pipeline_registry,
-  'boardSettingNav' => new pipeline_registry,
-  'boardSettingTmpl' => new pipeline_registry,
-  'boardDetailsTmpl' => new pipeline_registry,
-);
+
+// I could move the PIPELINE_ prefix into the definePipeline function
+// but then you couldn't locate these in grep
+definePipeline('PIPELINE_BOARD_HEADER_TMPL',  'board_header_tmpl');
+definePipeline('PIPELINE_BOARD_NAV',          'board_nav');
+definePipeline('PIPELINE_BOARD_DETAILS_TMPL', 'board_details_tmpl');
+definePipeline('PIPELINE_BOARD_SETTING_NAV',  'board_setting_nav');
+definePipeline('PIPELINE_BOARD_SETTING_TMPL', 'board_setting_tmpl');
+
 // forms pipelines
 // - newThreadForm
 // - newReplyForm
