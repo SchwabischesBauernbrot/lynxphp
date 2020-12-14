@@ -9,6 +9,7 @@
  *   general
  *     endpoint (lynx/bob) REQUIRED
  *     method (GET, POST, AUTO, etc)
+ *     querystring is an array
  *   post data
  *     requires - validation
  *     formData - associative array of key/values
@@ -45,9 +46,15 @@ function consume_beRsrc($options, $params = '') {
     'files' => curl_file_create($tmpfile, $type, $filename)
   ), '', '', '', 'POST');
   */
+  $querystring = '';
+  if (!empty($options['querystring'])) {
+    $querystring = '?' . join('&', $options['querystring']);
+  }
+  //echo "querystring[$querystring]<br>\n";
+
   // post login/IP
-  $responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'], $postData,
-    $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
+  $responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
+    $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
   if (!empty($options['expectJson']) || !empty($options['unwrapData'])) {
     $obj = json_decode($responseText, true);
     if (!$obj) {
