@@ -19,14 +19,7 @@
 $fePkg = $this->makeFrontend();
 
 //$fePkg->addBackendResource('', $beRsrc);
-global $beRrsc_random, $beRrsc_list, $beRrsc_add, $beRrsc_del;
-$beRrsc_random = array(
-  'endpoint' => 'lynx/randomBanner',
-  'unwrapData' => true,
-  'requires' => array(
-    'boardUri'
-  ),
-);
+global $beRrsc_list, $beRrsc_add, $beRrsc_del;
 
 $beRrsc_list = array(
   'endpoint' => 'lynx/bannerManagement',
