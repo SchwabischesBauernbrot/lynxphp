@@ -50,7 +50,6 @@ function consume_beRsrc($options, $params = '') {
   if (!empty($options['querystring'])) {
     $querystring = '?' . join('&', $options['querystring']);
   }
-  //echo "querystring[$querystring]<br>\n";
 
   // post login/IP
   $responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
