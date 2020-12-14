@@ -18,7 +18,7 @@ $package->addResource('random', array(
   'endpoint' => 'lynx/randomBanner',
   'unwrapData' => true,
   'requires' => array(
-    'boardUri'
+    'boardUri' => 'querystring',
   ),
 ));
 
