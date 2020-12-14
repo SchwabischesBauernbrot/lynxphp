@@ -1,12 +1,14 @@
 <?php
 
+// set up backend specific code (models, modules)
+
 // pipelines:
 // - boardData
 
-//$bePkg = new backend_package($this);
+// $this is the package
 $bePkg = $this->makeBackend();
 
-
+// add backend models
 $bePkg->addModel(array(
   'name'   => 'board_banner',
   'fields' => array(
