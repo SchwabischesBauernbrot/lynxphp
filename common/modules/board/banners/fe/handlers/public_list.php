@@ -6,11 +6,9 @@ $params = $getHandler();
 // $boardData = boardOwnerMiddleware($request);
 
 $boardUri = $request['params']['uri'];
-global $beRrsc_list;
-$call = $beRrsc_list;
-// FIXME:
-$call['endpoint'] .= '?boardUri=' . $boardUri;
-$banners = consume_beRsrc($call, array('boardUri' => $boardUri));
+
+// get a list of banners from backend
+$banners = $pkg->useResource('list', array('boardUri' => $boardUri));
 
 $templates = moduleLoadTemplates('banner_listing', __DIR__);
 
