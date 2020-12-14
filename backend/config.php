@@ -2,7 +2,7 @@
 
 // local server config
 // has to be first if we use defines...
-$localConfig = 'config_'.$_SERVER['SERVER_NAME'].'.php';
+$localConfig = 'config_' . getServerField('SERVER_NAME') . '.php';
 if (file_exists($localConfig)) {
   include($localConfig);
 } else {
@@ -13,7 +13,10 @@ if (file_exists($localConfig)) {
 
 // CORS configuration
 
+//
 // defaults
+//
+
 if (!defined('DB_HOST')) define('DB_HOST', 'localhost');
 if (!defined('DB_USER')) define('DB_USER', 'root');
 if (!defined('DB_PWD')) define('DB_PWD', '');
