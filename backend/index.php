@@ -2,6 +2,8 @@
 
 // REST API
 
+include '../common/post_vars.php';
+
 // read backend config
 include 'config.php';
 
@@ -10,7 +12,6 @@ include 'config.php';
 // message queue
 
 $router = include '../common/router.php';
-include '../common/post_vars.php';
 
 // connect to db
 // FIXME: database type to select driver
