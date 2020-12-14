@@ -1,71 +1,32 @@
 <?php
 
-// pipelines:
+// set up frontend specific code (handlers, forms, modules)
 
-// frontend handlers...
-// boardAdminNav
-// page tmpl
-// thread tmpl
-// catalog tmpl
-
-// this could be a template
-// which we copy and set the params
-
-// could attach to a package handle if we had one here...
-
-// FIXME: pass in $package...
-// or return this, so we can set it...
-//$fePkg = new frontend_package($this);
+// $this is the package
 $fePkg = $this->makeFrontend();
 
-//$fePkg->addBackendResource('', $beRsrc);
-global $beRrsc_list, $beRrsc_add, $beRrsc_del;
-
-$beRrsc_list = array(
-  'endpoint' => 'lynx/bannerManagement',
-  'unwrapData' => true,
-  'requires' => array(
-    'boardUri'
-  ),
-);
-
-$beRrsc_add = array(
-  'endpoint'    => 'lynx/createBanners',
-  'method'      => 'POST',
-  'sendSession' => true,
-  'unwrapData'  => true,
-  'requires'    => array(
-    'boardUri'
-  ),
-);
-
-$beRrsc_del = array(
-  'endpoint'    => 'lynx/deleteBanner',
-  'method'      => 'POST',
-  'sendSession' => true,
-  'unwrapData'  => true,
-  'requires'    => array(
-    'bannerId'
-  ),
-);
-
+// add frontend handlers and forms
 $fePkg->addHandler('GET', '/:uri/banners', 'public_list');
 $fePkg->addHandler('GET', '/:uri/settings/banners', 'settings_list');
 $fePkg->addForm('/:uri/settings/banners/add', 'add');
 $fePkg->addForm('/:uri/settings/banners/:id/delete', 'delete');
 
-// yea, we can't embed the correct width/height this way to prevent bounce...
+// disabled because
+// we can't embed the correct width/height this way to prevent bounce...
+//$fePkg->addHandler('GET', '/:uri/banners/random', 'random_banner');
 /*
 $router->get('/:uri/banners/random', function($request) {
   $boardUri = $request['params']['uri'];
-  global $beRrsc_random;
-  $call = $beRrsc_random;
-  $call['endpoint'] .= '?boardUri=' . $boardUri;
-  $banner = consume_beRsrc($call, array('boardUri' => $boardUri));
+
+  // get a random banner from backend
+  $banner = $pkg->useResource('random', array('boardUri' => $boardUri));
+
+  // redirect to banner
   header('Location: ' . BASE_HREF . 'backend/'.$banner['image']);
 });
 */
 
+// add frontend pipeline modules
 // add [Banner] to board naviagtion
 $fePkg->addModule(PIPELINE_BOARD_NAV,          'nav');
 // add {{banner}} tag to board_header_tmpl
