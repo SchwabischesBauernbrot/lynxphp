@@ -14,6 +14,10 @@ if (file_exists($localConfig)) {
 // site wide config
 // most of this should be in the db or on the backend
 
+//
+// defaults
+//
+
 // backend_url
 // needs to be HTTPS if the backend is not on the same server
 // must have trailing slash
