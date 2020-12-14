@@ -22,7 +22,7 @@ function renderBoardNav($boardUri, $pageCount, $selected) {
     '[Index]' => '{{uri}}/',
     '[Catalog]' => '{{uri}}/catalog',
   );
-  $pipelines['boardNav']->execute($navItems);
+  $pipelines['board_nav']->execute($navItems);
 
   $nav_html = getNav($navItems, array(
     'uri' => $boardUri,
