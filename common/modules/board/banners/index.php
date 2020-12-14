@@ -2,26 +2,28 @@
 
 $package = new package('board_banners', 1, __dir__);
 
-// Lynx:
-// bannerManagement
-// createBanners
-// deleteBanner
-// randomBanner
-
 // frontend usually routes wrap around these...
 // so we can't just add more frontend resources
 // we need to attach a frontend to it?
 // and we don't need frontend attachments here...
 // there could be some benefits of documenting the frontend routes here...
 
+// Lynx:
+// randomBanner
+// bannerManagement
+// createBanners
+// deleteBanner
+
+// FIXME: not ideal for caching...
 $package->addResource('random', array(
   'endpoint' => 'lynx/randomBanner',
   'unwrapData' => true,
   // can't set type like this
   // we need to be able to set types of non-required fields...
   'requires' => array(
-    'boardUri' => 'querystring',
+    'boardUri',
   ),
+  'params' => 'querystring',
 ));
 
 $package->addResource('list', array(
@@ -30,6 +32,7 @@ $package->addResource('list', array(
   'requires' => array(
     'boardUri'
   ),
+  'params' => 'querystring',
 ));
 
 $package->addResource('add', array(
@@ -39,6 +42,10 @@ $package->addResource('add', array(
   'unwrapData'  => true,
   'requires'    => array(
     'boardUri'
+  ),
+  'params' => array(
+    'querystring' => array('boardUri'),
+    'formData' => array('files'),
   ),
 ));
 
@@ -50,6 +57,7 @@ $package->addResource('del', array(
   'requires'    => array(
     'bannerId'
   ),
+  'params' => 'querystring',
 ));
 
 return $package;
