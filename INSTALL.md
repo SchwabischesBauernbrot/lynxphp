@@ -47,3 +47,7 @@ also you'll need to make these directories and make sure they're web server writ
 - backend/storage
 - backend/storage/tmp
 - backend/storage/boards
+
+# Installation Help
+
+Frontend now has an install.php you can run to check your installation, to see if you have the requirements and have followed the install instructions correctly.
