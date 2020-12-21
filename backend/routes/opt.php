@@ -6,6 +6,12 @@
 
 $router = new router;
 
+$router->get('/check', function($request) {
+  // db check...
+  global $db;
+  sendResponse(array('check' => ($db->conn !== null) ? 'ok' : 'not ok'));
+});
+
 $router->get('/session', function($request) {
   $user_id = loggedIn();
   if (!$user_id) {
