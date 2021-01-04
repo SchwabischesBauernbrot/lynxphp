@@ -60,20 +60,25 @@ function consume_beRsrc($options, $params = '') {
       wrapContent('Backend error: ' .  $options['endpoint'] . ': ' . $responseText);
       return;
     }
+    // this hides 401s... we need to handle and pass back problems better...
     if (!empty($options['unwrapData'])) return $obj['data'];
     return $obj;
   }
   return $responseText;
 }
 
-function getExpectJson($endpoint) {
-  $json = curlHelper(BACKEND_BASE_URL . $endpoint);
+function expectJson($json, $endpoint = '') {
   $obj = json_decode($json, true);
   if (!$obj) {
     wrapContent('Backend error: ' .  $endpoint . ': ' . $json);
     return;
   }
   return $obj;
+}
+
+function getExpectJson($endpoint) {
+  $json = curlHelper(BACKEND_BASE_URL . $endpoint);
+  return expectJson($json, $endpoint);
 }
 
 function getBoards() {
@@ -137,7 +142,7 @@ function backendLogin($user, $pass) {
     'login'    => $user,
     'password' => $pass,
   ), array('HTTP_X_FORWARDED_FOR' => getip()));
-  echo "data[$data]<br>\n";
+  //echo "data[$data]<br>\n";
   $res = json_decode($data, true);
   if (!empty($res['data']['session'])) {
     setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
@@ -159,10 +164,7 @@ function backendCreateBoard() {
 
 function backendLynxAccount() {
   $json = backendAuthedGet('lynx/account');
-  //echo "json[$json]<br>\n";
-  $account = json_decode($json, true);
-  //print_r($account);
-  return $account;
+  return expectJson($json, 'lynx/account');
 }
 
 
