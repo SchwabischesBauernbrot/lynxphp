@@ -20,12 +20,16 @@ $bePkg->addModel(array(
   )
 ));
 
+// is this needed?
+// well we could inject this data into some other endpoints...
+$bePkg->addModule(PIPELINE_BOARD_DATA, 'boardData');
+
+/*
 $module = new pipeline_module('board_banners');
 $module->dependencies = array();
 $module->preempt      = array();
-// is this needed?
-// well we could inject this data into some other endpoints...
 $module->attach('boardData', function(&$row) {
 });
+*/
 
 ?>
