@@ -32,4 +32,33 @@ function getip() {
   return $ip;
 }
 
+$pipelines = array();
+function definePipeline($constant, $str) {
+  global $pipelines;
+  define($constant, $str);
+  $pipelines[$str] = new pipeline_registry;
+}
+
+function modelToString($model) {
+  $s = '<ul><li>Name: ' . $model['name'];
+  if (isset($model['fields'])) {
+    $s .= '<li><table>';
+    foreach($model['fields'] as $k => $v) {
+      // type, length
+      $s .= '<tr><th>' . $k . '<td>' . $v['type'];
+    }
+    $s .= '</table>';
+  }
+  if (isset($model['seed'])) {
+    $s .= '<li><table>';
+    foreach($model['seed'] as $k => $v) {
+      // type, length
+      $s .= '<tr><th>' . $k . '<td>' . print_r($v, 1);
+    }
+    $s .= '</table>';
+  }
+  $s .= '</ul>';
+  return $s;
+}
+
 ?>
