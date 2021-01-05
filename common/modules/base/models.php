@@ -134,19 +134,26 @@ $board_user_model = array(
   )
 );
 
-$user_group = array(
-  'name' => 'user_group',
+$usergroup_model = array(
+  'name' => 'usergroup',
   'indexes' => array('userid', 'groupid'),
   'fields' => array(
-    'userid' => array('type'=>'integer'),
-    'groupid' => array('type'=>'integer'),
+    // automatically made...
+    'groupid' => array('type'=>'int'),
+    'userid' => array('type'=>'int'),
+  ),
+  'seed' => array(
+    array('userid'=>1, 'groupid'=>1),
   )
 );
 
 $group_model = array(
   'name' => 'group',
   'fields' => array(
-    'name' => array('type'=>'string', 'length'=>100),
+    'name' => array('type'=>'str', 'length'=>100),
+  ),
+  'seed' => array(
+    array('name'=>'admin'),
   )
 );
 
@@ -156,6 +163,8 @@ $db->autoupdate($migration_model);
 $db->autoupdate($user_model);
 $db->autoupdate($user_session_model);
 $db->autoupdate($board_model);
+$db->autoupdate($usergroup_model);
+$db->autoupdate($group_model);
 
 // for each board set up:
 // a posts_model table
@@ -171,6 +180,8 @@ $models = array(
   'board'     => $board_model,
   'session'   => $user_session_model,
   'user'      => $user_model,
+  'group'     => $group_model,
+  'usergroup' => $usergroup_model,
 );
 
 
