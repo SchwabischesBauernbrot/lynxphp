@@ -90,7 +90,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $model['fields']['json'] = array('type'=>'text');
     // get name
     $tableName = modelToTableName($model);
-    $res = mysqli_query($this->conn, 'describe ' . $tableName);
+    $res = mysqli_query($this->conn, 'describe `' . $tableName. '`');
     $err = mysqli_error($this->conn);
     // do we need to create table?
     if ($err && strpos($err, 'doesn\'t exist') !== false) {
@@ -118,7 +118,8 @@ class mysql_driver extends database_driver_base_class implements database_driver
       }
       return true;
     } else {
-      if ($err) echo "err[$err] sql[$sql]<br>\n";
+      // describle table name failed...
+      if ($err) echo "err[$err]<br>\n";
       // get fields
       //echo "getting fields ", $tableName, "\n";
       $haveFields = array();
