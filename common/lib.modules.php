@@ -263,6 +263,10 @@ class pipeline_module extends orderable_module {
   function attach($pipeline, $code) {
     // deps and preempt are set
     global $pipelines;
+    if (empty($pipelines[$pipeline])) {
+      echo "no pipeline[$pipeline]<br>\n";
+      return;
+    }
     $pipelines[$pipeline]->register($this->name, $this);
     $this->code = $code;
   }
