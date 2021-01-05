@@ -118,7 +118,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       }
       return true;
     } else {
-      if ($err) echo "err[$err]<br>\n";
+      if ($err) echo "err[$err] sql[$sql]<br>\n";
       // get fields
       //echo "getting fields ", $tableName, "\n";
       $haveFields = array();
