@@ -1,5 +1,8 @@
 <?php
 
+// by loggedIn already outputting on failure
+// that means we need to output on all failure cases...
+
 // FIXME: refactor this out
 // or make it simpler on the router/middleware...
 // new name suggestion: boardExistsMiddleware ?
@@ -34,6 +37,18 @@ function boardOwnerMiddleware($request) {
     return;
   }
   return $boardUri;
+}
+
+function userInGroupMiddleware($request, $groups) {
+  $user_id = loggedIn();
+  if (!$user_id) {
+    return;
+  }
+  $pass = userInGroup($user_id, $groups);
+  if (!$pass) {
+    return;
+  }
+  return true;
 }
 
 ?>
