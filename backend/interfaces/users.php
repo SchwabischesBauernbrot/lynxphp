@@ -25,4 +25,26 @@ function getAccount($user_id) {
   return $user;
 }
 
+function getUserGroups($user_id) {
+  global $db, $models;
+  $models['usergroup']['parents'] = array(
+    array(
+      //'type' => 'left',
+      'model' => $models['group'],
+    )
+  );
+  $res = $db->find($models['usergroup'], array('criteria'=>array(
+    'userid' => $user_id,
+  )));
+  $groups = pluck($db->toArray($res), 'name');
+  $db->free($res);
+  return $groups;
+}
+
+function userInGroup($user_id, $group) {
+  $usergroups = getUserGroups($user_id);
+  return in_array($group, $usergroups);
+}
+
+
 ?>
