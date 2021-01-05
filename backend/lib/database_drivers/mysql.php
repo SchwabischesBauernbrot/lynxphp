@@ -113,7 +113,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
         echo "err[$err]<br>\n";
         return false;
       }
-      if (is_array($model['seed'])) {
+      if (isset($model['seed']) && is_array($model['seed'])) {
         $this->insert($model, $model['seed']);
       }
       return true;
@@ -122,6 +122,10 @@ class mysql_driver extends database_driver_base_class implements database_driver
       // get fields
       //echo "getting fields ", $tableName, "\n";
       $haveFields = array();
+      if (is_bool($res)) {
+        echo "existing table, didnt like describe?!<br>\n";
+        return;
+      }
       while($row = mysqli_fetch_assoc($res)) {
         // Field, Type, Null, Key, Default, Extra
         //print_r($row);
