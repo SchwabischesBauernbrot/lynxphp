@@ -83,6 +83,8 @@ class mysql_driver extends database_driver_base_class implements database_driver
     }
     return $this->switch_db($db);
   }
+
+  // build table if it doesn't exist...
   public function autoupdate($model) {
     // force json field in all models
     $model['fields']['json'] = array('type'=>'text');
@@ -90,6 +92,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $tableName = modelToTableName($model);
     $res = mysqli_query($this->conn, 'describe ' . $tableName);
     $err = mysqli_error($this->conn);
+    // do we need to create table?
     if ($err && strpos($err, 'doesn\'t exist') !== false) {
       // create table
       //echo "creating table ", $tableName, "\n";
@@ -109,6 +112,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
       if ($err) {
         echo "err[$err]<br>\n";
         return false;
+      }
+      if (is_array($model['seed'])) {
+        $this->insert($model, $model['seed']);
       }
       return true;
     } else {
@@ -257,32 +263,84 @@ class mysql_driver extends database_driver_base_class implements database_driver
     }
     return true;
   }
+
+  private function handleJoin($models, $data, $tableName, $useField = '') {
+    foreach($models as $join) {
+      // same field in both tables
+      if ($useField) {
+        // use from root table
+        $field = $useField;
+      } else {
+        // calculate off joined table
+        $field = modelToId($join['model']);
+      }
+      $joinTable = modelToTableName($join['model']);
+      $data['joins'][] = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join ' .
+        $joinTable . ' on ' .
+        $joinTable . '.' . $field . '=' .
+        $tableName . '.' . $field;
+      // support an empty array
+      if (isset($join['pluck']) && is_array($join['pluck'])) {
+        // probably integrate the alias...
+        $data['fields'] = array_merge($data['fields'], $join['pluck']);
+      } else {
+        // if no pluck, then grab all
+        $data['fields'][] = $joinTable . '.*';
+      }
+      if (!empty($join['groupby'])) {
+        $data['groupbys'] = array_merge($data['groupbys'], explode(',', $join['groupby']));
+      }
+      $data = $this->expandJoin($join['model'], $data);
+    }
+    return $data;
+  }
+
+  private function expandJoin($rootModel, $data) {
+    $tableName = modelToTableName($rootModel);
+    if (!empty($rootModel['children']) && is_array($rootModel['children'])) {
+      $data = $this->handleJoin($rootModel['children'], $data, $tableName, modelToId($rootModel));
+    }
+    // use id field from parent table (groupid instead of usergroupid)
+    if (!empty($rootModel['parents']) && is_array($rootModel['parents'])) {
+      $data = $this->handleJoin($rootModel['parents'], $data, $tableName);
+    }
+    return $data;
+  }
+
   // options
   //   fields = if not set, give all fields, else expect an array
   //   criteria = if set, an array
   //              array(field, comparison, field/constant)
   public function find($rootModel, $options = false, $fields = '*') {
     $tableName = modelToTableName($rootModel);
-    $sql = 'select '. $fields . ' from ' . $tableName;
-    $joins = array();
-    if (!empty($rootModel['children']) && is_array($rootModel['children'])) {
-      foreach($rootModel['children'] as $join) {
-        $field = modelToId($rootModel);
-        $joinTable = modelToTableName($join['model']);
-        $joins[] = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join ' .
-          $joinTable . ' on ' .
-          $joinTable . '.' . $field . '=' .
-          $tableName . '.' . $field;
-      }
-      if (count($joins)) {
-        $sql .= ' ' . join(' ', $joins);
-      }
+    if (!$tableName) {
+      echo "<pre>model[", print_r($rootModel, 1), "] is missing a name</pre>\n";
+      return;
+    }
+    $data = array(
+      'joins'    => array(),
+      'groupbys' => array(),
+      'fields'   => array(),
+    );
+    $data = $this->expandJoin($rootModel, $data);
+    // FIXME: renaming support
+    $useFields = array_merge(array_map(function($f) use ($data, $tableName) {
+      return (count($data['joins']) ? $tableName . '.' : '') . $f;
+    }, explode(',', $fields)), $data['fields']);
+    $sql = 'select '. join(',', $useFields) . ' from ' . $tableName;
+    $useAlias = '';
+    if (count($data['joins'])) {
+      $sql .= ' ' . join(' ', $data['joins']);
+      $useAlias = $tableName;
     }
     if (isset($options['criteria'])) {
-      $sql .= ' where ' . $this->build_where($options['criteria'], count($joins) ? $tableName : '');
+      $sql .= ' where ' . $this->build_where($options['criteria'], $useAlias);
+    }
+    if (count($data['groupbys'])) {
+      $sql .= ' group by ' . join(',', $data['groupbys']);
     }
     if (isset($options['order'])) {
-      $defAlias = count($joins) ? $tableName : '';
+      $defAlias = count($data['joins']) ? $tableName : '';
       $alias = $defAlias ? $defAlias . '.' : '';
       $sql .= ' order by ' . $alias . $options['order'];
     }
@@ -314,11 +372,22 @@ class mysql_driver extends database_driver_base_class implements database_driver
   }
   // a bit more optimized
   public function toArray($res) {
+    if (!is_object($res) || !$res) {
+      echo "<pre>non-resultSet passed into toArray [", gettype($res), "](",print_r($res, 1), ")</pre>\n";
+      return array();
+    }
     $arr = array();
     while($row = mysqli_fetch_assoc($res)) {
       $arr[] = $row;
     }
     return $arr;
+  }
+  public function free($res) {
+    if (!is_object($res) || !$res) {
+      echo "<pre>non-resultSet passed into toArray [", gettype($res), "](",print_r($res, 1), ")</pre>\n";
+      return array();
+    }
+    return mysqli_free_result($res);
   }
 }
 
