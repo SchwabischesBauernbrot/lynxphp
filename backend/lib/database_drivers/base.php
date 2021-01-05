@@ -79,9 +79,17 @@ class database_driver_base_class {
 }
 
 function modelToTableName($model) {
+  if (!isset($model['name'])) {
+    echo "<pre>model[", print_r($model, 1), "] is missing a name</pre>\n";
+    return;
+  }
   return $model['name'].'s';
 }
 function modelToId($model) {
+  if (!isset($model['name'])) {
+    echo "<pre>model[", print_r($model, 1), "] is missing a name</pre>\n";
+    return;
+  }
   $parts = explode('_', $model['name']);
   $name = array_pop($parts);
   return $name.'id';
@@ -89,6 +97,28 @@ function modelToId($model) {
 
 function make_db_field($value) {
   return array($value);
+}
+
+// columns
+// https://laravel.com/docs/8.x/collections#method-pluck
+function pluck($rows, $fields) {
+  $res = array();
+  foreach($rows as $row) {
+    $keys = array();
+    if (is_array($fields)) {
+      foreach($fields as $f) {
+        $keys[$f] = $row[$f];
+      }
+    } else {
+      $keys = array($fields => $row[$fields]);
+    }
+    if (count($keys) === 1) {
+      $res[] = array_shift($keys);
+    } else {
+      $res[] = $keys;
+    }
+  }
+  return $res;
 }
 
 ?>
