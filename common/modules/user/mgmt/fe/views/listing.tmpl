@@ -1,0 +1,23 @@
+<div class="catalog">
+  <table>
+{{users}}
+  </table>
+</div>
+<!-- loop -->
+<li><img class="board-banner" src="{{backend}}/{{image}}" loading="lazy">
+<!-- end -->
+<!-- loop -->
+
+<tr>
+<th>{{username}}
+<td><a href="mailto:{{email}}">{{email}}</a>
+<td>{{created_at}}
+<td>{{updated_at}}
+<td><a href="admin/users/{{id}}/delete">X</a>
+
+<!-- end -->
+<!-- loop -->
+  <a href="admin/users/add">Add user</a><br>
+  {{users}}
+  <a href="admin.php">Back to Admin</a>
+<!-- end -->
