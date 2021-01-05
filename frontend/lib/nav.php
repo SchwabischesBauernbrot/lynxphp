@@ -1,11 +1,13 @@
 <?php
 
+// FIXME: pass in template...
 function getNav($navItems, $replaces, $selected = '', $list = true) {
   $nav_html = '';
   if ($list) $nav_html = '<ul>';
   foreach($navItems as $label => $urlTemplate) {
+    $url = $urlTemplate;
     foreach($replaces as $s => $r) {
-      $url = str_replace('{{' . $s . '}}', $r, $urlTemplate);
+      $url = str_replace('{{' . $s . '}}', $r, $url);
     }
     if ($list) $nav_html .= '<li>';
     $class = '';
@@ -18,10 +20,40 @@ function getNav($navItems, $replaces, $selected = '', $list = true) {
   return $nav_html;
 }
 
+function getNav2($navItems, $options = array()) {
+  $list = isset($options['list']) ? $options['list'] : false;
+  $selected = isset($options['selected']) ? $options['selected'] :'';
+  $selectedURL = isset($options['selectedURL']) ? $options['selectedURL'] : false;
+  $replaces = isset($options['replaces']) ? $options['replaces'] : array();
+  $prelabel = isset($options['prelabel']) ? $options['prelabel'] :'';
+  $postlabel = isset($options['postlabel']) ? $options['postlabel'] :'';
+
+  $nav_html = '';
+  if ($list) $nav_html = '<ul>';
+  foreach($navItems as $label => $urlTemplate) {
+    $url = $urlTemplate;
+    foreach($replaces as $s => $r) {
+      $url = str_replace('{{' . $s . '}}', $r, $url);
+    }
+    if ($list) $nav_html .= '<li>';
+    $class = '';
+    //echo "selectedURL[$selectedURL] url[$url]<br>\n";
+    if ($selectedURL && $selectedURL === $url) {
+      $class = ' class="bold"';
+    }
+    if ($selected === $label) {
+      $class = ' class="bold"';
+    }
+    $nav_html .= '<a' . $class . ' href="' . $url . '">' . $prelabel . $label . $postlabel . '</a>' . "\n";
+  }
+  if ($list) $nav_html .= '</ul>';
+  return $nav_html;
+}
+
 /*
 $portal = array(
   'header'=>array(
-    'file => '',
+    'file' => '',
     // tag => code/constant
     'replaces' => array(),
     'nav' => array(
@@ -34,7 +66,7 @@ $portal = array(
     )
   ),
   'footer'=>array(
-    'file => '',
+    'file' => '',
     'replaces' => array(),
   ),
 );
@@ -62,6 +94,9 @@ class portal {
     $this->footerTemplateFile = $footer_template;
   }
 
+  // if we stay as a class
+  // it's a safe assumption that a header's going to have a footer
+  // but we may only want to have one in memory at a time
   function renderHeader() {
     $templates = loadTemplatesFile($wrapper_template);
     $template = $templates['header'];
