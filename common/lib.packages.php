@@ -70,7 +70,7 @@ class package {
     }
     $this->resources[$label] = $rsrcArr;
   }
-  function useResource($label, $params) {
+  function useResource($label, $params = false) {
     $rsrc = $this->resources[$label];
     if (!empty($rsrc['requires'])) {
       $ok = true;
@@ -136,10 +136,14 @@ class package {
       }
       // requires the router name matches the route prefix
       $rsrc['endpoint'] = str_replace($router, '', $rsrc['endpoint']);
-      //echo "Adding [$label] to [$router]<br>\n";
-      $res = $routers[$router]->fromResource($label, $rsrc);
-      if ($res !== true) {
-        echo "Problem building routes for : $res<br>\n";
+      //echo "Adding [$label][", $rsrc['endpoint'], "] to [$router]<br>\n";
+
+      // might be included from frontend...
+      if (isset($routers[$router])) {
+        $res = $routers[$router]->fromResource($label, $rsrc);
+        if ($res !== true) {
+          echo "Problem building routes for : $res<br>\n";
+        }
       }
     }
   }
@@ -153,11 +157,11 @@ class package {
       $fe_pkg->buildRoutes($router, $method);
     }
   }
-  function registerFrontendPackage(&$fe_pkg) {
-    $this->frontend_packages[] = &$fe_pkg;
+  function registerFrontendPackage($fe_pkg) {
+    $this->frontend_packages[] = $fe_pkg;
   }
-  function registerBackendPackage(&$fe_pkg) {
-    $this->backend_packages[] = &$fe_pkg;
+  function registerBackendPackage($be_pkg) {
+    $this->backend_packages[] = $be_pkg;
   }
   function exec($label, $params) {
   }
@@ -167,15 +171,66 @@ class backend_package {
   function __construct($meta_pkg) {
     $this->pkg = $meta_pkg;
     $this->pkg->registerBackendPackage($this);
+    $this->models = array();
+    $this->modules = array();
   }
   function addModel($model) {
     global $db, $models;
     $name = $model['name'];
+    $this->models[] = $name;
     // FIXME: move this into an activate module step
     // I think it makes the most to do this check once on start update
     // or maybe we build a list of tables to check and batch check...
-    $db->autoupdate($model);
+
+    // might be activated in the frontend...
+    if (isset($db)) {
+      $db->autoupdate($model);
+    }
     $models[$name] = $model;
+  }
+  // how to set dependencies/preempt?
+  function addModule($pipeline_name, $file = false) {
+    $bsn = new pipeline_module($this->pkg->name. '_' . $pipeline_name);
+    if ($file === false) $file = $pipeline_name;
+    $path = strtolower($this->pkg->dir) . 'be/modules/' . strtolower($file) . '.php';
+    $pkg = &$this->pkg;
+    $this->modules[] = $file;
+    $bsn->attach($pipeline_name, function(&$io) use ($pipeline_name, $path, $pkg) {
+      $getModule = function() use ($pipeline_name) {
+        //echo "Set up module for [$pipeline_name]<br>\n";
+        return array();
+      };
+      /*
+      if (!file_exists($path)) {
+        echo "This module [$pipeline_name], [$path] is not found<br>\n";
+        return;
+      }
+      */
+      //echo "Running path[$path]<br>\n";
+      include $path;
+    });
+    return $bsn;
+  }
+  function toString() {
+    $content ='<ul>';
+    if (is_array($this->models) && count($this->models)) {
+      global $models;
+      $content .= '<li>Models<ul>';
+      foreach($this->models as $mname) {
+        $content .= '<li>' . $mname . modelToString($models[$mname]);
+      }
+      $content .= '</ul>';
+    }
+    if (is_array($this->modules) && count($this->modules)) {
+      global $models;
+      $content .= '<li>Modules<ul>';
+      foreach($this->modules as $mname) {
+        $content .= '<li>' . $mname;
+      }
+      $content .= '</ul>';
+    }
+    $content .= '</ul>';
+    return $content;
   }
 }
 
@@ -187,6 +242,7 @@ class frontend_package {
     $this->pkg = $meta_pkg;
     $this->pkg->registerFrontendPackage($this);
     $this->handlers = array();
+    $this->modules = array();
   }
   // could make a addCRUD (optional update)
   // could make an addForm that has a get/post
@@ -227,6 +283,7 @@ class frontend_package {
       //echo "Running path[$path]<br>\n";
       include $path;
     });
+    return $bsn;
   }
   function buildRoutes(&$router, $method) {
     // do we have any routes in this method
@@ -248,6 +305,24 @@ class frontend_package {
       };
       $router->addMethodRoute($method, $cond, $func);
     }
+  }
+  function toString() {
+    $content = '';
+    if (is_array($this->handlers)) {
+      $content .= 'Handlers: ';
+      $content .= 'Methods: ' . join(', ', array_keys($this->handlers));
+      $content .= '<table>';
+      foreach($this->handlers as $type => $handlers) {
+        //$content .= '<li>'. $type;
+        if (is_array($handlers)) {
+          foreach($handlers as $route => $rname) {
+            $content .= '<tr><th>' . $rname . '<td>' . $type . '<td>' . $route;
+          }
+        }
+      }
+      $content .= '</table>';
+    }
+    return $content;
   }
 }
 
