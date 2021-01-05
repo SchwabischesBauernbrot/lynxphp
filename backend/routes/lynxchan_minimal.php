@@ -48,6 +48,7 @@ $router->post('/login', function($request) {
     return sendResponse(array(), 401, 'Incorrect login - no username');
   }
   $row = $db->get_row($res);
+  $db->free($res);
   // password check
   if (!password_verify($_POST['password'], $row['password'])) {
     return sendResponse(array(), 401, 'Incorrect login - bad pass');
@@ -62,6 +63,7 @@ $router->post('/login', function($request) {
     'expires' => $ttl,
     'ip'      => getip(),
   )));
+
   // and return it
   $data = array(
     'username' => $row['username'],
@@ -180,6 +182,8 @@ $router->get('/account', function($request) {
   }
   $userRes = getAccount($user_id);
   $ownedBoards = userBoards($user_id);
+  $groups = getUserGroups($user_id);
+
   echo json_encode(array(
     'noCaptchaBan' => false,
     'login' => $userRes['username'],
@@ -189,6 +193,7 @@ $router->get('/account', function($request) {
     //'volunteeredBoards'
     'boardCreationAllowed' => true,
     'ownedBoards' => $ownedBoards,
+    'groups' => $groups,
     //'settings'
     'reportFilter' => array(), // category filters for e-mail notifications
   ));
