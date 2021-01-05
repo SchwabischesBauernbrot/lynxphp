@@ -37,11 +37,11 @@ include '../common/lib.modules.php'; // module functions and classes
 // - upload file
 // - get ip
 // - post var processing
-$pipelines['boardData'] = new pipeline_registry;
-$pipelines['postData'] = new pipeline_registry;
-$pipelines['userData'] = new pipeline_registry;
-$pipelines['post'] = new pipeline_registry;
-$pipelines['file'] = new pipeline_registry;
+definePipeline('PIPELINE_BOARD_DATA', 'boardData');
+definePipeline('PIPELINE_POST_DATA',  'postData');
+definePipeline('PIPELINE_USER_DATA',  'userData');
+definePipeline('PIPELINE_POST', 'post');
+definePipeline('PIPELINE_FILE', 'file');
 
 $routers = array();
 $routers['4chan'] = include 'routes/4chan.php';
@@ -70,6 +70,7 @@ include 'interfaces/sessions.php';
 
 $packages = array();
 registerPackageGroup('board');
+registerPackageGroup('user');
 // build routes (and activate backend_handlers.php/models.php)
 foreach($packages as $pkg) {
   $pkg->buildBackendRoutes();
