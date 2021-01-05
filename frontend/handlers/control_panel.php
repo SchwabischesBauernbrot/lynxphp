@@ -8,15 +8,22 @@ function getControlPanel() {
   }
   $account = backendLynxAccount();
   //print_r($account);
+
   $templates = loadTemplates('account');
   $tmpl = $templates['header'];
   $board_html = $templates['loop0'];
+  $admin_html = $templates['loop1'];
+
+  $isAdmin = in_array('admin', $account['groups']);
+  $tmpl = str_replace('{{admin}}', $isAdmin ? $admin_html : '', $tmpl);
 
   $boards_html = '';
-  foreach($account['ownedBoards'] as $board) {
-    $tmp = $board_html;
-    $tmp = str_replace('{{uri}}', $board['uri'], $tmp);
-    $boards_html .= $tmp;
+  if (is_array($account['ownedBoards'])) {
+    foreach($account['ownedBoards'] as $board) {
+      $tmp = $board_html;
+      $tmp = str_replace('{{uri}}', $board['uri'], $tmp);
+      $boards_html .= $tmp;
+    }
   }
   $tmpl = str_replace('{{ownedBoards}}', $boards_html, $tmpl);
   wrapContent($tmpl);
