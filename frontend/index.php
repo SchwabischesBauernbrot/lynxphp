@@ -38,14 +38,6 @@ $router = include '../common/router.php';
 
 include '../common/lib.modules.php'; // module functions and classes
 
-$pipelines = array();
-
-function definePipeline($constant, $str) {
-  global $pipelines;
-  define($constant, $str);
-  $pipelines[$str] = new pipeline_registry;
-}
-
 // pipelines...
 // - content page?
 // template pipelines
@@ -69,6 +61,8 @@ definePipeline('PIPELINE_BOARD_NAV',          'board_nav');
 definePipeline('PIPELINE_BOARD_DETAILS_TMPL', 'board_details_tmpl');
 definePipeline('PIPELINE_BOARD_SETTING_NAV',  'board_setting_nav');
 definePipeline('PIPELINE_BOARD_SETTING_TMPL', 'board_setting_tmpl');
+definePipeline('PIPELINE_ADMIN_NAV',          'admin_nav');
+definePipeline('PIPELINE_ADMIN_HEADER_TMPL',  'admin_heading_tmpl');
 
 // forms pipelines
 // - newThreadForm
@@ -92,18 +86,21 @@ include 'lib/middlewares.php';
 // frontend handlers
 include 'handlers/mixins/board_header.php';
 include 'handlers/mixins/board_nav.php';
+include 'handlers/mixins/admin_portal.php';
 
 include 'handlers/homepage.php';
 include 'handlers/login.php';
 include 'handlers/signup.php';
 include 'handlers/control_panel.php';
 include 'handlers/boards.php';
+include 'handlers/admin.php';
 
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 $req_path   = getServerField('PATH_INFO');
 
 $packages = array();
 registerPackageGroup('board');
+registerPackageGroup('user');
 // build routes (and activate frontend_handlers.php)
 foreach($packages as $pkg) {
   $pkg->buildFrontendRoutes($router, $req_method);
@@ -244,6 +241,14 @@ $router->get('/create_board.php', function() {
 $router->post('/create_board.php', function() {
   postCreateBoard();
 });
+
+$router->get('/admin.php', function() {
+  getAdminPage();
+});
+$router->get('/admin/modules', function() {
+  getAdminModulesPage();
+});
+
 
 $router->get('/logout.php', function() {
   getLogout();
