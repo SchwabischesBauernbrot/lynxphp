@@ -52,13 +52,13 @@ function boardPage($boardUri, $page = 1) {
     return;
   }
   $post_files_model = getPostFilesModel($boardUri);
-  $limitPage = $page - 1;
+  $limitPage = $page - 1; // make it start at 0
   //echo "page[$page] limitPage[$limitPage]<br>\n";
   $res = $db->find($posts_model, array('criteria'=>array(
       array('threadid', '=', 0),
     ),
     'order'=>'updated_at desc',
-    'limit' => $tpp . ($limitPage ? ',' . $limitPage : '')
+    'limit' => ($limitPage ? ($limitPage * $tpp) . ',' : '') . $tpp
   ));
   $threads = array();
   while($row = $db->get_row($res)) {
