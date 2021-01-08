@@ -51,7 +51,6 @@ EOB;
 
 function postCreateBoard() {
   $result = backendCreateBoard();
-  //print_r($result);
   if ($result['data'] === 'ok') {
     // maybe not display this?
     //wrapContent('Board created!');
