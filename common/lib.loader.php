@@ -29,7 +29,9 @@ function registerPackageGroup($group) {
     if (is_dir($path)) {
       $loaded++;
       $pkg = &registerPackage($group . '/' . $file);
-      $packages[$pkg->name] = $pkg;
+      if ($pkg) {
+        $packages[$pkg->name] = $pkg;
+      }
     }
   }
   closedir($dh);
@@ -39,7 +41,36 @@ function registerPackageGroup($group) {
 function &registerPackage($pkg_path) {
   global $module_base;
   $full_pkg_path = '../' . $module_base . $pkg_path . '/';
-  $pkg = include $full_pkg_path . 'index.php';
+  /*
+  if (file_exists($full_pkg_path . 'module.json')) {
+    $json = file_get_contents($full_pkg_path . 'module.json');
+    //$json = preg_replace("/,(?!.*,)/", "", $json);
+    //echo "json[$json]<br>\n";
+    // json is an ugly format, not native
+    // not performant to add json5 support for such a critical task...
+    // but is a cacheable process...
+    // but php data file is simpler and less complex
+    $data = json_decode($json, true);
+    //echo "<pre>", print_r($data, 1), "</pre>\n";
+    // FIXME: 2 phases, introspect vs use
+    // convert data into code...
+    $pkg = new package($data['name'], $data['version'], substr($full_pkg_path, 0, -1));
+    foreach($data['resources'] as $rsrcHdr) {
+      $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params']);
+    }
+  */
+  if (file_exists($full_pkg_path . 'module.php')) {
+    $data = include $full_pkg_path . 'module.php';
+    $pkg = new package($data['name'], $data['version'], substr($full_pkg_path, 0, -1));
+    foreach($data['resources'] as $rsrcHdr) {
+      $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params']);
+    }
+  } else {
+    $pkg = false;
+    if (file_exists($full_pkg_path . 'index.php')) {
+      $pkg = include $full_pkg_path . 'index.php';
+    }
+  }
   return $pkg;
 }
 
