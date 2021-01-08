@@ -32,12 +32,14 @@ function postSignup() {
   $email = $_POST['email'];
   $pass  = $_POST['password'];
   // login, password, email
-  $result = curlHelper(BACKEND_BASE_URL . 'lynx/registerAccount', array(
+  $json = curlHelper(BACKEND_BASE_URL . 'lynx/registerAccount', array(
     'login'    => $user,
     'password' => $pass,
     'email'    => $email,
   ));
-  //echo $data;
+  //echo "json[$json]<br>\n";
+  $result = expectJson($json, 'lynx/registerAccount');
+  // echo "<pre>[", print_r($result, 1), "]",gettype($result),"</pre>\n";
   if (!empty($result['data']['username'])) {
     $result = backendLogin($user, $pass);
     if ($login === true) {
