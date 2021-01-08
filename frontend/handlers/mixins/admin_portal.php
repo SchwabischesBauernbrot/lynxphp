@@ -17,6 +17,8 @@ function renderAdminPortal() {
   // default admin items
   $navItems = array(
     'Modules' => 'admin/modules',
+    // should be iframe'd or more integrated...
+    'System' => 'admin/install',
   );
   $pipelines[PIPELINE_ADMIN_NAV]->execute($navItems);
   $nav_html = getNav2($navItems, array(
