@@ -8,10 +8,12 @@ function boardOwnerMiddleware($request) {
   // do we own this board?
   $account = backendLynxAccount();
   $ok = false;
-  foreach($account['ownedBoards'] as $board) {
-    if ($board['uri'] === $boardUri) {
-      $ok = true;
-      break;
+  if (isset($account['ownedBoards']) && is_array($account['ownedBoards'])) {
+    foreach($account['ownedBoards'] as $board) {
+      if ($board['uri'] === $boardUri) {
+        $ok = true;
+        break;
+      }
     }
   }
   if (!$ok) {
