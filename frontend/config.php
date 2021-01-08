@@ -4,7 +4,7 @@
 
 // local server config
 // has to be first if we use defines...
-$localConfig = 'config_' . getServerField('SERVER_NAME') . '.php';
+$localConfig = 'config_' . getServerField('HTTP_HOST', getServerField('SERVER_NAME')) . '.php';
 if (file_exists($localConfig)) {
   include($localConfig);
 } else {
@@ -25,7 +25,10 @@ if (!defined('BACKEND_BASE_URL')) define('BACKEND_BASE_URL', 'http://localhost/b
 
 // what request path is the site design to run under
 if (!defined('BASE_HREF')) {
-  define('BASE_HREF', dirname(getServerField('SCRIPT_NAME', __FILE__)) . '/');
+  // nginx: /index.php
+  // maybe a different var would be better...
+  // REQUEST_URI (but what does this look like in not /)
+  define('BASE_HREF', rtrim(dirname(getServerField('SCRIPT_NAME', __FILE__)), '/') . '/');
 }
 
 ?>
