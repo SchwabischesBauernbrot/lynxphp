@@ -9,6 +9,11 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     $fields_string=$fields;
   }
 
+  if (!function_exists('curl_init')) {
+    echo "PHP does not have the curl extension installed<br>\n";
+    exit(1);
+  }
+
   //open handle
   $ch = curl_init();
 
