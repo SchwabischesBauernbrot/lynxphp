@@ -21,7 +21,7 @@ function getNav($navItems, $replaces, $selected = '', $list = true) {
 }
 
 function getNav2($navItems, $options = array()) {
-  $list = isset($options['list']) ? $options['list'] : false;
+  $list = isset($options['list']) ? $options['list'] : true;
   $selected = isset($options['selected']) ? $options['selected'] :'';
   $selectedURL = isset($options['selectedURL']) ? $options['selectedURL'] : false;
   $replaces = isset($options['replaces']) ? $options['replaces'] : array();
