@@ -26,6 +26,7 @@ foreach($users as $user) {
   $tmp = str_replace('{{id}}',         $user['userid'],     $tmp);
   $tmp = str_replace('{{username}}',   $user['username'],   $tmp);
   $tmp = str_replace('{{email}}',      $user['email'],      $tmp);
+  $tmp = str_replace('{{groups}}',     $user['groupnames'],     $tmp);
   $tmp = str_replace('{{created_at}}', $user['created_at'], $tmp);
   $tmp = str_replace('{{updated_at}}', $user['updated_at'], $tmp);
   $users_html .= $tmp;
