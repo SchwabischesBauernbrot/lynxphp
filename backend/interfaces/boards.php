@@ -97,6 +97,7 @@ function boardCatalog($boardUri) {
   ), 'order'=>'updated_at desc'));
   $page = 1;
   // FIXME: rewrite to be more memory efficient
+  $threads = array();
   while($row = $db->get_row($res)) {
     postDBtoAPI($row, $post_files_model);
     $threads[$page][] = $row;
