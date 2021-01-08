@@ -68,6 +68,7 @@ include 'interfaces/sessions.php';
 
 $packages = array();
 registerPackageGroup('board');
+registerPackageGroup('post');
 registerPackageGroup('user');
 // build routes (and activate backend_handlers.php/models.php)
 foreach($packages as $pkg) {
