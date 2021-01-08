@@ -367,7 +367,10 @@ class mysql_driver extends database_driver_base_class implements database_driver
     return $cnt;
   }
   public function findById($rootModel, $id, $options = false) {
-    return mysqli_fetch_assoc(parent::findById($rootModel, $id, $options));
+    $res = parent::findById($rootModel, $id, $options);
+    $row = mysqli_fetch_assoc($res);
+    $this->free($res);
+    return $row;
   }
   public function num_rows($res) {
     return mysqli_num_rows($res);
