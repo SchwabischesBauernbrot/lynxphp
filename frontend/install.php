@@ -31,11 +31,11 @@ if (PHP_MAJOR_VERSION < 5) {
 }
 
 if (!$hasASupportedWebserver) {
-  echo "You currently don't have a support webserver.<br>\n";
+  echo "You currently don't have a supported webserver.<br>\n";
   $ok = false;
 }
 if (!$hasASupportedDB) {
-  echo "You currently don't have a support database server driver installed (mysqli module).<br>\n";
+  echo "You currently don't have a supported database server driver installed (mysqli module).<br>\n";
   $ok = false;
 }
 if (!$hasCurl) {
