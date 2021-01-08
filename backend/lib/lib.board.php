@@ -27,7 +27,7 @@ function getBoardByUri($boardUri) {
       array('uri', '=', $boardUri),
   )));
   if (!$res) return;
-  $row = mysqli_fetch_assoc($res);
+  $row = $db->get_row($res);
   if ($row['json']) $row['json'] = json_decode($row['json'], true);
   return $row;
 }
