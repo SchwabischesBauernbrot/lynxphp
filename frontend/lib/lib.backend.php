@@ -142,7 +142,7 @@ function backendLogin($user, $pass) {
     'login'    => $user,
     'password' => $pass,
   ), array('HTTP_X_FORWARDED_FOR' => getip()));
-  $res = json_decode($data, true);
+  $res = expectJson($json, 'lynx/login');
   if (!empty($res['data']['session'])) {
     setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
     //redirectTo('control_panel.php');
@@ -152,13 +152,13 @@ function backendLogin($user, $pass) {
 }
 
 function backendCreateBoard() {
-  $data = curlHelper(BACKEND_BASE_URL . 'lynx/createBoard', array(
+  $json = curlHelper(BACKEND_BASE_URL . 'lynx/createBoard', array(
     'boardUri'         => $_POST['uri'],
     'boardName'        => $_POST['title'],
     'boardDescription' => $_POST['description'],
     // captcha?
   ), array('sid' => $_COOKIE['session']));
-  return $data;
+  return expectJson($json, 'lynx/createBoard');
 }
 
 function backendLynxAccount() {
