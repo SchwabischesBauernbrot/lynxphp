@@ -142,7 +142,6 @@ function backendLogin($user, $pass) {
     'login'    => $user,
     'password' => $pass,
   ), array('HTTP_X_FORWARDED_FOR' => getip()));
-  //echo "data[$data]<br>\n";
   $res = json_decode($data, true);
   if (!empty($res['data']['session'])) {
     setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
