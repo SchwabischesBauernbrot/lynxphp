@@ -389,7 +389,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
   }
   public function free($res) {
     if (!is_object($res) || !$res) {
-      echo "<pre>non-resultSet passed into toArray [", gettype($res), "](",print_r($res, 1), ")</pre>\n";
+      echo "<pre>non-resultSet passed into free [", gettype($res), "](",print_r($res, 1), ")</pre>\n";
       return array();
     }
     return mysqli_free_result($res);
