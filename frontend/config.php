@@ -8,7 +8,7 @@ $localConfig = 'config_' . getServerField('HTTP_HOST', getServerField('SERVER_NA
 if (file_exists($localConfig)) {
   include($localConfig);
 } else {
-  echo "Local config file [$localConfig] not found<br>\n";
+  echo "Local frontend config file [$localConfig] not found in ", getcwd(), "<br>\n";
 }
 
 // site wide config
