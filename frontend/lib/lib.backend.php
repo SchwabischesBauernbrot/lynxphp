@@ -62,7 +62,7 @@ function consume_beRsrc($options, $params = '') {
     $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
   if (!empty($options['expectJson']) || !empty($options['unwrapData'])) {
     $obj = json_decode($responseText, true);
-    if ($obj === false) {
+    if ($obj === NULL) {
       wrapContent('Backend error (consume_beRsrc): ' .  $options['endpoint'] . ': ' . $responseText);
       return;
     }
@@ -75,7 +75,7 @@ function consume_beRsrc($options, $params = '') {
 
 function expectJson($json, $endpoint = '') {
   $obj = json_decode($json, true);
-  if ($obj === false) {
+  if ($obj === NULL) {
     wrapContent('Backend JSON parsing error: ' .  $endpoint . ': ' . $json);
     return;
   }
