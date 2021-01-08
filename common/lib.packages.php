@@ -18,6 +18,13 @@ class backend_resource {
 }
 */
 
+// frontend usually routes wrap around these...
+// so we can't just add more frontend resources
+// we need to attach a frontend to it?
+// and we don't need frontend attachments here...
+// there could be some benefits of documenting the frontend routes here...
+// here was pkg.json/module index
+
 // a owner of a collection of pipeline_modules...
 class package {
   var $ver;
@@ -62,6 +69,7 @@ class package {
    *     unwrapData
    */
   function addResource($label, $rsrcArr) {
+    $label = strtolower($label); // must be lowercase since it's a filename
     if (!isset($rsrcArr['handlerFile'])) {
       $rsrcArr['handlerFile'] = $this->dir . 'be/handlers/'. $label . '.php';
       if (!file_exists($rsrcArr['handlerFile'])) {
@@ -70,16 +78,23 @@ class package {
     }
     $this->resources[$label] = $rsrcArr;
   }
-  function useResource($label, $params = false) {
+  function useResource($label, $params = false, $options = false) {
+    if (empty($this->resources[$label])) {
+      echo "<pre>Cannot call [$label] no such resource: ", print_r(array_keys($this->resources), 1), "</pre>\n";
+      return;
+    }
     $rsrc = $this->resources[$label];
     if (!empty($rsrc['requires'])) {
-      $ok = true;
+      $missing = array();
       foreach($rsrc['requires'] as $name) {
-        if (empty($params[$name])) {
-          $ok = false;
-          echo "<pre>Cannot call [$label] because [$name] is missing from parameters: ", print_r($params, 1), "</pre>\n";
-          return;
+        // allow false to be a valid value...
+        if (!isset($params[$name])) {
+          $missing[] = $name;
         }
+      }
+      if (count($missing)) {
+        echo "<pre>Cannot call [$label] because ", join(', ', $missing), " are missing from parameters: ", print_r($params, 1), "</pre>\n";
+        return;
       }
     }
     if (isset($rsrc['params'])) {
@@ -88,6 +103,7 @@ class package {
         if (!isset($rsrc['formData']))    $rsrc['formData'] = array();
         $qs = array_flip($rsrc['params']['querystring']);
         $fd = array_flip($rsrc['params']['formData']);
+        // FIXME: what if we call this multiple times?
         foreach($params as $k=>$v) {
           if (isset($qs[$k])) {
             $rsrc['querystring'][] = $k . '=' . urlencode($v);
@@ -108,6 +124,13 @@ class package {
         echo "Unknown parameter type[", $params['params'], "]<br>\n";
       }
     }
+    if ($options) {
+      if (!empty($options['addPostFields'])) {
+        foreach($options['addPostFields'] as $f => $v) {
+          $rsrc['formData'][$f] = $v;
+        }
+      }
+    }
     $result = consume_beRsrc($rsrc, $params);
     return $result;
   }
@@ -120,6 +143,18 @@ class package {
     }
     */
     // activate backend hooks
+    if (file_exists($this->dir . 'be/data.php')) {
+      $bePkgs = include $this->dir . 'be/data.php';
+      foreach($bePkgs as $pName => $pData) {
+        $bePkg = $this->makeBackend();
+        foreach($pData['models'] as $m) {
+          $bePkg->addModel($m);
+        }
+        foreach($pData['modules'] as $m) {
+          $bePkg->addModule(constant($m['pipeline']), $m['module']);
+        }
+      }
+    } else
     if (file_exists($this->dir . 'be/index.php')) {
       include $this->dir . 'be/index.php';
     }
@@ -149,6 +184,23 @@ class package {
   }
   function buildFrontendRoutes(&$router, $method) {
     // activate frontend hooks
+    if (file_exists($this->dir . 'fe/data.php')) {
+      $fePkgs = include $this->dir . 'fe/data.php';
+      // package name is optinal
+      foreach($fePkgs as $pName => $pData) {
+        $fePkg = $this->makeFrontend();
+        foreach($pData['handlers'] as $h) {
+          //$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
+          $fePkg->addHandler($h['method'], $h['route'], $h['handler']);
+        }
+        foreach($pData['forms'] as $form) {
+          //$fePkg->addForm('/:uri/settings/banners/:id/delete', 'delete');
+        }
+        foreach($pData['modules'] as $m) {
+          $fePkg->addModule(constant($m['pipeline']), $m['module']);
+        }
+      }
+    } else
     if (file_exists($this->dir . 'fe/index.php')) {
       include $this->dir . 'fe/index.php';
     }
@@ -189,6 +241,7 @@ class backend_package {
     $models[$name] = $model;
   }
   // how to set dependencies/preempt?
+  // FIXME: key caching...
   function addModule($pipeline_name, $file = false) {
     $bsn = new pipeline_module($this->pkg->name. '_' . $pipeline_name);
     if ($file === false) $file = $pipeline_name;
@@ -269,10 +322,12 @@ class frontend_package {
     if ($file === false) $file = $pipeline_name;
     $path = strtolower($this->pkg->dir) . 'fe/modules/' . strtolower($file) . '.php';
     $pkg = &$this->pkg;
-    $bsn->attach($pipeline_name, function(&$io) use ($pipeline_name, $path, $pkg) {
-      $getModule = function() use ($pipeline_name) {
+    $bsn->attach($pipeline_name, function(&$io, $options = false) use ($pipeline_name, $path, $pkg) {
+      $getModule = function() use ($pipeline_name, $options) {
         //echo "Set up module for [$pipeline_name]<br>\n";
-        return array();
+        return array(
+          'options' => $options,
+        );
       };
       /*
       if (!file_exists($path)) {
@@ -294,15 +349,22 @@ class frontend_package {
     // only build the routes we need
     foreach($this->handlers[$method] as $cond => $file) {
       $path = strtolower($this->pkg->dir) . 'fe/handlers/' . strtolower($file) . '.php';
-      $func = function($request) use ($path, $pkg) {
-        // lastMod function?
-        // well just deep memiozation could work...
-        // middlewares, wrapContent => sendResponse
-        $getHandler = function() {
-          return array();
-        };
-        $intFunc = include $path;
+      // FIXME: hide the ../commoon
+      $func = function($request) use ($path) {
+        // as configured by ...
+        echo "handler[$path] does not exist<br>\n";
       };
+      if (file_exists($path)) {
+        $func = function($request) use ($path, $pkg) {
+          // lastMod function?
+          // well just deep memiozation could work...
+          // middlewares, wrapContent => sendResponse
+          $getHandler = function() {
+            return array();
+          };
+          $intFunc = include $path;
+        };
+      }
       $router->addMethodRoute($method, $cond, $func);
     }
   }
