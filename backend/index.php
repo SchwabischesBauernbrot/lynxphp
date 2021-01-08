@@ -14,10 +14,8 @@ include 'config.php';
 $router = include '../common/router.php';
 
 // connect to db
-// FIXME: database type to select driver
-$db_driver = 'mysql';
-include 'lib/database_drivers/'.$db_driver.'.php';
-$driver_name = $db_driver . '_driver';
+include 'lib/database_drivers/' . DB_DRIVER . '.php';
+$driver_name = DB_DRIVER . '_driver';
 $db = new $driver_name;
 
 $tpp = 10; // threads per page
@@ -107,6 +105,7 @@ $router->all('/opt/*', $routers['opt']);
 
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 $req_path   = getServerField('PATH_INFO');
+
 $res = $router->exec($req_method, $req_path);
 if (!$res) {
   http_response_code(404);
