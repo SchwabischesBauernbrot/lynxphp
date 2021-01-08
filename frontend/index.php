@@ -87,6 +87,7 @@ include 'lib/middlewares.php';
 include 'handlers/mixins/board_header.php';
 include 'handlers/mixins/board_nav.php';
 include 'handlers/mixins/admin_portal.php';
+include 'handlers/mixins/post_renderer.php';
 
 include 'handlers/homepage.php';
 include 'handlers/login.php';
@@ -101,6 +102,7 @@ $req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 
 $packages = array();
 registerPackageGroup('board');
+registerPackageGroup('post');
 registerPackageGroup('user');
 // build routes (and activate frontend_handlers.php)
 foreach($packages as $pkg) {
@@ -252,7 +254,9 @@ $router->get('/admin.php', function() {
 $router->get('/admin/modules', function() {
   getAdminModulesPage();
 });
-
+$router->get('/admin/install', function() {
+  getAdminInstallPage();
+});
 
 $router->get('/logout.php', function() {
   getLogout();
