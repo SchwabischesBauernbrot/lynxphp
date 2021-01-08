@@ -38,6 +38,7 @@ function getOverboardHandler() {
   wrapContent($content);
 }
 
+// /:uri/
 function getBoardThreadListing($boardUri, $pagenum = 1) {
   $boardThreads = backendGetBoardThreadListing($boardUri, $pagenum);
   //echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
@@ -178,7 +179,14 @@ function getThreadHandler($boardUri, $threadNum) {
 
 function getBoardCatalogHandler($boardUri) {
   $catalog = getBoardCatalog($boardUri);
-  //print_r($catalog);
+  if (!empty($catalog['meta']['err'])) {
+    if ($catalog['meta']['err'] === 'Board not found') {
+      wrapContent("Board not found");
+    } else {
+      wrapContent("Unknown board error");
+    }
+    return;
+  }
   $templates = loadTemplates('catalog');
 
   $tmpl = $templates['header'];
@@ -205,7 +213,11 @@ function getBoardCatalogHandler($boardUri) {
 
   $maxPage = 0;
   foreach($catalog as $obj) {
-    $maxPage = max($obj['page'], $maxPage);
+    if (isset($obj['page'])) {
+      $maxPage = max($obj['page'], $maxPage);
+    } else {
+      echo "<pre>No page set in [", print_r($obj, 1), "]</pre>\n";
+    }
   }
   $boardnav_html = renderBoardNav($boardUri, $maxPage, '[Catalog]');
 
@@ -255,11 +267,16 @@ function getBoardSettingsHandler($boardUri) {
   global $pipelines;
   $templates = loadTemplates('board_settings');
   $tmpl = $templates['header'];
-  $navItems = array();
-  $pipelines['board_setting_nav']->execute($navItems);
-  $nav_html = getNav($navItems, array(
+
+  $io = array(
+    'navItems' => array(),
+    'boardUri' => $boardUri,
+  );
+  $pipelines[PIPELINE_BOARD_SETTING_NAV]->execute($io);
+  $nav_html = getNav($io['navItems'], array(
     'uri' => $boardUri,
   ));
+
   $tmpl = str_replace('{{nav}}', $nav_html, $tmpl);
   //$pipelines['boardSettingTmpl']->execute($tmpl);
   wrapContent($tmpl);
