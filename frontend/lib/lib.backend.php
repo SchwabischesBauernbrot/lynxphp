@@ -32,11 +32,17 @@ function consume_beRsrc($options, $params = '') {
   }
   $headers = array();
   if (!empty($options['sendSession'])) {
+    if (isset($_COOKIE['session'])) {
+      $headers['sid'] = $_COOKIE['session'];
+    }
+  }
+  if (!empty($options['requireSession'])) {
     if (!isset($_COOKIE['session'])) {
       return false;
     }
     $headers['sid'] = $_COOKIE['session'];
   }
+  // when shouldn't we send this?
   if (!empty($options['sendIP'])) $headers['HTTP_X_FORWARDED_FOR'] = getip();
   if (!count($headers)) $headers = '';
 
