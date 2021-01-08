@@ -9,6 +9,11 @@ $boardUri = $io['boardUri'];
 $banner = $pkg->useResource('random', array('boardUri' => $boardUri));
 
 // add {{banner}} tag
-$io['tags']['banner'] = '<img src="'. BASE_HREF . 'backend/' . $banner['image']. '" width="'.$banner['w'].'" height="'.$banner['h'].'">';
+if (is_array($banner) && count($banner)) {
+  $io['tags']['banner'] = '<img src="'. BASE_HREF . 'backend/' . $banner['image']. '" width="'.$banner['w'].'" height="'.$banner['h'].'">';
+} else {
+  // array() just means no banners
+  $io['tags']['banner'] = 'No banners, make a banners thread';
+}
 
 ?>
