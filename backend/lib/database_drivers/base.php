@@ -1,10 +1,7 @@
 <?php
 
 interface database_driver_base {
-  // direct
-  public function connect($host, $user, $pass, $port = 0);
-  // direct
-  public function switch_db($db);
+  public function connect_db($host, $user, $pass, $db, $port = 0);
   // easy
   public function autoupdate($model);
   public function build_where($criteria);
