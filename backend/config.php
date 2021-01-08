@@ -6,7 +6,7 @@ $localConfig = 'config_' . getServerField('HTTP_HOST') . '.php';
 if (file_exists($localConfig)) {
   include($localConfig);
 } else {
-  echo "Local config file [$localConfig] not found<br>\n";
+  echo "Local backend config file [$localConfig] not found in ", getcwd(), "<br>\n";
 }
 
 // site wide config
