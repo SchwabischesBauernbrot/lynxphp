@@ -31,9 +31,8 @@ function getControlPanel() {
   wrapContent($tmpl);
 }
 
-function getCreateBoard() {
-
-  $content = <<< EOB
+function getCreateBoardFrom() {
+  return <<< EOB
 <form action="create_board.php" method="POST">
   <dl>
     <dt>URI
@@ -45,7 +44,10 @@ function getCreateBoard() {
   <input type=submit value="create">
 </form>
 EOB;
-  wrapContent($content);
+}
+
+function getCreateBoard() {
+  wrapContent(getCreateBoardFrom());
 }
 
 function postCreateBoard() {
@@ -60,8 +62,8 @@ function postCreateBoard() {
     */
     return;
   }
-  $tmpl = "Error: Sign up error: " . $result['meta']['err'] . "<br>\n";
-  wrapContent($tmpl . getSignupForm());
+  $tmpl = "Error: Board creation error: " . $result['meta']['err'] . "<br>\n";
+  wrapContent($tmpl . getCreateBoardFrom());
 }
 
 ?>
