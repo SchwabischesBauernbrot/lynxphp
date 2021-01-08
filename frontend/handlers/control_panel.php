@@ -14,11 +14,14 @@ function getControlPanel() {
   $board_html = $templates['loop0'];
   $admin_html = $templates['loop1'];
 
-  $isAdmin = in_array('admin', $account['groups']);
+  $isAdmin = false;
+  if (isset($account['groups'])) {
+    $isAdmin = in_array('admin', $account['groups']);
+  }
   $tmpl = str_replace('{{admin}}', $isAdmin ? $admin_html : '', $tmpl);
 
   $boards_html = '';
-  if (is_array($account['ownedBoards'])) {
+  if (isset($account['ownedBoards']) && is_array($account['ownedBoards'])) {
     foreach($account['ownedBoards'] as $board) {
       $tmp = $board_html;
       $tmp = str_replace('{{uri}}', $board['uri'], $tmp);
