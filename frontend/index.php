@@ -96,7 +96,8 @@ include 'handlers/boards.php';
 include 'handlers/admin.php';
 
 $req_method = getServerField('REQUEST_METHOD', 'GET');
-$req_path   = getServerField('PATH_INFO');
+// REQUEST_URI seems to be more accruate in NGINX
+$req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 
 $packages = array();
 registerPackageGroup('board');
@@ -113,6 +114,9 @@ foreach($packages as $pkg) {
 // FIXME: we should be getting page conent and wrapping it here...
 // FIXME: move into routes and the caching layer can go here too
 $router->get('', function() {
+  homepage();
+});
+$router->get('/', function() {
   homepage();
 });
 $router->get('/boards.php', function() {
@@ -257,8 +261,11 @@ $router->get('/logout.php', function() {
 // needs to go last...
 $router->get('/:uri', function($request) {
   $boardUri = $request['params']['uri'];
+  if ($boardUri) {
+    $boardUri .= '/';
+  }
   // maybe only redir if the board exists...
-  redirectTo(BASE_HREF . $boardUri . '/');
+  redirectTo(BASE_HREF . $boardUri);
 });
 
 $res = $router->exec($req_method, $req_path);
