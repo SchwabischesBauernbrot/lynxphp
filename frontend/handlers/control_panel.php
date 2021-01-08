@@ -7,7 +7,6 @@ function getControlPanel() {
     return;
   }
   $account = backendLynxAccount();
-  //print_r($account);
 
   $templates = loadTemplates('account');
   $tmpl = $templates['header'];
