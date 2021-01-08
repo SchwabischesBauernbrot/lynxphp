@@ -66,6 +66,16 @@ class database_driver_base_class {
     );
     return $this->find($rootModel, $options);
   }
+  public function deleteById($rootModel, $id, $options = false) {
+    $tableName = modelToTableName($rootModel);
+    $id = (int)$id;
+    $options = array(
+      'criteria' => array(
+        array(modelToId($rootModel) , '=', $id)
+      )
+    );
+    return $this->delete($rootModel, $options);
+  }
   public function toArray($res) {
     $arr = array();
     while($row = $this->getrow($res)) {
