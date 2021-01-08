@@ -13,7 +13,7 @@ $router->get('/:board/catalog.json', function($request) {
   global $tpp;
   $boardUri = $request['params']['board'];
   $page = boardCatalog($boardUri);
-  if (!$page) {
+  if (!is_array($page)) {
     sendResponse(array(), 404, 'Board not found');
     return;
   }
