@@ -2,7 +2,7 @@
 
 // local server config
 // has to be first if we use defines...
-$localConfig = 'config_' . getServerField('SERVER_NAME') . '.php';
+$localConfig = 'config_' . getServerField('HTTP_HOST') . '.php';
 if (file_exists($localConfig)) {
   include($localConfig);
 } else {
