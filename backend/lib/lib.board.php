@@ -18,6 +18,8 @@ getBoardsWith($field, $value)
 getBoardSettingForm($uri)
 */
 
+// lock/unlock board?
+
 // needs to return ID
 function getBoardByUri($boardUri) {
   global $db, $models;
@@ -28,6 +30,15 @@ function getBoardByUri($boardUri) {
   $row = mysqli_fetch_assoc($res);
   if ($row['json']) $row['json'] = json_decode($row['json'], true);
   return $row;
+}
+
+function updateBoard($boardUri,$row) {
+  global $db, $models;
+  if ($row['json']) $row['json'] = json_encode($row['json']);
+  // feels really dangerous...
+  return $db->update($models['board'], $row, array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
 }
 
 function boardDealer($connections, $boardUri) {
