@@ -6,8 +6,10 @@ Requirements
 
 # Debian-ish help
 
+```
 apt install apache2 libapache2-mod-php php-mysql php-curl mysql-server git
 a2enmod rewrite
+```
 
 Change AllowOverride to All
 /etc/apache2/apache2.conf
