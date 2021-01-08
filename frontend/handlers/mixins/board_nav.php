@@ -24,9 +24,13 @@ function renderBoardNav($boardUri, $pageCount, $selected) {
   );
   $pipelines['board_nav']->execute($navItems);
 
-  $nav_html = getNav($navItems, array(
-    'uri' => $boardUri,
-  ), $selected, false);
+  $nav_html = getNav2($navItems, array(
+    'list' => false,
+    // handle no pages...
+    //'selected' => $pageCount ? $selected : NULL,
+    'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
+    'replaces' => array('uri' => $boardUri),
+  ));
 
   $tmpl = str_replace('{{boardNav}}', $nav_html, $tmpl);
   return $tmpl;
