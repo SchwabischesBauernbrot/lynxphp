@@ -19,12 +19,14 @@ Change AllowOverride to All
 </Directory>
 ```
 
+```
 cd /var/www
 mv html old
 git clone https://gitgud.io/odilitime/lynxphp.git
 ln -s lynxphp/frontend html
 cd lynxphp/frontend
 ln -s ../backend
+```
 
 then you need to make config_HOSTNAME.php in frontend and backend
 
