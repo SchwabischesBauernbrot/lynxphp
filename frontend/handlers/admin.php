@@ -78,4 +78,8 @@ function getAdminModulesPage() {
   wrapContent(renderAdminPortal() . $content);
 }
 
+function getAdminInstallPage() {
+  wrapContent(renderAdminPortal() . '<iframe src="install.php" frameborder=0 width=100%></iframe>');
+}
+
 ?>
