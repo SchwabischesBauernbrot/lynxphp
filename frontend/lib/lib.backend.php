@@ -144,7 +144,7 @@ function checkSession() {
 
 function backendLogin($user, $pass) {
   // login, password, email
-  $data = curlHelper(BACKEND_BASE_URL . 'lynx/login', array(
+  $json = curlHelper(BACKEND_BASE_URL . 'lynx/login', array(
     'login'    => $user,
     'password' => $pass,
   ), array('HTTP_X_FORWARDED_FOR' => getip()));
