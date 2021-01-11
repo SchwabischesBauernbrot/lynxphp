@@ -157,6 +157,16 @@ $group_model = array(
   )
 );
 
+// for backend system rate limiting
+$request_model = array(
+  'name' => 'request',
+  'fields' => array(
+	  'ip' => array('type'=>'str'),
+	  'count' => array('type'=>'int'),
+	  'type' => array('type'=>'str'),
+  )
+);
+
 global $db, $models;
 
 $db->autoupdate($migration_model);
@@ -165,6 +175,7 @@ $db->autoupdate($user_session_model);
 $db->autoupdate($board_model);
 $db->autoupdate($usergroup_model);
 $db->autoupdate($group_model);
+$db->autoupdate($request_model);
 
 // for each board set up:
 // a posts_model table
@@ -182,6 +193,7 @@ $models = array(
   'user'      => $user_model,
   'group'     => $group_model,
   'usergroup' => $usergroup_model,
+  'request'   => $request_model,
 );
 
 
