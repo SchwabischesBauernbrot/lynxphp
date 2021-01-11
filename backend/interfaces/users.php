@@ -11,6 +11,7 @@ function userBoards($user_id) {
     'owner_id' => $user_id
   )));
   $boards = $db->toArray($res);
+  $db->free($res);
   foreach($boards as &$row) {
     boardDBtoAPI($row);
   }
