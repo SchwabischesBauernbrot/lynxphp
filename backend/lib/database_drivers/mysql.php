@@ -197,7 +197,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $recs[0]['created_at'] = $date;
     $recs[0]['updated_at'] = $date;
     $fields = join(',', array_keys($recs[0]));
-    $sql = 'insert into ' . $tableName . ' (' . $fields . ') values';
+    $sql = 'insert into `' . $tableName . '` (' . $fields . ') values';
     $sets = array();
     foreach($recs as $rec) {
       $cleanArr = array();
@@ -238,7 +238,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       }
       $sets[] = $f . '=' . $val;
     }
-    $sql = 'update ' .$tableName . ' set '. join(', ', $sets);
+    $sql = 'update `' .$tableName . '` set '. join(', ', $sets);
     if (isset($options['criteria'])) {
       $sql .= ' where ' . $this->build_where($options['criteria']);
     }
@@ -254,7 +254,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function delete($rootModel, $options) {
     $tableName = modelToTableName($rootModel);
 
-    $sql = 'delete from ' .$tableName;
+    $sql = 'delete from `' .$tableName . '`';
     if (isset($options['criteria'])) {
       $sql .= ' where ' . $this->build_where($options['criteria']);
     //} else {
@@ -281,17 +281,17 @@ class mysql_driver extends database_driver_base_class implements database_driver
         $field = modelToId($join['model']);
       }
       $joinTable = modelToTableName($join['model']);
-      $data['joins'][] = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join ' .
-        $joinTable . ' on ' .
-        $joinTable . '.' . $field . '=' .
-        $tableName . '.' . $field;
+      $data['joins'][] = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join `' .
+        $joinTable . '` on ' .
+        '`' . $joinTable . '`.' . $field . '=' .
+        '`' . $tableName . '`.' . $field;
       // support an empty array
       if (isset($join['pluck']) && is_array($join['pluck'])) {
         // probably integrate the alias...
         $data['fields'] = array_merge($data['fields'], $join['pluck']);
       } else {
         // if no pluck, then grab all
-        $data['fields'][] = $joinTable . '.*';
+        $data['fields'][] = '`' . $joinTable . '`.*';
       }
       if (!empty($join['groupby'])) {
         $data['groupbys'] = array_merge($data['groupbys'], explode(',', $join['groupby']));
@@ -331,9 +331,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $data = $this->expandJoin($rootModel, $data);
     // FIXME: renaming support
     $useFields = array_merge(array_map(function($f) use ($data, $tableName) {
-      return (count($data['joins']) ? $tableName . '.' : '') . $f;
+      return (count($data['joins']) ? '`'. $tableName . '`.' : '') . $f;
     }, explode(',', $fields)), $data['fields']);
-    $sql = 'select '. join(',', $useFields) . ' from ' . $tableName;
+    $sql = 'select '. join(',', $useFields) . ' from `' . $tableName . '`';
     $useAlias = '';
     if (count($data['joins'])) {
       $sql .= ' ' . join(' ', $data['joins']);
