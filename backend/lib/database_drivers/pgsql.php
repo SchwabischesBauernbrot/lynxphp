@@ -42,6 +42,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       'integer' => 'int',
       'character varying' => 'str',
       'text' => 'text',
+      'boolean' => 'bool',
     );
   }
   // easy
