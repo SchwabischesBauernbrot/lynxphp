@@ -4,7 +4,6 @@ $params = $get();
 $action = getQueryField('action');
 
 // board-threadnum-postnum is the name...
-//print_r($_POST);
 $posts = array();
 $boards = array();
 foreach($_POST as $k => $v) {
@@ -70,6 +69,7 @@ switch($action) {
       $data['json']['reports'][] = $report;
       updateBoard($r['board'], $data);
     }
+    // FIXME: global report
     if ($_REQUEST['globalReport']) {
       // also make a global report
     }
