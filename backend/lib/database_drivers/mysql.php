@@ -96,7 +96,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     if ($err && strpos($err, 'doesn\'t exist') !== false) {
       // create table
       //echo "creating table ", $tableName, "\n";
-      $sql = 'create table ' . $tableName. ' (';
+      $sql = 'create table `' . $tableName. '` (';
       $idf = modelToId($model);
       $sql .= $idf.' BIGINT AUTO_INCREMENT PRIMARY KEY, ';
       //$sql .= 'json MEDIUMTEXT NOT NULL, ';
