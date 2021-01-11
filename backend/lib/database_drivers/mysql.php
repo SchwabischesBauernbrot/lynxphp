@@ -230,8 +230,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $urow['updated_at'] = $date;
     $sets = array();
     foreach($urow as $f=>$v) {
+      // updates are always assignments (=, never </>=)
       if (is_array($v)) {
-        $val = $v;
+        $val = $v[0];
       } else {
         $val = $this->make_constant($v);
       }
