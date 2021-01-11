@@ -25,8 +25,10 @@ function listBoards() {
     boardDBtoAPI($row);
     $boards[] = $row;
   }
+  $db->free($res);
   return $boards;
 }
+
 // get single board
 function getBoard($boardUri) {
   global $db, $models;
@@ -34,9 +36,30 @@ function getBoard($boardUri) {
     array('uri', '=', $boardUri),
   )));
   $row = $db->get_row($res);
+  $db->free($res);
   boardDBtoAPI($row);
   return $row;
 }
+
+function getBoards($boardUris) {
+  global $db, $models;
+  if (is_array($boardUris)) {
+    $res = $db->find($models['board'], array('criteria'=>array(
+      array('uri', 'in', $boardUris),
+    )));
+  } else {
+    $res = $db->find($models['board'], array('criteria'=>array(
+      array('uri', 'in', explode(',', $boardUris)),
+    )));
+  }
+  $data = array();
+  while($row = $db->get_row($res)) {
+    boardDBtoAPI($row);
+    $data[] = $row;
+  }
+  return $row;
+}
+
 // get board thread
 // create board
 
@@ -75,9 +98,11 @@ function boardPage($boardUri, $page = 1) {
       postDBtoAPI($prow, $post_files_model);
       $resort[] = $prow;
     }
+    $db->free($postRes);
     $posts = array_merge($posts, array_reverse($resort));
     $threads[] = array('posts' => $posts);
   }
+  $db->free($res);
   return $threads;
 }
 
@@ -106,8 +131,25 @@ function boardCatalog($boardUri) {
       $threads[$page] = array();
     }
   }
+  $db->free($res);
   //echo "page[$page]<br>\n";
   return $threads;
+}
+
+function isBO($boardUri, $userid = false) {
+  if ($user_id === false) {
+    $user_id = loggedIn();
+    if (!$user_id) {
+      return NULL;
+    }
+  }
+  global $db, $models;
+  $res = $db->find($models['board'], array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
+  $row = $db->get_row($res);
+  $db->free($res);
+  return $row['owner_id'] === $user_id;
 }
 
 // optimization
