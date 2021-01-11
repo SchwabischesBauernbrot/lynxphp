@@ -20,6 +20,8 @@ getBoardSettingForm($uri)
 
 // lock/unlock board?
 
+// getBoardUri to updateBoard URI, should create an object...
+// and bitch if it's held too long...
 // needs to return ID
 function getBoardByUri($boardUri) {
   global $db, $models;
@@ -28,6 +30,7 @@ function getBoardByUri($boardUri) {
   )));
   if (!$res) return;
   $row = $db->get_row($res);
+  $db->free($res);
   if ($row['json']) $row['json'] = json_decode($row['json'], true);
   return $row;
 }
@@ -41,6 +44,18 @@ function updateBoard($boardUri,$row) {
   )));
 }
 
+$rateLimitsTTL['type'] = 0;
+function checkLimit($type, $ip = '') {
+	global $db, $models;
+	if ($ip === '') $ip = getip();
+	$res = $db->find($models['request'], array('criteria' => array( 'ip' => $ip, 'type' => $type)));
+	$row = $db->get_row($res); // should only be one
+	$db->free($res);
+}
+function recordRequest($type, $ip = '') {
+	global $db, $models;
+	if ($ip === '') $ip = getip();
+}
 function boardDealer($connections, $boardUri) {
   $mc = strlen($boardUri);
   $v = 0;
