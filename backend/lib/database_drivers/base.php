@@ -6,6 +6,7 @@ interface database_driver_base {
   public function autoupdate($model);
   public function build_where($criteria);
   public function make_constant($value);
+  public function make_direct($value);
   public function insert($rootModel, $recs);
   public function update($rootModel, $urow, $options);
   // options
@@ -36,6 +37,9 @@ class database_driver_base_class {
   public function make_constant($value) {
     return '"'. addslashes($value) . '"';
   }
+  public function make_direct($value) {
+  	return array($value);
+  }
   // convert array into where clause
   public function build_where($criteria, $defAlias = '') {
     // field, comparator, field
@@ -43,6 +47,7 @@ class database_driver_base_class {
     $alias = $defAlias ? $defAlias . '.' : '';
     foreach($criteria as $k => $set) {
       if (is_numeric($k)) {
+      	// flexible criteria
         if (is_array($set[2])) {
           $sets[] = $alias . $set[0] . ' ' . $set[1] . ' ' . $set[2][0];
         } else {
@@ -119,6 +124,7 @@ function pluck($rows, $fields) {
     } else {
       $keys = array($fields => $row[$fields]);
     }
+    // might not be able to know how to handle return values...
     if (count($keys) === 1) {
       $res[] = array_shift($keys);
     } else {
