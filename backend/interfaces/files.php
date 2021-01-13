@@ -8,6 +8,10 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
   global $db;
   $post_files_model = getPostFilesModel($boardUri);
   foreach($files as $num => $file) {
+    if (empty($file['hash'])) {
+      // FIXME; complains somewhere
+      continue;
+    }
     // move file into path
     $srcPath = 'storage/tmp/'.$file['hash'];
     if (!file_exists($srcPath)) {
@@ -22,6 +26,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     $finalPath = $threadPath . '/' . $postid . '_' . $num . '.' . $ext;
     // not NFS safe
     rename($srcPath, $finalPath);
+    $size = filesize($finalPath);
     $db->insert($post_files_model, array(array(
       'postid' => $postid,
       'sha256' => $file['hash'],
@@ -29,6 +34,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       'ext'    => $ext,
       'browser_type' => $file['type'],
       'filename'     => $file['name'],
+      //'size' => $size,
       'w' => 0,
       'h' => 0,
       'filedeleted' => 0,
