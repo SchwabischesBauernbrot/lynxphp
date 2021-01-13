@@ -79,6 +79,8 @@ function boardPage($boardUri, $page = 1) {
   //echo "page[$page] limitPage[$limitPage]<br>\n";
   $res = $db->find($posts_model, array('criteria'=>array(
       array('threadid', '=', 0),
+      // we need the thread tombstones...
+      //array('deleted', '=', 0),
     ),
     'order'=>'updated_at desc',
     'limit' => ($limitPage ? ($limitPage * $tpp) . ',' : '') . $tpp
@@ -92,6 +94,7 @@ function boardPage($boardUri, $page = 1) {
     // add remaining posts
     $postRes = $db->find($posts_model, array('criteria'=>array(
       array('threadid', '=', $row['no']),
+      array('deleted', '=', 0),
     ), 'order'=>'created_at desc', 'limit' => $lastXreplies));
     $resort = array();
     while($prow = $db->get_row($postRes)) {
@@ -137,9 +140,9 @@ function boardCatalog($boardUri) {
 }
 
 function isBO($boardUri, $userid = false) {
-  if ($user_id === false) {
-    $user_id = loggedIn();
-    if (!$user_id) {
+  if ($userid === false) {
+    $userid = loggedIn();
+    if (!$userid) {
       return NULL;
     }
   }
@@ -149,7 +152,7 @@ function isBO($boardUri, $userid = false) {
   )));
   $row = $db->get_row($res);
   $db->free($res);
-  return $row['owner_id'] === $user_id;
+  return $row['owner_id'] === $userid;
 }
 
 // optimization
