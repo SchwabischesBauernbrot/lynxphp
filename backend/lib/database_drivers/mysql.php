@@ -19,10 +19,10 @@ function modelToSQL($type) {
       $sql = ' TINYINT UNSIGNED NOT NULL DEFAULT 0, ';
     break;
     case 'text': // official
-      $sql = ' MEDIUMTEXT NOT NULL DEFAULT "", '; // 16mb
+      $sql = ' MEDIUMTEXT NOT NULL, '; // 16mb
     break;
     case 'bigtext':
-      $sql = ' LONGTEXT NOT NULL DEFAULT "", '; // 4GB
+      $sql = ' LONGTEXT NOT NULL, '; // 4GB
     break;
   }
   return $sql;
