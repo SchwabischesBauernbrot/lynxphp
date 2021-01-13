@@ -30,10 +30,13 @@ $hasDeleteAccess = false;
 $removedThreads = 0;
 $removedPosts   = 0;
 
+
 switch($action) {
   case 'delete':
     $password = $_POST['password'];
+    global $db;
     foreach($posts as $r) {
+      $posts_model = getPostsModel($r['board']);
       $post = $db->findById($posts_model, $r['postid']);
       if (!$post) continue;
       if ($hasDeleteAccess || $post['password'] === $password) {
