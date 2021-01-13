@@ -51,9 +51,12 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
 
   $page_template = $templates['loop0'];
   $boardnav_html = $templates['loop1'];
+  $file_template = $templates['loop2'];
   $threadhdr_template = $templates['loop3'];
   $threadftr_template = $templates['loop4'];
   $thread_template = $templates['loop5'];
+
+  //echo "test[", htmlspecialchars(print_r($templates, 1)),"]<br>\n";
 
   /*
   $pages_html = '';
@@ -90,6 +93,17 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
       $tmp = str_replace('{{jstime}}', date('c', $post['created_at']), $tmp);
       $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $post['created_at']), $tmp);
       $files_html = '';
+      foreach($post['files'] as $file) {
+        $ftmpl = $file_template;
+        // disable images until we can mod...
+        $ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
+      $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
+      $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
+      $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
+      $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
+        $files_html .= $ftmpl;
+      }
+      //echo "<pre>", $post['no'], "files_tempate[", htmlspecialchars($files_html), "] count[", count($post['files']),"] data[",print_r($post['files'], 1),"] [",print_r($file_template, 1),"]</pre>\n";
       $tmp = str_replace('{{files}}', $files_html, $tmp);
       $threads_html .= $tmp;
     }
@@ -135,6 +149,7 @@ function getThreadHandler($boardUri, $threadNum) {
   $posts = getBoardThread($boardUri, $threadNum);
   $posts_html = '';
   foreach($posts as $post) {
+    //echo "<pre>", print_r($post, 1), "</pre>\n";
     $tmp = $post_template;
     $tmp = str_replace('{{subject}}', htmlspecialchars($post['sub']),  $tmp);
     $tmp = str_replace('{{message}}', htmlspecialchars($post['com']),  $tmp);
@@ -147,8 +162,13 @@ function getThreadHandler($boardUri, $threadNum) {
     $files_html = '';
     foreach($post['files'] as $file) {
       $ftmpl = $file_template;
+      //print_r($file);
       // disbale images until we can mod...
-      //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
+      $ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
+      $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
+      $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
+      $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
+      $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
       $files_html .= $ftmpl;
     }
     $tmp = str_replace('{{files}}', $files_html, $tmp);
@@ -192,7 +212,7 @@ function getBoardCatalogHandler($boardUri) {
   $tmpl = $templates['header'];
 
   $boardnav_html  = $templates['loop0'];
-  $tileimage_html = $templates['loop1'];
+  $image_template = $templates['loop1'];
   $tile_template  = $templates['loop2'];
 
   /*
@@ -234,11 +254,17 @@ function getBoardCatalogHandler($boardUri) {
       $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $thread['created_at']), $tmp);
       // FIXME: enable image
       $tile_image = '';
-      if (0 && count($thread['files'])) {
-        $tile_image = $tile_template;
+      if (count($thread['files'])) {
+        $tile_image = $image_template;
         $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
         $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
-        $tile_image = str_replace('{{file}}', $thread['files'][0]['path'], $tile_image);
+        $tile_image = str_replace('{{file}}', 'backend/'.$thread['files'][0]['path'], $tile_image);
+        /*
+        $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
+        $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
+        $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
+        $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
+      */
       }
       $tmp = str_replace('{{tile_image}}', $tile_image, $tmp);
       $tiles_html .= $tmp;
