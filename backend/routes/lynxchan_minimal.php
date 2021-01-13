@@ -134,11 +134,13 @@ $router->post('/newThread', function($request) {
     'name' => getOptionalPostField('name'),
     'sub'  => getOptionalPostField('subject'),
     'com'  => getOptionalPostField('message'),
+    'password' => getOptionalPostField('password'),
     'sticky' => 0,
     'closed' => 0,
     'trip' => '',
     'capcode' => '',
     'country' => '',
+    'deleted' => 0,
   )));
   processFiles($boardUri, $_POST['files'], $id, $id);
   $data = $id;
@@ -162,19 +164,23 @@ $router->post('/replyThread', function($request) {
     'name' => getOptionalPostField('name'),
     'sub'  => getOptionalPostField('subject'),
     'com'  => getOptionalPostField('message'),
+    'password' => getOptionalPostField('password'),
     'sticky' => 0,
     'closed' => 0,
     'trip' => '',
     'capcode' => '',
     'country' => '',
+    'deleted' => 0,
   )));
   $data = $id;
+  processFiles($boardUri, $_POST['files'], $threadid, $id);
+
   // bump thread
   $urow = array('updated_at' => '');
   $db->update($posts_model, $urow, array('criteria'=>array(
     array('postid', '=', $threadid),
   )));
-  processFiles($boardUri, $_POST['files'], $threadid, $id);
+
   sendResponse($data);
 });
 
