@@ -7,52 +7,7 @@
   <h4 class="board-description">{{description}}</h4>
 </div>
 <br>
-<section class="form-wrapper flex-center">
-  <form class="form-post" id="postform" action="{{uri}}/post" enctype="multipart/form-data" method="POST">
-    <input type="hidden" name="thread" value="{{threadNum}}">
-    <section class="row jsonly">
-      <div class="noselect" id="dragHandle">New Reply</div>
-    </section>
-    <section class="row">
-      <div class="label">Sage</div>
-      <label class="postform-style ph-5">
-        <input type="checkbox" name="email" value="sage">
-      </label>
-      <a class="close postform-style" href="#!">X</a>
-    </section>
-    <section class="row">
-      <div class="label"><span>Message</span></div>
-      <textarea id="message" name="message" rows="5" autocomplete="chrome-off" minlength="0" maxlength="20000"></textarea>
-    </section>
-    <section class="row">
-      <div class="label">
-        <span>Files</span>
-        <small>Max X files</small>
-        <small>Y MB total</small>
-      </div>
-      <span class="col">
-      <label class="jsonly postform-style filelabel" for="file">
-        Select/Drop/Paste files
-      </label>
-      <input id="file" type="file" name="file" multiple>
-      <div class="upload-list" data-spoilers="true">
-      </div>
-      </span>
-      <noscript>
-        <label class="postform-style ph-5 ml-1 fh">
-          <input type="checkbox" name="spoiler_all" value="true">
-          Spoiler
-        </label>
-      </noscript>
-    </section>
-    <section class="row">
-      <div class="label">Password</div>
-      <input type="password" name="postpassword" placeholder="Password to delete/spoiler/unlink later" maxlength="50">
-    </section>
-    <input id="submitpost" type="submit" value="New Reply">
-  </form>
-  <a class="toggle-summary no-decoration" href="{{uri}}/thread/{{threadNum}}.html#postform">[New Reply]</a>
-</section>
+{{postform}}
 <br>
 <nav class="stickynav">
 <a class="nav-item" href="#bottom">
@@ -61,7 +16,8 @@
 [&#9650;]</a>
 </nav>
 {{boardNav}}
-<form action="/forms/board/b/actions" method="POST" enctype="application/x-www-form-urlencoded">
+<form action="/forms/board/{{uri}}/actions" method="POST" enctype="application/x-www-form-urlencoded">
+  <input type="hidden" name="thread" value="{{threadNum}}">
   <hr size="1">
   <div class="thread">
     {{posts}}
@@ -85,7 +41,7 @@
     </span>
     <div class="post-file-src" data-type="image" data-attachment="false">
       <a target="_blank" href="{{path}}">
-        <img class="file-thumb" src="{{path}}" height="232" width="250" loading="lazy"/>
+        {{thumb}}
       </a>
     </div>
   </div>
@@ -104,7 +60,7 @@
     <div class="post-info">
       <span>
         <label>
-          <input class="post-check" type="checkbox" name="checkedposts" value="{{no}}"/>
+          <input class="post-check" type="checkbox" name="checkedposts[]" value="{{no}}"/>
           <span class="post-name">{{name}}</span>
         </label>
         <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
@@ -139,135 +95,10 @@
       <span>X replies</span> |  <span>X file</span>
     </div>
   </div>
-  <div class="jsonly" id="livetext">
+  <!-- div class="jsonly" id="livetext">
     <div class="dot" id="livecolor"></div>
     Connecting...
     <input class="postform-style ml-5 di" type="button" value="Update">
-  </div>
-  <details class="toggle-label" id="actionform">
-    <summary class="toggle-summary">Show Post Actions</summary>
-    <div class="actions">
-      <h4 class="no-m-p">Actions:</h4>
-      <label>
-        <input class="post-check" type="checkbox" name="delete" value="1">
-        Delete Posts
-      </label>
-      <label>
-        <input class="post-check" type="checkbox" name="unlink_file" value="1">
-        Unlink Files
-      </label>
-    <label>
-    <input class="post-check" type="checkbox" name="spoiler" value="1">
-    Spoiler Files</label>
-    <label>
-    <input id="password" type="password" name="postpassword" placeholder="Post password" autocomplete="chrome-off">
-    </label>
-    <label>
-    <input class="post-check" type="checkbox" name="report" value="1">
-    Report</label>
-    <label>
-    <input class="post-check" type="checkbox" name="global_report" value="1">
-    Global Report</label>
-    <label>
-    <input id="report" type="text" name="report_reason" placeholder="Report reason" autocomplete="chrome-off">
-    </label>
-    </div>
-    <div class="actions">
-    <h4 class="no-m-p">
-    Captcha:</h4>
-    <a class="text-center" href="/faq.html#captcha">
-    Instructions</a>
-    <div class="catalog">
-    <noscript class="no-m-p">
-    <iframe class="captcha" src="/captcha.html" width="150" height="150" scrolling="no" loading="lazy">
-    </iframe>
-    </noscript>
-    <div class="jsonly captcha" style="display:none">
-    </div>
-    <div class="captchafield noselect">
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="0">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="1">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="2">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="3">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="4">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="5">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="6">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="7">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="8">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="9">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="10">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="11">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="12">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="13">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="14">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    <label class="captchachecklabel">
-    <input type="checkbox" name="captcha" value="15">
-    <span class="captchacheckbox">
-    </span>
-    </label>
-    </div>
-    </div>
-    </div>
-    <input type="submit" value="submit">
-  </details>
+  </div -->
+  {{postactions}}
 </form>
