@@ -64,12 +64,10 @@ function wrapContent($content) {
   $hdrTmpl = str_replace('{{nav}}', '', $hdrTmpl);
   // FIXME: cacheable...
   $hdrTmpl = str_replace('{{basehref}}', BASE_HREF, $hdrTmpl);
-  echo $hdrTmpl;
-
-  echo $content;
-
+  echo $hdrTmpl, $content;
   $ftrTmpl = file_get_contents('templates/footer.tmpl');
   echo $ftrTmpl;
+  flush();
 }
 
 function redirectTo($url) {
