@@ -54,6 +54,7 @@ $board_model = array(
   )
 );
 
+/*
 $public_post_model = array(
   'name' => 'public_post',
   'indexes' => array('boardUri'),
@@ -100,6 +101,7 @@ $files_model = array(
     'sha512' => array('type'=>'string', 'length'=>255),
     'tim' => array('type'=>'integer'),
     'filename' => array('type'=>'string', 'length'=>128),
+    'size' => array('type'=>'int'),
     'ext' => array('type'=>'string', 'length'=>128),
     // b64 encoded
     'md5' => array('type'=>'string', 'length'=>24),
@@ -123,6 +125,7 @@ $files_model = array(
     'archived_on' => array('type'=>'integer'),
   )
 );
+*/
 
 $board_user_model = array(
   'name' => 'board_user',
@@ -161,9 +164,9 @@ $group_model = array(
 $request_model = array(
   'name' => 'request',
   'fields' => array(
-	  'ip' => array('type'=>'str'),
-	  'count' => array('type'=>'int'),
-	  'type' => array('type'=>'str'),
+    'ip' => array('type'=>'str'),
+    'count' => array('type'=>'int'),
+    'type' => array('type'=>'str'),
   )
 );
 
