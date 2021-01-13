@@ -7,21 +7,22 @@ function modelToSQL($type) {
   switch($type) {
     case 'string':
     case 'str': // official
-      $sql = ' VARCHAR(255) NOT NULL, ';
+      $sql = ' VARCHAR(255) NOT NULL DEFAULT "", ';
     break;
     case 'integer':
     case 'int': // official
-      $sql = ' BIGINT NOT NULL, ';
+      $sql = ' BIGINT NOT NULL DEFAULT 0, ';
     break;
+    // we might need to do some cast on mysql...
     case 'boolean':
     case 'bool': // official
-      $sql = ' TINYINT UNSIGNED NOT NULL, ';
+      $sql = ' TINYINT UNSIGNED NOT NULL DEFAULT 0, ';
     break;
     case 'text': // official
-      $sql = ' MEDIUMTEXT NOT NULL, '; // 16mb
+      $sql = ' MEDIUMTEXT NOT NULL DEFAULT "", '; // 16mb
     break;
     case 'bigtext':
-      $sql = ' LONGTEXT NOT NULL, '; // 4GB
+      $sql = ' LONGTEXT NOT NULL DEFAULT "", '; // 4GB
     break;
   }
   return $sql;
@@ -90,6 +91,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $model['fields']['json'] = array('type'=>'text');
     // get name
     $tableName = modelToTableName($model);
+    //echo "Checking [$tableName]<br>\n";
     $res = mysqli_query($this->conn, 'describe `' . $tableName. '`');
     $err = mysqli_error($this->conn);
     // do we need to create table?
@@ -110,7 +112,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       $res = mysqli_query($this->conn, $sql);
       $err = mysqli_error($this->conn);
       if ($err) {
-        echo "err[$err]<br>\n";
+        echo "mysql::autoupdate - create err[$err]<br>\n";
         return false;
       }
       if (isset($model['seed']) && is_array($model['seed'])) {
@@ -119,7 +121,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       return true;
     } else {
       // describle table name failed...
-      if ($err) echo "err[$err]<br>\n";
+      if ($err) echo "mysql::autoupdate - describe err[$err]<br>\n";
       // get fields
       //echo "getting fields ", $tableName, "\n";
       $haveFields = array();
@@ -153,18 +155,18 @@ class mysql_driver extends database_driver_base_class implements database_driver
         }
       }
       // FIXME: delete scan
-      //echo "<pre>Changes", print_r($changes, 1), "</pre>\n";
+      //echo "<pre>$tableName: Changes", print_r($changes, 1), "</pre>\n";
       // everything in sync?
       if ($haveAll && $noChanges) {
         return true;
       }
       $sql = 'alter table ' . $tableName . ' ';
       if (!$haveAll) {
-        echo "Need to create<br>\n";
+        //echo "Need to create<br>\n";
         // ALTER TABLE
         foreach($missing as $fieldName => $f) {
           // ADD
-          echo "field[$fieldName]<br>\n";
+          //echo "field[$fieldName]<br>\n";
           $sql .= 'ADD ' . $fieldName . ' ' .modelToSQL($f['type']);
         }
         $sql = substr($sql, 0, -2);
@@ -177,11 +179,11 @@ class mysql_driver extends database_driver_base_class implements database_driver
         }
       }
       $sql .= '';
-      echo "sql[$sql]<br>\n";
+      //echo "sql[$sql]<br>\n";
       $res = mysqli_query($this->conn, $sql);
       $err = mysqli_error($this->conn);
       if ($err) {
-        echo "err[$err]<br>\n";
+        echo "mysql::autoupdate - update err[$err]<br>\n";
         return false;
       }
       return true;
@@ -217,7 +219,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "err[$err]<br>\n";
+      echo "mysql::insert err[$err]<br>\n";
       return false;
     }
     // how does this handle multiple?
@@ -246,7 +248,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "err[$err]<br>\n";
+      echo "mysql::update err[$err]<br>\n";
       return false;
     }
     return true;
@@ -264,7 +266,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "err[$err]<br>\n";
+      echo "mysql::delete err[$err]<br>\n";
       return false;
     }
     return true;
@@ -357,7 +359,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "err[$err]<br>\n";
+      echo "mysql::find err[$err]<br>\n";
       return false;
     }
     return $res;
