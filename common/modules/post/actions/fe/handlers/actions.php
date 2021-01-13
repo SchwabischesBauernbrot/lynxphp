@@ -14,15 +14,35 @@ $boardUri = $request['params']['uri'];
 // ip deletion?
 // purge files vs remove from post
 
-if ($_POST['delete']) {
+wrapContent('Please wait...');
+
+if (getOptionalPostField('delete')) {
   // FIXME: could be a ban-delete too
-  $result = $pkg->useResource('content_actions',
-    array('action' => 'delete', 'password' => $_POST['postpassword']),
-    array('addPostFields' => array( $boardUri . '-ThreadNum-'.$_POST['checkedposts'] => true))
-  );
+  if (is_array($_POST['checkedposts'])) {
+    $threadNum = getOptionalPostField('thread') ? getOptionalPostField('thread') : 'ThreadNum';
+    $postFields = array();
+    foreach($_POST['checkedposts'] as $postNum) {
+      $postFields[$boardUri . '-' . $threadNum . '-' . $postNum] = true;
+    }
+    // how is multiple handled?
+    $result = $pkg->useResource('content_actions',
+      array('action' => 'delete', 'password' => getOptionalPostField('password')),
+      array('addPostFields' => $postFields)
+    );
+    if ($result['removedPosts'] + $result['removedThreads'] === count($postFields)) {
+      echo "Successful!<bR>\n"; flush();
+      if ($threadNum === 'ThreadNum') {
+        return redirectTo('/' . $boardUri);
+      } else {
+        return redirectTo('/' . $boardUri . '/thread/' . $threadNum . '.html');
+      }
+    }
+  } else {
+    echo "write me!<br>\n";
+  }
 }
 
-if ($_POST['report']) {
+if (getOptionalPostField('report')) {
   // send report request to BE
   // is reason required?
   $result = $pkg->useResource('content_actions',
@@ -30,7 +50,7 @@ if ($_POST['report']) {
     array('addPostFields' => array( $boardUri . '-ThreadNum-'.$_POST['checkedposts'] => true))
   );
 }
-if ($_POST['global_report']) {
+if (getOptionalPostField('global_report')) {
   // send report request to BE
   // is reason required?
   $result = $pkg->useResource('content_actions',
@@ -39,6 +59,6 @@ if ($_POST['global_report']) {
   );
 }
 
-wrapContent('<pre>'.print_r($result, 1).'</pre>');
+// echo '<pre>'.print_r($result, 1).'</pre>', "\n";
 
 ?>
