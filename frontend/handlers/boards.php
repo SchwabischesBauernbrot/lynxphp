@@ -95,12 +95,29 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
       $files_html = '';
       foreach($post['files'] as $file) {
         $ftmpl = $file_template;
+        $type = $file['type'] ? $file['type'] : 'image';
+        if ($type === 'audio') {
+          $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg';
+          if (!$isPlayable) {
+            $type = 'file';
+          }
+        }
+        if ($type === 'video') {
+          $isPlayable = $file['mime_type'] === 'video/mp4' || $file['mime_type'] === 'video/webm' || $file['mime_type'] === 'video/ogg';
+          if (!$isPlayable) {
+            $type = 'file';
+          }
+        }
+        if ($type === 'file' || $type === 'image') $type = 'img';
         // disable images until we can mod...
         $ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
-      $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
-      $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
-      $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
-      $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
+        $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
+        if (isset($file['size'])) {
+          $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
+        }
+        $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
+        $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
+        $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" height="232" width="250" loading="lazy" controls loop preload=auto />', $ftmpl);
         $files_html .= $ftmpl;
       }
       //echo "<pre>", $post['no'], "files_tempate[", htmlspecialchars($files_html), "] count[", count($post['files']),"] data[",print_r($post['files'], 1),"] [",print_r($file_template, 1),"]</pre>\n";
@@ -127,6 +144,9 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
   $tmpl = str_replace('{{threads}}', $threads_html, $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
+  // mixin
+  $tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/'), $tmpl);
+  $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
 
   wrapContent($tmpl);
 }
@@ -160,8 +180,24 @@ function getThreadHandler($boardUri, $threadNum) {
     $tmp = str_replace('{{jstime}}', date('c', $post['created_at']), $tmp);
     $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $post['created_at']), $tmp);
     $files_html = '';
+    // tn_w, tn_h aren't enabled yet
+    //echo "<pre>", print_r($post['files'], 1), "</pre>\n";
     foreach($post['files'] as $file) {
       $ftmpl = $file_template;
+      $type = $file['type'] ? $file['type'] : 'image';
+      if ($type === 'audio') {
+        $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg';
+        if (!$isPlayable) {
+          $type = 'file';
+        }
+      }
+      if ($type === 'video') {
+        $isPlayable = $file['mime_type'] === 'video/mp4' || $file['mime_type'] === 'video/webm' || $file['mime_type'] === 'video/ogg';
+        if (!$isPlayable) {
+          $type = 'image';
+        }
+      }
+      if ($type === 'file' || $type === 'image') $type = 'img';
       //print_r($file);
       // disbale images until we can mod...
       $ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
@@ -169,6 +205,7 @@ function getThreadHandler($boardUri, $threadNum) {
       $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
       $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
       $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
+      $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" height="232" width="250" loading="lazy" controls loop preload=auto />', $ftmpl);
       $files_html .= $ftmpl;
     }
     $tmp = str_replace('{{files}}', $files_html, $tmp);
@@ -194,6 +231,9 @@ function getThreadHandler($boardUri, $threadNum) {
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
   $tmpl = str_replace('{{posts}}', $posts_html, $tmpl);
+  // mixins
+  $tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/thread/' . $threadNum . '.html', array('reply' => $threadNum)), $tmpl);
+  $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
   wrapContent($tmpl);
 }
 
@@ -286,6 +326,9 @@ function getBoardCatalogHandler($boardUri) {
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
   $tmpl = str_replace('{{tiles}}',    $tiles_html,    $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
+  // mixin
+  $tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/catalog'), $tmpl);
+  $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
   wrapContent($tmpl);
 }
 
