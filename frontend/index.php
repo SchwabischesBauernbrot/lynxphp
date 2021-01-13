@@ -165,16 +165,23 @@ $router->post('/:uri/post', function($request) {
       echo "detected multiple files<br>\n";
       foreach($_FILES['file']['tmp_name'] as $i=>$path) {
         $res = sendFile($path, $_FILES['file']['type'][$i], $_FILES['file']['name'][$i]);
-        // check for error?
+        // check for error
+      if (empty($res['hash'])) {
+        echo "file error[", print_r($res, 1), "]<br>\n";
+        return;
+      }
         $files[] = $res;
       }
     } else {
       $res = sendFile($_FILES['file']['tmp_name'], $_FILES['file']['type'], $_FILES['file']['name']);
-      // check for error?
+      // check for error
+      if (empty($res['hash'])) {
+        echo "file error[", print_r($res, 1), "]<br>\n";
+        return;
+      }
       $files[] = $res;
     }
   }
-  //print_r($files);
   // make post...
   if (empty($_POST['thread'])) {
     // new thead
@@ -193,6 +200,8 @@ $router->post('/:uri/post', function($request) {
     ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session')));
     //echo "json[$json]<Br>\n";
     $result = json_decode($json, true);
+    //echo "<pre>thread", print_r($result, 1), "</pre>\n";
+    //return;
     if (is_numeric($result['data'])) {
       // success
       redirectTo(BASE_HREF . $boardUri . '/');
@@ -217,6 +226,8 @@ $router->post('/:uri/post', function($request) {
     ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session')));
     //echo "json[$json]<Br>\n";
     $result = json_decode($json, true);
+    //echo "<pre>reply", print_r($result, 1), "</pre>\n";
+    //return;
     if (is_numeric($result['data'])) {
       // success
       redirectTo(BASE_HREF . $boardUri . '/thread/' . $_POST['thread']);
