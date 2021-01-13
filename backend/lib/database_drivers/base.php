@@ -16,6 +16,8 @@ interface database_driver_base {
   public function find($rootModel, $options = false);
   public function count($rootModel, $options = false);
   public function findById($rootModel, $id, $options = false);
+  public function updateById($rootModel, $id, $row, $options = false);
+  public function deleteById($rootModel, $id, $options = false);
   // result functions
   public function num_rows($res);
   public function get_row($res);
@@ -70,6 +72,16 @@ class database_driver_base_class {
       )
     );
     return $this->find($rootModel, $options);
+  }
+  public function updateById($rootModel, $id, $row, $options = false) {
+    $tableName = modelToTableName($rootModel);
+    $id = (int)$id;
+    $options = array(
+      'criteria' => array(
+        array(modelToId($rootModel) , '=', $id)
+      )
+    );
+    return $this->update($rootModel, $row, $options);
   }
   public function deleteById($rootModel, $id, $options = false) {
     $tableName = modelToTableName($rootModel);
