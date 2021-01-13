@@ -46,15 +46,15 @@ function updateBoard($boardUri,$row) {
 
 $rateLimitsTTL['type'] = 0;
 function checkLimit($type, $ip = '') {
-	global $db, $models;
-	if ($ip === '') $ip = getip();
-	$res = $db->find($models['request'], array('criteria' => array( 'ip' => $ip, 'type' => $type)));
-	$row = $db->get_row($res); // should only be one
-	$db->free($res);
+  global $db, $models;
+  if ($ip === '') $ip = getip();
+  $res = $db->find($models['request'], array('criteria' => array( 'ip' => $ip, 'type' => $type)));
+  $row = $db->get_row($res); // should only be one
+  $db->free($res);
 }
 function recordRequest($type, $ip = '') {
-	global $db, $models;
-	if ($ip === '') $ip = getip();
+  global $db, $models;
+  if ($ip === '') $ip = getip();
 }
 function boardDealer($connections, $boardUri) {
   $mc = strlen($boardUri);
@@ -84,6 +84,7 @@ function getPostsModel($boardUri) {
       'resto' => array('type'=>'int'),
       'sticky' => array('type'=>'bool'),
       'closed' => array('type'=>'bool'),
+      'deleted' => array('type'=>'bool'),
       // 'now' => array('type'=>'integer'),
       //'time' => array('type'=>'integer'),
       'name' => array('type'=>'str', 'length'=>128),
@@ -93,6 +94,7 @@ function getPostsModel($boardUri) {
       //'country_name' => array('type'=>'string', 'length'=>128),
       'sub' => array('type'=>'str', 'length'=>128),
       'com' => array('type'=>'text'),
+      'password' => array('type'=>'str'),
     )
   );
   $db->autoupdate($public_post_model);
@@ -117,8 +119,11 @@ function getPostFilesModel($boardUri) {
       'path' => array('type'=>'str', 'length'=>255),
       //'sha512' => array('type'=>'str', 'length'=>255),
       'browser_type' => array('type'=>'str', 'length'=>255),
+      'mime_type' => array('type'=>'str', 'length'=>255),
+      'type' => array('type'=>'str', 'length'=>255),
       //'tim' => array('type'=>'int'),
       'filename' => array('type'=>'str', 'length'=>128),
+      'size' => array('type'=>'int'),
       'ext' => array('type'=>'str', 'length'=>128),
       // b64 encoded
       //'md5' => array('type'=>'str', 'length'=>24),
