@@ -82,13 +82,17 @@ include 'lib/lib.handler.php'; // output functions
 include 'lib/nav.php'; // nav structure
 include 'lib/middlewares.php';
 
-
 // frontend handlers
+
+// mixins
 include 'handlers/mixins/board_header.php';
 include 'handlers/mixins/board_nav.php';
 include 'handlers/mixins/admin_portal.php';
 include 'handlers/mixins/post_renderer.php';
+include 'handlers/mixins/post_form.php';
+include 'handlers/mixins/post_actions.php';
 
+// handlers
 include 'handlers/homepage.php';
 include 'handlers/login.php';
 include 'handlers/signup.php';
@@ -161,25 +165,43 @@ $router->post('/:uri/post', function($request) {
   // validate results
   $files = array();
   if (isset($_FILES)) {
+    $phpFileUploadErrors = array(
+        0 => 'There is no error, the file uploaded with success',
+        1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+        2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+        3 => 'The uploaded file was only partially uploaded',
+        4 => 'No file was uploaded',
+        6 => 'Missing a temporary folder',
+        7 => 'Failed to write file to disk.',
+        8 => 'A PHP extension stopped the file upload.',
+    );
+    //print_r($_FILES);
     if (is_array($_FILES['file']['tmp_name'])) {
       echo "detected multiple files<br>\n";
       foreach($_FILES['file']['tmp_name'] as $i=>$path) {
         $res = sendFile($path, $_FILES['file']['type'][$i], $_FILES['file']['name'][$i]);
         // check for error
-      if (empty($res['hash'])) {
-        echo "file error[", print_r($res, 1), "]<br>\n";
-        return;
-      }
+        if (empty($res['hash'])) {
+          echo "multifile - file error[", print_r($res, 1), "]<br>\n";
+          return;
+        }
         $files[] = $res;
       }
     } else {
-      $res = sendFile($_FILES['file']['tmp_name'], $_FILES['file']['type'], $_FILES['file']['name']);
-      // check for error
-      if (empty($res['hash'])) {
-        echo "file error[", print_r($res, 1), "]<br>\n";
+      if ($_FILES['file']['error'] && $_FILES['file']['error'] !== 4) {
+        echo "file PHP file upload error[", $phpFileUploadErrors[$_FILES['file']['error']], "](", $_FILES['file']['error'], ")<br>\n";
         return;
       }
-      $files[] = $res;
+      // make sure there is a file upload...
+      if ($_FILES['file']['error'] !== 4) {
+        $res = sendFile($_FILES['file']['tmp_name'], $_FILES['file']['type'], $_FILES['file']['name']);
+        // check for error
+        if (empty($res['hash'])) {
+          echo "file error[", print_r($res, 1), "]<br>\n";
+          return;
+        }
+        $files[] = $res;
+      }
     }
   }
   // make post...
