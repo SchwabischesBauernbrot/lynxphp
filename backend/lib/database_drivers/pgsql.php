@@ -32,8 +32,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       'string' => 'VARCHAR NOT NULL,',
       'int' => 'BIGINT NOT NULL,',
       'integer' => 'BIGINT NOT NULL,',
-      'boolean' => 'Boolean,',
-      'bool' => 'Boolean,',
+      'boolean' => 'Boolean DEFAULT false,',
+      'bool' => 'Boolean DEFAULT false,',
       'text' => 'TEXT NOT NULL,',
       //'bigtext' => 'TEXT NOT NULL,',
     );
@@ -151,21 +151,21 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       if ($haveAll && $noChanges) {
         return true;
       }
-      $sql = 'alter table ' . $tableName . ' ';
+      $sql = 'alter table "' . $tableName . '" ';
       if (!$haveAll) {
-        echo "Need to create<br>\n";
+       // echo "Need to create<br>\n";
         // ALTER TABLE
         foreach($missing as $fieldName => $f) {
           // ADD
-          echo "field[$fieldName]<br>\n";
-          $sql .= 'ADD ' . $fieldName . ' ' . $this->modelToSQL[$f['type']];
+          //echo "field[$fieldName]<br>\n";
+          $sql .= 'ADD COLUMN ' . $fieldName . ' ' . $this->modelToSQL[$f['type']]. ' ';
         }
         $sql = substr($sql, 0, -2);
       }
       if (!$noChanges) {
         echo "Need to change<br>\n";
         foreach($changes as $fieldName => $f) {
-          echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
+          //echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
           //$sql .= 'MODIFY ' . $fieldName . ' ' .modelToSQL($f['type']);
         }
       }
@@ -179,9 +179,6 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       }
       return true;
     }
-  }
-  public function make_constant($value) {
-    return '\''. pg_escape_string($value) . '\'';
   }
   public function insert($rootModel, $recs) {
     $tableName = modelToTableName($rootModel);
@@ -208,6 +205,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       $sets[] = '(' . join(',', $cleanArr) . ')';
     }
     $sql .= join(',', $sets);
+    //echo "sql[$sql]<br>\n";
     $res = pg_query($this->conn, $sql . ' returning ' . $idf);
     $err = pg_result_error($res);
     if ($err) {
@@ -221,17 +219,22 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   }
   public function update($rootModel, $urow, $options) {
     $tableName = modelToTableName($rootModel);
-    $date = time();
-    $urow['updated_at'] = $date;
-    $sets = array();
+    $sets = array(
+      'updated_at' => 'updated_at = ' . time(),
+    );
+    //echo "json was[", print_r($urow['json'], 1), "]<br>\n";
+    if ($urow['json']) $urow['json'] = json_encode($urow['json']);
+    //echo "json now[$json]<br>\n";
     foreach($urow as $f=>$v) {
       if (is_array($v)) {
         $val = $v[0];
       } else {
         $val = $this->make_constant($v);
       }
-      $sets[] = $f . '=' . $val;
+      $sets[$f] = $f . '=' . $val;
     }
+    $idf = modelToId($rootModel);
+    unset($sets[$idf]);
     $sql = 'update ' .$tableName . ' set '. join(', ', $sets);
     if (isset($options['criteria'])) {
       $sql .= ' where ' . $this->build_where($options['criteria']);
@@ -388,6 +391,12 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       return array();
     }
     return pg_free_result($res);
+  }
+  public function make_constant($value) {
+    return '\''. pg_escape_string($value) . '\'';
+  }
+  public function groupAgg($field) {
+    return 'string_agg(' . $field . ', \',\')';
   }
 }
 
