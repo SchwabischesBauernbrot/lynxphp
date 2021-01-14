@@ -22,6 +22,7 @@ interface database_driver_base {
   public function num_rows($res);
   public function get_row($res);
   public function toArray($res);
+  public function groupAgg($field);
 }
 
 class database_driver_base_class {
