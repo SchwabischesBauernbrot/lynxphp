@@ -189,9 +189,6 @@ class mysql_driver extends database_driver_base_class implements database_driver
       return true;
     }
   }
-  public function make_constant($value) {
-    return '"'. addslashes($value) . '"';
-  }
   public function insert($rootModel, $recs) {
     $tableName = modelToTableName($rootModel);
     $date = time();
@@ -228,9 +225,10 @@ class mysql_driver extends database_driver_base_class implements database_driver
   }
   public function update($rootModel, $urow, $options) {
     $tableName = modelToTableName($rootModel);
-    $date = time();
-    $urow['updated_at'] = $date;
-    $sets = array();
+    $sets = array(
+      'updated_at' => 'updated_at = ' . time(),
+    );
+    if ($urow['json']) $urow['json'] = json_encode($urow['json']);
     foreach($urow as $f=>$v) {
       // updates are always assignments (=, never </>=)
       if (is_array($v)) {
@@ -399,6 +397,12 @@ class mysql_driver extends database_driver_base_class implements database_driver
       return array();
     }
     return mysqli_free_result($res);
+  }
+  public function make_constant($value) {
+    return '"'. addslashes($value) . '"';
+  }
+  public function groupAgg($field) {
+    return 'group_concat(' . $field . ')';
   }
 }
 
