@@ -133,15 +133,16 @@ class Router {
       $method . '_routes' => array_keys($this->methods[$method]),
     );
   }
-  function exec($method, $path) {
+  function exec($method, $path, $level = 0) {
     $methods = $this->methods[$method];
     $segments = explode('/', $path);
+    //echo "router::exec[$level] - path[$path] segments[", count($segments), "]<br>\n";
 
     $params = array();
     $request = array(
       'method' => $method,
       'originalPath' => $path,
-      'path' => $path,
+      'path' => $path, // * route will truncate off previous router...
       'params' => $params,
     );
     $response = array(
@@ -150,70 +151,111 @@ class Router {
     $next = function() {
     };
 
-    //echo "path[$path] rules[", count($methods), "]<br>\n";
+    //echo "router::exec[$level] - path[$path] rules[", count($methods), "]<br>\n";
 
     // there should only be one match
     // the one match can have multiple calls...
+    $matches = array();
     foreach($methods as $cond => $func) {
       //echo "rule[$cond]<br>\n";
       if ($path === $cond) {
         $func($request);
         return true;
-      } else {
-        $csegs = explode('/', $cond);
-        //echo "AdvRule[$cond] pDirs[", count($segments), "] rDirs[", count($csegs), "]<br>\n";
-        //echo "Rule has router[", strpos($cond, '*') !== false, "]<br>\n";
-        // optimization?
-        if (strpos($cond, '*') === false && count($csegs) !== count($segments)) {
-          //echo "Skipping rule[$cond]<br>\n";
+      }
+      $csegs = explode('/', $cond);
+      //echo "router::exec[$level] - Rule has router[", strpos($cond, '*') !== false, "]<br>\n";
+      //echo "router::exec[$level] - Rule[$cond] condCnt[", count($csegs), "] vs reqeustCnt[", count($segments), "]<br>\n";
+      // optimization?
+      // no * in route and the depth doesn't match
+      if (strpos($cond, '*') === false && count($csegs) !== count($segments)) {
+        //echo "[$level] Skipping rule[$cond]<br>\n";
+        continue;
+      }
+      $match = true;
+      $params = array();
+      //echo "Checking [$path] against [$cond]<br>\n";
+      foreach($csegs as $i => $c) {
+        //echo "[$i] [", $segments[$i], "] vs [$c]<br>\n";
+        if (strlen($c) && $c === '*') {
+          //echo "Router check<br>\n";
+          $this->debug['router'] = $cond;
+          // auto match the rest
+          // could treat $func as a router and exec it here
+          if (is_object($func)) {
+            $request['params'] = $params;
+            $tsegs = array();
+            for($j = 0; $j < $i; $j++) {
+              $tsegs[] = $segments[$j];
+            }
+            $usedPath = join('/', $tsegs) . '/'; // + 1 for the current
+            // make sure it starts with /
+            // even tho we just stripped it
+            // since we can't remove / from /*
+            $newPath = '/' . substr($path, strlen($usedPath));
+            $request['path'] = $newPath;
+            $res = $func->exec($request['method'], $newPath, $level + 1);
+            return $res;
+          }
+          break;
+        } else
+        if (strlen($c) && $c[0] === ':') {
+          $paramName = substr($c, 1);
+          //print_r($segments);
+          //echo "[$i] Building[$paramName] c[$c] seg[", $segments[$i], "]<br>\n";
+          $params[$paramName] = $segments[$i];
           continue;
         }
-        $match = true;
-        $params = array();
-        //echo "Checking [$path] against [$cond]<br>\n";
-        foreach($csegs as $i => $c) {
-          //echo "[$i] [$c] vs [", $segments[$i], "]<br>\n";
-          if (strlen($c) && $c === '*') {
-            //echo "Router check<br>\n";
-            $this->debug['router'] = $cond;
-            // auto match the rest
-            // could treat $func as a router and exec it here
-            if (is_object($func)) {
-              $request['params'] = $params;
-              $tsegs = array();
-              for($j = 0; $j < $i; $j++) {
-                $tsegs[] = $segments[$j];
-              }
-              $usedPath = join('/', $tsegs) . '/'; // + 1 for the current
-              // make sure it starts with /
-              // even tho we just stripped it
-              // since we can't remove / from /*
-              $newPath = '/' . substr($path, strlen($usedPath));
-              $request['path'] = $newPath;
-              $res = $func->exec($request['method'], $newPath);
-              return $res;
-            }
-            break;
-          } else
-          if (strlen($c) && $c[0] === ':') {
-            $paramName = substr($c, 1);
-            //print_r($segments);
-            //echo "[$i] Building[$paramName] c[$c] seg[", $segments[$i], "]<br>\n";
-            $params[$paramName] = $segments[$i];
-            continue;
-          }
-          if (!isset($segments[$i]) || $segments[$i] !== $c) {
-            $match = false;
-            break;
-          }
+        /*
+        echo "condCnt[", count($csegs), "] vs reqeustCnt[", count($segments), "]<br>\n";
+        if (count($csegs) !== count($segments)) {
+          $match = false;
+          break;
         }
-        if ($match) {
-          $request['params'] = $params;
+        */
+        // is segment is missing or they don't match...
+        //echo "[$i] segment[", $segments[$i], "] =? [", $c, "]<br>\n";
+        if (!isset($segments[$i]) || $segments[$i] !== $c) {
+          //echo "router - path[$path] did not matched[$cond]<br>\n";
+          $match = false;
+          break; // stop cseg check
+        }
+      }
+      if ($match) {
+        //echo "router - path[$path] matched[$cond]<br>\n";
+        $matches[] = array(
+          'cond' => $cond,
+          'params' => $params,
+          'func' => $func
+        );
+      }
+    }
+    if (count($matches)) {
+      if (count($matches) === 1) {
+        $func = $matches[0]['func'];
+        $request['params'] = $matches[0]['params'];
+        $func($request);
+        return true;
+      } else {
+        $use = false;
+        $minScore = 99;
+        foreach($matches as $c => $row) {
+          $score = levenshtein($row['cond'], $path);
+          if ($score < $minScore) {
+            $use = $row;
+            $minScore = $score;
+          }
+          //echo "[$c][", print_r($row, 1), "]=[$score]<br>\n";
+        }
+        if ($use) {
+          $func = $use['func'];
+          $request['params'] = $use['params'];
           $func($request);
-          return true;
-        //} else {
-          //echo "failed path[$path] cond[$cond]<Br>\n";
+        } else {
+          $func = $matches[0]['func'];
+          $request['params'] = $matches[0]['params'];
+          $func($request);
         }
+        return true;
       }
     }
     // can't handle 404 here because sometimes we return to another router
