@@ -13,13 +13,14 @@ EOB;
 
 // detect webserver
 $isApache = strpos($_SERVER["SERVER_SOFTWARE"], 'Apache') !== false;
-//$isNginx = stripos($_SERVER["SERVER_SOFTWARE"], 'nginx') !== false;
+$isNginx = stripos($_SERVER["SERVER_SOFTWARE"], 'nginx') !== false;
 $hasASupportedWebserver = $isApache || $isNginx;
 // detect php version
 $phpVer = phpversion();
 // mysql
 $hasMysql = function_exists('mysqli_connect');
-$hasASupportedDB = $hasMysql;
+$hasPgsql = function_exists('pg_connect');
+$hasASupportedDB = $hasMysql || $hasPgsql;
 // curl
 $hasCurl = function_exists('curl_version');
 
@@ -66,9 +67,9 @@ if (file_exists('backend') && is_dir('backend')) {
   chdir('backend/');
   include 'backend/config.php';
 
-  $db_driver = 'mysql';
+  $db_driver = DB_DRIVER;
   include 'backend/lib/database_drivers/'.$db_driver.'.php';
-  $driver_name = $db_driver . '_driver';
+  $driver_name = DB_DRIVER . '_driver';
   $db = new $driver_name;
 
   if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
