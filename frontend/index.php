@@ -56,13 +56,20 @@ include '../common/lib.modules.php'; // module functions and classes
 
 // I could move the PIPELINE_ prefix into the definePipeline function
 // but then you couldn't locate these in grep
+definePipeline('PIPELINE_HOMEPAGE_BOARDS_FIELDS',  'homepage_boards_fields');
+
 definePipeline('PIPELINE_BOARD_HEADER_TMPL',  'board_header_tmpl');
 definePipeline('PIPELINE_BOARD_NAV',          'board_nav');
 definePipeline('PIPELINE_BOARD_DETAILS_TMPL', 'board_details_tmpl');
 definePipeline('PIPELINE_BOARD_SETTING_NAV',  'board_setting_nav');
 definePipeline('PIPELINE_BOARD_SETTING_TMPL', 'board_setting_tmpl');
+definePipeline('PIPELINE_BOARD_SETTING_GENERAL',  'board_setting_general');
+
 definePipeline('PIPELINE_ADMIN_NAV',          'admin_nav');
 definePipeline('PIPELINE_ADMIN_HEADER_TMPL',  'admin_heading_tmpl');
+definePipeline('PIPELINE_ADMIN_SETTING_GENERAL',  'admin_setting_general');
+
+
 
 // forms pipelines
 // - newThreadForm
@@ -78,6 +85,7 @@ definePipeline('PIPELINE_ADMIN_HEADER_TMPL',  'admin_heading_tmpl');
 include 'lib/lib.http.php'; // comms lib
 include 'lib/lib.backend.php'; // comms lib
 include 'lib/lib.handler.php'; // output functions
+include 'lib/lib.files.php'; // file upload functions
 // structures
 include 'lib/nav.php'; // nav structure
 include 'lib/middlewares.php';
@@ -93,7 +101,6 @@ include 'handlers/mixins/post_form.php';
 include 'handlers/mixins/post_actions.php';
 
 // handlers
-include 'handlers/homepage.php';
 include 'handlers/login.php';
 include 'handlers/signup.php';
 include 'handlers/control_panel.php';
@@ -105,9 +112,11 @@ $req_method = getServerField('REQUEST_METHOD', 'GET');
 $req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 
 $packages = array();
+$packages['base'] = registerPackage('base');
 registerPackageGroup('board');
 registerPackageGroup('post');
 registerPackageGroup('user');
+registerPackageGroup('site');
 // build routes (and activate frontend_handlers.php)
 foreach($packages as $pkg) {
   $pkg->buildFrontendRoutes($router, $req_method);
@@ -117,14 +126,8 @@ foreach($packages as $pkg) {
 // or define a set of functions
 // functions can be variables...
 
-// FIXME: we should be getting page conent and wrapping it here...
+// FIXME: we should be getting page content and wrapping it here...
 // FIXME: move into routes and the caching layer can go here too
-$router->get('', function() {
-  homepage();
-});
-$router->get('/', function() {
-  homepage();
-});
 $router->get('/boards.php', function() {
   getBoardsHandler();
 });
@@ -163,47 +166,8 @@ $router->post('/:uri/post', function($request) {
   $boardUri = $request['params']['uri'];
   // valid board name
   // validate results
-  $files = array();
-  if (isset($_FILES)) {
-    $phpFileUploadErrors = array(
-        0 => 'There is no error, the file uploaded with success',
-        1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
-        2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
-        3 => 'The uploaded file was only partially uploaded',
-        4 => 'No file was uploaded',
-        6 => 'Missing a temporary folder',
-        7 => 'Failed to write file to disk.',
-        8 => 'A PHP extension stopped the file upload.',
-    );
-    //print_r($_FILES);
-    if (is_array($_FILES['file']['tmp_name'])) {
-      echo "detected multiple files<br>\n";
-      foreach($_FILES['file']['tmp_name'] as $i=>$path) {
-        $res = sendFile($path, $_FILES['file']['type'][$i], $_FILES['file']['name'][$i]);
-        // check for error
-        if (empty($res['hash'])) {
-          echo "multifile - file error[", print_r($res, 1), "]<br>\n";
-          return;
-        }
-        $files[] = $res;
-      }
-    } else {
-      if ($_FILES['file']['error'] && $_FILES['file']['error'] !== 4) {
-        echo "file PHP file upload error[", $phpFileUploadErrors[$_FILES['file']['error']], "](", $_FILES['file']['error'], ")<br>\n";
-        return;
-      }
-      // make sure there is a file upload...
-      if ($_FILES['file']['error'] !== 4) {
-        $res = sendFile($_FILES['file']['tmp_name'], $_FILES['file']['type'], $_FILES['file']['name']);
-        // check for error
-        if (empty($res['hash'])) {
-          echo "file error[", print_r($res, 1), "]<br>\n";
-          return;
-        }
-        $files[] = $res;
-      }
-    }
-  }
+  $res = processFiles();
+  $files = $res['handles']['file'];
   // make post...
   if (empty($_POST['thread'])) {
     // new thead
