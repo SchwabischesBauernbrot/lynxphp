@@ -4,18 +4,15 @@ function renderAdminPortal() {
   global $pipelines;
 
   $templates = loadTemplates('mixins/admin_header');
-  $tmpl = $templates['header'];
 
   $p = array(
     'tags' => array()
   );
   $pipelines[PIPELINE_ADMIN_HEADER_TMPL]->execute($p);
-  foreach($p['tags'] as $s => $r) {
-    $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
-  }
 
   // default admin items
   $navItems = array(
+    'Settings' => 'admin/settings',
     'Modules' => 'admin/modules',
     // should be iframe'd or more integrated...
     'System' => 'admin/install',
@@ -27,8 +24,9 @@ function renderAdminPortal() {
     'postlabel' => ']',
   ));
 
-  $tmpl = str_replace('{{adminNav}}', $nav_html, $tmpl);
-  return $tmpl;
+  return replace_tags($templates['header'], array_merge($p['tags'], array(
+    'adminNav' => $nav_html,
+  )));
 }
 
 ?>
