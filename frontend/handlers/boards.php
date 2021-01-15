@@ -117,7 +117,7 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
         }
         $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
         $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
-        $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" height="232" width="250" loading="lazy" controls loop preload=auto />', $ftmpl);
+        $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" height="232" width="250" loading="lazy" controls loop preload=no />', $ftmpl);
         $files_html .= $ftmpl;
       }
       //echo "<pre>", $post['no'], "files_tempate[", htmlspecialchars($files_html), "] count[", count($post['files']),"] data[",print_r($post['files'], 1),"] [",print_r($file_template, 1),"]</pre>\n";
@@ -205,7 +205,7 @@ function getThreadHandler($boardUri, $threadNum) {
       $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
       $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
       $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
-      $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" height="232" width="250" loading="lazy" controls loop preload=auto />', $ftmpl);
+      $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" height="232" width="250" loading="lazy" controls loop preload=no />', $ftmpl);
       $files_html .= $ftmpl;
     }
     $tmp = str_replace('{{files}}', $files_html, $tmp);
