@@ -17,11 +17,11 @@ $fePkgs = array(
     'forms' => array(
       array(
         'route' => '/:uri/settings/banners/add',
-        'module' => 'add',
+        'handler' => 'add',
       ),
       array(
         'route' => '/:uri/settings/banners/:id/delete',
-        'module' => 'delete',
+        'handler' => 'delete',
       ),
     ),
     'modules' => array(
