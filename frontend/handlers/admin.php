@@ -8,7 +8,8 @@ function getAdminPage() {
       // tag => code/constant
       'replaces' => array(),
       'nav' => array(
-        'items' => array(),
+        'items' => array(
+        ),
         'replaces' => array(),
         'selected' => '',
         'displayOpts' => array(
@@ -45,12 +46,13 @@ function getAdminModulesPage() {
     $content .= '<li>Module directory: ' . $dir;
     if (is_array($pkg->resources)) {
       $content .= '<li>Resources: '. count($pkg->resources);
-      $content .= '<ul>';
+      $content .= '<table><tr><th>Name<th>Method<th>Route';
       foreach($pkg->resources as $rname => $rsrc) {
         // endpoint, unwrapData, requires(array), params (formData, querystring), handlerFile
-        $content .= '<li>' . $rname . ': ' . $rsrc['endpoint'];
+        $method = empty($rsrc['method']) ? 'GET' : $rsrc['method'];
+        $content .= '<tr><td>' . $rname . '<td>' . $method . '<td>' . $rsrc['endpoint'];
       }
-      $content .= '</ul>';
+      $content .= '</table>';
     }
     if (is_array($pkg->frontend_packages)) {
       $content .= '<li>Frontend Packages: '. count($pkg->frontend_packages);
