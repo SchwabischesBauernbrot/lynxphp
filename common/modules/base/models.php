@@ -170,6 +170,13 @@ $request_model = array(
   )
 );
 
+$settings_model = array(
+  'name' => 'site_setting',
+  'fields' => array(
+    'changedby' => array('type'=>'int'),
+  ),
+);
+
 global $db, $models;
 
 $db->autoupdate($migration_model);
@@ -179,6 +186,7 @@ $db->autoupdate($board_model);
 $db->autoupdate($usergroup_model);
 $db->autoupdate($group_model);
 $db->autoupdate($request_model);
+$db->autoupdate($settings_model);
 
 // for each board set up:
 // a posts_model table
@@ -197,6 +205,7 @@ $models = array(
   'group'     => $group_model,
   'usergroup' => $usergroup_model,
   'request'   => $request_model,
+  'setting'   => $settings_model,
 );
 
 
