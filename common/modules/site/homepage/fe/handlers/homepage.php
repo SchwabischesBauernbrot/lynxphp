@@ -1,25 +1,41 @@
 <?php
 
-function homepage() {
-  $boards = getBoards();
-  $templates = loadTemplates('index');
-  //echo "<pre>", print_r($templates, 1), "</pre>\n";
-  $boards_html = '';
-  if (is_array($boards)) {
-    foreach($boards as $c=>$b) {
-      $tmp = $templates['loop0'];
-      $tmp = str_replace('{{uri}}', $b['uri'], $tmp);
-      $tmp = str_replace('{{title}}', $b['title'], $tmp);
-      $tmp = str_replace('{{description}}', $b['description'], $tmp);
-      $boards_html .= $tmp . "\n";
-      if ($c > 10) break;
-    }
+$params = $getHandler();
+
+$homepage = $pkg->useResource('homepage');
+
+$boards = $homepage['boards'];
+$settings = $homepage['settings'];
+
+$templates = loadTemplates('index');
+$board_template = $templates['loop0'];
+$moreBoards = $templates['loop1'];
+
+$boards_html = '';
+if (is_array($boards)) {
+  foreach($boards as $c => $b) {
+    $boards_html .= replace_tags($board_template, $b) . "\n";
+    if ($c > 10) break;
   }
-
-  $content = $templates['header'];
-  $content = str_replace('{{boards}}', $boards_html, $content);
-
-  wrapContent($content);
 }
+
+$logo = 'images/default_logo.png';
+if (!empty($settings['logo'])) {
+  // FIXME: BACKEND_BASE_URL
+  $logo = 'backend/' . $settings['logo'];
+}
+
+$tags = array(
+  'siteName' => $settings['siteName'],
+  'slogan' => $settings['slogan'],
+  'logoURL' => $logo,
+  'boards' => $boards_html,
+);
+$content = replace_tags($templates['header'], $tags);
+if (count($boards) > 10) {
+  $content .= $moreBoards;
+}
+
+wrapContent($content);
 
 ?>
