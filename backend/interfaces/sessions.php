@@ -17,6 +17,8 @@ function getUserID() {
   return $sesRow['user_id'];
 }
 
+// maybe too helpful...
+// if this middleware condition failures, then returns this...
 function loggedIn() {
   $userid = getUserID();
   if ($userid === null) {
