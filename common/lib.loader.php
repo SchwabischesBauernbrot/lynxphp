@@ -28,9 +28,14 @@ function registerPackageGroup($group) {
     $path = $dir . '/' . $file;
     if (is_dir($path)) {
       $loaded++;
-      $pkg = &registerPackage($group . '/' . $file);
+      $pkg = registerPackage($group . '/' . $file);
       if ($pkg) {
         $packages[$pkg->name] = $pkg;
+      }
+    } else {
+      // file_exists but not a dir
+      if (!is_readable($path)) {
+        echo "I can't read [$path] please fix the permissions (set execute flag?)<br>\n";
       }
     }
   }
@@ -38,37 +43,36 @@ function registerPackageGroup($group) {
   return $loaded;
 }
 
-function &registerPackage($pkg_path) {
+function registerPackage($pkg_path) {
   global $module_base;
   $full_pkg_path = '../' . $module_base . $pkg_path . '/';
-  /*
-  if (file_exists($full_pkg_path . 'module.json')) {
-    $json = file_get_contents($full_pkg_path . 'module.json');
-    //$json = preg_replace("/,(?!.*,)/", "", $json);
-    //echo "json[$json]<br>\n";
-    // json is an ugly format, not native
-    // not performant to add json5 support for such a critical task...
-    // but is a cacheable process...
-    // but php data file is simpler and less complex
-    $data = json_decode($json, true);
-    //echo "<pre>", print_r($data, 1), "</pre>\n";
-    // FIXME: 2 phases, introspect vs use
-    // convert data into code...
-    $pkg = new package($data['name'], $data['version'], substr($full_pkg_path, 0, -1));
-    foreach($data['resources'] as $rsrcHdr) {
-      $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params']);
-    }
-  */
-  if (file_exists($full_pkg_path . 'module.php')) {
+
+  $pkg = false;
+  if (is_readable($full_pkg_path . 'module.php')) {
+    //echo "Loading [$full_pkg_path] module<br>\n";
+    // we want to keep these to pure data as much as possible (no calculation to get result)
     $data = include $full_pkg_path . 'module.php';
+    // handle empty module.php
+    if (empty($data['name'])) {
+      //echo "module.php did not return correct data<br>\n";
+      return $pkg;
+    }
     $pkg = new package($data['name'], $data['version'], substr($full_pkg_path, 0, -1));
     foreach($data['resources'] as $rsrcHdr) {
       $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params']);
     }
   } else {
-    $pkg = false;
-    if (file_exists($full_pkg_path . 'index.php')) {
-      $pkg = include $full_pkg_path . 'index.php';
+    //echo "module_base[$module_base]<br>\n";
+    if (!file_exists($full_pkg_path . 'module.php')) {
+      echo "No module.php in [$full_pkg_path]<br>\n";
+    } else {
+      // not sure these do anything...
+      if (!is_readable('../')) {
+        echo ".. isn't readable<br>\n";
+      }
+      if (!is_readable('../' . $module_base)) {
+        echo "../$module_base isn't readable<br>\n";
+      }
     }
   }
   return $pkg;
