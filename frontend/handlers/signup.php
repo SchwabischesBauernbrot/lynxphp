@@ -47,7 +47,7 @@ function postSignup() {
       return;
     }
   }
-  $tmpl = "Error: Sign up error: " . $result['meta']['err'] . "<br>\n";
+  $tmpl = "Error: Sign up error: " . print_r($result['meta'], 1) . "<br>\n";
   wrapContent($tmpl . getSignupForm());
 }
 
