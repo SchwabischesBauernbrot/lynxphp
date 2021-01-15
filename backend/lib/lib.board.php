@@ -31,7 +31,9 @@ function getBoardByUri($boardUri) {
   if (!$res) return;
   $row = $db->get_row($res);
   $db->free($res);
-  if ($row['json']) $row['json'] = json_decode($row['json'], true);
+  if ($row) {
+    if ($row['json']) $row['json'] = json_decode($row['json'], true);
+  }
   return $row;
 }
 
