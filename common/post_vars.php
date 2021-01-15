@@ -42,18 +42,18 @@ function definePipeline($constant, $str) {
 function modelToString($model) {
   $s = '<ul><li>Name: ' . $model['name'];
   if (isset($model['fields'])) {
-    $s .= '<li><table>';
+    $s .= '<li><table><tr><th>Field<th>Type';
     foreach($model['fields'] as $k => $v) {
       // type, length
-      $s .= '<tr><th>' . $k . '<td>' . $v['type'];
+      $s .= '<tr><td>' . $k . '<td>' . $v['type'];
     }
     $s .= '</table>';
   }
   if (isset($model['seed'])) {
-    $s .= '<li><table>';
+    $s .= '<li><table><tr><th>Field<th>Value';
     foreach($model['seed'] as $k => $v) {
       // type, length
-      $s .= '<tr><th>' . $k . '<td>' . print_r($v, 1);
+      $s .= '<tr><td>' . $k . '<td>' . print_r($v, 1);
     }
     $s .= '</table>';
   }
