@@ -1,9 +1,9 @@
 <h1 class="board-title"></h1>
-<img style="display: block; margin-left: auto; margin-right: auto;" src="/file/logo.png" alt="">
+<img style="display: block; margin-left: auto; margin-right: auto;" src="{{logoURL}}" alt="">
 <div class="table-container flex-center mv-10 text-center">
   <table>
-    <tr><th class="alt">Welcome to
-    <tr><td><pre class="no-m-p">SLOGAN</pre>
+    <tr><th class="alt">Welcome to {{siteName}}
+    <tr><td><pre class="no-m-p">{{slogan}}</pre>
   </table>
 </div>
 <div class="table-container flex-center mv-10 text-center">
@@ -11,21 +11,23 @@
     <tr>
       <th>Board
       <th>Description
-      <th>PPH
+      <!-- th>PPH
       <th>Users
-      <th>Posts
+      <th>Posts -->
     {{boards}}
 <!-- loop -->
     <tr>
       <td><a href="{{uri}}/">/{{uri}}/ - {{title}}</a>
       <td>{{description}}
+      <!-- td>
       <td>
-      <td>
-      <td>
+      <td -->
 <!-- end -->
+<!-- loop -->
     <tr>
       <td colspan="5">
         <a class="bold" href="/boards.php">More Boards</a>
+<!-- end -->
   </table>
 </div>
 <!-- div class="table-container flex-center mv-10 text-center">
