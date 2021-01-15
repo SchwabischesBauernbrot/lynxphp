@@ -25,8 +25,6 @@ foreach($boards as $uri => $t) {
   $hasDeleteAccess[$uri] = isBO();
 }
 
-$hasDeleteAccess = false;
-
 $removedThreads = 0;
 $removedPosts   = 0;
 
@@ -39,7 +37,7 @@ switch($action) {
       $posts_model = getPostsModel($r['board']);
       $post = $db->findById($posts_model, $r['postid']);
       if (!$post) continue;
-      if ($hasDeleteAccess || $post['password'] === $password) {
+      if ($hasDeleteAccess[$r['board']] || $post['password'] === $password) {
         // try to delete it
         if (!$db->deleteById($posts_model, $r['postid'])) {
           // FIXME: log error?
