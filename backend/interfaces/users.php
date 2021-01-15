@@ -44,6 +44,11 @@ function getUserGroups($user_id) {
 
 function userInGroup($user_id, $group) {
   $usergroups = getUserGroups($user_id);
+  if (is_array($group)) {
+    foreach($group as $g) {
+      if (in_array($g, $usergroups)) return true;
+    }
+  }
   return in_array($group, $usergroups);
 }
 
