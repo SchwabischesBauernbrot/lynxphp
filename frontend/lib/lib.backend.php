@@ -66,6 +66,10 @@ function consume_beRsrc($options, $params = '') {
       wrapContent('Backend error (consume_beRsrc): ' .  $options['endpoint'] . ': ' . $responseText);
       return;
     }
+    // let's just handle 401s globally here
+    if (!empty($obj['meta']) && $obj['meta']['code'] === 401) {
+      return redirectTo('/login.php');
+    }
     // this hides 401s... we need to handle and pass back problems better...
     if (!empty($options['unwrapData'])) return $obj['data'];
     return $obj;
@@ -121,8 +125,7 @@ function sendFile($tmpfile, $type, $filename) {
   $json  = curlHelper(BACKEND_BASE_URL . 'lynx/files', array(
     'files' => make_file($tmpfile, $type, $filename)
   ), '', '', '', 'POST');
-  $result = json_decode($json, true);
-  return $result['data'];
+  return expectJson($json, 'lynx/files');
 }
 
 // authed functions
@@ -138,8 +141,7 @@ function backendAuthedGet($endpoint) {
 
 function checkSession() {
   $json = backendAuthedGet('opt/session');
-  $ses = json_decode($json, true);
-  return $ses;
+  return expectJson($json, 'opt/session');
 }
 
 function backendLogin($user, $pass) {
