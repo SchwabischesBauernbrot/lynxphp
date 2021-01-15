@@ -65,11 +65,14 @@ include 'interfaces/posts.php';
 include 'interfaces/users.php';
 include 'interfaces/files.php';
 include 'interfaces/sessions.php';
+include 'interfaces/settings.php';
 
 $packages = array();
+$packages['base'] = registerPackage('base');
 registerPackageGroup('board');
 registerPackageGroup('post');
 registerPackageGroup('user');
+registerPackageGroup('site');
 // build routes (and activate backend_handlers.php/models.php)
 foreach($packages as $pkg) {
   $pkg->buildBackendRoutes();
