@@ -1,5 +1,25 @@
 <?php
 
+function redirectTo($url) {
+  echo '<head>';
+  //echo '<base href="', BASE_HREF, '">';
+  echo '<meta http-equiv="refresh" content="0; url=', $url,'">';
+  echo '</head>';
+  /*
+  echo '<script>';
+  echo 'window.location = "', $url, '"';
+  echo '</script>';
+  */
+}
+
+function tagify($tag) {
+  return '{{' . $tag . '}}';
+}
+
+function replace_tags($template, $tags) {
+  return str_replace(array_map('tagify', array_keys($tags)), array_values($tags), $template);
+}
+
 function loadTemplates($template) {
   return loadTemplatesFile('templates/' . $template . '.tmpl');
 }
@@ -57,29 +77,20 @@ function loadTemplatesFile2($path) {
 }
 
 function wrapContent($content) {
-  // could be readfile but probably going to need tags
-  $templates = loadTemplates('header');
-  $hdrTmpl = $templates['header'];
-  // how and when does this change?
-  $hdrTmpl = str_replace('{{nav}}', '', $hdrTmpl);
-  // FIXME: cacheable...
-  $hdrTmpl = str_replace('{{basehref}}', BASE_HREF, $hdrTmpl);
-  echo $hdrTmpl, $content;
-  $ftrTmpl = file_get_contents('templates/footer.tmpl');
-  echo $ftrTmpl;
-  flush();
-}
+  // how do we hook in our admin group?
+  // the data is only there if we asked for it...
+  // could be a: global, pipeline or ??
 
-function redirectTo($url) {
-  echo '<head>';
-  //echo '<base href="', BASE_HREF, '">';
-  echo '<meta http-equiv="refresh" content="0; url=', $url,'">';
-  echo '</head>';
-  /*
-  echo '<script>';
-  echo 'window.location = "', $url, '"';
-  echo '</script>';
-  */
+  $templates = loadTemplates('header');
+  // how and when does this change?
+  // FIXME: cacheable...
+  $tags = array(
+    'nav' => '',
+    'basehref' => BASE_HREF
+  );
+  echo replace_tags($templates['header'], $tags), $content;
+  readfile('templates/footer.tmpl');
+  flush();
 }
 
 ?>
