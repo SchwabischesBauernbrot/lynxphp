@@ -14,7 +14,8 @@ $models['usergroup']['parents'] = array(
     'type'  => 'left',
     'model' => $models['group'],
     //'pluck' => array('name' => 'groupname'),
-    'pluck' => array('name' => 'group_concat(name) as groupnames'),
+    // group_concat(name)
+    'pluck' => array('name' => $db->groupAgg('name').' as groupnames'),
     // need an aggregate function...
     //'pluck' => array('name' => 'name as groupnames'),
   )
