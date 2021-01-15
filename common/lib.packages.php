@@ -38,6 +38,7 @@ class package {
     // should we register with something? not now...
     $this->frontend_packages = array();
     $this->backend_packages = array();
+    $this->common = array(); // optional common data
   }
   // should we make a frontend_package/backend_package
   // no because they're optional and could have more than one
@@ -72,6 +73,7 @@ class package {
     $label = strtolower($label); // must be lowercase since it's a filename
     if (!isset($rsrcArr['handlerFile'])) {
       $rsrcArr['handlerFile'] = $this->dir . 'be/handlers/'. $label . '.php';
+      // is this only an issue if used (fe/be)?
       if (!file_exists($rsrcArr['handlerFile'])) {
         echo "Failed to setup [", $rsrcArr['handlerFile'], "]<br>\n";
       }
@@ -104,7 +106,7 @@ class package {
         $qs = array_flip($rsrc['params']['querystring']);
         $fd = array_flip($rsrc['params']['formData']);
         // FIXME: what if we call this multiple times?
-        foreach($params as $k=>$v) {
+        foreach($params as $k => $v) {
           if (isset($qs[$k])) {
             $rsrc['querystring'][] = $k . '=' . urlencode($v);
           } else if (isset($fd[$k])) {
@@ -116,9 +118,19 @@ class package {
       } else
       if ($rsrc['params'] === 'querystring') {
         if (!isset($rsrc['querystring'])) $rsrc['querystring'] = array();
-        foreach($params as $k=>$v) {
-          // should we urlencode k too?
-          $rsrc['querystring'][] = $k . '=' . urlencode($v);
+        if (is_array($params)) {
+          foreach($params as $k=>$v) {
+            // should we urlencode k too?
+            if (is_string($v)) {
+              $rsrc['querystring'][] = $k . '=' . urlencode($v);
+            } else {
+              echo "<pre>What do I do with [$k] of type [",gettype($v),"]=[", print_r($v, 1),"]</pre>\n";
+            }
+          }
+        }
+      } else if ($rsrc['params'] === 'postdata') {
+        foreach($params as $k => $v) {
+          $rsrc['formData'][$k] = $v;
         }
       } else {
         echo "Unknown parameter type[", $params['params'], "]<br>\n";
@@ -142,22 +154,39 @@ class package {
       include $this->dir . 'models.php';
     }
     */
+
     // activate backend hooks
     if (file_exists($this->dir . 'be/data.php')) {
       $bePkgs = include $this->dir . 'be/data.php';
+      if (empty($bePkgs) || !is_array($bePkgs)) {
+        return;
+      }
       foreach($bePkgs as $pName => $pData) {
         $bePkg = $this->makeBackend();
         foreach($pData['models'] as $m) {
           $bePkg->addModel($m);
         }
         foreach($pData['modules'] as $m) {
-          $bePkg->addModule(constant($m['pipeline']), $m['module']);
+          if (defined($m['pipeline'])) {
+            $bePkg->addModule(constant($m['pipeline']), $m['module']);
+          } else {
+            // pipeline isn't defined, likely modules admin interface
+          }
         }
       }
-    } else
+    }
+    /*
+    else
     if (file_exists($this->dir . 'be/index.php')) {
       include $this->dir . 'be/index.php';
     }
+    */
+    // optional common functions and data
+    // load here so they couldn't be called to calculate data for the module/data
+    if (is_readable($this->dir . 'common.php')) {
+      $this->common = include $this->dir . 'common.php';
+    }
+
     // install routes
     foreach($this->resources as $label => $rsrc) {
       $endpoint = $rsrc['endpoint'];
@@ -171,14 +200,17 @@ class package {
       }
       // requires the router name matches the route prefix
       $rsrc['endpoint'] = str_replace($router, '', $rsrc['endpoint']);
-      //echo "Adding [$label][", $rsrc['endpoint'], "] to [$router]<br>\n";
 
       // might be included from frontend...
       if (isset($routers[$router])) {
+        //echo "Adding [$label][", $rsrc['endpoint'], "] to [$router]<br>\n";
         $res = $routers[$router]->fromResource($label, $rsrc);
         if ($res !== true) {
           echo "Problem building routes for : $res<br>\n";
         }
+      } else {
+        // admin/modules hits this path...
+        //echo "Unknown router[$router]<br>\n";
       }
     }
   }
@@ -186,6 +218,9 @@ class package {
     // activate frontend hooks
     if (file_exists($this->dir . 'fe/data.php')) {
       $fePkgs = include $this->dir . 'fe/data.php';
+      if (empty($fePkgs) || !is_array($fePkgs)) {
+        return;
+      }
       // package name is optinal
       foreach($fePkgs as $pName => $pData) {
         $fePkg = $this->makeFrontend();
@@ -193,17 +228,26 @@ class package {
           //$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
           $fePkg->addHandler($h['method'], $h['route'], $h['handler']);
         }
-        foreach($pData['forms'] as $form) {
-          //$fePkg->addForm('/:uri/settings/banners/:id/delete', 'delete');
+        foreach($pData['forms'] as $f) {
+          $fePkg->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
         }
         foreach($pData['modules'] as $m) {
           $fePkg->addModule(constant($m['pipeline']), $m['module']);
         }
       }
-    } else
+    }
+    /*
+    else
     if (file_exists($this->dir . 'fe/index.php')) {
       include $this->dir . 'fe/index.php';
+    }*/
+
+    // optional common functions and data
+    // load here so they couldn't be called to calculate data for the module/data
+    if (is_readable($this->dir . 'common.php')) {
+      $this->common = include $this->dir . 'common.php';
     }
+
     // build all frontend routes
     foreach($this->frontend_packages as $fe_pkg) {
       $fe_pkg->buildRoutes($router, $method);
@@ -309,10 +353,14 @@ class frontend_package {
     if (!isset($this->handlers[$method])) {
       $this->handlers[$method] = array();
     }
-    $this->handlers[$method][$cond] = $file;
+    $this->handlers[$method][$cond] = array(
+      'file' => $file,
+      'options' => $options,
+    );
   }
   function addForm($cond, $file, $options = false) {
-    if (!isset($options['get_options'])) $options['get_options'] = false;
+    if (!isset($options['get_options'])) $options['get_options'] = array();
+    $options['get_options']['form'] = true;
     if (!isset($options['post_options'])) $options['post_options'] = false;
     $this->addHandler('GET', $cond, 'form_'.$file.'_get', $options['get_options']);
     $this->addHandler('POST', $cond, 'form_'.$file.'_post', $options['post_options']);
@@ -347,20 +395,38 @@ class frontend_package {
     }
     $pkg = &$this->pkg;
     // only build the routes we need
-    foreach($this->handlers[$method] as $cond => $file) {
-      $path = strtolower($this->pkg->dir) . 'fe/handlers/' . strtolower($file) . '.php';
+    foreach($this->handlers[$method] as $cond => $row) {
+      $file = $row['file'];
+      $module_path = strtolower($this->pkg->dir);
+      $fe_path = $module_path . 'fe/';
+      $path = $fe_path . 'handlers/' . strtolower($file) . '.php';
       // FIXME: hide the ../commoon
       $func = function($request) use ($path) {
         // as configured by ...
         echo "handler[$path] does not exist<br>\n";
       };
       if (file_exists($path)) {
-        $func = function($request) use ($path, $pkg) {
+        $func = function($request) use ($path, $pkg, $row, $fe_path) {
+          if (is_readable($fe_path . 'common.php')) {
+            $common = include $fe_path . 'common.php';
+          } else {
+            if (file_exists($fe_path . 'common.php')) {
+              echo "lulwat[$fe_path]<br>\n";
+            }
+          }
           // lastMod function?
           // well just deep memiozation could work...
           // middlewares, wrapContent => sendResponse
-          $getHandler = function() {
-            return array();
+          $getHandler = function() use ($request, $path, $row) {
+            $res = array(
+              'request' => $request,
+            );
+            if (!empty($row['options'])) {
+              if (!empty($row['options']['form'])) {
+                $res['action'] = $request['originalPath'];
+              }
+            }
+            return $res;
           };
           $intFunc = include $path;
         };
@@ -373,12 +439,12 @@ class frontend_package {
     if (is_array($this->handlers)) {
       $content .= 'Handlers: ';
       $content .= 'Methods: ' . join(', ', array_keys($this->handlers));
-      $content .= '<table>';
+      $content .= '<table><tr><th>Name<th>Method<th>Route';
       foreach($this->handlers as $type => $handlers) {
         //$content .= '<li>'. $type;
         if (is_array($handlers)) {
-          foreach($handlers as $route => $rname) {
-            $content .= '<tr><th>' . $rname . '<td>' . $type . '<td>' . $route;
+          foreach($handlers as $route => $h) {
+            $content .= '<tr><td>' . $h['file'] . '<td>' . $type . '<td>' . $route;
           }
         }
       }
