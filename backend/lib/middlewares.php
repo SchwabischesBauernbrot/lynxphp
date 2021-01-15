@@ -42,10 +42,12 @@ function boardOwnerMiddleware($request) {
 function userInGroupMiddleware($request, $groups) {
   $user_id = loggedIn();
   if (!$user_id) {
+    // loggedIn will send something
     return;
   }
-  $pass = userInGroup($user_id, $groups);
+  $pass = userInGroup($user_id, $groups); // does not send something
   if (!$pass) {
+    sendResponse(array(), 401, 'One of these access groups is required: '. join(',', $groups));
     return;
   }
   return true;
