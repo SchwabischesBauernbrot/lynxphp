@@ -19,8 +19,8 @@ $result = $pkg->useResource('close_reports', array(
 );
 
 if ($result['success'] === 'ok') {
-  // redirect
   redirectTo('/'. $boardUri . '/settings/reports');
+} else {
 }
 
 ?>
