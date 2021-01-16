@@ -51,6 +51,9 @@ class Router {
       // get session
       $user_id = null;
       if (!empty($res['sendSession'])) {
+        $user_id = getUserID();
+      }
+      if (!empty($res['requireSession'])) {
         $user_id = loggedIn();
         if (!$user_id) {
           return;
