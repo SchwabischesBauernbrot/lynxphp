@@ -19,6 +19,10 @@ function boardMiddleware($request) {
 // way more useful if we just pass boardUri in...
 function boardOwnerMiddleware($request) {
   $boardUri = getQueryField('boardUri');
+  if (!$boardUri) {
+    sendResponse(array(), 400, 'No boardUri passed');
+    return;
+  }
   $user_id = loggedIn();
   if (!$user_id) {
     return;
@@ -33,7 +37,8 @@ function boardOwnerMiddleware($request) {
     }
   }
   if (!$ok) {
-    wrapContent('You do not own this board');
+    //wrapContent('You do not own this board: [' . $boardUri . ']' . print_r($ownedBoards, 1));
+    sendResponse(array(), 400, 'You do not own this board');
     return;
   }
   return $boardUri;
