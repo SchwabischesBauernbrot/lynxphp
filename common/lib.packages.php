@@ -82,7 +82,7 @@ class package {
   }
   function useResource($label, $params = false, $options = false) {
     if (empty($this->resources[$label])) {
-      echo "<pre>Cannot call [$label] no such resource: ", print_r(array_keys($this->resources), 1), "</pre>\n";
+      echo "<pre>lib.pacakge:::package::useResource - Cannot call [$label] no such resource: ", print_r(array_keys($this->resources), 1), "</pre>\n";
       return;
     }
     $rsrc = $this->resources[$label];
@@ -95,16 +95,23 @@ class package {
         }
       }
       if (count($missing)) {
-        echo "<pre>Cannot call [$label] because ", join(', ', $missing), " are missing from parameters: ", print_r($params, 1), "</pre>\n";
+        echo "<pre>lib.pacakge:::package::useResource - Cannot call [$label] because ", join(', ', $missing), " are missing from parameters: ", print_r($params, 1), "</pre>\n";
         return;
       }
     }
+    // handle $params mapping
+    //echo "<pre>params[", print_r($rsrc, 1), "]</pre>\n";
     if (isset($rsrc['params'])) {
       if (is_array($rsrc['params'])) {
-        if (!isset($rsrc['querystring'])) $rsrc['querystring'] = array();
-        if (!isset($rsrc['formData']))    $rsrc['formData'] = array();
+        //echo "<pre>params[", print_r($rsrc['params'], 1), "]</pre>\n";
+        if (!isset($rsrc['params']['querystring'])) $rsrc['params']['querystring'] = array();
+        if (!isset($rsrc['params']['formData']))    $rsrc['params']['formData'] = array();
+        if (!is_array($rsrc['params']['querystring'])) $rsrc['params']['querystring'] = array($rsrc['params']['querystring']);
+        if (!is_array($rsrc['params']['formData']))    $rsrc['params']['formData'] = array($rsrc['params']['formData']);
         $qs = array_flip($rsrc['params']['querystring']);
         $fd = array_flip($rsrc['params']['formData']);
+        //echo "<pre>[", print_r($qs, 1), "]</pre>\n";
+        //echo "<pre>[", print_r($fd, 1), "]</pre>\n";
         // FIXME: what if we call this multiple times?
         foreach($params as $k => $v) {
           if (isset($qs[$k])) {
@@ -112,7 +119,7 @@ class package {
           } else if (isset($fd[$k])) {
             $rsrc['formData'][$k] = $v;
           } else {
-            echo "Don't know what to do with $k in $label<br>\n";
+            echo "lib.pacakge:::package::useResource - Don't know what to do with $k in $label<br>\n";
           }
         }
       } else
@@ -124,7 +131,7 @@ class package {
             if (is_string($v)) {
               $rsrc['querystring'][] = $k . '=' . urlencode($v);
             } else {
-              echo "<pre>What do I do with [$k] of type [",gettype($v),"]=[", print_r($v, 1),"]</pre>\n";
+              echo "<pre>lib.pacakge:::package::useResource - What do I do with [$k] of type [",gettype($v),"]=[", print_r($v, 1),"]</pre>\n";
             }
           }
         }
@@ -133,9 +140,10 @@ class package {
           $rsrc['formData'][$k] = $v;
         }
       } else {
-        echo "Unknown parameter type[", $params['params'], "]<br>\n";
+        echo "lib.pacakge:::package::useResource - Unknown parameter type[", $params['params'], "]<br>\n";
       }
     }
+    // handle $options
     if ($options) {
       if (!empty($options['addPostFields'])) {
         foreach($options['addPostFields'] as $f => $v) {
@@ -143,6 +151,10 @@ class package {
         }
       }
     }
+    //echo "<pre>lib.pacakge:::package::useResource - cookie: ", print_r($_COOKIE, 1), "</pre>\n";
+    //echo "<pre>lib.pacakge:::package::useResource - out: ", print_r($rsrc, 1), "</pre>\n";
+
+    // make the call
     $result = consume_beRsrc($rsrc, $params);
     return $result;
   }
