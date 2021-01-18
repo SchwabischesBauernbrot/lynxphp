@@ -212,9 +212,12 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       echo "err[$err]<br>\n";
       return false;
     }
+    list($id) = pg_fetch_row($res);
+    pg_free_result($res);
+
     //echo "res[$res]<br>\n";
     // how does this handle multiple?
-    return $res;
+    return $id;
 
   }
   public function update($rootModel, $urow, $options) {
