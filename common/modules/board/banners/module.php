@@ -26,7 +26,7 @@ return array(
       'params' => array(
         'endpoint' => 'lynx/createBanners',
         'method' => 'POST',
-        'sendSession' => true,
+        'requireSession' => true,
         'unwrapData' => true,
         'requires' => array('boardUri'),
         'params' => array(
@@ -40,10 +40,13 @@ return array(
       'params' => array(
         'endpoint' => 'lynx/deleteBanner',
         'method' => 'POST',
-        'sendSession' => true,
+        'requireSession' => true,
         'unwrapData' => true,
-        'requires' => array('bannerId'),
-        'params' => 'querystring',
+        'requires' => array('boardUri', 'bannerId'),
+        'params' => array (
+          'querystring' => 'boardUri',
+          'formData' => 'bannerId',
+        ),
       ),
     ),
   ),
