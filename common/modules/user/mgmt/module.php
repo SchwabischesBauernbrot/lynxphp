@@ -8,9 +8,30 @@ return array(
       'params' => array(
         'endpoint' => 'opt/admin/users',
         'unwrapData' => true,
-        'sendSession'=> true,
+        'requireSession'=> true,
         //'requires' => array('boardUri'),
         //'params' => 'querystring',
+      ),
+    ),
+    array(
+      'name' => 'listgroups',
+      'params' => array(
+        'endpoint' => 'opt/admin/groups',
+        'unwrapData' => true,
+        'requireSession'=> true,
+        //'requires' => array('boardUri'),
+        //'params' => 'querystring',
+      ),
+    ),
+    array(
+      'name' => 'updateusergroups',
+      'params' => array(
+        'endpoint' => 'opt/admin/users/:id/groups',
+        'method' => 'POST',
+        'unwrapData' => true,
+        'requireSession'=> true,
+        'requires' => array('groups'),
+        'params' => 'postdata',
       ),
     ),
   ),
