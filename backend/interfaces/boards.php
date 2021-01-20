@@ -156,7 +156,7 @@ function isBO($boardUri, $userid = false) {
 }
 
 // optimization
-function getThreadCount($boardUri) {
+function getBoardThreadCount($boardUri) {
   global $db;
   $posts_model = getPostsModel($boardUri);
   $threadCount = $db->count($posts_model, array('criteria'=>array(
@@ -164,5 +164,13 @@ function getThreadCount($boardUri) {
   )));
   return $threadCount;
 }
+
+function getBoardPostCount($boardUri) {
+  global $db;
+  $posts_model = getPostsModel($boardUri);
+  $postCount = $db->count($posts_model);
+  return $postCount;
+}
+
 
 ?>
