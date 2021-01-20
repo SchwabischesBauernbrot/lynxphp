@@ -1,18 +1,37 @@
 <?php
 
 function getBoardsHandler() {
-  $boards = getBoards();
+  $res = getBoards();
+  $boards = $res['data'];
+
   $templates = loadTemplates('board_listing');
+  $overboard_template = $templates['loop0'];
+  $board_template     = $templates['loop1'];
+  $page_template      = $templates['loop2'];
+
   $boards_html = '';
   foreach($boards as $c=>$b) {
-    $tmp = $templates['loop0'];
+    $tmp = $board_template;
     $tmp = str_replace('{{uri}}', $b['uri'], $tmp);
     $tmp = str_replace('{{title}}', htmlspecialchars($b['title']), $tmp);
     $tmp = str_replace('{{description}}', htmlspecialchars($b['description']), $tmp);
+    $tmp = str_replace('{{threads}}', $b['threads'], $tmp);
+    $tmp = str_replace('{{posts}}', $b['posts'], $tmp);
+    $tmp = str_replace('{{lastActivityColor}}', '72d900', $tmp);
+    $tmp = str_replace('{{last_post}}', empty($b['last']) ? '' : $b['last'], $tmp);
     $boards_html .= $tmp . "\n";
   }
 
   $content = $templates['header'];
+  $content = str_replace('{{overboard}}', '', $content);
+  $content = str_replace('{{fields}}', '', $content);
+
+  $page_html = '';
+  $tmp = $page_template;
+  $tmp = str_replace('{{page}}', 1, $tmp);
+  $page_html .= $tmp;
+
+  $content = str_replace('{{pages}}',  $page_html, $content);
   $content = str_replace('{{boards}}', $boards_html, $content);
 
   wrapContent($content);
