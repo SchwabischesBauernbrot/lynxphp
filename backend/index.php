@@ -13,6 +13,9 @@ include 'config.php';
 
 $router = include '../common/router.php';
 
+// one syscall to get the current time
+$now = time();
+
 // connect to db
 include 'lib/database_drivers/' . DB_DRIVER . '.php';
 $driver_name = DB_DRIVER . '_driver';
@@ -24,7 +27,24 @@ if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
   exit(1);
 }
 
+
 include '../common/lib.modules.php'; // module functions and classes
+// transformations (x => y)
+// access list (remove this, add this)
+// change input, output (aren't these xforms tho)
+// change processing is a little more sticky...
+
+
+// have to be defined before we can enable modules:
+// routers, db options, cache options, pipelines...
+
+// build modules...
+enableModulesType('models'); // bring models online
+
+include 'interfaces/requests.php';
+// we have database connections
+logRequest(getip());
+
 // pipelines
 // - boardDB to API
 // - thread to API
@@ -45,18 +65,6 @@ $routers = array();
 $routers['4chan'] = include 'routes/4chan.php';
 $routers['lynx']  = include 'routes/lynxchan_minimal.php';
 $routers['opt']   = include 'routes/opt.php';
-
-// transformations (x => y)
-// access list (remove this, add this)
-// change input, output (aren't these xforms tho)
-// change processing is a little more sticky...
-
-
-// have to be defined before we can enable modules:
-// routers, db options, cache options, pipelines...
-
-// build modules...
-enableModulesType('models'); // bring models online
 
 include 'lib/lib.board.php';
 include 'lib/middlewares.php';
