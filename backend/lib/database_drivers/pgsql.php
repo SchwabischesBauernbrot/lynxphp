@@ -147,6 +147,21 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       }
       // FIXME: delete scan
       //echo "<pre>Changes", print_r($changes, 1), "</pre>\n";
+
+      if (isset($model['seed']) && is_array($model['seed'])) {
+        $inserts = array();
+        foreach($model['seed'] as $row) {
+          $cnt = $this->count($model, array('criteria'=>$row));
+          if (!$cnt) {
+            //echo "need to insert: ", print_r($row, 1), "<br>\n";
+            $inserts[] = $row;
+          }
+        }
+        if (count($inserts)) {
+          $this->insert($model, $inserts);
+        }
+      }
+
       // everything in sync?
       if ($haveAll && $noChanges) {
         return true;
@@ -207,9 +222,9 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     $sql .= join(',', $sets);
     //echo "sql[$sql]<br>\n";
     $res = pg_query($this->conn, $sql . ' returning ' . $idf);
-    $err = pg_result_error($res);
+    $err = pg_last_error($this->conn);
     if ($err) {
-      echo "err[$err]<br>\n";
+      echo "err[$err] [$sql]<br>\n";
       return false;
     }
     list($id) = pg_fetch_row($res);
@@ -221,12 +236,13 @@ class pgsql_driver extends database_driver_base_class implements database_driver
 
   }
   public function update($rootModel, $urow, $options) {
+    global $now;
     $tableName = modelToTableName($rootModel);
     $sets = array(
-      'updated_at' => 'updated_at = ' . time(),
+      'updated_at' => 'updated_at = ' . $now,
     );
     //echo "json was[", print_r($urow['json'], 1), "]<br>\n";
-    if ($urow['json']) $urow['json'] = json_encode($urow['json']);
+    if (!empty($urow['json'])) $urow['json'] = json_encode($urow['json']);
     //echo "json now[$json]<br>\n";
     foreach($urow as $f=>$v) {
       if (is_array($v)) {
@@ -400,6 +416,9 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   }
   public function groupAgg($field) {
     return 'string_agg(' . $field . ', \',\')';
+  }
+  public function unixtime() {
+    return 'cast(extract(epoch from CURRENT_TIMESTAMP) as integer)';
   }
 }
 
