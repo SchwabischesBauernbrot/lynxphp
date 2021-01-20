@@ -7,28 +7,28 @@
 $router = new router;
 
 $router->post('/registerAccount', function($request) {
-  global $db, $models;
   if (!hasPostVars(array('login', 'password', 'email'))) {
-    return;
+    return sendResponse(array(), 400, 'Needs login, password, and email');
   }
+  global $db, $models;
+  $email = strtolower($_POST['email']);
+  $login = strtolower($_POST['login']);
   $emRes = $db->find($models['user'], array('criteria' => array(
-    array('email', '=', $_POST['email']),
+    array('email', '=', $email),
   )));
   if ($db->num_rows($emRes)) {
     return sendResponse(array(), 403, 'Already has account');
-    return;
   }
   $res = $db->find($models['user'], array('criteria' => array(
-    array('username', '=', $_POST['login']),
+    array('username', '=', $login),
   )));
   if ($db->num_rows($res)) {
     return sendResponse(array(), 403, 'Already Taken');
-    return;
   }
   //echo "Creating<br>\n";
   $id = $db->insert($models['user'], array(array(
-    'username' => $_POST['login'],
-    'email'    => $_POST['email'],
+    'username' => $login,
+    'email'    => $email,
     'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
   )));
   $data = array('id'=>$id);
