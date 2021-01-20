@@ -137,12 +137,32 @@ class package {
         }
       } else if ($rsrc['params'] === 'postdata') {
         foreach($params as $k => $v) {
-          $rsrc['formData'][$k] = $v;
+          if (is_array($v)) {
+            // or we could pass PHP style...
+            // backend might not be PHP...
+            $rsrc['formData'][$k] = json_encode($v);
+          } else {
+            $rsrc['formData'][$k] = $v;
+          }
         }
       } else {
         echo "lib.pacakge:::package::useResource - Unknown parameter type[", $params['params'], "]<br>\n";
       }
     }
+    // does endpoint has params?
+    if (strpos($rsrc['endpoint'], '/:') !== false) {
+      $parts = explode('/:', $rsrc['endpoint']);
+      $ds = array_shift($parts);
+      $condParams = array();
+      foreach($parts as $part) {
+        $parts2 = explode('/', $part);
+        $name = array_shift($parts2);
+        $condParams[$name] = $params[$name];
+        $rsrc['endpoint'] = str_replace(':' . $name, $condParams[$name], $rsrc['endpoint']);
+      }
+      //print_r($condParams);
+    }
+
     // handle $options
     if ($options) {
       if (!empty($options['addPostFields'])) {
@@ -175,14 +195,18 @@ class package {
       }
       foreach($bePkgs as $pName => $pData) {
         $bePkg = $this->makeBackend();
-        foreach($pData['models'] as $m) {
-          $bePkg->addModel($m);
+        if (isset($pData['models']) && is_array($pData['models'])) {
+          foreach($pData['models'] as $m) {
+            $bePkg->addModel($m);
+          }
         }
-        foreach($pData['modules'] as $m) {
-          if (defined($m['pipeline'])) {
-            $bePkg->addModule(constant($m['pipeline']), $m['module']);
-          } else {
-            // pipeline isn't defined, likely modules admin interface
+        if (isset($pData['modules']) && is_array($pData['modules'])) {
+          foreach($pData['modules'] as $m) {
+            if (defined($m['pipeline'])) {
+              $bePkg->addModule(constant($m['pipeline']), $m['module']);
+            } else {
+              // pipeline isn't defined, likely modules admin interface
+            }
           }
         }
       }
@@ -238,7 +262,7 @@ class package {
         $fePkg = $this->makeFrontend();
         foreach($pData['handlers'] as $h) {
           //$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
-          $fePkg->addHandler($h['method'], $h['route'], $h['handler']);
+          $fePkg->addHandler(empty($h['method']) ? 'GET' : $h['method'], $h['route'], $h['handler']);
         }
         foreach($pData['forms'] as $f) {
           $fePkg->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
