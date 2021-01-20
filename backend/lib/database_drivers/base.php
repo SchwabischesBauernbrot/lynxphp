@@ -41,7 +41,7 @@ class database_driver_base_class {
     return '"'. addslashes($value) . '"';
   }
   public function make_direct($value) {
-  	return array($value);
+    return array($value);
   }
   // convert array into where clause
   public function build_where($criteria, $defAlias = '') {
@@ -50,15 +50,39 @@ class database_driver_base_class {
     $alias = $defAlias ? $defAlias . '.' : '';
     foreach($criteria as $k => $set) {
       if (is_numeric($k)) {
-      	// flexible criteria
-        if (is_array($set[2])) {
-          $sets[] = $alias . $set[0] . ' ' . $set[1] . ' ' . $set[2][0];
+        // flexible criteria
+        $one = $alias;
+        if (is_array($set[0])) {
+          $one .= $set[0][0];
         } else {
-          $sets[] = $alias . $set[0] . ' ' . $set[1] . ' ' . $this->make_constant($set[2]);
+          // $this->make_constant()
+          // postgres can't put quotes around fields
+          $one .= $set[0];
+        }
+        $operand = $set[1];
+        if ($operand === 'IN') {
+          // list operands
+          if (!is_array($set[2])) {
+            // auto promote to array or abort?
+            return false;
+          }
+          $sets[] = $one . ' ' . $operand . ' (' . join(',', $set[2]). ')';
+        } else {
+          if (is_array($set[2])) {
+            $sets[] = $one . ' ' . $operand . ' ' . $set[2][0];
+          } else {
+            $sets[] = $one . ' ' . $operand . ' ' . $this->make_constant($set[2]);
+          }
         }
       } else {
         // named key
-        $sets[] = $alias . $k . '=' . $set;
+        if (is_array($set)) {
+          // direct
+          $sets[] = $alias . $k . '=' . $set;
+        } else {
+          // default: safe
+          $sets[] = $alias . $k . '=' . $this->make_constant($set);
+        }
       }
     }
     return join(' AND ', $sets);
@@ -77,6 +101,7 @@ class database_driver_base_class {
   public function updateById($rootModel, $id, $row, $options = false) {
     $tableName = modelToTableName($rootModel);
     $id = (int)$id;
+    // this stomps $options...
     $options = array(
       'criteria' => array(
         array(modelToId($rootModel) , '=', $id)
