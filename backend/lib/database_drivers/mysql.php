@@ -156,6 +156,20 @@ class mysql_driver extends database_driver_base_class implements database_driver
       }
       // FIXME: delete scan
       //echo "<pre>$tableName: Changes", print_r($changes, 1), "</pre>\n";
+      if (isset($model['seed']) && is_array($model['seed'])) {
+        $inserts = array();
+        foreach($model['seed'] as $row) {
+          $cnt = $this->count($model, array('criteria'=>$row));
+          if (!$cnt) {
+            //echo "need to insert: ", print_r($row, 1), "<br>\n";
+            $inserts[] = $row;
+          }
+        }
+        if (count($inserts)) {
+          $this->insert($model, $inserts);
+        }
+      }
+
       // everything in sync?
       if ($haveAll && $noChanges) {
         return true;
@@ -224,11 +238,12 @@ class mysql_driver extends database_driver_base_class implements database_driver
 
   }
   public function update($rootModel, $urow, $options) {
+    global $now;
     $tableName = modelToTableName($rootModel);
     $sets = array(
-      'updated_at' => 'updated_at = ' . time(),
+      'updated_at' => 'updated_at = ' . $now,
     );
-    if ($urow['json']) $urow['json'] = json_encode($urow['json']);
+    if (!empty($urow['json'])) $urow['json'] = json_encode($urow['json']);
     foreach($urow as $f=>$v) {
       // updates are always assignments (=, never </>=)
       if (is_array($v)) {
@@ -403,6 +418,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
   }
   public function groupAgg($field) {
     return 'group_concat(' . $field . ')';
+  }
+  public function unixtime() {
+    return 'UNIX_TIMESTAMP()';
   }
 }
 
