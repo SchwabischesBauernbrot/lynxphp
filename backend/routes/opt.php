@@ -31,7 +31,7 @@ $router->get('/boards/:uri/:page', function($request) {
     return sendResponse(array(), 404, 'Board does not exist');
   }
   boardDBtoAPI($boardData);
-  $threadCount = getThreadCount($boardUri);
+  $threadCount = getBoardThreadCount($boardUri);
   $threads = boardPage($boardUri, $pageNum);
   sendResponse(array(
     'board' => $boardData,
@@ -63,6 +63,30 @@ $router->get('/boards/:uri/catalog', function($request) {
 });
 */
 
+$router->get('/boards.json', function($request) {
+  global $db;
+  $boards = listBoards();
+  $res = array();
+  foreach($boards as $b) {
+    // FIXME: N+1s...
+    // include posts, threads, last_activity
+    $b['threads'] = getBoardThreadCount($b['uri']);
+    $b['posts'] = getBoardPostCount($b['uri']);
+
+    if ($b['threads']) {
+      $posts_model = getPostsModel($b['uri']);
+      $newestThreadRes = $db->find($posts_model, array('criteria'=>array(
+          array('threadid', '=', 0),
+      ), 'limit' => '1', 'order'=>'updated_at desc'));
+      $newestThread = $db->toArray($newestThreadRes);
+      $b['last'] = $newestThread[0];
+    }
+    $res[] = $b;
+  }
+  sendResponse($res);
+});
+
+
 $router->get('/myBoards', function($request) {
   $user_id = loggedIn();
   if (!$user_id) {
@@ -82,7 +106,7 @@ $router->get('/:board', function($request) {
     echo '[]';
     return;
   }
-  $boardData['threadCount'] = getThreadCount($boardUri);
+  $boardData['threadCount'] = getBoardThreadCount($boardUri);
   $boardData['pageCount'] = ceil($boardData['threadCount']/$tpp);
   sendResponse($boardData);
 });
