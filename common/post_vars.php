@@ -28,7 +28,13 @@ function getOptionalPostField($field) {
 
 function getip() {
   $ip = getServerField('REMOTE_ADDR', '127.0.0.1');
-  $ip = getServerField('HTTP_X_FORWARDED_FOR', $ip); // cloudflare support
+  // FIXME: don't trust HTTP_X_FORWARDED_FOR from any one...
+  // cloudflare support and frontend will tuck it here
+  $ip = getServerField('HTTP_X_FORWARDED_FOR', $ip);
+  if (strpos($ip, ',') !== false) {
+    $parts = explode(',', $ip);
+    $ip = array_shift($parts);
+  }
   return $ip;
 }
 
