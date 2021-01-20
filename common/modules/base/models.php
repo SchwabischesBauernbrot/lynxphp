@@ -157,6 +157,7 @@ $group_model = array(
   ),
   'seed' => array(
     array('name'=>'admin'),
+    array('name'=>'global'),
   )
 );
 
@@ -165,6 +166,8 @@ $request_model = array(
   'name' => 'request',
   'fields' => array(
     'ip' => array('type'=>'str'),
+    // set a TTL to clear the count...
+    // now - updated_at should give use the lifetime
     'count' => array('type'=>'int'),
     'type' => array('type'=>'str'),
   )
