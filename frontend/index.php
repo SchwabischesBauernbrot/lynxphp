@@ -131,6 +131,11 @@ foreach($packages as $pkg) {
 $router->get('/boards.php', function() {
   getBoardsHandler();
 });
+// nginx support...
+$router->get('/boards', function() {
+  getBoardsHandler();
+});
+
 // FIXME: move into module
 $router->get('/overboard.php', function() {
   getOverboardHandler();
