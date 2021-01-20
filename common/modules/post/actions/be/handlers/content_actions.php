@@ -16,31 +16,38 @@ foreach($_POST as $k => $v) {
       'threadid' => $parts[1],
       'postid'   => $parts[2],
     );
-    $baords[$parts[0]] = true;
+    $boards[$parts[0]] = true;
   }
 }
 
 $hasDeleteAccess = array();
 foreach($boards as $uri => $t) {
-  $hasDeleteAccess[$uri] = isBO();
+  $hasDeleteAccess[$uri] = isBO($uri);
 }
 
 $removedThreads = 0;
 $removedPosts   = 0;
 
+$issues = array();
 
 switch($action) {
   case 'delete':
-    $password = $_POST['password'];
+    $password = getOptionalPostField('password');
     global $db;
     foreach($posts as $r) {
       $posts_model = getPostsModel($r['board']);
       $post = $db->findById($posts_model, $r['postid']);
-      if (!$post) continue;
-      if ($hasDeleteAccess[$r['board']] || $post['password'] === $password) {
+      if (!$post) {
+        //echo "No post [", $r['postid'], "]<br>\n";
+        // is this key enough?
+        $issues[$r['board'].'_'.$r['postid']] = 'post not found';
+        continue;
+      }
+      if ($hasDeleteAccess[$r['board']] || ($post['password'] && $post['password'] === $password)) {
         // try to delete it
-        if (!$db->deleteById($posts_model, $r['postid'])) {
+        if (!deletePost($r['board'], $r['postid'], false, $post)) {
           // FIXME: log error?
+          $issues[$r['board'].'_'.$r['postid']] = 'deletion failed';
           continue;
         }
         if ($post['threadid']) {
@@ -65,20 +72,26 @@ switch($action) {
         'created_at' => time(),
         'status' => 'open',
       );
-      if ($_POST['reasonReport']) $report['reason'] = $_POST['reasonReport'];
+      if (getOptionalPostField('reasonReport')) $report['reason'] = getOptionalPostField('reasonReport');
       // make sure reason is unique?
       $data['json']['reports'][] = $report;
       updateBoard($r['board'], $data);
     }
     // FIXME: global report
-    if ($_REQUEST['globalReport']) {
+    if (getOptionalPostField('globalReport')) {
       // also make a global report
     }
+  break;
+  default:
+    // FIXME:
   break;
 }
 
 sendResponse(array(
   'removedThreads' => $removedThreads,
   'removedPosts' => $removedPosts,
+  'request' => $posts,
+  'hasDeleteAccess' => $hasDeleteAccess,
+  'issues' => $issues,
 ));
 ?>
