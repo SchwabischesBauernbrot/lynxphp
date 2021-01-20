@@ -11,6 +11,9 @@ if (!hasPostVars(array('bannerId'))) {
 }
 $bannerId = (int)$_POST['bannerId'];
 global $db, $models;
+// FIXME: check the DB to see if any one else is using this banner file
+// if not delete it from disk!
+
 $res = $db->delete($models['board_banner'],array('criteria'=>array(
   array('bannerid', '=', $bannerId),
 )));
