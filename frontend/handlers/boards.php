@@ -18,7 +18,7 @@ function getBoardsHandler() {
     $tmp = str_replace('{{threads}}', $b['threads'], $tmp);
     $tmp = str_replace('{{posts}}', $b['posts'], $tmp);
     $tmp = str_replace('{{lastActivityColor}}', '72d900', $tmp);
-    $tmp = str_replace('{{last_post}}', empty($b['last']) ? '' : $b['last'], $tmp);
+    $tmp = str_replace('{{last_post}}', empty($b['last']) ? '' : date('Y-m-d H:i:s', $b['last']['updated_at']), $tmp);
     $boards_html .= $tmp . "\n";
   }
 
