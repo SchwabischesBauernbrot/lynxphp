@@ -55,6 +55,8 @@ switch($action) {
         } else {
           $removedThreads++;
         }
+      } else {
+        $issues[$r['board'].'_'.$r['postid']] = 'access denied';
       }
     }
     //
