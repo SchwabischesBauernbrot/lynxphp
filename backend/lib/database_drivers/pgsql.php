@@ -186,7 +186,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
         }
       }
       $sql .= '';
-      echo "sql[$sql]<br>\n";
+      //echo "sql[$sql]<br>\n";
       $res = pg_query($this->conn, $sql);
       $err = pg_last_error($this->conn);
       if ($err) {
