@@ -30,7 +30,11 @@ function moduleLoadTemplates($template, $dir) {
 }
 
 function loadTemplatesFile($path) {
-  $lines = file($path);
+  $lines = @file($path);
+  if (!is_array($lines)) {
+    echo "lib.handler::loadTemplatesFile - Can't read [$path]<br>\n";
+    return array();
+  }
   $section = 'header';
   $loop = -1;
   $templates = array('header' => '');
