@@ -32,6 +32,7 @@ class Router {
       $this->methods[$method][$cond] = $func;
     }
   }
+  // only done on the backend...
   function fromResource($name, $res) {
     if (!isset($res['handlerFile'])) {
       return 'handlerFile is not set';
@@ -138,6 +139,7 @@ class Router {
   }
   function exec($method, $path, $level = 0) {
     $methods = $this->methods[$method];
+    // could strip & but that's non-standard
     $segments = explode('/', $path);
     //echo "router::exec[$level] - path[$path] segments[", count($segments), "]<br>\n";
 
@@ -233,6 +235,7 @@ class Router {
       }
     }
     if (count($matches)) {
+      //echo "<pre>", print_r($matches, 1), "</pre>\n";
       if (count($matches) === 1) {
         $func = $matches[0]['func'];
         $request['params'] = $matches[0]['params'];
