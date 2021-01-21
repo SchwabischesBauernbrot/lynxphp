@@ -14,7 +14,7 @@ $boardUri = $request['params']['uri'];
 // ip deletion?
 // purge files vs remove from post
 
-wrapContent('Please wait...');
+echo "Please wait...<br>\n"; flush();
 
 if (getOptionalPostField('delete')) {
   // FIXME: could be a ban-delete too
@@ -32,7 +32,7 @@ if (getOptionalPostField('delete')) {
     if ($result['removedPosts'] + $result['removedThreads'] === count($postFields)) {
       echo "Successful!<bR>\n"; flush();
       if ($threadNum === 'ThreadNum') {
-        return redirectTo('/' . $boardUri);
+        return redirectTo('/' . $boardUri . '/');
       } else {
         return redirectTo('/' . $boardUri . '/thread/' . $threadNum . '.html');
       }
@@ -59,6 +59,20 @@ if (getOptionalPostField('global_report')) {
   );
 }
 
-// echo '<pre>'.print_r($result, 1).'</pre>', "\n";
+if (count($result['issues'])) {
+  wrapContent(print_r($result['issues'], 1)."<br>\n<pre>".print_r($result, 1)."</pre>\n");
+} else {
+  $boardUri = $result['request'][0]['board'];
+  wrapContent('<pre>' . print_r($result, 1) . '</pre>');
+  /*
+  if ($result['request'][0]['threadid'] !== 'ThreadNum') {
+    redirectTo('/'. $boardUri . '/thread/' . $result['request'][0]['threadid'] . '.html');
+  } else {
+    redirectTo('/'. $boardUri . '/');
+  }
+  */
+}
+
+
 
 ?>
