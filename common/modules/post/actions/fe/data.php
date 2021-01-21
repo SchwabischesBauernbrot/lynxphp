@@ -39,12 +39,21 @@ $fePkgs = array(
         'route'   => '/:uri/settings/reports/:id/banReport',
         'handler' => 'ban_reporter',
       ),
+      array(
+        'method'  => 'GET',
+        'route'   => '/globals/reports',
+        'handler' => 'global_report_list',
+      ),
     ),
     'forms' => array(),
     'modules' => array(
       array(
         'pipeline' => 'PIPELINE_BOARD_SETTING_NAV',
         'module' => 'nav_settings',
+      ),
+      array(
+        'pipeline' => 'PIPELINE_GLOBALS_NAV',
+        'module' => 'global_nav',
       ),
     ),
   ),
