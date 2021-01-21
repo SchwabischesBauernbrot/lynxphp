@@ -93,9 +93,9 @@ function boardPage($boardUri, $page = 1) {
       'type' => 'left',
       'model' => $posts_model,
       'srcField' => 'threadid',
-      'pluck' => array('count(ALIAS.*) as cnt'),
+      'pluck' => array('count(ALIAS.postid) as cnt'),
       'groupby' => $postTable . '.postid',
-      'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.*)>0))',
+      'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.postid)>0))',
       'where' => array(
         array('deleted', '=', 0)
       ),
