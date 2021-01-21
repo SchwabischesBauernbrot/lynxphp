@@ -1,6 +1,58 @@
 <?php
 
+function secondsToTime($inputSeconds) {
+  global $now;
+
+  $obj = new DateTime();
+  $obj->setTimeStamp($now - $inputSeconds);
+
+  $diff = $then->diff(new DateTime(date('Y-m-d H:i:s', $now)));
+  return array('years' => $diff->y, 'months' => $diff->m, 'days' => $diff->d, 'hours' => $diff->h, 'minutes' => $diff->i, 'seconds' => $diff->s);
+}
+
+function relativeColor($relativeTo) {
+  global $now;
+  $SECOND = 1;
+  $MINUTE = 60; // 60s in 1min
+  $HOUR   = 3600;
+  $DAY    = 86400;
+  $WEEK   = 604800;
+  $MONTH  = 2629800;
+  $YEAR   = 31536000;
+
+  $diff = $now - $relativeTo;
+  $minAgo = floor($diff / $MINUTE);
+
+  $r=0; $g=0; $b=0;
+  if ($diff < $MINUTE) {
+    $g = 0.7; $b = 1;
+  } else
+  if ($diff < $HOUR) {
+    $r = ($minAgo / 60) * 0.5;
+    $g = 1;
+  } else
+  if ($diff < $DAY) {
+    $r = 0.5 + ($minAgo / 1440) * 0.5;
+    $g = 1;
+  } else
+  if ($diff < $WEEK) {
+    $g = 1 - ($minAgo /10080) * 0.5;
+    $r = 1;
+  } else
+  if ($diff < $MONTH) {
+    $g = 0.5 - ($minAgo / 43830) * 0.5;
+    $r = 1;
+  } else
+  if ($diff < $YEAR) {
+    $r = 1 - ($minAgo / 525960);
+  }
+  // else leave it black
+
+  return sprintf('%02x%02x%02x', $r * 255, $g * 255, $b * 255);
+}
+
 function getBoardsHandler() {
+  global $now;
   $res = getBoards();
   $boards = $res['data'];
 
@@ -11,14 +63,64 @@ function getBoardsHandler() {
 
   $boards_html = '';
   foreach($boards as $c=>$b) {
+    $last = '';
+    $color = ''; // green
+    if (!empty($b['last'])) {
+      $time = $now - $b['last']['updated_at'];
+
+      $months = floor($time / (60 * 60 * 24 * 30));
+      $time -= $months * (60 * 60 * 24 * 30);
+
+      $weeks = floor($time / (60 * 60 * 24 * 7));
+      $time -= $weeks * (60 * 60 * 24 * 7);
+
+      $days = floor($time / (60 * 60 * 24));
+      $time -= $days * (60 * 60 * 24);
+
+      $hours = floor($time / (60 * 60));
+      $time -= $hours * (60 * 60);
+
+      $minutes = floor($time / 60);
+      $time -= $minutes * 60;
+
+      $seconds = floor($time);
+      $time -= $seconds;
+
+      $last = '';
+      if ($seconds) {
+        $last = $seconds . ' seconds ago';
+      }
+      if ($minutes) {
+        $last = $days    . ' minute ago';
+      }
+      if ($hours) {
+        $last = $hours   . ' hours ago';
+        $color = '7cd900';
+      }
+      if ($days) {
+        $last = $days    . ' days ago';
+        $color = 'd9b900'; // yellow
+      }
+      if ($weeks) {
+        $last = $weeks   . ' weeks ago';
+        $color = 'd95200'; // orange
+      }
+      if ($months) {
+        $last = $months  . ' months ago';
+        $color = 'c50000'; // red
+      }
+
+      $color = relativeColor($b['last']['updated_at']);
+    }
+
     $tmp = $board_template;
     $tmp = str_replace('{{uri}}', $b['uri'], $tmp);
     $tmp = str_replace('{{title}}', htmlspecialchars($b['title']), $tmp);
     $tmp = str_replace('{{description}}', htmlspecialchars($b['description']), $tmp);
     $tmp = str_replace('{{threads}}', $b['threads'], $tmp);
     $tmp = str_replace('{{posts}}', $b['posts'], $tmp);
-    $tmp = str_replace('{{lastActivityColor}}', '72d900', $tmp);
-    $tmp = str_replace('{{last_post}}', empty($b['last']) ? '' : date('Y-m-d H:i:s', $b['last']['updated_at']), $tmp);
+    $tmp = str_replace('{{lastActivityColor}}', $color, $tmp);
+    $tmp = str_replace('{{last_post}}', $last, $tmp);
     $boards_html .= $tmp . "\n";
   }
 
