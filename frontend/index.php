@@ -7,7 +7,7 @@ include '../common/post_vars.php';
 $req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 
-if ($req_path !== '/loginc.php' && $req_method !== 'POST') {
+if (($req_path !== '/login.php' && $req_method !== 'POST') || $req_path === '/logout.php') {
   echo '<div style="height: 40px;"></div>', "\n"; flush();
 }
 
