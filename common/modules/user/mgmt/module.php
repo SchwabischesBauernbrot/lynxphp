@@ -1,6 +1,6 @@
 <?php
 return array(
-  'name' => 'user_mgmt',
+  'name' => 'users_mgmt',
   'version' => 1,
   'resources' => array(
     array(
