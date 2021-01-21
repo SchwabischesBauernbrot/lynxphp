@@ -1,8 +1,15 @@
 <?php
-echo '<div style="height: 40px;"></div>', "\n"; flush();
 $now = time();
 
 include '../common/post_vars.php';
+
+// REQUEST_URI seems to be more accruate in NGINX
+$req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
+$req_method = getServerField('REQUEST_METHOD', 'GET');
+
+if ($req_path !== '/loginc.php' && $req_method !== 'POST') {
+  echo '<div style="height: 40px;"></div>', "\n"; flush();
+}
 
 // load frontend config
 include 'config.php';
@@ -116,10 +123,6 @@ include 'handlers/control_panel.php';
 include 'handlers/boards.php';
 include 'handlers/admin.php';
 include 'handlers/global.php';
-
-$req_method = getServerField('REQUEST_METHOD', 'GET');
-// REQUEST_URI seems to be more accruate in NGINX
-$req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 
 $packages = array();
 $packages['base'] = registerPackage('base');
