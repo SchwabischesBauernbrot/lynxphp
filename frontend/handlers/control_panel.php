@@ -12,12 +12,16 @@ function getControlPanel() {
   $tmpl = $templates['header'];
   $board_html = $templates['loop0'];
   $admin_html = $templates['loop1'];
+  $global_html = $templates['loop2'];
 
   $isAdmin = false;
+  $isGlobal = false;
   if (isset($account['groups'])) {
     $isAdmin = in_array('admin', $account['groups']);
+    $isGlobal = in_array('global', $account['groups']);
   }
   $tmpl = str_replace('{{admin}}', $isAdmin ? $admin_html : '', $tmpl);
+  $tmpl = str_replace('{{global}}', $isGlobal ? $global_html : '', $tmpl);
 
   $boards_html = '';
   if (isset($account['ownedBoards']) && is_array($account['ownedBoards'])) {
