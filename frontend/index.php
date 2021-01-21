@@ -1,4 +1,6 @@
 <?php
+echo '<div style="height: 40px;"></div>', "\n"; flush();
+$now = time();
 
 include '../common/post_vars.php';
 
@@ -69,6 +71,11 @@ definePipeline('PIPELINE_ADMIN_NAV',          'admin_nav');
 definePipeline('PIPELINE_ADMIN_HEADER_TMPL',  'admin_heading_tmpl');
 definePipeline('PIPELINE_ADMIN_SETTING_GENERAL',  'admin_setting_general');
 
+definePipeline('PIPELINE_GLOBALS_NAV', 'globals_nav');
+definePipeline('PIPELINE_GLOBALS_HEADER_TMPL', 'globals_heading_tmpl');
+
+definePipeline('PIPELINE_USER_NAV', 'user_nav');
+definePipeline('PIPELINE_USER_HEADER_TMPL', 'user_heading_tmpl');
 
 
 // forms pipelines
@@ -96,6 +103,8 @@ include 'lib/middlewares.php';
 include 'handlers/mixins/board_header.php';
 include 'handlers/mixins/board_nav.php';
 include 'handlers/mixins/admin_portal.php';
+include 'handlers/mixins/global_portal.php';
+include 'handlers/mixins/user_portal.php';
 include 'handlers/mixins/post_renderer.php';
 include 'handlers/mixins/post_form.php';
 include 'handlers/mixins/post_actions.php';
@@ -106,6 +115,7 @@ include 'handlers/signup.php';
 include 'handlers/control_panel.php';
 include 'handlers/boards.php';
 include 'handlers/admin.php';
+include 'handlers/global.php';
 
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 // REQUEST_URI seems to be more accruate in NGINX
@@ -260,6 +270,10 @@ $router->get('/admin/install', function() {
   getAdminInstallPage();
 });
 
+$router->get('/global.php', function() {
+  getGlobalPage();
+});
+
 $router->get('/logout.php', function() {
   getLogout();
 });
@@ -270,7 +284,7 @@ $router->get('/:uri', function($request) {
   if ($boardUri) {
     $boardUri .= '/';
   }
-  // maybe only redir if the board exists...
+  // FIXME: only redir if the board exists...
   redirectTo(BASE_HREF . $boardUri);
 });
 
