@@ -54,9 +54,10 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $this->conn = null;
     $this->modelToSQL = array();
     $this->sqlToModel = array();
+    $this->joinCount = 0;
   }
   // direct
-  public function connect($host, $user, $pass, $port = 0) {
+  private function connect($host, $user, $pass, $port = 0) {
     if ($this->conn !== null) {
       // throw exception?
       echo "Already connected<br>\n";
@@ -72,7 +73,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     return true;
   }
   // direct
-  public function switch_db($db) {
+  private function switch_db($db) {
     // FIXME check result code
     mysqli_select_db($this->conn, $db);
     return true;
@@ -96,6 +97,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $err = mysqli_error($this->conn);
     // do we need to create table?
     if ($err && strpos($err, 'doesn\'t exist') !== false) {
+      mysqli_free_result($res);
       // create table
       //echo "creating table ", $tableName, "\n";
       $sql = 'create table `' . $tableName. '` (';
@@ -126,7 +128,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       //echo "getting fields ", $tableName, "\n";
       $haveFields = array();
       if (is_bool($res)) {
-        echo "existing table, didnt like describe?!<br>\n";
+        echo "mysql::autoupdate - existing table, didnt like describe?!<br>\n";
         return;
       }
       while($row = mysqli_fetch_assoc($res)) {
@@ -186,9 +188,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
         $sql = substr($sql, 0, -2);
       }
       if (!$noChanges) {
-        echo "Need to change<br>\n";
+        echo "mysql::autoupdate - Need to change<br>\n";
         foreach($changes as $fieldName => $f) {
-          echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
+          //echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
           //$sql .= 'MODIFY ' . $fieldName . ' ' .modelToSQL($f['type']);
         }
       }
@@ -230,7 +232,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "mysql::insert err[$err]<br>\n";
+      echo "mysql::insert - err[$err]<br>\n";
       return false;
     }
     // how does this handle multiple?
@@ -261,7 +263,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "mysql::update err[$err]<br>\n";
+      echo "mysql::update - err[$err]<br>\n";
       return false;
     }
     return true;
@@ -279,7 +281,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "mysql::delete err[$err]<br>\n";
+      echo "mysql::delete - err[$err]<br>\n";
       return false;
     }
     return true;
@@ -295,21 +297,42 @@ class mysql_driver extends database_driver_base_class implements database_driver
         // calculate off joined table
         $field = modelToId($join['model']);
       }
+      // should be the same field
+      $rootField = $field;
+      $joinField = $field;
+      // unles...
+      if (!empty($join['srcField'])) $rootField = $join['srcField'];
+      if (!empty($join['useField'])) $joinField = $join['useField'];
+      // set up join table/alias
       $joinTable = modelToTableName($join['model']);
-      $data['joins'][] = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join `' .
-        $joinTable . '` on ' .
-        '`' . $joinTable . '`.' . $field . '=' .
-        '`' . $tableName . '`.' . $field;
+      $joinAlias = $joinTable;
+      if ($joinTable === $tableName) {
+        $this->joinCount++;
+        $joinAlias = 'jt' . $this->joinCount;
+        $joinTable .= ' as ' . $joinAlias;
+      }
+      $joinStr = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join ' .
+        $joinTable . ' on (' .
+        $joinAlias . '.' . $joinField . '=' .
+        $tableName . '.' . $rootField;
+      if (!empty($join['where'])) {
+        $joinStr .= ' and ' . $this->build_where($join['where'], $joinAlias);
+      }
+      $data['joins'][] = $joinStr . ')';
       // support an empty array
       if (isset($join['pluck']) && is_array($join['pluck'])) {
         // probably integrate the alias...
-        $data['fields'] = array_merge($data['fields'], $join['pluck']);
+        $clean = str_replace('ALIAS', $joinAlias, $join['pluck']);
+        $data['fields'] = array_merge($data['fields'], $clean);
       } else {
         // if no pluck, then grab all
-        $data['fields'][] = '`' . $joinTable . '`.*';
+        $data['fields'][] = '`' . $joinAlias . '`.*';
       }
       if (!empty($join['groupby'])) {
         $data['groupbys'] = array_merge($data['groupbys'], explode(',', $join['groupby']));
+      }
+      if (!empty($join['having'])) {
+        $data['having'] .= ' ' . str_replace('ALIAS', $joinAlias, $join['having']);
       }
       $data = $this->expandJoin($join['model'], $data);
     }
@@ -341,6 +364,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $data = array(
       'joins'    => array(),
       'groupbys' => array(),
+      'having'   => '',
       'fields'   => array(),
     );
     $data = $this->expandJoin($rootModel, $data);
@@ -360,6 +384,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
     if (count($data['groupbys'])) {
       $sql .= ' group by ' . join(',', $data['groupbys']);
     }
+    if (!empty($data['having'])) {
+      $sql .= ' having ' . $data['having'];
+    }
     if (isset($options['order'])) {
       $defAlias = count($data['joins']) ? $tableName : '';
       $alias = $defAlias ? $defAlias . '.' : '';
@@ -372,7 +399,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "mysql::find err[$err]<br>\n";
+      echo "mysql::find - err[$err]<br>\n";
       return false;
     }
     return $res;
@@ -385,7 +412,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function findById($rootModel, $id, $options = false) {
     $res = parent::findById($rootModel, $id, $options);
     $row = mysqli_fetch_assoc($res);
-    $this->free($res);
+    mysqli_free_result($res);
     return $row;
   }
   public function num_rows($res) {

@@ -44,6 +44,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       'text' => 'text',
       'boolean' => 'bool',
     );
+    $this->joinCount = 0;
   }
   // easy
   public function connect_db($host, $user, $pass, $db, $port = 5432) {
@@ -98,9 +99,9 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       $sql .= ')';
       // echo "$sql\n";
       $res = pg_query($this->conn, $sql);
-      $err = pg_result_error($res);
+      $err = pg_last_error($this->conn);
       if ($err) {
-        echo "err[$err]<br>\n";
+        echo "pgsql::autoupdate - create err[$err]<br>\nSQL[$sql]<br>\n";
         return false;
       }
       if (isset($model['seed']) && is_array($model['seed'])) {
@@ -109,19 +110,19 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       return true;
     } else {
       // describle table name failed...
-      if ($err) echo "err[$err]<br>\n";
+      if ($err) echo "pgsql::autoupdate - describe err[$err]<br>\n";
       // get fields
       //echo "getting fields ", $tableName, "\n";
       $haveFields = array();
       if (is_bool($res)) {
-        echo "existing table, didnt like describe?!<br>\n";
+        echo "pgsql::autoupdate - existing table, didnt like describe?!<br>\n";
         return;
       }
       while($row = pg_fetch_assoc($res)) {
         // Field, Type, Null, Key, Default, Extra
         //print_r($row);
         if (!isset($this->sqlToModel[$row['data_type']])) {
-          echo "sql type[", $row['data_type'], "] is missing<br>\n";
+          echo "pgsql::autoupdate - sql type[", $row['data_type'], "] is missing<br>\n";
         }
         $haveFields[ $row['column_name'] ] = $this->sqlToModel[$row['data_type']];
       }
@@ -146,7 +147,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
         }
       }
       // FIXME: delete scan
-      //echo "<pre>Changes", print_r($changes, 1), "</pre>\n";
+      //echo "<pre>$tableName: Changes", print_r($changes, 1), "</pre>\n";
 
       if (isset($model['seed']) && is_array($model['seed'])) {
         $inserts = array();
@@ -168,7 +169,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       }
       $sql = 'alter table "' . $tableName . '" ';
       if (!$haveAll) {
-       // echo "Need to create<br>\n";
+        //echo "Need to create<br>\n";
         // ALTER TABLE
         foreach($missing as $fieldName => $f) {
           // ADD
@@ -178,7 +179,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
         $sql = substr($sql, 0, -2);
       }
       if (!$noChanges) {
-        echo "Need to change<br>\n";
+        echo "pgsql::autoupdate - Need to change<br>\n";
         foreach($changes as $fieldName => $f) {
           //echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
           //$sql .= 'MODIFY ' . $fieldName . ' ' .modelToSQL($f['type']);
@@ -187,9 +188,9 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       $sql .= '';
       echo "sql[$sql]<br>\n";
       $res = pg_query($this->conn, $sql);
-      $err = pg_result_error($res);
+      $err = pg_last_error($this->conn);
       if ($err) {
-        echo "err[$err]<br>\n";
+        echo "pgsql::autoupdate - err[$err]<br>\n";
         return false;
       }
       return true;
@@ -224,7 +225,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     $res = pg_query($this->conn, $sql . ' returning ' . $idf);
     $err = pg_last_error($this->conn);
     if ($err) {
-      echo "err[$err] [$sql]<br>\n";
+      echo "pgsql::insert - err[$err] [$sql]<br>\n";
       return false;
     }
     list($id) = pg_fetch_row($res);
@@ -245,6 +246,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     if (!empty($urow['json'])) $urow['json'] = json_encode($urow['json']);
     //echo "json now[$json]<br>\n";
     foreach($urow as $f=>$v) {
+      // updates are always assignments (=, never </>=)
       if (is_array($v)) {
         $val = $v[0];
       } else {
@@ -260,9 +262,9 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     }
     //echo "sql[$sql]<br>\n";
     $res = pg_query($this->conn, $sql);
-    $err = pg_result_error($res);
+    $err = pg_last_error($this->conn);
     if ($err) {
-      echo "err[$err]<br>\n";
+      echo "pgsql::update - err[$err]<br>\n";
       return false;
     }
     return true;
@@ -278,9 +280,9 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     }
     //echo "sql[$sql]<br>\n";
     $res = pg_query($this->conn, $sql);
-    $err = pg_result_error($res);
+    $err = pg_last_error($this->conn);
     if ($err) {
-      echo "err[$err]<br>\n";
+      echo "pgsql::delete - err[$err]<br>\n";
       return false;
     }
     return true;
@@ -296,21 +298,42 @@ class pgsql_driver extends database_driver_base_class implements database_driver
         // calculate off joined table
         $field = modelToId($join['model']);
       }
+      // should be the same field
+      $rootField = $field;
+      $joinField = $field;
+      // unles...
+      if (!empty($join['srcField'])) $rootField = $join['srcField'];
+      if (!empty($join['useField'])) $joinField = $join['useField'];
+      // set up join table/alias
       $joinTable = modelToTableName($join['model']);
-      $data['joins'][] = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join ' .
-        $joinTable . ' on ' .
-        $joinTable . '.' . $field . '=' .
-        $tableName . '.' . $field;
+      $joinAlias = $joinTable;
+      if ($joinTable === $tableName) {
+        $this->joinCount++;
+        $joinAlias = 'jt' . $this->joinCount;
+        $joinTable .= ' as ' . $joinAlias;
+      }
+      $joinStr = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join ' .
+        $joinTable . ' on (' .
+        $joinAlias . '.' . $joinField . '=' .
+        $tableName . '.' . $rootField;
+      if (!empty($join['where'])) {
+        $joinStr .= ' and ' . $this->build_where($join['where'], $joinAlias);
+      }
+      $data['joins'][] = $joinStr . ')';
       // support an empty array
       if (isset($join['pluck']) && is_array($join['pluck'])) {
         // probably integrate the alias...
-        $data['fields'] = array_merge($data['fields'], $join['pluck']);
+        $clean = str_replace('ALIAS', $joinAlias, $join['pluck']);
+        $data['fields'] = array_merge($data['fields'], $clean);
       } else {
         // if no pluck, then grab all
-        $data['fields'][] = $joinTable . '.*';
+        $data['fields'][] = $joinAlias . '.*';
       }
       if (!empty($join['groupby'])) {
         $data['groupbys'] = array_merge($data['groupbys'], explode(',', $join['groupby']));
+      }
+      if (!empty($join['having'])) {
+        $data['having'] .= ' ' . str_replace('ALIAS', $joinAlias, $join['having']);
       }
       $data = $this->expandJoin($join['model'], $data);
     }
@@ -328,6 +351,24 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     }
     return $data;
   }
+  private function typeCriteria($model, &$crit) {
+    $fields = $model['fields']; // $fieldname => $f['type']
+    foreach($crit as $k => $set) {
+      if (is_numeric($k)) {
+        $f = $set[0];
+        //echo "[$k][", $fields[$f]['type'], "][", print_r($set, 1), "]<br>\n";
+        if (isset($fields[$f]['type']) && $fields[$f]['type'] === 'bool') {
+          //echo "Maybe fix up [$k][", print_r($set, 1), "]<br>\n";
+          $crit[$k][2] = $crit[$k][2] ? 'true' : 'false';
+        }
+      } else {
+        //echo "[$k][", $fields[$k]['type'], "]<br>\n";
+        if (isset($fields[$k]['type']) && $fields[$k]['type'] === 'bool') {
+          //echo "Maybe fix up [$k][", print_r($set, 1), "]<br>\n";
+        }
+      }
+    }
+  }
 
   // options
   //   fields = if not set, give all fields, else expect an array
@@ -339,9 +380,14 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       echo "<pre>model[", print_r($rootModel, 1), "] is missing a name</pre>\n";
       return;
     }
+    $groupbys = array();
+    if (!empty($options['groupby'])) {
+      $groupbys = $options['groupby'];
+    }
     $data = array(
       'joins'    => array(),
       'groupbys' => array(),
+      'having'   => '',
       'fields'   => array(),
     );
     $data = $this->expandJoin($rootModel, $data);
@@ -356,11 +402,21 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       $useAlias = $tableName;
     }
     if (isset($options['criteria'])) {
+      // I don' think we need this...
+      //$this->typeCriteria($rootModel, $options['criteria']);
       $sql .= ' where ' . $this->build_where($options['criteria'], $useAlias);
     }
     if (count($data['groupbys'])) {
       $sql .= ' group by ' . join(',', $data['groupbys']);
     }
+    if (!empty($data['having'])) {
+      $sql .= ' having ' . $data['having'];
+    }
+    /*
+    if (isset($options['having'])) {
+      $sql .= ' having ' . $options['having'];
+    }
+    */
     if (isset($options['order'])) {
       $defAlias = count($data['joins']) ? $tableName : '';
       $alias = $defAlias ? $defAlias . '.' : '';
@@ -371,9 +427,10 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     }
     //echo "sql[$sql]<br>\n";
     $res = pg_query($this->conn, $sql);
-    $err = pg_result_error($res);
+    //$err = pg_result_error($res);
+    $err = pg_last_error($this->conn);
     if ($err) {
-      echo "err[$err]<br>\n";
+      echo "pgsql::find - err[$err]<br>\nSQL[<code>$sql</code>]<br>\n";
       return false;
     }
     return $res;
@@ -384,7 +441,10 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     return $cnt;
   }
   public function findById($rootModel, $id, $options = false) {
-    return pg_fetch_assoc(parent::findById($rootModel, $id, $options));
+    $res = parent::findById($rootModel, $id, $options);
+    $row = pg_fetch_assoc($res);
+    pg_free_result($res);
+    return $row;
   }
   public function num_rows($res) {
     return pg_num_rows($res);
