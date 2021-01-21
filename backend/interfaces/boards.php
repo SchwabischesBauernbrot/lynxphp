@@ -77,13 +77,38 @@ function boardPage($boardUri, $page = 1) {
   $post_files_model = getPostFilesModel($boardUri);
   $limitPage = $page - 1; // make it start at 0
   //echo "page[$page] limitPage[$limitPage]<br>\n";
-  $res = $db->find($posts_model, array('criteria'=>array(
+
+
+  // get threads, join posts filter out
+  //   deleted posts
+  //   and deleted threads without any (non-deleted) posts
+  // and not affect paging/count
+
+  $posts_extended_model = $posts_model;
+  $postTable = modelToTableName($posts_model);
+
+  // join all non-deleted posts
+  $posts_extended_model['children'] = array(
+    array(
+      'type' => 'left',
+      'model' => $posts_model,
+      'srcField' => 'threadid',
+      'pluck' => array('count(ALIAS.*) as cnt'),
+      'groupby' => $postTable . '.postid',
+      'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.*)>0))',
+      'where' => array(
+        array('deleted', '=', 0)
+      ),
+    )
+  );
+
+  $res = $db->find($posts_extended_model, array('criteria'=>array(
       array('threadid', '=', 0),
       // we need the thread tombstones...
       //array('deleted', '=', 0),
     ),
     'order'=>'updated_at desc',
-    'limit' => ($limitPage ? ($limitPage * $tpp) . ',' : '') . $tpp
+    'limit' => ($limitPage ? ($limitPage * $tpp) . ',' : '') . $tpp,
   ));
   $threads = array();
   while($row = $db->get_row($res)) {
@@ -91,6 +116,7 @@ function boardPage($boardUri, $page = 1) {
     // add thread
     postDBtoAPI($row, $post_files_model);
     $posts[] = $row;
+
     // add remaining posts
     $postRes = $db->find($posts_model, array('criteria'=>array(
       array('threadid', '=', $row['no']),
@@ -141,7 +167,7 @@ function boardCatalog($boardUri) {
 
 function isBO($boardUri, $userid = false) {
   if ($userid === false) {
-    $userid = loggedIn();
+    $userid = getUserID();
     if (!$userid) {
       return NULL;
     }
