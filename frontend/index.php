@@ -100,6 +100,7 @@ include 'lib/lib.http.php'; // comms lib
 include 'lib/lib.backend.php'; // comms lib
 include 'lib/lib.handler.php'; // output functions
 include 'lib/lib.files.php'; // file upload functions
+include 'lib/lib.form.php'; // form helper
 // structures
 include 'lib/nav.php'; // nav structure
 include 'lib/middlewares.php';
@@ -193,6 +194,7 @@ $router->post('/:uri/post', function($request) {
     //echo "boardUri[$boardUri]<br>\n";
     $json = curlHelper(BACKEND_BASE_URL . 'lynx/newThread', array(
       // noFlag
+      'name'     => getOptionalPostField('name'),
       'email'    => getOptionalPostField('email'),
       'message'  => $_POST['message'],
       'subject'  => getOptionalPostField('subject'),
@@ -222,6 +224,7 @@ $router->post('/:uri/post', function($request) {
     $json = curlHelper(BACKEND_BASE_URL . 'lynx/replyThread', array(
       // noFlag
       'threadId' => $_POST['thread'],
+      'name'     => getOptionalPostField('name'),
       'email'    => getOptionalPostField('email'),
       'message'  => $_POST['message'],
       'subject'  => getOptionalPostField('subject'),
@@ -298,7 +301,7 @@ $router->get('/:uri', function($request) {
   // FIXME: only redir if the board exists...
   redirectTo(BASE_HREF . $boardUri);
 });
-
+-
 $res = $router->exec($req_method, $req_path);
 if (!$res) {
   http_response_code(404);
