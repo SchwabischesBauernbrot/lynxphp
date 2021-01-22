@@ -17,7 +17,6 @@
 
 .default-pgsql: &default-pgsql
   # Install required PHP extensions
-  - apt install libpq-dev
   - docker-php-ext-install -j$(nproc) pgsql curl
   # set up config files
   - touch backend/config_.php
@@ -32,10 +31,10 @@
 # Why use debian if alpine is faster? Robustness tests?
 .debian: &debian
   - apt-get update -yqq
-  - apt-get install git libcurl4-openssl-dev -yqq
+  - apt-get install -yqq git libcurl4-openssl-dev libpq-dev
 
 .alpine: &alpine
-  - apk add curl-dev
+  - apk add curl-dev postgresql-dev
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
