@@ -66,7 +66,7 @@ function getBoards($boardUris) {
 function boardPage($boardUri, $page = 1) {
   global $db, $tpp;
   $page = (int)$page;
-  $lastXreplies = 10;
+  $lastXreplies = 5;
   // get threads for this page
   $posts_model = getPostsModel($boardUri);
   if ($posts_model === false) {
@@ -198,5 +198,28 @@ function getBoardPostCount($boardUri) {
   return $postCount;
 }
 
+function getBoardSettings($boardUri) {
+  global $db, $models;
+  global $db, $models;
+  $res = $db->find($models['board'], array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
+  $row = $db->get_row($res);
+  $db->free($res);
+  //boardDBtoAPI($row);
+  /*
+  $settings = $db->findById($models['setting'], 1);
+  // create ID 1 if needed
+  if ($settings === false) {
+    $db->insert($models['setting'], array(
+      // 'settingid'=>1,
+      array('changedby' => 0),
+    ));
+    $settings = array('json' => '[]', 'changedby' => 0, 'settingsid' => 1);
+  }
+  return json_decode($settings['json'], true);
+  */
+  return $row;
+}
 
 ?>
