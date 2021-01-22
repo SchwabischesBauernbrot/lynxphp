@@ -94,7 +94,7 @@ test:latest:cli:pgsql:
 
 test:latest:apache:mysql:
   before_script:
-    - *alpine
+    - *debian
     - *default-mysql
   image: php:8.0.0-apache
   services:
@@ -120,7 +120,7 @@ test:latest:apache:mysql:
 
 test:latest:apache:pgsql:
   before_script:
-    - *alpine
+    - *debian
     - *default-pgsql
   image: php:8.0.0-apache
   services:
