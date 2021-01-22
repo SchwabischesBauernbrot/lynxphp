@@ -2,6 +2,9 @@
 $params = $get();
 
 $boardUri = boardOwnerMiddleware($request);
+if (!$boardUri) {
+  return;
+}
 global $db, $models;
 // FIXME: validation that there is an upload...
 // handle file uploads...
