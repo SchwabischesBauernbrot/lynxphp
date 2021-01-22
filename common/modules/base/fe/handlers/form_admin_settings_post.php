@@ -14,12 +14,11 @@ $pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
 
 // FIXME: get from formdata...
 $res = processFiles();
-
 wrapContent('Please wait...');
 
 $files = array();
 if (!empty($res['handles']['logo'])) {
-  $files = $res['handles']['logo'][0]['data'];
+  $files = $res['handles']['logo'][0];
 }
 //echo '<pre>files: ', print_r($files, 1), "</pre>\n";
 
