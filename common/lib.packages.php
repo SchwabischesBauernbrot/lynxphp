@@ -217,11 +217,15 @@ class package {
       include $this->dir . 'be/index.php';
     }
     */
+
+    // delay loading of this unless the route is actually called
+    /*
     // optional common functions and data
     // load here so they couldn't be called to calculate data for the module/data
     if (is_readable($this->dir . 'common.php')) {
       $this->common = include $this->dir . 'common.php';
     }
+    */
 
     // install routes
     foreach($this->resources as $label => $rsrc) {
@@ -240,7 +244,7 @@ class package {
       // might be included from frontend...
       if (isset($routers[$router])) {
         //echo "Adding [$label][", $rsrc['endpoint'], "] to [$router]<br>\n";
-        $res = $routers[$router]->fromResource($label, $rsrc);
+        $res = $routers[$router]->fromResource($label, $rsrc, $this->dir);
         if ($res !== true) {
           echo "Problem building routes for : $res<br>\n";
         }
@@ -280,9 +284,11 @@ class package {
 
     // optional common functions and data
     // load here so they couldn't be called to calculate data for the module/data
+    /*
     if (is_readable($this->dir . 'common.php')) {
       $this->common = include $this->dir . 'common.php';
     }
+    */
 
     // build all frontend routes
     foreach($this->frontend_packages as $fe_pkg) {
@@ -434,20 +440,22 @@ class frontend_package {
     foreach($this->handlers[$method] as $cond => $row) {
       $file = $row['file'];
       $module_path = strtolower($this->pkg->dir);
-      $fe_path = $module_path . 'fe/';
-      $path = $fe_path . 'handlers/' . strtolower($file) . '.php';
+      $path = $module_path . 'fe/' . 'handlers/' . strtolower($file) . '.php';
       // FIXME: hide the ../commoon
       $func = function($request) use ($path) {
         // as configured by ...
         echo "handler[$path] does not exist<br>\n";
       };
       if (file_exists($path)) {
-        $func = function($request) use ($path, $pkg, $row, $fe_path) {
-          if (is_readable($fe_path . 'common.php')) {
-            $common = include $fe_path . 'common.php';
+        $func = function($request) use ($path, $pkg, $row, $module_path) {
+          if (is_readable($module_path . 'shared.php')) {
+            $shared = include $module_path . 'shared.php';
+          }
+          if (is_readable($module_path . 'fe/common.php')) {
+            $common = include $module_path . 'fe/common.php';
           } else {
-            if (file_exists($fe_path . 'common.php')) {
-              echo "lulwat[$fe_path]<br>\n";
+            if (file_exists($module_path . 'fe/common.php')) {
+              echo "lulwat [$module_path]fe/common.php<br>\n";
             }
           }
           // lastMod function?
