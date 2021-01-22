@@ -45,11 +45,15 @@ function processFiles($filter_fields = false) {
         if ($_FILES[$field]['error'] !== 4) {
           $res = sendFile($_FILES[$field]['tmp_name'], $_FILES[$field]['type'], $_FILES[$field]['name']);
           // check for error
-          if (empty($res['data']['hash'])) {
-            echo "fe::::lib.files:::processFiles file error[", print_r($res, 1), "]<br>\n";
+          if ($res['meta']['code'] !== 200) {
+            echo "fe::::lib.files:::processFiles - code[", $res['meta']['code'], "] file error[", print_r($res, 1), "]<br>\n";
             return;
           }
-          $files[$field][] = $res;
+          if (empty($res['data']['hash'])) {
+            echo "fe::::lib.files:::processFiles - no hash, file error[", print_r($res, 1), "]<br>\n";
+            return;
+          }
+          $files[$field][] = $res['data'];
         }
       }
     }
