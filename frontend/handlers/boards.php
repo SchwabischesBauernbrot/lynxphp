@@ -203,47 +203,7 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
     //echo "count[", count($posts), "]<br>\n";
     $threads_html .= $threadhdr_template;
     foreach($posts as $i => $post) {
-      $tmp = $thread_template;
-      $tmp = str_replace('{{op}}',      $i === 0 ? 'op' : '', $tmp);
-      $tmp = str_replace('{{subject}}', htmlspecialchars($post['sub']),  $tmp);
-      $tmp = str_replace('{{message}}', htmlspecialchars($post['com']),  $tmp);
-      $tmp = str_replace('{{name}}',    htmlspecialchars($post['name']), $tmp);
-      $tmp = str_replace('{{no}}',        $post['no'],   $tmp);
-      $tmp = str_replace('{{threadNum}}', empty($post['threadid']) ? $post['no'] : $post['threadid'], $tmp);
-      $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-      $tmp = str_replace('{{jstime}}', date('c', $post['created_at']), $tmp);
-      $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $post['created_at']), $tmp);
-      $files_html = '';
-      foreach($post['files'] as $file) {
-        $ftmpl = $file_template;
-        $type = $file['type'] ? $file['type'] : 'image';
-        if ($type === 'audio') {
-          $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg';
-          if (!$isPlayable) {
-            $type = 'file';
-          }
-        }
-        if ($type === 'video') {
-          $isPlayable = $file['mime_type'] === 'video/mp4' || $file['mime_type'] === 'video/webm' || $file['mime_type'] === 'video/ogg';
-          if (!$isPlayable) {
-            $type = 'file';
-          }
-        }
-        if ($type === 'file' || $type === 'image') $type = 'img';
-        // disable images until we can mod...
-        $ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
-        $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
-        if (isset($file['size'])) {
-          $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
-        }
-        $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
-        $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
-        $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" height="232" width="250" loading="lazy" controls loop preload=no />', $ftmpl);
-        $files_html .= $ftmpl;
-      }
-      //echo "<pre>", $post['no'], "files_tempate[", htmlspecialchars($files_html), "] count[", count($post['files']),"] data[",print_r($post['files'], 1),"] [",print_r($file_template, 1),"]</pre>\n";
-      $tmp = str_replace('{{files}}', $files_html, $tmp);
-      $threads_html .= $tmp;
+      $threads_html .= renderPost($boardUri, $post, array('checkable' => true));
     }
     $threads_html .= $threadftr_template;
   }
@@ -292,47 +252,7 @@ function getThreadHandler($boardUri, $threadNum) {
   foreach($posts as $post) {
     //echo "<pre>", print_r($post, 1), "</pre>\n";
     $tmp = $post_template;
-    $tmp = str_replace('{{subject}}', htmlspecialchars($post['sub']),  $tmp);
-    $tmp = str_replace('{{message}}', htmlspecialchars($post['com']),  $tmp);
-    $tmp = str_replace('{{name}}',    htmlspecialchars($post['name']), $tmp);
-    $tmp = str_replace('{{no}}',      $post['no'],   $tmp);
-    $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-    $tmp = str_replace('{{threadNum}}', $threadNum, $tmp);
-    $tmp = str_replace('{{jstime}}', date('c', $post['created_at']), $tmp);
-    $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $post['created_at']), $tmp);
-    $files_html = '';
-    // tn_w, tn_h aren't enabled yet
-    //echo "<pre>", print_r($post['files'], 1), "</pre>\n";
-    foreach($post['files'] as $file) {
-      $ftmpl = $file_template;
-      $type = $file['type'] ? $file['type'] : 'image';
-      if ($type === 'audio') {
-        $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg';
-        if (!$isPlayable) {
-          $type = 'file';
-        }
-      }
-      if ($type === 'video') {
-        $isPlayable = $file['mime_type'] === 'video/mp4' || $file['mime_type'] === 'video/webm' || $file['mime_type'] === 'video/ogg';
-        if (!$isPlayable) {
-          $type = 'image';
-        }
-      }
-      if ($type === 'file' || $type === 'image') $type = 'img';
-      //print_r($file);
-      // disbale images until we can mod...
-      $ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
-      $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
-      $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
-      $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
-      $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
-      $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" height="232" width="250" loading="lazy" controls loop preload=no />', $ftmpl);
-      $files_html .= $ftmpl;
-    }
-    $tmp = str_replace('{{files}}', $files_html, $tmp);
-    $replies_html = '';
-    $tmp = str_replace('{{replies}}', $replies_html, $tmp);
-    $posts_html .= $tmp;
+    $posts_html .= renderPost($boardUri, $post, array('checkable' => true));
   }
 
   $boardData = getBoard($boardUri);
