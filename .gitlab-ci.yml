@@ -23,7 +23,7 @@
   - touch backend/config_.php
   - echo "<?php // local config" >> backend/config_.php
   - echo "define('DB_HOST', 'pgsql');" >> backend/config_.php
-  - echo "define('DB_USER', 'runner');" >> backend/config_.php
+  - echo "define('DB_USER', 'lynxphp');" >> backend/config_.php
   - echo "define('DB_PWD', '');" >> backend/config_.php
   - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
   - echo "define('DB_DRIVER', 'pgsql');" >> backend/config_.php
@@ -45,7 +45,7 @@ variables:
   MYSQL_ROOT_PASSWORD: "mysql"
   MYSQL_ROOT_HOST: "%"
   POSTGRES_DB: "lynxphp"
-  POSTGRES_USER: "runner"
+  POSTGRES_USER: "lynxphp"
   POSTGRES_PASSWORD: ""
   POSTGRES_HOST_AUTH_METHOD: trust
 
