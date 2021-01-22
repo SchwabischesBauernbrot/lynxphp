@@ -105,7 +105,7 @@ test:latest:cli:pgsql:
 test:latest:apache:mysql:
   before_script:
     - *debian
-    - a2enmod rewrite && sed '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /etc/apache2/httpd.conf && service apache2 restart
+    - a2enmod rewrite && sed '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /usr/local/apache2/conf/httpd.conf && service apache2 restart
     - mv /var/www/html /var/www/old && cd .. && mv lynxphp /var/www && ln -s /var/www/lynxphp/frontend /var/www/html && ln -s /var/www/lynxphp/backend /var/www/html/backend && cd /var/www/lynxphp
     - *default-mysql
   image: php:8.0.0-apache
@@ -137,7 +137,7 @@ test:latest:apache:mysql:
 test:latest:apache:pgsql:
   before_script:
     - *debian
-    - a2enmod rewrite && sed '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /etc/apache2/httpd.conf && service apache2 restart
+    - a2enmod rewrite && sed '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /usr/local/apache2/conf/httpd.conf && service apache2 restart
     - mv /var/www/html /var/www/old && cd .. && mv lynxphp /var/www && ln -s /var/www/lynxphp/frontend /var/www/html && ln -s /var/www/lynxphp/backend /var/www/html/backend && cd /var/www/lynxphp
     - *default-pgsql
   image: php:8.0.0-apache
