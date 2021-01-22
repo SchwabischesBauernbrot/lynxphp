@@ -67,6 +67,9 @@ variables:
 #   - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
+# cli is always alpine
+# will keep it this way until we find a bug that requires us to test debian
+
 test:latest:cli:mysql:
   before_script:
     - *alpine
@@ -87,7 +90,7 @@ test:latest:cli:pgsql:
     - *default-pgsql
   image: php:8.0.0-cli-alpine
   services:
-    - name: postgres:12.2-alpine
+    - name: postgres:latest
       alias: pgsql
   tags:
     - docker
@@ -95,6 +98,10 @@ test:latest:cli:pgsql:
     - tests/run.sh
 #  allow_failure: true
 
+# apache is always debian
+# so alpine behaviors maybe different
+
+# debian
 test:latest:apache:mysql:
   before_script:
     - *debian
@@ -107,6 +114,9 @@ test:latest:apache:mysql:
     - docker
   script:
     - tests/run.sh
+    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar
+    - chmod u+x phpunit
+    - ./phpunit tests/integration
 
 #test:latest:nginx:mysql:
 #  before_script:
@@ -121,18 +131,22 @@ test:latest:apache:mysql:
 #  script:
 #    - tests/run.sh
 
+# debian
 test:latest:apache:pgsql:
   before_script:
     - *debian
     - *default-pgsql
   image: php:8.0.0-apache
   services:
-    - name: postgres:12.2-alpine
+    - name: postgres:latest
       alias: pgsql
   tags:
     - docker
   script:
     - tests/run.sh
+    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar
+    - chmod u+x phpunit
+    - ./phpunit tests/integration
 
 #test:latest:nginx:pgsql:
 #  before_script:
