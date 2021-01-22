@@ -33,28 +33,43 @@ function removeExif($old, $new) {
 }
 
 function processFiles($boardUri, $files_json, $threadid, $postid) {
+  $issues = array();
   $files = json_decode($files_json, true);
+  if ($files === false) {
+    $issues[] = 'json decode failure: ' . $files_json;
+    return $issues;
+  }
   $threadid = (int)$threadid; // prevent any .. tricks
   $postid = (int)$postid; // prevent any .. tricks
 
   if (!is_array($files)) {
-    return;
+    // ok not to have files
+    //$issues[] = 'no files';
+    return $issues;
   }
   global $db;
   $post_files_model = getPostFilesModel($boardUri);
   foreach($files as $num => $file) {
+    if (!empty($file['meta'])) {
+      $issues[] = $num . ' - no hash but got meta';
+      continue;
+    }
     if (empty($file['hash'])) {
-      // FIXME; complains somewhere
+      $issues[] = $num . ' - no hash';
       continue;
     }
     // move file into path
     $srcPath = 'storage/tmp/'.$file['hash'];
     if (!file_exists($srcPath)) {
+      $issues[] = $num . ' - '.$file['hash'] . ' does not exist';
       continue;
     }
     $threadPath = 'storage/boards/' . $boardUri . '/' . $threadid;
     if (!file_exists($threadPath)) {
-      mkdir($threadPath);
+      if (!mkdir($threadPath)) {
+        $issues[] = $num . ' - can not make ' . $threadPath;
+        continue;
+      }
     }
     $arr = explode('.', $file['name']);
     $ext = end($arr);
@@ -88,7 +103,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     }
     // FIXME: thumbnail?
 
-    $db->insert($post_files_model, array(array(
+    $id = $db->insert($post_files_model, array(array(
       'postid' => $postid,
       'sha256' => $file['hash'],
       'path'   => $finalPath,
@@ -103,7 +118,11 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       'filedeleted' => 0,
       'spoiler' => 0,
     )));
+    if (!$id) {
+      $issues[] = $num . ' - '.$file['hash'] . ' database error';
+    }
   }
+  return $issues;
 }
 
 ?>
