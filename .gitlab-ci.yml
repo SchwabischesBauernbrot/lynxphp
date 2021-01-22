@@ -78,6 +78,20 @@ test:latest:cli:mysql:
     - tests/run.sh
 #  allow_failure: true
 
+test:latest:cli:pgsql:
+  before_script:
+    - *alpine
+    - *default-pgsql
+  image: php:8.0.0-cli-alpine
+  services:
+    - name: postgres:12.2-alpine
+      alias: pgsql
+  tags:
+    - docker
+  script:
+    - tests/run.sh
+#  allow_failure: true
+
 test:latest:apache:mysql:
   before_script:
     - *alpine
