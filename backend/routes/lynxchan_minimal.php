@@ -39,7 +39,7 @@ $router->post('/login', function($request) {
   global $db, $models;
   // login, password, remember
   if (!hasPostVars(array('login', 'password'))) {
-    return;
+    return sendResponse(array(), 400, 'Requires login and password');
   }
   $res = $db->find($models['user'], array('criteria' => array(
     array('username', '=', $_POST['login']),
@@ -81,7 +81,7 @@ $router->post('/createBoard', function($request) {
     return;
   }
   if (!hasPostVars(array('boardUri', 'boardName', 'boardDescription'))) {
-    return;
+    return sendResponse(array(), 400, 'Requires boardUri, boardName and boardDescription');
   }
   $boardUri = strtolower($_POST['boardUri']);
   $res = $db->find($models['board'], array('criteria'=>array(
@@ -122,7 +122,7 @@ $router->post('/newThread', function($request) {
   global $db;
   // require image with each thread
   if (!hasPostVars(array('boardUri', 'files'))) {
-    return;
+    return sendResponse(array(), 400, 'Requires boardUri and files');
   }
   $user_id = (int)getUserID();
   $boardUri = $_POST['boardUri'];
@@ -150,7 +150,7 @@ $router->post('/newThread', function($request) {
 $router->post('/replyThread', function($request) {
   global $db;
   if (!hasPostVars(array('boardUri', 'threadId'))) {
-    return;
+    return sendResponse(array(), 400, 'Requires boardUri and threadId');
   }
   $user_id = (int)getUserID();
   $boardUri = $_POST['boardUri'];
@@ -173,13 +173,20 @@ $router->post('/replyThread', function($request) {
     'deleted' => 0,
   )));
   $data = $id;
-  processFiles($boardUri, $_POST['files'], $threadid, $id);
+  $issues = processFiles($boardUri, $_POST['files'], $threadid, $id);
 
   // bump thread
-  $urow = array('updated_at' => '');
+  $urow = array();
   $db->update($posts_model, $urow, array('criteria'=>array(
     array('postid', '=', $threadid),
   )));
+
+  if (count($issues)) {
+    return sendResponse(array(
+      'issues' => $issues,
+      'id' => $data
+    ));
+  }
 
   sendResponse($data);
 });
