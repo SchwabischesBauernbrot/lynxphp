@@ -3,7 +3,7 @@
 #  paths:
 #  - vendor/
 
-.default: &default
+.default-mysql: &default-mysql
   # Install required PHP extensions
   - docker-php-ext-install -j$(nproc) mysqli curl
   # set up config files
@@ -14,6 +14,19 @@
   - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
   - echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
   - touch frontend/config_.php
+
+.default-pgsql: &default-pgsql
+  # Install required PHP extensions
+  - docker-php-ext-install -j$(nproc) pgsql curl
+  # set up config files
+  - touch backend/config_.php
+  - echo "<?php // local config" >> backend/config_.php
+  - echo "define('DB_HOST', 'pgsql');" >> backend/config_.php
+  - echo "define('DB_USER', 'runner');" >> backend/config_.php
+  - echo "define('DB_PWD', '');" >> backend/config_.php
+  - echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
+  - touch frontend/config_.php
+
 
 # Why use debian if alpine is faster? Robustness tests?
 .debian: &debian
@@ -28,6 +41,10 @@ variables:
   MYSQL_DATABASE: "lynxphp"
   MYSQL_ROOT_PASSWORD: "mysql"
   MYSQL_ROOT_HOST: "%"
+  POSTGRES_DB: "lynxphp
+  POSTGRES_USER: runner
+  POSTGRES_PASSWORD: ""
+  POSTGRES_HOST_AUTH_METHOD: trust
 
 # We test PHP5.6 (the default) with MySQL
 # Select image from https://hub.docker.com/_/php/
@@ -50,7 +67,7 @@ variables:
 test:php-latest:mysql-latest:
   before_script:
     - *alpine
-    - *default
+    - *default-mysql
   image: php:8.0.0-cli-alpine
   services:
     - name: mysql/mysql-server:latest
@@ -60,3 +77,56 @@ test:php-latest:mysql-latest:
   script:
     - tests/run.sh
 #  allow_failure: true
+
+test:php-latest:mysql-latest:apache-latest:
+  before_script:
+    - *alpine
+    - *default-mysql
+  image: php:8.0.0-apache-alpine
+  services:
+    - name: mysql/mysql-server:latest
+      alias: mysql
+  tags:
+    - docker
+  script:
+    - tests/run.sh
+
+test:php-latest:mysql-latest:nginx-latest:
+  before_script:
+    - *alpine
+    - *default-mysql
+  image: php:8.0.0-nginx-alpine
+  services:
+    - name: mysql/mysql-server:latest
+      alias: mysql
+  tags:
+    - docker
+  script:
+    - tests/run.sh
+
+test:php-latest:pgsql-latest:apache-latest:
+  before_script:
+    - *alpine
+    - *default-pgsql
+  image: php:8.0.0-apache-alpine
+  services:
+    - name: pgsql/postgres:12.2-alpine
+      alias: pgsql
+  tags:
+    - docker
+  script:
+    - tests/run.sh
+
+test:php-latest:pgsql-latest:nginx-latest:
+  before_script:
+    - *alpine
+    - *default-pgsql
+  image: php:8.0.0-nginx-alpine
+  services:
+    - name: pgsql/postgres:12.2-alpine
+      alias: pgsql
+  tags:
+    - docker
+  script:
+    - tests/run.sh
+
