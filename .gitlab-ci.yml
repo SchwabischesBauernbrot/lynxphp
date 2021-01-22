@@ -41,7 +41,7 @@ variables:
   MYSQL_DATABASE: "lynxphp"
   MYSQL_ROOT_PASSWORD: "mysql"
   MYSQL_ROOT_HOST: "%"
-  POSTGRES_DB: "lynxphp
+  POSTGRES_DB: "lynxphp"
   POSTGRES_USER: runner
   POSTGRES_PASSWORD: ""
   POSTGRES_HOST_AUTH_METHOD: trust
