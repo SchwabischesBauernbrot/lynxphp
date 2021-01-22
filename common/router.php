@@ -33,7 +33,7 @@ class Router {
     }
   }
   // only done on the backend...
-  function fromResource($name, $res) {
+  function fromResource($name, $res, $moduleDir) {
     if (!isset($res['handlerFile'])) {
       return 'handlerFile is not set';
     }
@@ -48,7 +48,7 @@ class Router {
       }
     }
 
-    $func = function($request) use ($res) {
+    $func = function($request) use ($res, $moduleDir) {
       // get session
       $user_id = null;
       if (!empty($res['sendSession'])) {
@@ -64,6 +64,13 @@ class Router {
       $ip = null;
       if (!empty($res['sendIP'])) {
         $ip = getip();
+      }
+
+      if (is_readable($moduleDir . 'shared.php')) {
+        $shared = include $moduleDir . 'shared.php';
+      }
+      if (is_readable($moduleDir . 'be/common.php')) {
+        $common = include $moduleDir . 'be/common.php';
       }
 
       // make pass a callback to handle response
