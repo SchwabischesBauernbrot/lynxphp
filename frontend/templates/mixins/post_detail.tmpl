@@ -1,10 +1,10 @@
 <div class="anchor" id="{{no}}"></div>
-<div class="post-container op" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
+<div class="post-container {{op}}" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
+  <div class="post-info">
     <span>
       {{checkable}}
       <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
     </span>
-  <div class="post-info">
     <span class="post-links">
       <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">No.</a>
       <span class="post-quoters">
@@ -31,17 +31,18 @@
 <!-- loop -->
   <div class="post-file">
     <span class="post-file-info">
-      <span>
-        <a href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{filename}}</a>
-      </span>
-      <br/>
-      <span>({{size}}, {{width}}x{{height}})</span>
     </span>
     <div class="post-file-src" data-type="image" data-attachment="false">
       <a target="_blank" href="{{path}}">
-        <img class="file-thumb" src="{{path}}" height="232" width="250" loading="lazy"/>
+        {{thumb}}
       </a>
     </div>
+    <span class="post-file-info">
+      <span>
+        <a href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{filename}}</a>
+      </span>
+      <span>({{size}}, {{width}}x{{height}})</span>
+    </span>
   </div>
 <!-- end -->
 <!-- loop -->
