@@ -186,6 +186,7 @@ $router->post('/:uri/post', function($request) {
   // validate results
   $res = processFiles();
   $files = $res['handles']['file'];
+
   // make post...
   if (empty($_POST['thread'])) {
     // new thead
@@ -204,6 +205,9 @@ $router->post('/:uri/post', function($request) {
     ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session')));
     //echo "json[$json]<Br>\n";
     $result = json_decode($json, true);
+    if ($result === false) {
+      wrapContent('Post Error: <pre>' . $json . '</pre>');
+    }
     //echo "<pre>thread", print_r($result, 1), "</pre>\n";
     //return;
     if (is_numeric($result['data'])) {
@@ -230,6 +234,10 @@ $router->post('/:uri/post', function($request) {
     ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session')));
     //echo "json[$json]<Br>\n";
     $result = json_decode($json, true);
+    // can't parse
+    if ($result === false) {
+      wrapContent('Post Error: <pre>' . $json . '</pre>');
+    }
     //echo "<pre>reply", print_r($result, 1), "</pre>\n";
     //return;
     if (is_numeric($result['data'])) {
