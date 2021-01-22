@@ -12,7 +12,8 @@
   - echo "define('DB_HOST', 'mysql');" >> backend/config_.php
   - echo "define('DB_USER', 'root');" >> backend/config_.php
   - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
-  - echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
+  - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
+  - echo "?>"  >> backend/config_.php
   - touch frontend/config_.php
 
 .default-pgsql: &default-pgsql
@@ -22,19 +23,21 @@
   - touch backend/config_.php
   - echo "<?php // local config" >> backend/config_.php
   - echo "define('DB_HOST', 'pgsql');" >> backend/config_.php
-  - echo "define('DB_USER', 'runner');" >> backend/config_.php
+  - echo "define('DB_USER', 'lynxphp');" >> backend/config_.php
   - echo "define('DB_PWD', '');" >> backend/config_.php
-  - echo "define('DB_NAME', 'lynxphp'); ?>" >> backend/config_.php
+  - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
+  - echo "define('DB_DRIVER', 'pgsql');" >> backend/config_.php
+  - echo "?>"  >> backend/config_.php
   - touch frontend/config_.php
 
 
 # Why use debian if alpine is faster? Robustness tests?
 .debian: &debian
   - apt-get update -yqq
-  - apt-get install git libcurl4-openssl-dev -yqq
+  - apt-get install -yqq git libcurl4-openssl-dev libpq-dev
 
 .alpine: &alpine
-  - apk add curl-dev
+  - apk add curl-dev postgresql-dev
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
@@ -42,7 +45,7 @@ variables:
   MYSQL_ROOT_PASSWORD: "mysql"
   MYSQL_ROOT_HOST: "%"
   POSTGRES_DB: "lynxphp"
-  POSTGRES_USER: runner
+  POSTGRES_USER: "lynxphp"
   POSTGRES_PASSWORD: ""
   POSTGRES_HOST_AUTH_METHOD: trust
 
@@ -64,7 +67,10 @@ variables:
 #   - tests/run.sh
 #  - vendor/bin/phpunit --configuration phpunit_mysql.xml --coverage-text
 
-test:php-latest:mysql-latest:
+# cli is always alpine
+# will keep it this way until we find a bug that requires us to test debian
+
+test:latest:cli:mysql:
   before_script:
     - *alpine
     - *default-mysql
@@ -78,11 +84,29 @@ test:php-latest:mysql-latest:
     - tests/run.sh
 #  allow_failure: true
 
-test:php-latest:mysql-latest:apache-latest:
+test:latest:cli:pgsql:
   before_script:
     - *alpine
+    - *default-pgsql
+  image: php:8.0.0-cli-alpine
+  services:
+    - name: postgres:latest
+      alias: pgsql
+  tags:
+    - docker
+  script:
+    - tests/run.sh
+#  allow_failure: true
+
+# apache is always debian
+# so alpine behaviors maybe different
+
+# debian
+test:latest:apache:mysql:
+  before_script:
+    - *debian
     - *default-mysql
-  image: php:8.0.0-apache-alpine
+  image: php:8.0.0-apache
   services:
     - name: mysql/mysql-server:latest
       alias: mysql
@@ -90,43 +114,50 @@ test:php-latest:mysql-latest:apache-latest:
     - docker
   script:
     - tests/run.sh
+    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar
+    - chmod u+x phpunit
+    - ./phpunit tests/integration
 
-test:php-latest:mysql-latest:nginx-latest:
-  before_script:
-    - *alpine
-    - *default-mysql
-  image: php:8.0.0-nginx-alpine
-  services:
-    - name: mysql/mysql-server:latest
-      alias: mysql
-  tags:
-    - docker
-  script:
-    - tests/run.sh
+#test:latest:nginx:mysql:
+#  before_script:
+#    - *alpine
+#    - *default-mysql
+#  image: php:8.0.0-nginx-alpine
+#  services:
+#    - name: mysql/mysql-server:latest
+#      alias: mysql
+#  tags:
+#    - docker
+#  script:
+#    - tests/run.sh
 
-test:php-latest:pgsql-latest:apache-latest:
+# debian
+test:latest:apache:pgsql:
   before_script:
-    - *alpine
+    - *debian
     - *default-pgsql
-  image: php:8.0.0-apache-alpine
+  image: php:8.0.0-apache
   services:
-    - name: pgsql/postgres:12.2-alpine
+    - name: postgres:latest
       alias: pgsql
   tags:
     - docker
   script:
     - tests/run.sh
+    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar
+    - chmod u+x phpunit
+    - ./phpunit tests/integration
 
-test:php-latest:pgsql-latest:nginx-latest:
-  before_script:
-    - *alpine
-    - *default-pgsql
-  image: php:8.0.0-nginx-alpine
-  services:
-    - name: pgsql/postgres:12.2-alpine
-      alias: pgsql
-  tags:
-    - docker
-  script:
-    - tests/run.sh
+#test:latest:nginx:pgsql:
+#  before_script:
+#    - *alpine
+#    - *default-pgsql
+#  image: php:8.0.0-nginx-alpine
+#  services:
+#    - name: postgres:12.2-alpine
+#      alias: pgsql
+#  tags:
+#    - docker
+#  script:
+#    - tests/run.sh
 
