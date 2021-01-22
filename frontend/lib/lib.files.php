@@ -26,7 +26,6 @@ function processFiles($filter_fields = false) {
       // each field could have multiple file support...
       $files[$field] = array();
       if (is_array($_FILES[$field]['tmp_name'])) {
-        echo "detected multiple files<br>\n";
         foreach($_FILES[$field]['tmp_name'] as $i=>$path) {
           $res = sendFile($path, $_FILES[$field]['type'][$i], $_FILES[$field]['name'][$i]);
           // check for error
