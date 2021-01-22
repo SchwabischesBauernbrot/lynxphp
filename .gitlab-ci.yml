@@ -17,6 +17,7 @@
 
 .default-pgsql: &default-pgsql
   # Install required PHP extensions
+  - apt install libpq-dev
   - docker-php-ext-install -j$(nproc) pgsql curl
   # set up config files
   - touch backend/config_.php
