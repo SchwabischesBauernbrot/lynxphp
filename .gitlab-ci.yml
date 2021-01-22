@@ -105,6 +105,8 @@ test:latest:cli:pgsql:
 test:latest:apache:mysql:
   before_script:
     - *debian
+    - a2enmod rewrite && sed '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' httpd.conf && /etc/init.d/apache2 restart
+    - mv /var/www/html /var/www/old && cd .. && mv lynxphp /var/www && ln -s /var/www/lynxphp/frontend /var/www/html && ln -s /var/www/lynxphp/backend /var/www/html/backend
     - *default-mysql
   image: php:8.0.0-apache
   services:
@@ -135,6 +137,8 @@ test:latest:apache:mysql:
 test:latest:apache:pgsql:
   before_script:
     - *debian
+    - a2enmod rewrite && sed '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' httpd.conf && /etc/init.d/apache2 restart
+    - mv /var/www/html /var/www/old && cd .. && mv lynxphp /var/www && ln -s /var/www/lynxphp/frontend /var/www/html && ln -s /var/www/lynxphp/backend /var/www/html/backend
     - *default-pgsql
   image: php:8.0.0-apache
   services:
