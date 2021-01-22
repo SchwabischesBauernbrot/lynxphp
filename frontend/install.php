@@ -58,6 +58,15 @@ if (!file_exists('../common') || !is_dir('../common')) {
 }
 include '../common/post_vars.php';
 
+// assuming ran by php/webserver
+if (function_exists('posix_getpwuid')) {
+  $arr = posix_getpwuid(posix_geteuid());
+  //print_r($user);
+  $user = $arr['name'];
+} else {
+  $user = getenv("username");
+}
+
 // detect settings override...
 if (file_exists('backend') && is_dir('backend')) {
   // local backend tests
@@ -78,13 +87,6 @@ if (file_exists('backend') && is_dir('backend')) {
   }
   // uploads configuration
   if (!file_exists('storage') || !is_dir('storage') || !is_writeable('storage')) {
-    if (function_exists('posix_getpwuid')) {
-      $arr = posix_getpwuid(posix_geteuid());
-      //print_r($user);
-      $user = $arr['name'];
-    } else {
-      $user = getenv("username");
-    }
     echo "Backend's storage directory is not yet made OR not writeable by ", $user, ", please create<br>\n";
     exit(1);
   }
@@ -118,6 +120,24 @@ if ($result === false) {
   echo "It not return JSON<br>\n";
   exit(1);
 }
+
+$json = curlHelper(BACKEND_BASE_URL . '/opt/boards.json');
+$result = json_decode($json, true);
+//echo "<pre>", print_r($result, 1), "</pre>";
+echo '<ul>';
+foreach($result['data'] as $b) {
+  // threads, posts, udpated_at
+  echo '<li>', $b['uri'], ' owned by ', $b['owner_id'], "\n";
+  $path = 'backend/storage/boards/' . $b['uri'];
+  if (!file_exists($path) || !is_dir($path) || !is_writeable($path)) {
+    echo "Exist: ", file_exists($path) ? 'yes' : 'no', "<br>\n";
+    echo "IsDirectory: ", is_dir($path) ? 'yes' : 'no', "<br>\n";
+    echo "IsWritable: ", is_writeable($path) ? 'yes' : 'no', "<br>\n";
+    echo $b['uri'] . "'s storage directory [$path] is not yet made OR not writeable by ", $user, ", please create<br>\n";
+    exit(1);
+  }
+}
+echo '</ul>';
 
 echo "If it makes it this far in the script, then everything is a-ok<br>\n";
 
