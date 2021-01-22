@@ -34,7 +34,7 @@
 # Why use debian if alpine is faster? Robustness tests?
 .debian: &debian
   - apt-get update -yqq
-  - apt-get install -yqq git libcurl4-openssl-dev libpq-dev
+  - apt-get install -yqq git libcurl4-openssl-dev libpq-dev wget
 
 .alpine: &alpine
   - apk add curl-dev postgresql-dev
