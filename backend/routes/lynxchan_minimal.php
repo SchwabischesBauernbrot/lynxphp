@@ -90,6 +90,9 @@ $router->post('/createBoard', function($request) {
   if ($db->num_rows($res)) {
     return sendResponse(array(), 403, 'Board already exists');
   }
+  if (!mkdir('storage/boards/' . $boardUri)) {
+    return sendResponse(array(), 500, 'Can not create board directory for file uploads');
+  }
 
   // FIXME check unique fields...
   $db->insert($models['board'], array(array(
