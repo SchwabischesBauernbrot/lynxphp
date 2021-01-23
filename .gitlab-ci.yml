@@ -58,7 +58,7 @@ test:nginx:my:latest:
     - *default-mysql
     - apk add nginx
     - |
-      echo << END_TEXT
+      echo -e "
       user                            www;
       worker_processes                1;
 
@@ -100,7 +100,7 @@ test:nginx:my:latest:
               }
           }
       }
-      END_TEXT  > /etc/nginx/nginx.conf
+      "  > /etc/nginx/nginx.conf
     - nginx -t
     - rc-service nginx start
   image: php:8.0.0-fpm-alpine
