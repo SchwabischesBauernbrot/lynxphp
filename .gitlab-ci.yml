@@ -78,7 +78,7 @@ test:nginx:my:latest:
           keepalive_timeout           3000;
           server {
               listen                  80;
-              root                    /www;
+              root                    /var/www/html;
               index                   index.php;
               server_name             localhost;
               client_max_body_size    100m;
@@ -104,6 +104,7 @@ test:nginx:my:latest:
       "  > /etc/nginx/nginx.conf
     - cat /etc/nginx/nginx.conf
     - nginx -t
+    - mv /var/www/html /var/www/old && cd .. && mv lynxphp /var/www && ln -s /var/www/lynxphp/frontend /var/www/html && ln -s /var/www/lynxphp/backend /var/www/html/backend && cd /var/www/lynxphp
     - nginx # start it up
     - php-fpm -D
     - ps auxw|grep fpm
