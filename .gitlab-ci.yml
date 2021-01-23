@@ -76,7 +76,7 @@
 
             location /backend {
               if (!-e \$request_filename){
-                rewrite ^/backend(.*)$ /backend/index.php$1;
+                rewrite ^/backend(.*)$ /backend/index.php\$1;
               }
             }
 
