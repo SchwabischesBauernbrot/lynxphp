@@ -57,6 +57,7 @@ test:nginx:my:latest:
     - *alpine
     - *default-mysql
     - apk add nginx
+    - rc-service nginx stop
     - adduser -D -g 'www' www
     - |
       echo -e "
@@ -104,7 +105,7 @@ test:nginx:my:latest:
       "  > /etc/nginx/nginx.conf
     - cat /etc/nginx/nginx.conf
     - nginx -t
-    - rc-service nginx restart
+    - rc-service nginx start
   image: php:8.0.0-fpm-alpine
   services:
     - name: mysql/mysql-server:latest
