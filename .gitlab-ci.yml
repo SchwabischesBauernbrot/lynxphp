@@ -14,7 +14,9 @@
   - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
   - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
   - echo "?>"  >> backend/config_.php
+  - cp backend/config_.php backend/config_localhost.php
   - touch frontend/config_.php
+  - cp frontend/config_.php frontend/config_localhost.php
 
 .default-pgsql: &default-pgsql
   # Install required PHP extensions
@@ -28,8 +30,9 @@
   - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
   - echo "define('DB_DRIVER', 'pgsql');" >> backend/config_.php
   - echo "?>"  >> backend/config_.php
+  - cp backend/config_.php backend/config_localhost.php
   - touch frontend/config_.php
-
+  - cp frontend/config_.php frontend/config_localhost.php
 
 # Why use debian if alpine is faster? Robustness tests?
 .debian: &debian
@@ -116,8 +119,8 @@ test:latest:apache:mysql:
     - docker
   script:
     - tests/run.sh
-    - curl http://localhost/
     - curl http://localhost/backend/
+    - curl http://localhost/
     - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar
     - chmod u+x phpunit
     - ./phpunit tests/integration
@@ -150,8 +153,8 @@ test:latest:apache:pgsql:
     - docker
   script:
     - tests/run.sh
-    - curl http://localhost/
     - curl http://localhost/backend/
+    - curl http://localhost/
     - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar
     - chmod u+x phpunit
     - ./phpunit tests/integration
