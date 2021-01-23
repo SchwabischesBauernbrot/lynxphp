@@ -105,6 +105,7 @@ test:nginx:my:latest:
     - cat /etc/nginx/nginx.conf
     - nginx -t
     - nginx # start it up
+    - ps auxw|grep fpm
   image: php:8.0.0-fpm-alpine
   services:
     - name: mysql/mysql-server:latest
