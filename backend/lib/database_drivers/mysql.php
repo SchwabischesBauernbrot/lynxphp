@@ -183,7 +183,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
         foreach($missing as $fieldName => $f) {
           // ADD
           //echo "field[$fieldName]<br>\n";
-          $sql .= 'ADD ' . $fieldName . ' ' .modelToSQL($f['type']);
+          $sql .= 'ADD ' . $fieldName . modelToSQL($f['type']);
         }
         $sql = substr($sql, 0, -2);
       }
@@ -191,8 +191,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
         //echo "mysql::autoupdate - Need to change[$tablename]<br>\n";
         foreach($changes as $fieldName => $f) {
           echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
-          $sql .= 'MODIFY ' . $fieldName . ' ' .modelToSQL($f['type']);
+          $sql .= 'MODIFY ' . $fieldName . modelToSQL($f['type']);
         }
+        $sql = substr($sql, 0, -2);
       }
       $sql .= '';
       //echo "sql[$sql]<br>\n";
