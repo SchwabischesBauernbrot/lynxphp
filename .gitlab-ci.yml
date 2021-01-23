@@ -84,7 +84,7 @@ test:nginx:my:latest:
               client_max_body_size    100m;
 
               location /backend {
-                if (!-e $request_filename){
+                if (!-e \$request_filename){
                   rewrite ^/backend(.*)$ /backend/index.php$1;
                 }
               }
@@ -92,7 +92,7 @@ test:nginx:my:latest:
               location / {
                 # First attempt to serve request as file, then
                 # as directory, then fall back to displaying a 404.
-                try_files $uri $uri/ /index.php$uri;
+                try_files \$uri \$uri/ /index.php$uri;
               }
               location ~ [^/]\.php(/|$) {
                     fastcgi_pass      127.0.0.1:9000;
