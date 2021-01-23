@@ -142,7 +142,7 @@ test:nginx:pg:latest:
     - *default-post-database
     - *default-webserver
     - *default-nginx
-  image: php:8.0.0-nginx-alpine
+  image: php:8.0.0-fpm-alpine
   services:
     - name: postgres:12.2-alpine
       alias: pgsql
