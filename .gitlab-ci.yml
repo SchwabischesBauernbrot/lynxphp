@@ -40,7 +40,7 @@
   - apt-get install -yqq git libcurl4-openssl-dev libpq-dev wget curl
 
 .alpine: &alpine
-  - apk add curl-dev postgresql-dev wget curl
+  - apk add openrc curl-dev postgresql-dev wget curl
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
