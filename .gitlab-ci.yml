@@ -40,7 +40,7 @@
   - apt-get install -yqq git libcurl4-openssl-dev libpq-dev wget curl
 
 .alpine: &alpine
-  - apk add openrc curl-dev postgresql-dev wget curl
+  - apk add curl-dev postgresql-dev wget curl
 
 variables:
   # Configure mysql service (https://hub.docker.com/_/mysql/)
@@ -104,7 +104,8 @@ test:nginx:my:latest:
       "  > /etc/nginx/nginx.conf
     - cat /etc/nginx/nginx.conf
     - nginx -t
-    - rc-service nginx start
+    - ps axuw|grep nginx
+    - killall -HUP nginx
   image: php:8.0.0-fpm-alpine
   services:
     - name: mysql/mysql-server:latest
