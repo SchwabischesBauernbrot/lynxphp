@@ -73,7 +73,7 @@ variables:
 # cli is always alpine
 # will keep it this way until we find a bug that requires us to test debian
 
-test:latest:cli:mysql:
+test:cli:my:latest:
   before_script:
     - *alpine
     - *default-mysql
@@ -87,7 +87,7 @@ test:latest:cli:mysql:
     - tests/run.sh
 #  allow_failure: true
 
-test:latest:cli:pgsql:
+test:cli:pg:latest:
   before_script:
     - *alpine
     - *default-pgsql
@@ -105,12 +105,13 @@ test:latest:cli:pgsql:
 # so alpine behaviors maybe different
 
 # debian
-test:latest:apache:mysql:
+test:mod:my:latest:
   before_script:
     - *debian
     - a2enmod rewrite && sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /etc/apache2/apache2.conf && service apache2 restart
     - mv /var/www/html /var/www/old && cd .. && mv lynxphp /var/www && ln -s /var/www/lynxphp/frontend /var/www/html && ln -s /var/www/lynxphp/backend /var/www/html/backend && cd /var/www/lynxphp
     - *default-mysql
+    - service apache2 restart
   image: php:8.0.0-apache
   services:
     - name: mysql/mysql-server:latest
@@ -125,7 +126,7 @@ test:latest:apache:mysql:
     - chmod u+x phpunit
     - ./phpunit tests/integration
 
-#test:latest:nginx:mysql:
+#test:nginx:mys:atest:
 #  before_script:
 #    - *alpine
 #    - *default-mysql
@@ -139,12 +140,13 @@ test:latest:apache:mysql:
 #    - tests/run.sh
 
 # debian
-test:latest:apache:pgsql:
+test:mod:pg:latest:
   before_script:
     - *debian
-    - a2enmod rewrite && sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /etc/apache2/apache2.conf && service apache2 restart
+    - a2enmod rewrite && sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /etc/apache2/apache2.conf
     - mv /var/www/html /var/www/old && cd .. && mv lynxphp /var/www && ln -s /var/www/lynxphp/frontend /var/www/html && ln -s /var/www/lynxphp/backend /var/www/html/backend && cd /var/www/lynxphp
     - *default-pgsql
+    - service apache2 restart
   image: php:8.0.0-apache
   services:
     - name: postgres:latest
@@ -159,7 +161,7 @@ test:latest:apache:pgsql:
     - chmod u+x phpunit
     - ./phpunit tests/integration
 
-#test:latest:nginx:pgsql:
+#test:nginx:pg:latest:
 #  before_script:
 #    - *alpine
 #    - *default-pgsql
