@@ -104,8 +104,7 @@ test:nginx:my:latest:
       "  > /etc/nginx/nginx.conf
     - cat /etc/nginx/nginx.conf
     - nginx -t
-    - ps axuw|grep nginx
-    - killall -HUP nginx
+    - nginx # start it up
   image: php:8.0.0-fpm-alpine
   services:
     - name: mysql/mysql-server:latest
