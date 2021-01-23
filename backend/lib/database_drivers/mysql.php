@@ -178,25 +178,19 @@ class mysql_driver extends database_driver_base_class implements database_driver
       }
       $sql = 'alter table ' . $tableName . ' ';
       if (!$haveAll) {
-        //echo "Need to create<br>\n";
-        // ALTER TABLE
         foreach($missing as $fieldName => $f) {
-          // ADD
-          //echo "field[$fieldName]<br>\n";
           $sql .= 'ADD ' . $fieldName . modelToSQL($f['type']);
         }
         $sql = substr($sql, 0, -2);
       }
       if (!$noChanges) {
-        //echo "mysql::autoupdate - Need to change[$tablename]<br>\n";
         foreach($changes as $fieldName => $f) {
-          echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
           $sql .= 'MODIFY ' . $fieldName . modelToSQL($f['type']);
         }
         $sql = substr($sql, 0, -2);
       }
       $sql .= '';
-      //echo "sql[$sql]<br>\n";
+      //echo "mysql::autoupdate - sql[$sql]<br>\n";
       $res = mysqli_query($this->conn, $sql);
       $err = mysqli_error($this->conn);
       if ($err) {
