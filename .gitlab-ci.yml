@@ -52,11 +52,11 @@ variables:
   POSTGRES_PASSWORD: ""
   POSTGRES_HOST_AUTH_METHOD: trust
 
-test:nginx:my:atest:
+test:nginx:my:latest:
   before_script:
     - *alpine
     - *default-mysql
-  image: php:8.0.0-nginx-alpine
+  image: php:8.0.0-fpm-alpine
   services:
     - name: mysql/mysql-server:latest
       alias: mysql
