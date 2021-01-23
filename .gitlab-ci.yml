@@ -57,6 +57,7 @@ test:nginx:my:latest:
     - *alpine
     - *default-mysql
     - apk add nginx
+    - adduser -D -g 'www' www
     - |
       echo -e "
       user                            www;
