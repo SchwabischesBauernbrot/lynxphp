@@ -188,10 +188,10 @@ class mysql_driver extends database_driver_base_class implements database_driver
         $sql = substr($sql, 0, -2);
       }
       if (!$noChanges) {
-        echo "mysql::autoupdate - Need to change<br>\n";
+        //echo "mysql::autoupdate - Need to change[$tablename]<br>\n";
         foreach($changes as $fieldName => $f) {
-          //echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
-          //$sql .= 'MODIFY ' . $fieldName . ' ' .modelToSQL($f['type']);
+          echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
+          $sql .= 'MODIFY ' . $fieldName . ' ' .modelToSQL($f['type']);
         }
       }
       $sql .= '';
@@ -199,7 +199,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       $res = mysqli_query($this->conn, $sql);
       $err = mysqli_error($this->conn);
       if ($err) {
-        echo "mysql::autoupdate - update err[$err]<br>\n";
+        echo "mysql::autoupdate - update err[$err]<br>\nSQL[$sql]\n";
         return false;
       }
       return true;
