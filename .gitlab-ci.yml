@@ -6,6 +6,8 @@
 .init-tests: &init-tests
   - tests/run.sh
   - curl http://localhost/backend/
+  - curl http://localhost/backend/4chan/boards.json
+  - curl http://localhost/backend/opt/boards.json
   - curl http://localhost/
 
 .default-mysql: &default-mysql
@@ -95,7 +97,6 @@
   - nginx -t
   - nginx # start it up
   - php-fpm -D
-  - ps auxw|grep fpm
 
 # Why use debian if alpine is faster? Robustness tests?
 .debian: &debian
