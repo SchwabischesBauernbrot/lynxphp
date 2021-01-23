@@ -56,6 +56,53 @@ test:nginx:my:latest:
   before_script:
     - *alpine
     - *default-mysql
+    - apk add nginx
+    - |
+      echo << END_TEXT
+      user                            www;
+      worker_processes                1;
+
+      error_log                       /var/log/nginx/error.log warn;
+      pid                             /var/run/nginx.pid;
+
+      events {
+          worker_connections          1024;
+      }
+
+      http {
+          include                     /etc/nginx/mime.types;
+          default_type                application/octet-stream;
+          sendfile                    on;
+          access_log                  /var/log/nginx/access.log;
+          keepalive_timeout           3000;
+          server {
+              listen                  80;
+              root                    /www;
+              index                   index.php;
+              server_name             localhost;
+              client_max_body_size    100m;
+
+              location /backend {
+                if (!-e $request_filename){
+                  rewrite ^/backend(.*)$ /backend/index.php$1;
+                }
+              }
+
+              location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ /index.php$uri;
+              }
+              location ~ [^/]\.php(/|$) {
+                    fastcgi_pass      127.0.0.1:9000;
+                    fastcgi_index     index.php;
+                    include           fastcgi.conf;
+              }
+          }
+      }
+      END_TEXT  > /etc/nginx/nginx.conf
+    - nginx -t
+    - rc-service nginx start
   image: php:8.0.0-fpm-alpine
   services:
     - name: mysql/mysql-server:latest
@@ -64,3 +111,8 @@ test:nginx:my:latest:
     - docker
   script:
     - tests/run.sh
+    - curl http://localhost/backend/
+    - curl http://localhost/
+    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar
+    - chmod u+x phpunit
+    - ./phpunit tests/integration
