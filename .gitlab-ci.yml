@@ -104,7 +104,6 @@ test:nginx:my:latest:
       "  > /etc/nginx/nginx.conf
     - cat /etc/nginx/nginx.conf
     - nginx -t
-    - rc-service nginx stop
     - rc-service nginx start
   image: php:8.0.0-fpm-alpine
   services:
