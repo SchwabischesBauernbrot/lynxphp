@@ -27,6 +27,22 @@ foreach($banners as $banner) {
   $tmp = str_replace('{{backend}}', 'backend', $tmp);
   $tmp = str_replace('{{uri}}', $boardUri, $tmp);
   $tmp = str_replace('{{id}}', $banner['bannerid'], $tmp);
+
+  $w = $banner['w'];
+  $h = $banner['h'];
+  while($w > 640) {
+    $h *= 0.9;
+    $w *= 0.9;
+  }
+  while($h > 240) {
+    $h *= 0.9;
+    $w *= 0.9;
+  }
+  $ih = (int)$h;
+  $iw = (int)$w;
+
+  $tmp = str_replace('{{w}}', $iw, $tmp);
+  $tmp = str_replace('{{h}}', $ih, $tmp);
   $tmp = str_replace('{{image}}', $banner['image'], $tmp);
   $banners_html .= $tmp;
 }
