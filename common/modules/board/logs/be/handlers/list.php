@@ -2,11 +2,20 @@
 $params = $get();
 
 $boardData = boardMiddleware($request);
-global $db, $models;
-$res = $db->find($models['board_banner'], array('criteria' => array(
-  array('board_id', '=', $boardData['boardid']),
-)));
-$banners = $db->toArray($res);
-sendResponse($banners);
+
+$data = getBoardByUri($boardData['uri']);
+
+// $data['json']['reports']
+$reports = array();
+foreach($data['json']['reports'] as $r) {
+  $reports[] = array(
+    'id' => $r['id'],
+    'created_at' => $r['created_at'],
+    'status' => $r['status'],
+    'postid' => $r['postid'],
+  );
+}
+
+sendResponse($reports);
 
 ?>
