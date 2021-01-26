@@ -146,15 +146,35 @@ function boardCatalog($boardUri) {
   $posts_model = getPostsModel($boardUri);
   $post_files_model = getPostFilesModel($boardUri);
   // get a list of threads sorted by bump
+
+  // would be good to get the post count too
+  $postTable = modelToTableName($posts_model);
+  $posts_model['children'] = array(
+    array(
+      'type' => 'left',
+      'model' => $posts_model,
+      'srcField' => 'threadid',
+      'pluck' => array('count(ALIAS.postid) as reply_count'),
+      'groupby' => $postTable . '.postid',
+      //'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.postid)>0))',
+      'where' => array(
+        array('deleted', '=', 0)
+      ),
+    )
+  );
+
+
   $res = $db->find($posts_model, array('criteria' => array(
     array('threadid', '=', 0),
   ), 'order'=>'updated_at desc'));
   $page = 1;
   // FIXME: rewrite to be more memory efficient
+  // HOW?
   $threads = array();
   while($row = $db->get_row($res)) {
     postDBtoAPI($row, $post_files_model);
     $threads[$page][] = $row;
+    // do we need to add a page...
     if (count($threads[$page]) === $tpp) {
       $page++;
       $threads[$page] = array();
