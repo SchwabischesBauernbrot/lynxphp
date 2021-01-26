@@ -1,6 +1,5 @@
 <?php
-$now = time();
-$ms_now = microtime(true);
+$now = microtime(true);
 
 include '../common/post_vars.php';
 
