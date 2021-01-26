@@ -3,12 +3,12 @@
 return array(
   'user_mgmt' => array(
     'handlers' => array(
-      array(
-        'route'   => '/user/settings',
-        'handler' => 'list',
-      ),
     ),
     'forms' => array(
+      array(
+        'route' => '/user/settings',
+        'handler' => 'user_settings',
+      ),
       /*
       array(
         'route' => '/admin/users/add',
