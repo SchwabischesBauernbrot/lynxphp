@@ -24,11 +24,17 @@ if (file_exists($localConfig)) {
 if (!defined('BACKEND_BASE_URL')) define('BACKEND_BASE_URL', 'http://localhost/backend/');
 
 // what request path is the site design to run under
+// cannot include protocol
 if (!defined('BASE_HREF')) {
   // nginx: /index.php
   // maybe a different var would be better...
   // REQUEST_URI (but what does this look like in not /)
+  // without protocol
   define('BASE_HREF', rtrim(dirname(getServerField('SCRIPT_NAME', __FILE__)), '/') . '/');
 }
 
+// includes :PORT if needed
+if (!defined('BASE_HOST')) { define('BASE_HOST', getServerField('HTTP_HOST')); }
+// BASE_PATH is basically BASE_HREF
+if (!defined('DEV_MODE')) { define('DEV_MODE', false); }
 ?>
