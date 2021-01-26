@@ -18,16 +18,17 @@ $tmpl = $header;
 $reports_html = '';
 foreach ($result['reports'] as $r) {
   // _id, global, boardUri, threadId, postId, creaation
-  $thread = getBoardThread($boardUri, $r['threadId']);
-  $thisPost = array_filter($thread, function($t) use ($r) {
+  $threads = getBoardThread($r['boardUri'], $r['threadId']);
+  $thisPost = array_filter($threads['posts'], function($t) use ($r) {
     return $t['no'] === $r['postId'];
   });
   if (count($thisPost)) {
-    $thisPost = $thisPost[0];
+    $keys = array_keys($thisPost);
+    $thisPost = $thisPost[$keys[0]];
   }
   // close report...
   $tmp = $report_tmpl;
-  $tmp = str_replace('{{uri}}', $boardUri, $tmp);
+  $tmp = str_replace('{{uri}}', $r['boardUri'], $tmp);
 
   $tmp = str_replace('{{_id}}', $r['_id'], $tmp);
   $tmp = str_replace('{{zebra}}', ($r['_id'] % 2 === 1) ? 'odd' : 'even', $tmp);
@@ -35,10 +36,10 @@ foreach ($result['reports'] as $r) {
   $tmp = str_replace('{{threadId}}', $r['threadId'], $tmp);
   $tmp = str_replace('{{postId}}', $r['postId'], $tmp);
   $tmp = str_replace('{{creation}}', $r['creation'], $tmp);
-  $tmp = str_replace('{{post}}', renderPost($boardUri, $thisPost), $tmp);
+  $tmp = str_replace('{{post}}', renderPost($r['boardUri'], $thisPost), $tmp);
   $reports_html .= $tmp;
 }
-$tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
+$tmpl = str_replace('{{backURL}}', 'global.php', $tmpl);
 $tmpl = str_replace('{{reports}}', $reports_html, $tmpl);
 
 wrapContent($tmpl);
