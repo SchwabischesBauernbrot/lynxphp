@@ -2,7 +2,7 @@
 <div class="post-container {{op}}" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
   <div class="post-info">
     <span>
-      {{checkable}}
+{{postmeta}}
       <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
     </span>
     <span class="post-links">
@@ -23,10 +23,15 @@
   </div>
 </div>
 <!-- loop -->
-    <label>
-      <input class="post-check" type="checkbox" name="checkedposts" value="{{no}}"/>
-      <span class="post-name">{{name}}</span>
-    </label>
+        <input class="post-check" type="checkbox" name="checkedposts" value="{{no}}"/>
+<!-- end -->
+<!-- loop -->
+        <span class="post-icons">
+          {{icons}}
+        </span>
+<!-- end -->
+<!-- loop -->
+          <img src="/file/{{file}}.png" height="14" width="14" title="{{title}}">
 <!-- end -->
 <!-- loop -->
   <div class="post-file">
