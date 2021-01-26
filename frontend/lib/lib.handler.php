@@ -95,6 +95,12 @@ function wrapContent($content) {
   echo replace_tags($templates['header'], $tags), $content;
   readfile('templates/footer.tmpl');
   flush();
+  if (DEV_MODE) {
+    global $ms_now;
+    $diff = (microtime(true) - $ms_now) * 1000;
+    echo "took $diff ms<br>\n";
+    curl_log_report();
+  }
 }
 
 ?>
