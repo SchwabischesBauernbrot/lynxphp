@@ -12,8 +12,12 @@ function postDBtoAPI(&$row, $post_files_model) {
       'com' => 'Thread OP has been deleted but this placeholder is kept, so replies can be read',
       'sub' => '',
       'name' => '',
+      // no reasons to hide these...
       'created_at' => $row['created_at'],
+      'updated_at' => $row['updated_at'],
       'files' => array(),
+      // catalog uses this
+      'reply_count' => $row['reply_count'],
     );
     return;
   }
