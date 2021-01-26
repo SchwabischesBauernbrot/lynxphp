@@ -7,32 +7,58 @@ function renderPost($boardUri, $p, $options = false) {
 
   $templates = loadTemplates('mixins/post_detail');
   $checkable_template = $templates['loop0'];
-  $file_template      = $templates['loop1'];
-  $replies_template   = $templates['loop2'];
-  $reply_template     = $templates['loop3'];
+  $posticons_template = $templates['loop1'];
+  $icon_template      = $templates['loop2'];
+  $file_template      = $templates['loop3'];
+  $replies_template   = $templates['loop4'];
+  $reply_template     = $templates['loop5'];
 
-  $checkable = '';
+  $postmeta = '';
   if ($options['checkable']) {
-    $tmp = $checkable_template;
-    $tmp = str_replace('{{name}}', htmlspecialchars($p['name']), $tmp);
-    $tmp = str_replace('{{no}}', $p['no'], $tmp);
-    $tmp = str_replace('{{jstime}}', date('c', $p['created_at']), $tmp);
-    $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $p['created_at']), $tmp);
-    $checkable = $tmp;
+    $postmeta .= replace_tags($checkable_template, array('no' => $p['no']));
+  }
+  // FIXME: pipeline...
+  $icons = array();
+  if (isset($p['sticky']) && $p['sticky'] !== 'f') {
+    $icons[] = 'sticky';
+  }
+  if (isset($p['cyclic']) && $p['sticky'] !== 'f') {
+    $icons[] = 'cyclic';
+  }
+  if (count($icons)) {
+    $icons_html = '';
+    foreach($icons as $file) {
+      $tags = array(
+        'file' => $file,
+        'title' => $file,
+      );
+      $icons_html .= replace_tags($icon_template, $tags);
+    }
+    $tmp = $posticons_template;
+    $tmp = str_replace('{{icons}}', $icons_html, $tmp);
+    $postmeta .= $tmp;
+  }
+  // FIXME: this wrappers need to be controlled...
+  if (!empty($p['subject'])) {
+    $postmeta .= '<span class="post-subject">' . htmlspecialchars($p['subject']) . '</span>';
+  }
+  if (!empty($p['name'])) {
+    $postmeta .= '<span class="post-name">' . htmlspecialchars($p['name']) . '</span>';
+  }
+  if (!empty($p['flag'])) {
+    $flag = addslashes(htmlspecialchars($p['flag']));
+    $postmeta .= '<span class="flag flag-'.$p['flag_cc'].'" title="'.$flag.'" alt="'.$flag.'"></span>';
+  }
+  if (!empty($p['post-capcode'])) {
+    $postmeta .= '<span class="post-capcode">' . htmlspecialchars($p['post-capcode']) . '</span>';
+  }
+  if (!empty($p['user-id'])) {
+    $postmeta .= '<span class="user-id">' . htmlspecialchars($p['user-id']) . '</span>';
   }
 
-  $tmp = $templates['header'];
-  // $tmp = str_replace('{{op}}',      $i === 0 ? 'op' : '', $tmp);
-  $tmp = str_replace('{{op}}',  $p['threadid'] ? '' : 'op', $tmp);
-  $tmp = str_replace('{{subject}}', htmlspecialchars($p['sub']),  $tmp);
-  $tmp = str_replace('{{message}}', htmlspecialchars($p['com']),  $tmp);
-  $tmp = str_replace('{{name}}',    htmlspecialchars($p['name']), $tmp);
-  $tmp = str_replace('{{no}}',  $p['no'], $tmp);
-  $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-  $tmp = str_replace('{{threadNum}}', $p['threadid'] ? $p['threadid'] : $p['no'], $tmp);
-  $tmp = str_replace('{{jstime}}', date('c', $p['created_at']), $tmp);
-  $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $p['created_at']), $tmp);
-  $tmp = str_replace('{{checkable}}', $checkable, $tmp);
+  if ($postmeta !== '' && $options['checkable']) {
+    $postmeta = '      <label>' . "\n" . $postmeta . '      </label>';
+  }
 
   // tn_w, tn_h aren't enabled yet
   $files_html = '';
@@ -74,10 +100,24 @@ function renderPost($boardUri, $p, $options = false) {
     $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />', $ftmpl);
     $files_html .= $ftmpl;
   }
-  $tmp = str_replace('{{files}}', $files_html, $tmp);
 
   $replies_html = '';
-  $tmp = str_replace('{{replies}}', $replies_html, $tmp);
+
+  $tags = array(
+    'op'        => $p['threadid'] ? '': 'op',
+    'uri'       => $boardUri,
+    'threadNum' => $p['threadid'] ? $p['threadid'] : $p['no'],
+    'no'        => $p['no'],
+    'subject'   => htmlspecialchars($p['sub']),
+    'message'   => htmlspecialchars($p['com']),
+    'name'      => htmlspecialchars($p['name']),
+    'postmeta'  => $postmeta,
+    'files'     => $files_html,
+    'replies'   => $replies_html,
+    'jstime'    => gmdate('c', $p['created_at']),
+    'human_created_at' => gmdate('n/j/Y H:i:s', $p['created_at']),
+  );
+  $tmp = replace_tags($templates['header'], $tags);
 
   return $tmp;
 }
