@@ -78,6 +78,7 @@ class package {
         echo "Failed to setup [", $rsrcArr['handlerFile'], "]<br>\n";
       }
     }
+    //echo "Adding [$label] to [", $this->name, "]<br>\n";
     $this->resources[$label] = $rsrcArr;
   }
   function useResource($label, $params = false, $options = false) {
@@ -128,10 +129,10 @@ class package {
         if (is_array($params)) {
           foreach($params as $k=>$v) {
             // should we urlencode k too?
-            if (is_string($v)) {
+            if (is_string($v) || is_bool($v)) {
               $rsrc['querystring'][] = $k . '=' . urlencode($v);
             } else {
-              echo "<pre>lib.pacakge:::package::useResource - What do I do with [$k] of type [",gettype($v),"]=[", print_r($v, 1),"]</pre>\n";
+              echo "<pre>lib.pacakge:::package::useResource($label) - What do I do with [$k] of type [",gettype($v),"]=[", print_r($v, 1),"]</pre>\n";
             }
           }
         }
