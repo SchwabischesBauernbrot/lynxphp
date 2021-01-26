@@ -91,7 +91,7 @@ function getBoardsHandler() {
         $last = $seconds . ' seconds ago';
       }
       if ($minutes) {
-        $last = $days    . ' minute ago';
+        $last = $minutes    . ' minute ago';
       }
       if ($hours) {
         $last = $hours   . ' hours ago';
@@ -247,15 +247,16 @@ function getThreadHandler($boardUri, $threadNum) {
   $tmp = str_replace('{{uri}}', $boardUri, $tmp);
   $boardnav_html = $tmp;
 
-  $posts = getBoardThread($boardUri, $threadNum);
+  $boardData = getBoardThread($boardUri, $threadNum);
   $posts_html = '';
-  foreach($posts as $post) {
+  $files = 0;
+  foreach($boardData['posts'] as $post) {
     //echo "<pre>", print_r($post, 1), "</pre>\n";
     $tmp = $post_template;
     $posts_html .= renderPost($boardUri, $post, array('checkable' => true));
+    $files += count($post['files']);
   }
 
-  $boardData = getBoard($boardUri);
   $p = array(
     'boardUri' => $boardUri,
     'tags' => array()
@@ -272,6 +273,10 @@ function getThreadHandler($boardUri, $threadNum) {
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
   $tmpl = str_replace('{{posts}}', $posts_html, $tmpl);
+
+  $tmpl = str_replace('{{replies}}', count($boardData['posts']) - 1, $tmpl);
+  $tmpl = str_replace('{{files}}', $files, $tmpl);
+
   // mixins
   $tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/thread/' . $threadNum . '.html', array('reply' => $threadNum)), $tmpl);
   $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
@@ -295,22 +300,6 @@ function getBoardCatalogHandler($boardUri) {
   $boardnav_html  = $templates['loop0'];
   $image_template = $templates['loop1'];
   $tile_template  = $templates['loop2'];
-
-  /*
-  // loop 0 goes into this html...
-  $pages_html = '';
-
-  // FIXME: get page count...
-    $tmp = $page_template;
-    $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-    // bold
-    $tmp = str_replace('{{class}}', $pagenum == 1 ? 'bold' : '', $tmp);
-    $tmp = str_replace('{{pagenum}}', 1, $tmp);
-    $pages_html .= $tmp;
-
-  $boardnav_html = str_replace('{{pages}}', $pages_html, $boardnav_html);
-  */
-  //$boardnav_html = str_replace('{{uri}}',   $boardUri,   $boardnav_html);
 
   $maxPage = 0;
   foreach($catalog as $obj) {
@@ -348,6 +337,9 @@ function getBoardCatalogHandler($boardUri) {
       */
       }
       $tmp = str_replace('{{tile_image}}', $tile_image, $tmp);
+      $tmp = str_replace('{{replies}}', $thread['reply_count'], $tmp);
+      $tmp = str_replace('{{files}}', count($thread['files']), $tmp);
+      $tmp = str_replace('{{page}}', $page['page'], $tmp);
       $tiles_html .= $tmp;
     }
   }
