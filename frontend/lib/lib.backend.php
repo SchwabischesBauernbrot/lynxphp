@@ -122,8 +122,8 @@ function getBoardCatalog($boardUri) {
 }
 
 function getBoardThread($boardUri, $threadNum) {
-  $result = getExpectJson('4chan/' . $boardUri . '/thread/' . $threadNum . '.json');
-  return $result['posts'];
+  $result = getExpectJson('opt/' . $boardUri . '/thread/' . $threadNum . '.json');
+  return $result;
 }
 
 function sendFile($tmpfile, $type, $filename) {
