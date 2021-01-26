@@ -240,7 +240,11 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $sets = array(
       'updated_at' => 'updated_at = ' . $now,
     );
-    if (!empty($urow['json'])) $urow['json'] = json_encode($urow['json']);
+    if (!empty($urow['json'])) {
+      if (!is_string($urow['json'])) {
+        $urow['json'] = json_encode($urow['json']);
+      }
+    }
     foreach($urow as $f=>$v) {
       // updates are always assignments (=, never </>=)
       if (is_array($v)) {

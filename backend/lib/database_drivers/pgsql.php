@@ -243,7 +243,11 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       'updated_at' => 'updated_at = ' . $now,
     );
     //echo "json was[", print_r($urow['json'], 1), "]<br>\n";
-    if (!empty($urow['json'])) $urow['json'] = json_encode($urow['json']);
+    if (!empty($urow['json'])) {
+      if (!is_string($urow['json'])) {
+        $urow['json'] = json_encode($urow['json']);
+      }
+    }
     //echo "json now[$json]<br>\n";
     foreach($urow as $f=>$v) {
       // updates are always assignments (=, never </>=)
@@ -449,6 +453,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   public function num_rows($res) {
     return pg_num_rows($res);
   }
+  // we could decode json here but most interactions don't use it
+  // and json_decode / json_encode has some serious overhead..
   public function get_row($res) {
     return pg_fetch_assoc($res);
   }
