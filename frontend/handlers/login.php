@@ -1,6 +1,12 @@
 <?php
 
 function getLoginForm() {
+  $templates = loadTemplates('login');
+  $tags = array(
+    'action' => 'https://' . BASE_HOST . '/' . BASE_HREF . 'forms/login',
+  );
+  return replace_tags($templates['header'], $tags);
+
   $secure_login_link = 'login.php';
   $secure_signup_link = 'signup.php';
   $content = <<< EOB
@@ -32,7 +38,7 @@ function getLogout() {
 function postLogin() {
   $login = backendLogin($_POST['username'], $_POST['password']);
   if ($login === true) {
-    redirectTo('control_panel.php');
+    redirectTo('/control_panel.php');
   } else {
     $tmpl = "Error: Log In incorrect or other error<br>\n";
     wrapContent($tmpl . getLoginForm());
