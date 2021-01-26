@@ -102,7 +102,11 @@ function sendResponse($data, $code = 200, $err = '') {
   if ($err) {
     $resp['meta']['err'] = $err;
   }
-  echo json_encode($resp);
+  if (getQueryField('prettyPrint')) {
+    echo '<pre>', json_encode($resp, JSON_PRETTY_PRINT), "</pre>\n";
+  } else {
+    echo json_encode($resp);
+  }
   return true;
 }
 
