@@ -41,7 +41,7 @@ foreach ($result['reports'] as $r) {
   $tmp = str_replace('{{post}}', renderPost($boardUri, $thisPost), $tmp);
   $reports_html .= $tmp;
 }
-$tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
+$tmpl = str_replace('{{backURL}}', $boardUri . '/settings', $tmpl);
 $tmpl = str_replace('{{reports}}', $reports_html, $tmpl);
 
 wrapContent($tmpl);
