@@ -153,7 +153,7 @@ function boardCatalog($boardUri) {
     array(
       'type' => 'left',
       'model' => $posts_model,
-      'srcField' => 'threadid',
+      'useField' => 'threadid',
       'pluck' => array('count(ALIAS.postid) as reply_count'),
       'groupby' => $postTable . '.postid',
       //'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.postid)>0))',
