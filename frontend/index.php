@@ -1,5 +1,6 @@
 <?php
 $now = time();
+$ms_now = microtime(true);
 
 include '../common/post_vars.php';
 
@@ -186,7 +187,7 @@ $router->post('/:uri/post', function($request) {
   // valid board name
   // validate results
   $res = processFiles();
-  $files = $res['handles']['file'];
+  $files = isset($res['handles']['file']) ? $res['handles']['file'] : array();
 
   // make post...
   if (empty($_POST['thread'])) {
@@ -261,7 +262,7 @@ $router->post('/signup.php', function() {
 $router->get('/login.php', function() {
   getLogin();
 });
-$router->post('/login.php', function() {
+$router->post('/forms/login', function() {
   postLogin();
 });
 $router->get('/control_panel.php', function() {
@@ -301,7 +302,7 @@ $router->get('/:uri', function($request) {
   // FIXME: only redir if the board exists...
   redirectTo(BASE_HREF . $boardUri);
 });
--
+
 $res = $router->exec($req_method, $req_path);
 if (!$res) {
   http_response_code(404);
