@@ -4,7 +4,7 @@
 
 // function are automatically exported
 
-// allow export of data as $common in your handlers and modules
+// allow export of data as $shared in your handlers and modules
 return array(
   'fields' => array(
     'uri' => array(
