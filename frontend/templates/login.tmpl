@@ -1,0 +1,17 @@
+<h1 class="board-title">Login</h1>
+<div class="form-wrapper flex-center mv-10">
+  <form class="form-post" action="{{action}}" method="POST">
+    <input type="hidden" name="goto" value="{{goto}}">
+    <div class="row">
+      <div class="label">Username</div>
+      <input type="text" name="username" maxlength="50" required>
+    </div>
+    <div class="row">
+      <div class="label">Password</div>
+      <input type="password" name="password" maxlength="100" required>
+    </div>
+    <input type="submit" value="submit">
+  </form>
+  <p><a href="/changepassword.html">Change Password</a></p>
+  <p><a href="signup.php">create account</a></p>
+</div>
