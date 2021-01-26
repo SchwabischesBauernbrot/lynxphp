@@ -1,6 +1,14 @@
 <?php
 
+$curlLog = array();
+
+// we could reuse the curl handle
+// but we'd need to reset certain settings each time
+// but ultimately we should rather aim for one curl request per page total
 function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='AUTO') {
+  if (DEV_MODE) {
+    $start = microtime(true);
+  }
   if (is_array($fields) && $method === 'AUTO') {
     $fields_string='';
     foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
@@ -56,11 +64,33 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
 
   //close handle
   curl_close($ch);
+  if (DEV_MODE) {
+    global $curlLog;
+    $curlLog[] = array(
+      'method' => $method,
+      'url' => $url,
+      'took' => (microtime(true) - $start) * 1000,
+    );
+  }
+
   return $result;
 }
 
 function make_file($tmpfile, $type, $filename) {
   return curl_file_create($tmpfile, $type, $filename);
+}
+
+function curl_log_report() {
+  global $curlLog;
+  $ttl = 0;
+  echo '<ol>';
+  foreach($curlLog as $l) {
+    $m = ($l['method'] === 'AUTO' ? 'GET' : $l['method']);
+    echo '<li>' . $m . ' <a target=_blank href="' . $l['url'] . '">' . $l['url'] . '</a> took ' . $l['took'] . 'ms';
+    $ttl += $l['took'];
+  }
+  echo '</ol>';
+  echo count($curlLog), ' requests took ', $ttl, 'ms';
 }
 
 ?>
