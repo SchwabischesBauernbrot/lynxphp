@@ -42,6 +42,24 @@ $router->get('/boards/:uri/:page', function($request) {
   ));
 });
 
+// board data + thread data
+// would be good to include the banners data too
+// need a pipeline for that..
+$router->get('/:board/thread/:thread', function($request) {
+  global $tpp;
+  $boardUri = $request['params']['board'];
+  $boardData = getBoard($boardUri);
+  if (!$boardData) {
+    echo '[]';
+    return;
+  }
+  $threadNum = (int)str_replace('.json', '', $request['params']['thread']);
+  $boardData['threadCount'] = getBoardThreadCount($boardUri);
+  $boardData['pageCount'] = ceil($boardData['threadCount']/$tpp);
+  $boardData['posts'] = getThread($boardUri, $threadNum);
+  echo json_encode($boardData);
+});
+
 /*
 $router->get('/boards/:uri/catalog', function($request) {
   global $tpp;
