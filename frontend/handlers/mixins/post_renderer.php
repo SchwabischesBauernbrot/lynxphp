@@ -19,10 +19,10 @@ function renderPost($boardUri, $p, $options = false) {
   }
   // FIXME: pipeline...
   $icons = array();
-  if (isset($p['sticky']) && $p['sticky'] !== 'f') {
+  if (!empty($p['sticky']) && $p['sticky'] !== 'f') {
     $icons[] = 'sticky';
   }
-  if (isset($p['cyclic']) && $p['sticky'] !== 'f') {
+  if (!empty($p['cyclic']) && $p['sticky'] !== 'f') {
     $icons[] = 'cyclic';
   }
   if (count($icons)) {
