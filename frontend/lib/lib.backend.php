@@ -108,6 +108,7 @@ function getBoard($boardUri) {
 
 function backendGetBoardThreadListing($boardUri, $pageNum = 1) {
   $threadListing = getExpectJson('opt/boards/' . $boardUri . '/' . $pageNum);
+  if ($threadListing === null) return;
   return $threadListing['data'];
 }
 
