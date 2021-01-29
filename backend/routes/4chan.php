@@ -75,7 +75,10 @@ $router->get('/:board/:page', function($request) {
   $boardUri = $request['params']['board'];
   $page = str_replace('.json', '', $request['params']['page']);
   $threads = boardPage($boardUri, $page);
-  echo json_encode($threads);
+  $res = array(
+    'threads' => $threads,
+  );
+  echo json_encode($res);
 });
 
 // Thread endpoint
