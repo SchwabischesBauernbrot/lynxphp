@@ -17,6 +17,9 @@ function logRequest($ip) {
     array(array(($db->unixtime() . ' - updated_at'), '>', $db->make_direct('600')))
   ));
   //echo "ip[$ip]<br>\n";
+  if ($ip === '::1' || $ip === '127.0.0.1') {
+    return;
+  }
 
   $res = $db->find($models['request'],
     array( 'criteria' => array( 'ip' => $ip, 'type' => 'backend') )
