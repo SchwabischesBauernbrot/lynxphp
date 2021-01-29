@@ -67,4 +67,24 @@ function modelToString($model) {
   return $s;
 }
 
+function key_map($func, $arr) {
+  $nArr = array();
+  foreach($arr as $k => $v) {
+    $nK = $func($k);
+    $nArr[$nK] = $v;
+  }
+  return $nArr;
+}
+
+function gettrace() {
+  $calls = debug_backtrace();
+  array_shift($calls); // remove the call to self
+  $trace = '';
+  foreach($calls as $i => $call) {
+    if ($i > 2) break;
+    $trace .= ' <- ' . $call['file'] . ':' . $call['line'];
+  }
+  return $trace;
+}
+
 ?>
