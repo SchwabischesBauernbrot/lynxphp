@@ -162,6 +162,10 @@ function getOverboardHandler() {
 // /:uri/
 function getBoardThreadListing($boardUri, $pagenum = 1) {
   $boardThreads = backendGetBoardThreadListing($boardUri, $pagenum);
+  if (!$boardThreads) {
+    wrapContent("There is a problem with the backend");
+    return;
+  }
   //echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
   $pageData = $boardThreads['page1'];
   $pages = $boardThreads['pageCount'];
@@ -338,7 +342,7 @@ function getBoardCatalogHandler($boardUri) {
       }
       $tmp = str_replace('{{tile_image}}', $tile_image, $tmp);
       $tmp = str_replace('{{replies}}', $thread['reply_count'], $tmp);
-      $tmp = str_replace('{{files}}', count($thread['files']), $tmp);
+      $tmp = str_replace('{{files}}', $thread['file_count'], $tmp);
       $tmp = str_replace('{{page}}', $page['page'], $tmp);
       $tiles_html .= $tmp;
     }
