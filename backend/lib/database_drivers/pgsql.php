@@ -45,6 +45,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       'boolean' => 'bool',
     );
     $this->joinCount = 0;
+    $this->btTables = false;
+    $this->forceUnsetIdOnUpdate = true;
   }
   // easy
   public function connect_db($host, $user, $pass, $db, $port = 5432) {
@@ -196,33 +198,11 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       return true;
     }
   }
+
   public function insert($rootModel, $recs) {
-    $tableName = modelToTableName($rootModel);
-    $idf = modelToId($rootModel);
-    $date = time();
-    $recs[0]['json'] = '{}';
-    $recs[0]['created_at'] = $date;
-    $recs[0]['updated_at'] = $date;
-    $fields = join(',', array_keys($recs[0]));
-    $sql = 'insert into ' . $tableName . ' (' . $fields . ') values';
-    $sets = array();
-    foreach($recs as $rec) {
-      $cleanArr = array();
-      $rec['json'] = '{}';
-      $rec['created_at'] = $date;
-      $rec['updated_at'] = $date;
-      foreach($rec as $val) {
-        if (is_array($val)) {
-          $cleanArr[] = $val;
-        } else {
-          $cleanArr[] = $this->make_constant($val);
-        }
-      }
-      $sets[] = '(' . join(',', $cleanArr) . ')';
-    }
-    $sql .= join(',', $sets);
+    $sql = $this->makeInsertQuery($rootModel, $recs);
     //echo "sql[$sql]<br>\n";
-    $res = pg_query($this->conn, $sql . ' returning ' . $idf);
+    $res = pg_query($this->conn, $sql . ' returning ' . modelToId($rootModel));
     $err = pg_last_error($this->conn);
     if ($err) {
       echo "pgsql::insert - err[$err] [$sql]<br>\n";
@@ -234,36 +214,10 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     //echo "res[$res]<br>\n";
     // how does this handle multiple?
     return $id;
-
   }
+
   public function update($rootModel, $urow, $options) {
-    global $now;
-    $tableName = modelToTableName($rootModel);
-    $sets = array(
-      'updated_at' => 'updated_at = ' . $now,
-    );
-    //echo "json was[", print_r($urow['json'], 1), "]<br>\n";
-    if (!empty($urow['json'])) {
-      if (!is_string($urow['json'])) {
-        $urow['json'] = json_encode($urow['json']);
-      }
-    }
-    //echo "json now[$json]<br>\n";
-    foreach($urow as $f=>$v) {
-      // updates are always assignments (=, never </>=)
-      if (is_array($v)) {
-        $val = $v[0];
-      } else {
-        $val = $this->make_constant($v);
-      }
-      $sets[$f] = $f . '=' . $val;
-    }
-    $idf = modelToId($rootModel);
-    unset($sets[$idf]);
-    $sql = 'update ' .$tableName . ' set '. join(', ', $sets);
-    if (isset($options['criteria'])) {
-      $sql .= ' where ' . $this->build_where($options['criteria']);
-    }
+    $sql = $this->makeUpdateQuery($rootModel, $urow, $options);
     //echo "sql[$sql]<br>\n";
     $res = pg_query($this->conn, $sql);
     $err = pg_last_error($this->conn);
@@ -273,15 +227,9 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     }
     return true;
   }
-  public function delete($rootModel, $options) {
-    $tableName = modelToTableName($rootModel);
 
-    $sql = 'delete from ' .$tableName;
-    if (isset($options['criteria'])) {
-      $sql .= ' where ' . $this->build_where($options['criteria']);
-    //} else {
-      // a warning? or something to prevent total table loss if typo...
-    }
+  public function delete($rootModel, $options) {
+    $sql = $this->makeDeleteQuery($rootModel, $options);
     //echo "sql[$sql]<br>\n";
     $res = pg_query($this->conn, $sql);
     $err = pg_last_error($this->conn);
@@ -292,69 +240,6 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     return true;
   }
 
-  private function handleJoin($models, $data, $tableName, $useField = '') {
-    foreach($models as $join) {
-      // same field in both tables
-      if ($useField) {
-        // use from root table
-        $field = $useField;
-      } else {
-        // calculate off joined table
-        $field = modelToId($join['model']);
-      }
-      // should be the same field
-      $rootField = $field;
-      $joinField = $field;
-      // unles...
-      if (!empty($join['srcField'])) $rootField = $join['srcField'];
-      if (!empty($join['useField'])) $joinField = $join['useField'];
-      // set up join table/alias
-      $joinTable = modelToTableName($join['model']);
-      $joinAlias = $joinTable;
-      if ($joinTable === $tableName) {
-        $this->joinCount++;
-        $joinAlias = 'jt' . $this->joinCount;
-        $joinTable .= ' as ' . $joinAlias;
-      }
-      $joinStr = (empty($join['type']) ? '' : $join['type'] . ' ' ) . ' join ' .
-        $joinTable . ' on (' .
-        $joinAlias . '.' . $joinField . '=' .
-        $tableName . '.' . $rootField;
-      if (!empty($join['where'])) {
-        $joinStr .= ' and ' . $this->build_where($join['where'], $joinAlias);
-      }
-      $data['joins'][] = $joinStr . ')';
-      // support an empty array
-      if (isset($join['pluck']) && is_array($join['pluck'])) {
-        // probably integrate the alias...
-        $clean = str_replace('ALIAS', $joinAlias, $join['pluck']);
-        $data['fields'] = array_merge($data['fields'], $clean);
-      } else {
-        // if no pluck, then grab all
-        $data['fields'][] = $joinAlias . '.*';
-      }
-      if (!empty($join['groupby'])) {
-        $data['groupbys'] = array_merge($data['groupbys'], explode(',', $join['groupby']));
-      }
-      if (!empty($join['having'])) {
-        $data['having'] .= ' ' . str_replace('ALIAS', $joinAlias, $join['having']);
-      }
-      $data = $this->expandJoin($join['model'], $data);
-    }
-    return $data;
-  }
-
-  private function expandJoin($rootModel, $data) {
-    $tableName = modelToTableName($rootModel);
-    if (!empty($rootModel['children']) && is_array($rootModel['children'])) {
-      $data = $this->handleJoin($rootModel['children'], $data, $tableName, modelToId($rootModel));
-    }
-    // use id field from parent table (groupid instead of usergroupid)
-    if (!empty($rootModel['parents']) && is_array($rootModel['parents'])) {
-      $data = $this->handleJoin($rootModel['parents'], $data, $tableName);
-    }
-    return $data;
-  }
   private function typeCriteria($model, &$crit) {
     $fields = $model['fields']; // $fieldname => $f['type']
     foreach($crit as $k => $set) {
@@ -379,57 +264,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   //   criteria = if set, an array
   //              array(field, comparison, field/constant)
   public function find($rootModel, $options = false, $fields = '*') {
-    $tableName = modelToTableName($rootModel);
-    if (!$tableName) {
-      echo "<pre>model[", print_r($rootModel, 1), "] is missing a name</pre>\n";
-      return;
-    }
-    $groupbys = array();
-    if (!empty($options['groupby'])) {
-      $groupbys = $options['groupby'];
-    }
-    $data = array(
-      'joins'    => array(),
-      'groupbys' => array(),
-      'having'   => '',
-      'fields'   => array(),
-    );
-    $data = $this->expandJoin($rootModel, $data);
-    // FIXME: renaming support
-    $useFields = array_merge(array_map(function($f) use ($data, $tableName) {
-      return (count($data['joins']) ? $tableName . '.' : '') . $f;
-    }, explode(',', $fields)), $data['fields']);
-    $sql = 'select '. join(',', $useFields) . ' from ' . $tableName;
-    $useAlias = '';
-    if (count($data['joins'])) {
-      $sql .= ' ' . join(' ', $data['joins']);
-      $useAlias = $tableName;
-    }
-    if (isset($options['criteria'])) {
-      // I don' think we need this...
-      //$this->typeCriteria($rootModel, $options['criteria']);
-      $sql .= ' where ' . $this->build_where($options['criteria'], $useAlias);
-    }
-    if (count($data['groupbys'])) {
-      $sql .= ' group by ' . join(',', $data['groupbys']);
-    }
-    if (!empty($data['having'])) {
-      $sql .= ' having ' . $data['having'];
-    }
-    /*
-    if (isset($options['having'])) {
-      $sql .= ' having ' . $options['having'];
-    }
-    */
-    if (isset($options['order'])) {
-      $defAlias = count($data['joins']) ? $tableName : '';
-      $alias = $defAlias ? $defAlias . '.' : '';
-      $sql .= ' order by ' . $alias . $options['order'];
-    }
-    if (isset($options['limit'])) {
-      $sql .= ' limit ' . $options['limit'];
-    }
-    //echo "sql[$sql]<br>\n";
+    $sql = $this->makeSelectQuery($rootModel, $options, $fields);
     $res = pg_query($this->conn, $sql);
     //$err = pg_result_error($res);
     $err = pg_last_error($this->conn);
