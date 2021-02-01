@@ -94,19 +94,19 @@ function getBoardsHandler() {
         $last = $minutes    . ' minute ago';
       }
       if ($hours) {
-        $last = $hours   . ' hours ago';
+        $last = $hours   . ' hour(s) ago';
         $color = '7cd900';
       }
       if ($days) {
-        $last = $days    . ' days ago';
+        $last = $days    . ' day(s) ago';
         $color = 'd9b900'; // yellow
       }
       if ($weeks) {
-        $last = $weeks   . ' weeks ago';
+        $last = $weeks   . ' week(s) ago';
         $color = 'd95200'; // orange
       }
       if ($months) {
-        $last = $months  . ' months ago';
+        $last = $months  . ' month(s) ago';
         $color = 'c50000'; // red
       }
 
