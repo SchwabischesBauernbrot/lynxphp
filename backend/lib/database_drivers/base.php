@@ -30,6 +30,7 @@ class database_driver_base_class {
     $this->conn = null;
     $this->modelToSQL = array();
     $this->sqlToModel = array();
+    $this->subselectCounter = 0;
   }
   public function connect_db($host, $user, $pass, $db, $port = 0) {
     if (!$this->connect($host, $user, $pass, $port)) {
@@ -66,7 +67,17 @@ class database_driver_base_class {
             // auto promote to array or abort?
             return false;
           }
-          $sets[] = $one . ' ' . $operand . ' (' . join(',', $set[2]). ')';
+          $inSet = $set[2];
+          // we will need to address this...
+          /*
+          if ($defAlias) {
+            $inSet = array();
+            foreach($set[2] as $cond) {
+              $inSet[] = $defAlias . '.' . $cond;
+            }
+          }
+          */
+          $sets[] = $one . ' ' . $operand . ' (' . join(',', $inSet). ')';
         } else {
           if (is_array($set[2])) {
             $sets[] = $one . ' ' . $operand . ' ' . $set[2][0];
@@ -87,6 +98,266 @@ class database_driver_base_class {
     }
     return join(' AND ', $sets);
   }
+
+  protected function makeInsertQuery($rootModel, $recs) {
+    global $now;
+    $tableName = modelToTableName($rootModel);
+    $date = $now;
+    $recs[0]['json'] = '{}';
+    $recs[0]['created_at'] = $now;
+    $recs[0]['updated_at'] = $now;
+    $fields = join(',', array_keys($recs[0]));
+    if ($this->btTables) {
+      $sql = 'insert into `' . $tableName . '` (' . $fields . ') values';
+    } else {
+      $sql = 'insert into ' . $tableName . ' (' . $fields . ') values';
+    }
+    $sets = array();
+    foreach($recs as $rec) {
+      $cleanArr = array();
+      $rec['json'] = '{}';
+      $rec['created_at'] = $now;
+      $rec['updated_at'] = $now;
+      foreach($rec as $val) {
+        if (is_array($val)) {
+          $cleanArr[] = $val;
+        } else {
+          $cleanArr[] = $this->make_constant($val);
+        }
+      }
+      $sets[] = '(' . join(',', $cleanArr) . ')';
+    }
+    $sql .= join(',', $sets);
+    return $sql;
+  }
+
+  protected function makeUpdateQuery($rootModel, $urow, $options) {
+    global $now;
+    $tableName = modelToTableName($rootModel);
+    $sets = array(
+      'updated_at' => 'updated_at = ' . $now,
+    );
+    if (!empty($urow['json'])) {
+      if (!is_string($urow['json'])) {
+        $urow['json'] = json_encode($urow['json']);
+      }
+    }
+    foreach($urow as $f=>$v) {
+      // updates are always assignments (=, never </>=)
+      if (is_array($v)) {
+        $val = $v[0];
+      } else {
+        $val = $this->make_constant($v);
+      }
+      $sets[$f] = $f . '=' . $val;
+    }
+    if ($this->forceUnsetIdOnUpdate) {
+      $idf = modelToId($rootModel);
+      unset($sets[$idf]);
+    }
+    if ($this->btTables) {
+      $sql = 'update `' .$tableName . '` set '. join(', ', $sets);
+    } else {
+      $sql = 'update ' .$tableName . ' set '. join(', ', $sets);
+    }
+    if (isset($options['criteria'])) {
+      $sql .= ' where ' . $this->build_where($options['criteria']);
+    }
+    return $sql;
+  }
+
+  protected function makeDeleteQuery($rootModel, $options) {
+    $tableName = modelToTableName($rootModel);
+    if ($this->btTables) {
+      $sql = 'delete from `' .$tableName . '`';
+    } else {
+      $sql = 'delete from ' .$tableName;
+    }
+    if (isset($options['criteria'])) {
+      $sql .= ' where ' . $this->build_where($options['criteria']);
+    //} else {
+      // a warning? or something to prevent total table loss if typo...
+    }
+    return $sql;
+  }
+
+  // what's the minium in join? model
+  private function handleJoin($models, $data, $tableName, $useField = '') {
+    foreach($models as $join) {
+      // same field in both tables
+      if ($useField) {
+        // use from root table
+        $field = $useField;
+      } else {
+        // calculate off joined table
+        $field = modelToId($join['model']);
+      }
+      // should be the same field
+      $rootField = $field;
+      $joinField = $field;
+      // unles...
+      if (!empty($join['srcField'])) $rootField = $join['srcField'];
+      if (!empty($join['useField'])) $joinField = $join['useField'];
+      // set up join table/alias
+      $joinTable = modelToTableName($join['model']);
+      if (!empty($join['tableOverride'])) $tableName = $join['tableOverride'];
+      $joinAlias = $joinTable;
+      if ($joinTable === $tableName) {
+        $this->joinCount++;
+        $joinAlias = 'jt' . $this->joinCount;
+        $joinTable .= ' as ' . $joinAlias;
+      }
+      $joinStr = (empty($join['type']) ? '' : $join['type'] . ' ' ) . 'join ' .
+        $joinTable . ' on (';
+      if (!empty($join['on'])) {
+        $onAlias = $joinAlias;
+        if (!empty($join['onAlias'])) $onAlias = $join['onAlias'];
+        $joinStr .= $this->build_where($join['on'], $onAlias);
+      } else {
+        $joinStr .=
+          $joinAlias . '.' . $joinField . '=' .
+          $tableName . '.' . $rootField;
+        if (!empty($join['where'])) {
+          $joinStr .= ' and ' . $this->build_where($join['where'], $joinAlias);
+        }
+      }
+      $data['joins'][] = $joinStr . ')';
+      // support an empty array
+      if (isset($join['pluck']) && is_array($join['pluck'])) {
+        // probably integrate the alias...
+        $clean = str_replace('ALIAS', $joinAlias, $join['pluck']);
+        $data['fields'] = array_merge($data['fields'], $clean);
+      } else {
+        // if no pluck, then grab all
+        if ($this->btTables) {
+          $data['fields'][] = '`' . $joinAlias . '`.*';
+        } else {
+          $data['fields'][] = $joinAlias . '.*';
+        }
+      }
+      if (!empty($join['groupby'])) {
+        $data['groupbys'] = array_merge($data['groupbys'], explode(',', $join['groupby']));
+      }
+      if (!empty($join['having'])) {
+        $data['having'] .= ' ' . str_replace('ALIAS', $joinAlias, $join['having']);
+      }
+      $data = $this->expandJoin($join['model'], $data);
+    }
+    return $data;
+  }
+
+  protected function expandJoin($rootModel, $data) {
+    if (isset($rootModel['query'])) {
+      $tableName = 't';
+    } else {
+      $tableName = modelToTableName($rootModel);
+    }
+    if (!empty($rootModel['children']) && is_array($rootModel['children'])) {
+      if (isset($rootModel['query'])) {
+        if (isset($rootModel['model']['query'])) {
+          $idf = modelToId($rootModel['model']['model']);
+        } else {
+          $idf = modelToId($rootModel['model']);
+        }
+      } else {
+        $idf = modelToId($rootModel);
+      }
+      $data = $this->handleJoin($rootModel['children'], $data, $tableName, $idf);
+    }
+    // use id field from parent table (groupid instead of usergroupid)
+    if (!empty($rootModel['parents']) && is_array($rootModel['parents'])) {
+      $data = $this->handleJoin($rootModel['parents'], $data, $tableName);
+    }
+    return $data;
+  }
+
+  protected function makeSelectQuery($rootModel, $options = false, $fields = '*') {
+    if (isset($rootModel['query'])) {
+      $tableAlias = 't' . $this->subselectCounter;
+      $this->subselectCounter++;
+      $tableName = '(' . $rootModel['query'] . ') as ' . $tableAlias;
+    } else {
+      $tableName = modelToTableName($rootModel);
+      if (!$tableName) {
+        echo "<pre>model is missing a name[", print_r($rootModel, 1), "]</pre>\n";
+        return;
+      }
+      $tableAlias = $tableName;
+    }
+    $groupbys = array();
+    if (!empty($options['groupby'])) {
+      $groupbys = $options['groupby'];
+    }
+    $data = array(
+      'joins'    => array(),
+      'groupbys' => array(),
+      'having'   => '',
+      'fields'   => array(),
+    );
+    $data = $this->expandJoin($rootModel, $data);
+    // FIXME: renaming support
+    if ($fields === false) {
+      $useFields = $data['fields'];
+    } else {
+      $useFields = array_merge(array_map(function($f) use ($data, $tableAlias) {
+        return (count($data['joins']) ? $tableAlias . '.' : '') . $f;
+      }, explode(',', $fields)), $data['fields']);
+    }
+
+    if ($this->btTables && !isset($rootModel['query'])) {
+      $sql = 'select '. join(',', $useFields) . "\n" . 'from `' . $tableName . '`';
+    } else {
+      $sql = 'select '. join(',', $useFields) . "\n" . 'from ' . $tableName;
+    }
+    $useAlias = '';
+    if (count($data['joins'])) {
+      $sql .= "\n" . join("\n", $data['joins']);
+      $useAlias = $tableName;
+    }
+    if (isset($options['criteria'])) {
+      // I don' think we need this...
+      //$this->typeCriteria($rootModel, $options['criteria']);
+      $sql .= "\n" . 'where ' . $this->build_where($options['criteria'], $useAlias);
+    }
+    if (count($data['groupbys'])) {
+      $sql .= "\n" . 'group by ' . join(',', $data['groupbys']);
+    }
+    if (!empty($data['having'])) {
+      $sql .= "\n" . 'having ' . $data['having'];
+    }
+    /*
+    if (isset($options['having'])) {
+      $sql .= ' having ' . $options['having'];
+    }
+    */
+    if (isset($options['order'])) {
+      if (!empty($options['orderNoAlias'])) {
+        $sql .= "\n" . 'order by ' . $options['orderNoAlias'];
+      } else {
+        $defAlias = count($data['joins']) ? $tableName : '';
+        $alias = $defAlias ? $defAlias . '.' : '';
+        $sql .= "\n" . 'order by ' . $alias . $options['order'];
+      }
+    }
+    if (isset($options['limit'])) {
+      $sql .= "\n" . ' limit ' . $options['limit'];
+    }
+    if (0) {
+      $trace = gettrace();
+      echo "<pre>sql[$sql] $trace</pre>\n";
+    }
+    //$sql = str_replace("\n", ' ', $sql);
+    return $sql;
+  }
+
+  public function makeSubselect($rootModel, $options = false, $fields = '*') {
+    return array(
+      //'name'  => $rootModel['name'],
+      'model' => $rootModel,
+      'query' => $this->makeSelectQuery($rootModel, $options, $fields),
+    );
+  }
+
   public function findById($rootModel, $id, $options = false) {
     $tableName = modelToTableName($rootModel);
     $id = (int)$id;
@@ -130,19 +401,21 @@ class database_driver_base_class {
 
 function modelToTableName($model) {
   if (!isset($model['name'])) {
-    echo "<pre>model[", print_r($model, 1), "] is missing a name</pre>\n";
+    $trace = gettrace();
+    echo "<pre>base::modelToTableName - model is missing a name[", print_r($model, 1), "] $trace</pre>\n";
     return;
   }
   return $model['name'].'s';
 }
 function modelToId($model) {
   if (!isset($model['name'])) {
-    echo "<pre>model[", print_r($model, 1), "] is missing a name</pre>\n";
+    $trace = gettrace();
+    echo "<pre>base::modelToId - model is missing a name[", print_r($model, 1), "] $trace</pre>\n";
     return;
   }
   $parts = explode('_', $model['name']);
   $name = array_pop($parts);
-  return $name.'id';
+  return $name . 'id';
 }
 
 function make_db_field($value) {
