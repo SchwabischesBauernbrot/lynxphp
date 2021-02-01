@@ -1,6 +1,6 @@
 <?php
 
-function postDBtoAPI(&$row, $post_files_model) {
+function postDBtoAPI(&$row, $post_files_model = '') {
   global $db, $models;
   if ($row['deleted'] && $row['deleted'] !== 'f') {
     // non-OPs are automatically hidden...
@@ -18,9 +18,12 @@ function postDBtoAPI(&$row, $post_files_model) {
       'files' => array(),
       // catalog uses this
       'reply_count' => $row['reply_count'],
+      'file_count' => $row['file_count'],
     );
     return;
   }
+  // lets not N+1 it
+  /*
   $files = array();
   $res = $db->find($post_files_model, array('criteria'=>array(
     array('postid', '=', $row['postid']),
@@ -28,8 +31,9 @@ function postDBtoAPI(&$row, $post_files_model) {
   while($frow = $db->get_row($res)) {
     $files[] = $frow;
   }
-  $row['no'] = $row['postid'];
   $row['files'] = $files;
+  */
+  $row['no'] = $row['postid'];
   unset($row['postid']);
   unset($row['json']);
   // decode user_id
@@ -39,14 +43,13 @@ function getThread($boardUri, $threadNum) {
   global $db;
   $posts_model = getPostsModel($boardUri);
   $post_files_model = getPostFilesModel($boardUri);
-  /*(
+
   $posts_model['children'] = array(
     array(
       'type' => 'left',
       'model' => $post_files_model,
     )
   );
-  */
 
   $posts = array();
   $res = $db->find($posts_model, array('criteria'=>array(
@@ -54,16 +57,27 @@ function getThread($boardUri, $threadNum) {
   )));
   $row = $db->get_row($res);
   postDBtoAPI($row, $post_files_model);
-  $posts[] = $row;
+  $posts[$row['postid']] = $row;
 
   $res = $db->find($posts_model, array('criteria'=>array(
     array('threadid', '=', $threadNum),
     array('deleted', '=', 0),
   ), 'order' => 'created_at'));
   while($row = $db->get_row($res)) {
-    postDBtoAPI($row, $post_files_model);
-    $posts[] = $row;
+    //echo "<pre>", print_r($row, 1), "</pre>\n";
+    if (!isset($posts[$row['postid']])) {
+      postDBtoAPI($row, $post_files_model);
+      $posts[$row['postid']] = $row;
+      $posts['files'] = array();
+    }
+    if (!isset($posts[$row['postid']]['files'][$row['fileid']])) {
+      $posts[$row['postid']]['files'][$row['fileid']] = $row;
+    }
   }
+  foreach($posts as $pk => $p) {
+    $posts[$pk]['files'] = array_values($posts[$pk]['files']);
+  }
+  $posts = array_values($posts);
   return $posts;
 }
 
