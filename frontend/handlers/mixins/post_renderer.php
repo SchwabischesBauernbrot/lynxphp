@@ -114,7 +114,7 @@ function renderPost($boardUri, $p, $options = false) {
     'postmeta'  => $postmeta,
     'files'     => $files_html,
     'replies'   => $replies_html,
-    'jstime'    => gmdate('c', $p['created_at']),
+    'jstime'    => gmdate('Y-m-d', $p['created_at']) . 'T' . gmdate('H:i:s.v', $p['created_at']) . 'Z',
     'human_created_at' => gmdate('n/j/Y H:i:s', $p['created_at']),
   );
   $tmp = replace_tags($templates['header'], $tags);
