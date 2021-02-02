@@ -233,6 +233,21 @@ function boardPage($boardUri, $page = 1) {
   // MySQL version
   //
 
+  $posts_model['children'] = array(
+    array(
+      'type' => 'left',
+      'model' => $post_files_model,
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
+    )
+  );
+  $posts_extended_model['children'] = array(
+    array(
+      'type' => 'left',
+      'model' => $post_files_model,
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
+    )
+  );
+
   $res = $db->find($posts_extended_model, array('criteria'=>array(
       array('threadid', '=', 0),
       // we need the thread tombstones...
@@ -243,26 +258,56 @@ function boardPage($boardUri, $page = 1) {
   ));
   $threads = array();
   while($row = $db->get_row($res)) {
-    $posts = array();
-    // add thread
-    postDBtoAPI($row);
-    $posts[] = $row;
+    $orow = $row;
+    // do we have this thread?
+    if (!isset($threads[$row['postid']])) {
+      $threads[$row['postid']] = array(
+        // add op to posts
+        'posts' => array($row)
+      );
+      // filter OP
+      postDBtoAPI($threads[$row['postid']]['posts'][0]);
+      $threads[$row['postid']]['posts'][0]['files'] = array();
+    }
+
+    // do we have this file?
+    if (!empty($orow['file_fileid']) && !isset($threads[$row['postid']]['posts'][0]['files'][$orow['file_fileid']])) {
+      $threads[$row['postid']]['posts'][0]['files'][$orow['file_fileid']] = $orow;
+      fileDBtoAPI($threads[$row['postid']]['posts'][0]['files'][$orow['file_fileid']]);
+    }
 
     // add remaining posts
     $postRes = $db->find($posts_model, array('criteria'=>array(
-      array('threadid', '=', $row['no']),
+      array('threadid', '=', $orow['postid']),
       array('deleted', '=', 0),
     ), 'order'=>'created_at desc', 'limit' => $lastXreplies));
-    $resort = array();
-    while($prow = $db->get_row($postRes)) {
-      postDBtoAPI($prow);
-      $resort[] = $prow;
-    }
+    $posts = array_reverse($db->toArray($postRes));
     $db->free($postRes);
-    $posts = array_merge($posts, array_reverse($resort));
-    $threads[] = array('posts' => $posts);
+    foreach($posts as $i => $post) {
+      // do we have this post
+      if (!isset($threads[$orow['postid']]['posts'][$post['postid']])) {
+        $threads[$orow['postid']]['posts'][$post['postid']] = $post;
+        postDBtoAPI($threads[$orow['postid']]['posts'][$post['postid']]);
+        // set up files
+        $threads[$orow['postid']]['posts'][$post['postid']]['files'] = array();
+      }
+      // do we have this file
+      if (!empty($post['file_fileid']) && !isset($threads[$orow['postid']]['posts'][$post['postid']]['files'][$post['file_fileid']])) {
+        $threads[$orow['postid']]['posts'][$post['postid']]['files'][$post['file_fileid']] = $post;
+        fileDBtoAPI($threads[$orow['postid']]['posts'][$post['postid']]['files'][$post['file_fileid']]);
+      }
+    }
   }
   $db->free($res);
+
+  // remove keys nested...
+  foreach($threads as $tk => $t) {
+    foreach($t['posts'] as $pk => $p) {
+      $threads[$tk]['posts'][$pk]['files'] = array_values($p['files']);
+    }
+    $threads[$tk]['posts'] = array_values($t['posts']);
+  }
+  $threads = array_values($threads);
   return $threads;
 }
 
