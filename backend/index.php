@@ -21,6 +21,13 @@ include 'lib/database_drivers/' . DB_DRIVER . '.php';
 $driver_name = DB_DRIVER . '_driver';
 $db = new $driver_name;
 
+// make a queue
+// don't auto-detect, just get configuration
+// FIXME: make configurable
+include '../common/queue_implementations/db.php';
+$queue_type_class = 'db' . '_queue_driver';
+$queue = new $queue_type_class;
+
 $tpp = 10; // threads per page
 
 if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
