@@ -6,7 +6,7 @@ function secondsToTime($inputSeconds) {
   $obj = new DateTime();
   $obj->setTimeStamp($now - $inputSeconds);
 
-  $diff = $then->diff(new DateTime(date('Y-m-d H:i:s', $now)));
+  $diff = $then->diff(new DateTime(gmdate('Y-m-d H:i:s', $now)));
   return array('years' => $diff->y, 'months' => $diff->m, 'days' => $diff->d, 'hours' => $diff->h, 'minutes' => $diff->i, 'seconds' => $diff->s);
 }
 
@@ -324,8 +324,8 @@ function getBoardCatalogHandler($boardUri) {
       $tmp = str_replace('{{name}}',    htmlspecialchars($thread['name']), $tmp);
       $tmp = str_replace('{{no}}',      $thread['no'], $tmp);
       $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-      $tmp = str_replace('{{jstime}}', date('c', $thread['created_at']), $tmp);
-      $tmp = str_replace('{{human_created_at}}', date('n/j/Y H:i:s', $thread['created_at']), $tmp);
+      $tmp = str_replace('{{jstime}}', gmdate('Y-m-d', $thread['created_at']) . 'T' . gmdate('H:i:s.v', $thread['created_at']) . 'Z', $tmp);
+      $tmp = str_replace('{{human_created_at}}', gmdate('n/j/Y H:i:s', $thread['created_at']), $tmp);
       // FIXME: enable image
       $tile_image = '';
       if (count($thread['files'])) {
