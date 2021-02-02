@@ -57,7 +57,7 @@ $router->get('/:board/thread/:thread', function($request) {
   $boardData['threadCount'] = getBoardThreadCount($boardUri);
   $boardData['pageCount'] = ceil($boardData['threadCount']/$tpp);
   $boardData['posts'] = getThread($boardUri, $threadNum);
-  echo json_encode($boardData);
+  sendResponse($boardData);
 });
 
 /*
