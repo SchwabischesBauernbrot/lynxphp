@@ -328,7 +328,7 @@ function getBoardCatalogHandler($boardUri) {
       $tmp = str_replace('{{human_created_at}}', gmdate('n/j/Y H:i:s', $thread['created_at']), $tmp);
       // FIXME: enable image
       $tile_image = '';
-      if (count($thread['files'])) {
+      if (isset($thread['files']) && count($thread['files'])) {
         $tile_image = $image_template;
         $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
         $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
