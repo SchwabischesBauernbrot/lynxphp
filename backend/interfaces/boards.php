@@ -84,8 +84,19 @@ function boardPage($boardUri, $page = 1) {
   //   and deleted threads without any (non-deleted) posts
   // and not affect paging/count
 
-  $posts_extended_model = $posts_model;
   $postTable = modelToTableName($posts_model);
+  $filesTable = modelToTableName($post_files_model);
+
+  $postFields = array(
+    'postid', 'threadid', 'resto', 'sticky', 'closed', 'name', 'trip',
+    'capcode', 'country', 'sub', 'com', 'deleted', 'json', 'created_at', 'updated_at',
+  );
+  $filesFields = array_keys($post_files_model['fields']);
+  $filesFields[] = 'fileid';
+
+  // mysql uses this
+  $posts_extended_model = $posts_model; // copy array
+  $posts_extended_model2 = $posts_model;
 
   // join all non-deleted posts
   $posts_extended_model['children'] = array(
@@ -99,8 +110,128 @@ function boardPage($boardUri, $page = 1) {
       'where' => array(
         array('deleted', '=', 0)
       ),
-    )
+    ),
   );
+
+  /*
+  // select * from () as t
+  $subselect2 = $db->makeSubselect($posts_extended_model, array('criteria'=>array(
+      array('threadid', '=', 0),
+      // we need the thread tombstones...
+      //array('deleted', '=', 0),
+    ),
+    'order'=>'updated_at desc',
+    'limit' => ($limitPage ? ($limitPage * $tpp) . ',' : '') . $tpp,
+  ));
+
+  //   join board_test_public_posts as p on (p.threadid = t.postid or p.postid = t.postid)
+  $subselect2['children'] = array(
+    array(
+      'model' => $posts_extended_model2,
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as post_' . $f; }, $postFields),
+      'useField' => 'bob',
+      'onAlias' => 't1',
+      'on' => array(
+        array('postid', 'IN', array('board_test_public_posts.threadid', 'board_test_public_posts.postid')),
+      ),
+    ),
+  );
+  $subselect = $db->makeSubselect($subselect2);
+
+  //   left join board_test_public_post_files f on p.postid=f.postid
+  $subselect['children'] = array(
+    array(
+      'type' => 'left',
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields),
+      'model' => $post_files_model,
+    ),
+  );
+
+
+  $res = $db->find($subselect, array(
+    'order'        => true,
+    'orderNoAlias' => 't1.updated_at desc, board_test_public_posts.created_at asc',
+  ));
+  */
+  //echo "count [", $db->num_rows($res), "]<br>\n";
+  if (get_class($db) === 'pgsql_driver') {
+    $sql = 'select '.join(',', array_map(function ($f) { return 'f.' . $f . ' as file_' . $f; }, $filesFields)).', ranked_post.*
+              from
+              (
+                select t1.*, p.postid as replyid, t.postid as thread_postid, rank() OVER (PARTITION BY p.threadid ORDER BY p.created_at DESC) AS "rank",
+                  '.join(',', array_map(function ($f) { return 'p.' . $f . ' as post_' . $f; }, $postFields)).'
+                from (
+                  select p1.*,count(jt1.postid) as cnt
+                      from '.$postTable.' as p1
+                        left join '.$postTable.' as jt1 on (jt1.postid=p1.threadid and jt1.deleted = \'0\')
+                      where p1.threadid = \'0\'
+                      group by p1.postid
+                      having  (p1.deleted=\'0\' or (p1.deleted=\'1\' and count(jt1.postid)>0))
+                      order by p1.updated_at desc
+                  ) as t1
+                  left join '.$postTable.' as t on (t1.postid = t.postid)
+                  left join '.$postTable.' as p on (t1.postid = p.threadid)
+                order by t.updated_at desc, p.created_at desc
+              ) as ranked_post
+              left join '.$filesTable.' f on f.postid = ranked_post.replyid
+            where rank <= ' . $lastXreplies . '
+            order by ranked_post.thread_postid desc, ranked_post.replyid asc';
+    $res = pg_query($db->conn, $sql);
+    $data = array();
+    $threads = array();
+    while($row = $db->get_row($res)) {
+      //echo '<pre>', print_r($row, 1), "</pre>\n";
+      // don't stomp posts from last record
+      if (!isset($threads[$row['postid']])) {
+        $threads[$row['postid']] = array_filter($row, function($v, $k) {
+          $f5 = substr($k, 0, 5);
+          return $f5 !== 'post_' && $f5 !=='file_';
+        }, ARRAY_FILTER_USE_BOTH);
+        // process op
+        postDBtoAPI($threads[$row['postid']]);
+        $threads[$row['postid']]['posts'] = array();
+      }
+      // don't stomp files from last record
+      if ($row['post_postid'] && !isset($threads[$row['postid']]['posts'][$row['post_postid']])) {
+        $threads[$row['postid']]['posts'][$row['post_postid']] = key_map(function($v) { return substr($v, 5); }, array_filter($row, function($v, $k) {
+          $f5 = substr($k, 0, 5);
+          return $f5 === 'post_';
+        }, ARRAY_FILTER_USE_BOTH));
+        // process post
+        postDBtoAPI($threads[$row['postid']]['posts'][$row['post_postid']]);
+        $threads[$row['postid']]['posts'][$row['post_postid']]['files'] = array();
+      }
+      if ($row['file_fileid']) {
+        $threads[$row['postid']]['posts'][$row['post_postid']]['files'][$row['file_fileid']] = key_map(function($v) { return substr($v, 5); }, array_filter($row, function($v, $k) {
+            $f5 = substr($k, 0, 5);
+            return $f5 ==='file_';
+          }, ARRAY_FILTER_USE_BOTH));
+        // postDBtoAPI($threads[$row['postid']]['posts'][$row['post_postid']]['files'][$row['file_fileid']]);
+      }
+    }
+    $db->free($res);
+    foreach($threads as $tk => $t) {
+      foreach($t['posts'] as $pk => $p) {
+        $threads[$tk]['posts'][$pk]['files'] = array_values($p['files']);
+      }
+      $threads[$tk]['posts'] = array_values($t['posts']);
+      // find op
+      $op = $threads[$tk];
+      unset($op['posts']); // remove replies
+      $op['files'] = array(); // FIXME: need a thread with files...
+      // put at top
+      //array_unshift($threads[$tk]['posts'], $op);
+      $threads[$tk] = array(
+        'posts' => array_merge(array($op), $threads[$tk]['posts'])
+      );
+    }
+    $threads = array_values($threads);
+    return $threads;
+  }
+
+  //
+  // MySQL version
+  //
 
   $res = $db->find($posts_extended_model, array('criteria'=>array(
       array('threadid', '=', 0),
@@ -114,7 +245,7 @@ function boardPage($boardUri, $page = 1) {
   while($row = $db->get_row($res)) {
     $posts = array();
     // add thread
-    postDBtoAPI($row, $post_files_model);
+    postDBtoAPI($row);
     $posts[] = $row;
 
     // add remaining posts
@@ -124,7 +255,7 @@ function boardPage($boardUri, $page = 1) {
     ), 'order'=>'created_at desc', 'limit' => $lastXreplies));
     $resort = array();
     while($prow = $db->get_row($postRes)) {
-      postDBtoAPI($prow, $post_files_model);
+      postDBtoAPI($prow);
       $resort[] = $prow;
     }
     $db->free($postRes);
@@ -137,17 +268,22 @@ function boardPage($boardUri, $page = 1) {
 
 function boardCatalog($boardUri) {
   global $db, $tpp;
-  $board = getBoardByUri($boardUri);
-  if (!$board) {
+  $posts_model = getPostsModel($boardUri);
+  // make sure board exists...
+  if ($posts_model === false) {
     return false;
   }
-  // pages, threads
-  // get a list of threads
-  $posts_model = getPostsModel($boardUri);
   $post_files_model = getPostFilesModel($boardUri);
+
+  // pages, threads
   // get a list of threads sorted by bump
 
   // would be good to get the post count too
+  // and all non-deleted files
+  $fileTable = modelToTableName($post_files_model);
+  $posts_model['children'] = array(
+  );
+  //
   $postTable = modelToTableName($posts_model);
   $posts_model['children'] = array(
     array(
@@ -160,7 +296,14 @@ function boardCatalog($boardUri) {
       'where' => array(
         array('deleted', '=', 0)
       ),
-    )
+    ),
+    array(
+      'type' => 'left',
+      'model' => $post_files_model,
+      'tableOverride' => 'jt1',
+      'pluck' => array('count(ALIAS.fileid) as file_count'),
+      //'groupby' => $postTable . '.postid',
+    ),
   );
 
 
@@ -172,7 +315,9 @@ function boardCatalog($boardUri) {
   // HOW?
   $threads = array();
   while($row = $db->get_row($res)) {
+    $orow = $row; // don't let postDBtoAPI strip everything
     postDBtoAPI($row, $post_files_model);
+    $row['file_count'] = $orow['file_count']; // preserve file_count
     $threads[$page][] = $row;
     // do we need to add a page...
     if (count($threads[$page]) === $tpp) {
