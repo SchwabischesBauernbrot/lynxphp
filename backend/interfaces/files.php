@@ -1,5 +1,16 @@
 <?php
 
+function fileDBtoAPI(&$row) {
+  // expect file_ fields and strip the file_
+  $row = key_map(function($v) { return substr($v, 5); }, array_filter($row, function($v, $k) {
+    $f5 = substr($k, 0, 5);
+    return $f5 ==='file_';
+  }, ARRAY_FILTER_USE_BOTH));
+  unset($row['fileid']);
+  unset($row['postid']);
+  unset($row['json']);
+}
+
 // JPEG, TIFF, WAV
 // https://stackoverflow.com/a/38862429
 function removeExif($old, $new) {
