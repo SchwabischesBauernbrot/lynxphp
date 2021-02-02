@@ -1,6 +1,6 @@
 <?php
 
-function postDBtoAPI(&$row, $post_files_model = '') {
+function postDBtoAPI(&$row) {
   global $db, $models;
   if ($row['deleted'] && $row['deleted'] !== 'f') {
     // non-OPs are automatically hidden...
@@ -22,17 +22,13 @@ function postDBtoAPI(&$row, $post_files_model = '') {
     );
     return;
   }
-  // lets not N+1 it
-  /*
-  $files = array();
-  $res = $db->find($post_files_model, array('criteria'=>array(
-    array('postid', '=', $row['postid']),
-  )));
-  while($frow = $db->get_row($res)) {
-    $files[] = $frow;
-  }
-  $row['files'] = $files;
-  */
+
+  // filter out any file_ or post_ field
+  $row = array_filter($row, function($v, $k) {
+    $f5 = substr($k, 0, 5);
+    return $f5 !== 'file_' && $f5 !== 'post_';
+  }, ARRAY_FILTER_USE_BOTH);
+
   $row['no'] = $row['postid'];
   unset($row['postid']);
   unset($row['json']);
@@ -44,10 +40,18 @@ function getThread($boardUri, $threadNum) {
   $posts_model = getPostsModel($boardUri);
   $post_files_model = getPostFilesModel($boardUri);
 
+  //$filesFields = array_keys($post_files_model['fields']);
+  //$filesFields[] = 'fileid';
+
+  $filesFields = array('postid', 'sha256', 'path', 'browser_type', 'mime_type',
+    'type', 'filename', 'size', 'ext', 'w', 'h', 'filedeleted', 'spoiler', 'fileid');
+
+
   $posts_model['children'] = array(
     array(
       'type' => 'left',
       'model' => $post_files_model,
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
     )
   );
 
@@ -56,8 +60,19 @@ function getThread($boardUri, $threadNum) {
     array('postid', '=', $threadNum),
   )));
   $row = $db->get_row($res);
-  postDBtoAPI($row, $post_files_model);
-  $posts[$row['postid']] = $row;
+  $db->free($res);
+  //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
+  postDBtoAPI($row);
+  //echo "<pre>4chan", print_r($row, 1), "</pre>\n";
+  $posts[$row['no']] = $row;
+  $posts[$row['no']]['files'] = array();
+  if (!empty($row['file_fileid'])) {
+    if (!isset($posts[$row['no']]['files'][$row['file_fileid']])) {
+      $frow = $row;
+      fileDBtoAPI($frow);
+      $posts[$row['no']]['files'][$row['file_fileid']] = $frow;
+    }
+  }
 
   $res = $db->find($posts_model, array('criteria'=>array(
     array('threadid', '=', $threadNum),
@@ -65,13 +80,18 @@ function getThread($boardUri, $threadNum) {
   ), 'order' => 'created_at'));
   while($row = $db->get_row($res)) {
     //echo "<pre>", print_r($row, 1), "</pre>\n";
+    $orow = $row;
     if (!isset($posts[$row['postid']])) {
-      postDBtoAPI($row, $post_files_model);
-      $posts[$row['postid']] = $row;
-      $posts['files'] = array();
+      postDBtoAPI($row);
+      $posts[$row['no']] = $row;
+      $posts[$row['no']]['files'] = array();
     }
-    if (!isset($posts[$row['postid']]['files'][$row['fileid']])) {
-      $posts[$row['postid']]['files'][$row['fileid']] = $row;
+    if (!empty($orow['file_fileid'])) {
+      if (!isset($posts[$orow['postid']]['files'][$orow['file_fileid']])) {
+        $frow = $orow;
+        fileDBtoAPI($frow);
+        $posts[$orow['postid']]['files'][$orow['file_fileid']] = $frow;
+      }
     }
   }
   foreach($posts as $pk => $p) {
