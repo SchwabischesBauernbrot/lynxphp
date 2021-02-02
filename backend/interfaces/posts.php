@@ -4,7 +4,7 @@ function postDBtoAPI(&$row) {
   global $db, $models;
   if ($row['deleted'] && $row['deleted'] !== 'f') {
     // non-OPs are automatically hidden...
-    $row = array(
+    $nrow = array(
       'postid' => $row['postid'],
       'no' => $row['postid'],
       'threadid' => $row['threadid'],
@@ -17,9 +17,12 @@ function postDBtoAPI(&$row) {
       'updated_at' => $row['updated_at'],
       'files' => array(),
       // catalog uses this
-      'reply_count' => $row['reply_count'],
-      'file_count' => $row['file_count'],
+      //'reply_count' => $row['reply_count'],
+      //'file_count' => $row['file_count'],
     );
+    if (isset($row['reply_count'])) $nrow['reply_count'] = $row['reply_count'];
+    if (isset($row['file_count'])) $nrow['file_count'] = $row['file_count'];
+    $row = $nrow;
     return;
   }
 
@@ -55,6 +58,7 @@ function getThread($boardUri, $threadNum) {
     )
   );
 
+  // FIXME: only gets first image on OP
   $posts = array();
   $res = $db->find($posts_model, array('criteria'=>array(
     array('postid', '=', $threadNum),
