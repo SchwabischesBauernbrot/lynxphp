@@ -80,20 +80,34 @@ function loadTemplatesFile2($path) {
   return $templates;
 }
 
-function wrapContent($content) {
+function wrapContent($content, $siteSettings = '') {
   // how do we hook in our admin group?
   // the data is only there if we asked for it...
   // could be a: global, pipeline or ??
+  if ($siteSettings === '') {
+    global $packages;
+    $siteSettings = $packages['base']->useResource('settings');
+  }
+  $enableJs = true;
 
   $templates = loadTemplates('header');
   // how and when does this change?
   // FIXME: cacheable...
   $tags = array(
     'nav' => '',
-    'basehref' => BASE_HREF
+    'basehref' => BASE_HREF,
+    'title' => $siteSettings['siteName'],
+    'jsenable' => $enableJs ? '' : '<!-- ',
+    'jsenable2' => $enableJs ? '' : ' -->',
   );
   echo replace_tags($templates['header'], $tags), $content;
-  readfile('templates/footer.tmpl');
+  unset($templates);
+  $tags = array(
+    'jsenable' => $enableJs ? '' : '<!-- ',
+    'jsenable2' => $enableJs ? '' : ' -->',
+  );
+  $footer = loadTemplates('footer');
+  echo replace_tags($footer['header'], $tags);
   flush();
   if (DEV_MODE) {
     global $now;
