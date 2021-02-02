@@ -124,7 +124,7 @@ function getBoardCatalog($boardUri) {
 
 function getBoardThread($boardUri, $threadNum) {
   $result = getExpectJson('opt/' . $boardUri . '/thread/' . $threadNum . '.json');
-  return $result;
+  return $result['data'];
 }
 
 function sendFile($tmpfile, $type, $filename) {
