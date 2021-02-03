@@ -60,23 +60,28 @@ function getThread($boardUri, $threadNum) {
 
   // FIXME: only gets first image on OP
   $posts = array();
+
   $res = $db->find($posts_model, array('criteria'=>array(
     array('postid', '=', $threadNum),
   )));
-  $row = $db->get_row($res);
-  $db->free($res);
-  //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
-  postDBtoAPI($row);
-  //echo "<pre>4chan", print_r($row, 1), "</pre>\n";
-  $posts[$row['no']] = $row;
-  $posts[$row['no']]['files'] = array();
-  if (!empty($row['file_fileid'])) {
-    if (!isset($posts[$row['no']]['files'][$row['file_fileid']])) {
-      $frow = $row;
-      fileDBtoAPI($frow);
-      $posts[$row['no']]['files'][$row['file_fileid']] = $frow;
+  while($row = $db->get_row($res)) {
+    //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
+    if (!isset($posts[$row['postid']])) {
+      //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
+      $posts[$row['postid']] = $row;
+      postDBtoAPI($posts[$row['postid']]);
+      //echo "<pre>4chan", print_r($row, 1), "</pre>\n";
+      $posts[$row['postid']]['files'] = array();
+    }
+    if (!empty($row['file_fileid'])) {
+      if (!isset($posts[$row['postid']]['files'][$row['file_fileid']])) {
+        $frow = $row;
+        fileDBtoAPI($frow);
+        $posts[$row['postid']]['files'][$row['file_fileid']] = $frow;
+      }
     }
   }
+  $db->free($res);
 
   $res = $db->find($posts_model, array('criteria'=>array(
     array('threadid', '=', $threadNum),
