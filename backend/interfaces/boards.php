@@ -158,8 +158,9 @@ function boardPage($boardUri, $page = 1) {
     $sql = 'select '.join(',', array_map(function ($f) { return 'f.' . $f . ' as file_' . $f; }, $filesFields)).', ranked_post.*
               from
               (
-                select t1.*, p.postid as replyid, t.postid as thread_postid, rank() OVER (PARTITION BY p.threadid ORDER BY p.created_at DESC) AS "rank",
-                  '.join(',', array_map(function ($f) { return 'p.' . $f . ' as post_' . $f; }, $postFields)).'
+                select t1.*, tf.*, p.postid as replyid, t.postid as thread_postid, rank() OVER (PARTITION BY p.threadid ORDER BY p.created_at DESC) AS "rank",
+                  '.join(',', array_map(function ($f) { return 'p.' . $f . ' as post_' . $f; }, $postFields)).',
+                  '.join(',', array_map(function ($f) { return 'tf.' . $f . ' as threadfile_' . $f; }, $filesFields)).'
                 from (
                   select p1.*,count(jt1.postid) as cnt
                       from '.$postTable.' as p1
@@ -170,6 +171,7 @@ function boardPage($boardUri, $page = 1) {
                       order by p1.updated_at desc
                   ) as t1
                   left join '.$postTable.' as t on (t1.postid = t.postid)
+                  left join '.$filesTable.' tf on (tf.postid = t.postid)
                   left join '.$postTable.' as p on (t1.postid = p.threadid)
                 order by t.updated_at desc, p.created_at desc
               ) as ranked_post
@@ -177,19 +179,32 @@ function boardPage($boardUri, $page = 1) {
             where rank <= ' . $lastXreplies . '
             order by ranked_post.thread_postid desc, ranked_post.replyid asc';
     $res = pg_query($db->conn, $sql);
+    $err = pg_last_error($db->conn);
+    if ($err) {
+      echo "boards::boardPage:pgsql - err[$err]<br>\nSQL[<code>$sql</code>]<br>\n";
+    }
     $data = array();
     $threads = array();
     while($row = $db->get_row($res)) {
       //echo '<pre>', print_r($row, 1), "</pre>\n";
+
       // don't stomp posts from last record
       if (!isset($threads[$row['postid']])) {
         $threads[$row['postid']] = array_filter($row, function($v, $k) {
           $f5 = substr($k, 0, 5);
-          return $f5 !== 'post_' && $f5 !=='file_';
+          return $f5 !== 'post_' && $f5 !=='file_' && $f5 !== 'threa';
         }, ARRAY_FILTER_USE_BOTH);
         // process op
         postDBtoAPI($threads[$row['postid']]);
         $threads[$row['postid']]['posts'] = array();
+        $threads[$row['postid']]['files'] = array();
+      }
+      // process threadfiles
+      if ($row['threadfile_fileid'] && !isset($threads[$row['postid']]['files'][$row['threadfile_fileid']])) {
+        $threads[$row['postid']]['files'][$row['threadfile_fileid']] = key_map(function($v) { return substr($v, 11); }, array_filter($row, function($v, $k) {
+          $f11 = substr($k, 0, 11);
+          return $f11 ==='threadfile_';
+        }, ARRAY_FILTER_USE_BOTH));
       }
       // don't stomp files from last record
       if ($row['post_postid'] && !isset($threads[$row['postid']]['posts'][$row['post_postid']])) {
@@ -203,22 +218,23 @@ function boardPage($boardUri, $page = 1) {
       }
       if ($row['file_fileid']) {
         $threads[$row['postid']]['posts'][$row['post_postid']]['files'][$row['file_fileid']] = key_map(function($v) { return substr($v, 5); }, array_filter($row, function($v, $k) {
-            $f5 = substr($k, 0, 5);
-            return $f5 ==='file_';
-          }, ARRAY_FILTER_USE_BOTH));
+          $f5 = substr($k, 0, 5);
+          return $f5 ==='file_';
+        }, ARRAY_FILTER_USE_BOTH));
         // postDBtoAPI($threads[$row['postid']]['posts'][$row['post_postid']]['files'][$row['file_fileid']]);
       }
     }
     $db->free($res);
+    //echo "<pre>", print_r($threads, 1), "</pre>\n";
     foreach($threads as $tk => $t) {
       foreach($t['posts'] as $pk => $p) {
         $threads[$tk]['posts'][$pk]['files'] = array_values($p['files']);
       }
-      $threads[$tk]['posts'] = array_values($t['posts']);
+      $threads[$tk]['posts'] = array_values($threads[$tk]['posts']);
       // find op
       $op = $threads[$tk];
       unset($op['posts']); // remove replies
-      $op['files'] = array(); // FIXME: need a thread with files...
+      $op['files'] = array_values($t['files']); // restore files
       // put at top
       //array_unshift($threads[$tk]['posts'], $op);
       $threads[$tk] = array(
