@@ -86,7 +86,8 @@ function wrapContent($content, $siteSettings = '') {
   // could be a: global, pipeline or ??
   if ($siteSettings === '') {
     global $packages;
-    $siteSettings = $packages['base']->useResource('settings');
+    // this can cause an infinite loop if backend has an error...
+    $siteSettings = $packages['base']->useResource('settings', false, array('inWrapContent'=>true));
   }
   $enableJs = true;
 
