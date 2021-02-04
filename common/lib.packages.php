@@ -171,6 +171,9 @@ class package {
           $rsrc['formData'][$f] = $v;
         }
       }
+      if ($options['inWrapContent']) {
+        $rsrc['inWrapContent'] = true;
+      }
     }
     //echo "<pre>lib.pacakge:::package::useResource - cookie: ", print_r($_COOKIE, 1), "</pre>\n";
     //echo "<pre>lib.pacakge:::package::useResource - out: ", print_r($rsrc, 1), "</pre>\n";
