@@ -296,7 +296,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   // a bit more optimized
   public function toArray($res) {
     if (!$res) {
-      echo "<pre>non-resultSet passed into toArray [", gettype($res), "](",print_r($res, 1), ")</pre>\n";
+      $trace = gettrace();
+      echo "<pre>non-resultSet passed into toArray [", gettype($res), "](",print_r($res, 1), ") $trace</pre>\n";
       return array();
     }
     $arr = array();
@@ -307,7 +308,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   }
   public function free($res) {
     if (!$res) {
-      echo "<pre>non-resultSet passed into free [", gettype($res), "](",print_r($res, 1), ")</pre>\n";
+      $trace = gettrace();
+      echo "<pre>non-resultSet passed into free [", gettype($res), "](",print_r($res, 1), ") $trace</pre>\n";
       return array();
     }
     return pg_free_result($res);
