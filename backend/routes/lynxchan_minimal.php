@@ -105,6 +105,7 @@ $router->post('/createBoard', function($request) {
   sendResponse($data);
 });
 
+// used by settings forms and posts
 $router->post('/files', function($request) {
   // make sure tmp is made
   if (!file_exists('storage/tmp')) {
