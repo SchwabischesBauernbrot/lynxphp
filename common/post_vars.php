@@ -38,13 +38,6 @@ function getip() {
   return $ip;
 }
 
-$pipelines = array();
-function definePipeline($constant, $str) {
-  global $pipelines;
-  define($constant, $str);
-  $pipelines[$str] = new pipeline_registry;
-}
-
 function modelToString($model) {
   $s = '<ul><li>Name: ' . $model['name'];
   if (isset($model['fields'])) {
