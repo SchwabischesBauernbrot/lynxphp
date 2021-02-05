@@ -4,6 +4,12 @@ return array(
   'version' => 1,
   'resources' => array(
     array(
+      'name' => 'work',
+      'params' => array(
+        'endpoint' => 'opt/work',
+      ),
+    ),
+    array(
       'name' => 'settings',
       'params' => array(
         'endpoint' => 'opt/settings',
