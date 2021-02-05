@@ -6,6 +6,15 @@ function fileDBtoAPI(&$row) {
     $f5 = substr($k, 0, 5);
     return $f5 ==='file_';
   }, ARRAY_FILTER_USE_BOTH));
+  $path = parsePath($row['path']);
+  $thumb = $path['thumb'];
+  $fp = getcwd() . '/' .  $thumb;
+  //echo "path[$thumb] [", getcwd(), "] fp[$fp]<br>\n";
+  if (file_exists($fp) && filesize($fp)) {
+    //echo "[$thumb] exists<br>\n";
+    $row['thumbnail_path'] = $thumb;
+  }
+
   unset($row['fileid']);
   unset($row['postid']);
   unset($row['json']);
@@ -43,6 +52,50 @@ function removeExif($old, $new) {
   fclose($f2);
 }
 
+function parsePath($filePath) {
+  $parts = explode('/', $filePath);
+  $filename = array_pop($parts);
+  $path = join('/', $parts);
+  return array(
+    'file' => $filename,
+    'thumb' => $path . '/t_' . $filename,
+    'path' => $path,
+  );
+}
+
+function make_thumbnail($filePath, $duration = 1) {
+  $fileIn = escapeshellarg($filePath);
+
+  $path = parsePath($filePath);
+
+  $fileOut = escapeshellarg($path['thumb']);
+
+  $width  = 320;
+  $height = 200;
+  //$ffmpeg
+
+  $ffmpeg_out = array();
+  $try = floor($duration / 2);
+  $ffmpegPath = '/usr/bin/ffmpeg';
+  //exec('$ffmpegPath -strict -2 -ss ' . $try . ' -i ' . $fileIn . ' -v quiet -an -vframes 1 -f mjpeg -vf scale=' . $width . ':' . $height .' ' . $fileOut . ' 2>&1', $ffmpeg_out, $ret);
+  exec($ffmpegPath . ' -i ' . $fileIn . ' -vf scale=' . $width . ':' . $height .' ' . $fileOut . ' 2>&1', $ffmpeg_out, $ret);
+  //echo "ret[$ret]<br>\n";
+  if (!$ret) {
+    print_r($ffmpeg_out);
+  }
+  /*
+  // if duration fails
+  if (!filesize($fileOut) && $try) {
+    exec("$ffmpegPath -y -strict -2 -ss 0 -i $filename -v quiet -an -vframes 1 -f mjpeg -vf scale=$width:$height $thumbnailfc 2>&1", $ffmpeg_out, $ret);
+    clearstatcache();
+    if (!filesize($fileOut)) {
+      return false;
+    }
+  }
+  */
+  return true;
+}
+
 function processFiles($boardUri, $files_json, $threadid, $postid) {
   $issues = array();
   $files = json_decode($files_json, true);
@@ -61,6 +114,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
   global $db;
   $post_files_model = getPostFilesModel($boardUri);
   foreach($files as $num => $file) {
+    $num = (int) $num; // just be safe
     if (!empty($file['meta'])) {
       $issues[] = $num . ' - no hash but got meta';
       continue;
@@ -84,8 +138,13 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     }
     $arr = explode('.', $file['name']);
     $ext = end($arr);
+    // FIXME: escape ext?
     $finalPath = $threadPath . '/' . $postid . '_' . $num . '.' . $ext;
     copy($srcPath, $finalPath);
+    if (!file_exists($finalPath)) {
+      $issues[] = $num . ' - can not copy to ' . $finalPath;
+      continue;
+    }
     unlink($srcPath);
 
     $size = filesize($finalPath);
@@ -112,9 +171,8 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     }
     if ($isAudio) {
     }
-    // FIXME: thumbnail?
 
-    $id = $db->insert($post_files_model, array(array(
+    $fileData = array(
       'postid' => $postid,
       'sha256' => $file['hash'],
       'path'   => $finalPath,
@@ -128,7 +186,14 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       'h' => $sizes[1],
       'filedeleted' => 0,
       'spoiler' => 0,
-    )));
+    );
+
+    // FIXME: thumbnail?
+    global $workqueue;
+    // farm it out
+    $workqueue->addWork(PIPELINE_FILE, $fileData);
+
+    $id = $db->insert($post_files_model, array($fileData));
     if (!$id) {
       $issues[] = $num . ' - '.$file['hash'] . ' database error';
     }
