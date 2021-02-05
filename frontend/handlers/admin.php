@@ -36,6 +36,8 @@ function getAdminModulesPage() {
   global $packages;
   $webroot = realpath($_SERVER['DOCUMENT_ROOT'] . '/..');
   $content = '<ul>';
+  // FIXME: path...
+  include '../backend/pipelines.php'; // set up BE pipelines
   foreach($packages as $name => $pkg) {
     // load in backend packages
     $pkg->buildBackendRoutes();
