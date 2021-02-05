@@ -27,6 +27,9 @@ $db = new $driver_name;
 include '../common/queue_implementations/db.php';
 $queue_type_class = 'db' . '_queue_driver';
 $queue = new $queue_type_class;
+// set up workqueue
+include '../common/workqueue.php';
+$workqueue = new work_queue;
 
 $tpp = 10; // threads per page
 
@@ -52,21 +55,8 @@ include 'interfaces/requests.php';
 // we have database connections
 logRequest(getip());
 
-// pipelines
-// - boardDB to API
-// - thread to API
-// - post to API
-// - user to API
-// - create thread
-// - create reply
-// - upload file
-// - get ip
-// - post var processing
-definePipeline('PIPELINE_BOARD_DATA', 'boardData');
-definePipeline('PIPELINE_POST_DATA',  'postData');
-definePipeline('PIPELINE_USER_DATA',  'userData');
-definePipeline('PIPELINE_POST', 'post');
-definePipeline('PIPELINE_FILE', 'file');
+include '../common/lib.pipeline.php';
+include 'pipelines.php';
 
 $routers = array();
 $routers['4chan'] = include 'routes/4chan.php';
