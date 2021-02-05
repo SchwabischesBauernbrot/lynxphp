@@ -81,6 +81,12 @@ function renderPost($boardUri, $p, $options = false) {
       }
     }
     if ($type === 'file' || $type === 'image') $type = 'img';
+    $thumb = $file['path'];
+    if ($type === 'img') {
+      if (isset($file['thumbnail_path'])) {
+        $thumb = $file['thumbnail_path'];
+      }
+    }
     //print_r($file);
     // disbale images until we can mod...
     $ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
@@ -97,14 +103,14 @@ function renderPost($boardUri, $p, $options = false) {
     }
     $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
     $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
-    $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$file['path'].'" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />', $ftmpl);
+    $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$thumb.'" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />', $ftmpl);
     $files_html .= $ftmpl;
   }
 
   $replies_html = '';
 
   $tags = array(
-    'op'        => $p['threadid'] ? '': 'op',
+    'op'        => $p['threadid'] === $p['no'] ? 'op': '',
     'uri'       => $boardUri,
     'threadNum' => $p['threadid'] ? $p['threadid'] : $p['no'],
     'no'        => $p['no'],
