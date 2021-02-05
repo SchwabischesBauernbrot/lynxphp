@@ -97,7 +97,7 @@ function wrapContent($content, $siteSettings = '') {
   $tags = array(
     'nav' => '',
     'basehref' => BASE_HREF,
-    'title' => $siteSettings['siteName'],
+    'title' => empty($siteSettings['siteName']) ? '': $siteSettings['siteName'],
     'jsenable' => $enableJs ? '' : '<!-- ',
     'jsenable2' => $enableJs ? '' : ' -->',
   );
@@ -110,11 +110,21 @@ function wrapContent($content, $siteSettings = '') {
   $footer = loadTemplates('footer');
   echo replace_tags($footer['header'], $tags);
   flush();
+  // lets put this before the report, so we can profile it
+  // call backend worker
   if (DEV_MODE) {
     global $now;
     $diff = (microtime(true) - $now) * 1000;
     echo "took $diff ms<br>\n";
     curl_log_report();
+    curl_log_clear();
+  }
+  $result = $packages['base']->useResource('work', false, array('inWrapContent'=>true));
+  if (DEV_MODE) {
+    curl_log_report();
+    if ($result) {
+      echo "<pre>worker result [$result]</pre>\n";
+    }
   }
 }
 
