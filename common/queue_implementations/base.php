@@ -16,7 +16,7 @@
 // pub/sub
 interface queue_implementation_interface {
   function subscribe($queue);
-  function receive($queue, $waitformsg=false);
+  function receive($queue, $waitformsg = false);
   function send($queue, $message);
 
 }
@@ -25,17 +25,15 @@ class queue_implementation_base_class implements queue_implementation_interface 
   // clear queue?
   // are these storaged or not?
   // maybe an event vs task?
+
+  // I'm interesting in listening to this queue
   function subscribe($queue) {
   }
-  function receive($queue, $waitformsg=false) {
-    $msgs=$this->get('queue:'.$queue);
-    $this->clear('queue:'.$queue);
-    return $msgs;
+  // consume queue
+  function receive($queue, $waitformsg = false) {
   }
-  function send($queue,$message) {
-    $msgs=$this->get('queue:'.$queue);
-    $msgs[]=$message;
-    $this->set('queue:'.$queue, $msgs);
+  // send to this queue
+  function send($queue, $message) {
   }
 }
 
