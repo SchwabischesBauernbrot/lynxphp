@@ -17,7 +17,7 @@ $bePkgs = array(
     'modules' => array(
       // is this needed?
       // well we could inject this data into some other endpoints...
-      array('pipeline' => 'PIPELINE_BOARD_DATA', 'module' => 'boardData'),
+      array('pipeline' => PIPELINE_BOARD_DATA, 'module' => 'boardData'),
     ),
   ),
 );
