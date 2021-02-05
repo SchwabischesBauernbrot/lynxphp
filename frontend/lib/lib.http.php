@@ -9,6 +9,12 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   if (DEV_MODE) {
     $start = microtime(true);
   }
+
+  if (!$url) {
+    echo gettrace(), " no url given to curlHelper<br>\n";
+    exit(1);
+  }
+
   if (is_array($fields) && $method === 'AUTO') {
     $fields_string='';
     foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
@@ -78,6 +84,11 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
 
 function make_file($tmpfile, $type, $filename) {
   return curl_file_create($tmpfile, $type, $filename);
+}
+
+function curl_log_clear() {
+  global $curlLog;
+  $curlLog = array();
 }
 
 function curl_log_report() {
