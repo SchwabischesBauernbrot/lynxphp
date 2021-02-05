@@ -183,7 +183,7 @@ class package {
     return $result;
   }
   function buildBackendRoutes() {
-    global $routers;
+    global $routers, $pipelines;
     // we install models...
     /*
     if (file_exists($this->dir . 'models.php')) {
@@ -197,6 +197,11 @@ class package {
       if (empty($bePkgs) || !is_array($bePkgs)) {
         return;
       }
+      // we need to check for the array wrapper..
+      if (isset($bePkgs['models']) || isset($bePkgs['modules'])) {
+        echo "dir[", $this->dir, "] has data.php and found a models/modules at the root level, instead of an array<br>\n";
+        exit;
+      }
       foreach($bePkgs as $pName => $pData) {
         $bePkg = $this->makeBackend();
         if (isset($pData['models']) && is_array($pData['models'])) {
@@ -206,10 +211,15 @@ class package {
         }
         if (isset($pData['modules']) && is_array($pData['modules'])) {
           foreach($pData['modules'] as $m) {
-            if (defined($m['pipeline'])) {
-              $bePkg->addModule(constant($m['pipeline']), $m['module']);
+            if (isset($pipelines[$m['pipeline']])) {
+              // we could use constants in the data arrays
+              // but then we need to separate pipelines to their own file
+              // but breaks that data.php just contain data (no code)...
+              $bePkg->addModule($m['pipeline'], $m['module']);
             } else {
               // pipeline isn't defined, likely modules admin interface
+              echo "<pre>[", $this->dir . 'be/data.php', "]pipeline is not defiend in module [", print_r($m, 1), "]</pre>\n";
+              echo "<pre>Missing[", $m['pipeline'], "] [", print_r($pipelines, 1), "]</pre>\n";
             }
           }
         }
