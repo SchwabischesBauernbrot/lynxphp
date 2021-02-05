@@ -53,13 +53,19 @@ function registerPackage($pkg_path) {
     // we want to keep these to pure data as much as possible (no calculation to get result)
     $data = include $full_pkg_path . 'module.php';
     // handle empty module.php
-    if (empty($data['name'])) {
-      //echo "module.php did not return correct data<br>\n";
+    // maybe version should be assumed
+    if (
+      !empty($data) && (empty($data['name']) || empty($data['version']))
+    ) {
+      echo "[$full_pkg_path] module.php did not return correct data, make sure name and version are set<br>\n";
       return $pkg;
     }
     $pkg = new package($data['name'], $data['version'], substr($full_pkg_path, 0, -1));
-    foreach($data['resources'] as $rsrcHdr) {
-      $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params']);
+    // not all module.php will have resources
+    if (!empty($data['resources'])) {
+      foreach($data['resources'] as $rsrcHdr) {
+        $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params']);
+      }
     }
   } else {
     //echo "module_base[$module_base]<br>\n";
