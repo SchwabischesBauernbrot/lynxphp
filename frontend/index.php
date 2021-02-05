@@ -63,6 +63,9 @@ include '../common/lib.modules.php'; // module functions and classes
 // - board search
 // - boardSettingTmpl
 
+include '../common/lib.pipeline.php';
+// we could move these into a pipelines.php file...
+
 // I could move the PIPELINE_ prefix into the definePipeline function
 // but then you couldn't locate these in grep
 definePipeline('PIPELINE_HOMEPAGE_BOARDS_FIELDS',  'homepage_boards_fields');
