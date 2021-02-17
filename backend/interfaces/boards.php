@@ -204,10 +204,12 @@ function boardPage($boardUri, $page = 1) {
       }
       // process threadfiles
       if ($row['threadfile_fileid'] && !isset($threads[$row['thread_postid']]['files'][$row['threadfile_fileid']])) {
-        $threads[$row['thread_postid']]['files'][$row['threadfile_fileid']] = key_map(function($v) { return substr($v, 11); }, array_filter($row, function($v, $k) {
+        $threads[$row['thread_postid']]['files'][$row['threadfile_fileid']] = key_map(function($v) { return substr($v, 6); }, array_filter($row, function($v, $k) {
           $f11 = substr($k, 0, 11);
           return $f11 ==='threadfile_';
         }, ARRAY_FILTER_USE_BOTH));
+        //echo "<pre>", print_r($threads[$row['thread_postid']]['files'][$row['threadfile_fileid']], 1), "</pre>\n";
+        fileDBtoAPI($threads[$row['thread_postid']]['files'][$row['threadfile_fileid']]);
       }
 
       // don't stomp files from last record
@@ -221,11 +223,15 @@ function boardPage($boardUri, $page = 1) {
         $threads[$row['thread_postid']]['posts'][$row['post_postid']]['files'] = array();
       }
       if ($row['file_fileid']) {
+        /*
         $threads[$row['thread_postid']]['posts'][$row['file_postid']]['files'][$row['file_fileid']] = key_map(function($v) { return substr($v, 5); }, array_filter($row, function($v, $k) {
           $f5 = substr($k, 0, 5);
           return $f5 ==='file_';
         }, ARRAY_FILTER_USE_BOTH));
-        // postDBtoAPI($threads[$row['postid']]['posts'][$row['post_postid']]['files'][$row['file_fileid']]);
+        */
+        $threads[$row['thread_postid']]['posts'][$row['file_postid']]['files'][$row['file_fileid']] = $row;
+        // process file
+        fileDBtoAPI($threads[$row['thread_postid']]['posts'][$row['file_postid']]['files'][$row['file_fileid']]);
       }
     }
     $db->free($res);
@@ -353,8 +359,12 @@ function boardCatalog($boardUri) {
   // would be good to get the post count too
   // and all non-deleted files
   $fileTable = modelToTableName($post_files_model);
-  $posts_model['children'] = array(
-  );
+  // why are we stripping children here?
+  //$posts_model['children'] = array();
+
+  $filesFields = array_keys($post_files_model['fields']);
+  $filesFields[] = 'fileid';
+
   //
   $postTable = modelToTableName($posts_model);
   $posts_model['children'] = array(
@@ -363,7 +373,7 @@ function boardCatalog($boardUri) {
       'model' => $posts_model,
       'useField' => 'threadid',
       'pluck' => array('count(ALIAS.postid) as reply_count'),
-      'groupby' => $postTable . '.postid',
+      'groupby' => $postTable . '.postid, files2.fileid',
       //'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.postid)>0))',
       'where' => array(
         array('deleted', '=', 0)
@@ -376,6 +386,15 @@ function boardCatalog($boardUri) {
       'pluck' => array('count(ALIAS.fileid) as file_count'),
       //'groupby' => $postTable . '.postid',
     ),
+    array(
+      'type' => 'left',
+      'model' => $post_files_model,
+      'alias' => 'files2',
+      'tableOverride' => 'board_test_public_posts',
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields),
+      //'pluck' => array('count(ALIAS.fileid) as file_count'),
+      //'groupby' => $postTable . '.postid',
+    ),
   );
 
 
@@ -384,13 +403,22 @@ function boardCatalog($boardUri) {
   ), 'order'=>'updated_at desc'));
   $page = 1;
   // FIXME: rewrite to be more memory efficient
-  // HOW?
+  // How?
   $threads = array();
   while($row = $db->get_row($res)) {
-    $orow = $row; // don't let postDBtoAPI strip everything
-    postDBtoAPI($row, $post_files_model);
-    $row['file_count'] = $orow['file_count']; // preserve file_count
-    $threads[$page][] = $row;
+    // handle thread
+    if (!isset($threads[$page][$row['postid']])) {
+      // add thread
+      $threads[$page][$row['postid']] = $row;
+      postDBtoAPI($threads[$page][$row['postid']], $post_files_model);
+      $threads[$page][$row['postid']]['file_count'] = $row['file_count']; // preserve file_count
+      $threads[$page][$row['postid']]['files'] = array();
+    }
+    // handle files
+    if (!empty($row['file_fileid']) && !isset($threads[$page][$row['postid']]['files'][$row['file_fileid']])) {
+      $threads[$page][$row['postid']]['files'][$row['file_fileid']] = $row;
+      fileDBtoAPI($threads[$page][$row['postid']]['files'][$row['file_fileid']]);
+    }
     // do we need to add a page...
     if (count($threads[$page]) === $tpp) {
       $page++;
@@ -398,6 +426,12 @@ function boardCatalog($boardUri) {
     }
   }
   $db->free($res);
+  foreach($threads as $page => $ts) {
+    foreach($ts as $tk => $t) {
+      $threads[$page][$tk]['files'] = array_values($t['files']);
+    }
+    $threads[$page] = array_values($threads[$page]);
+  }
   //echo "page[$page]<br>\n";
   return $threads;
 }
