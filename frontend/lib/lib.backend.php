@@ -65,8 +65,8 @@ function consume_beRsrc($options, $params = '') {
   if (!empty($options['expectJson']) || !empty($options['unwrapData'])) {
     $obj = json_decode($responseText, true);
     if ($obj === NULL) {
-      if ($options['inWrapContent']) {
-        echo 'Backend error (consume_beRsrc): ' .  $options['endpoint'] . ': ' . $responseText, "\n";
+      if (!empty($options['inWrapContent'])) {
+        echo 'Backend error (consume_beRsrc): ' .  $options['endpoint'] . ': <pre>' . $responseText, "</pre>\n";
       } else {
         wrapContent('Backend error (consume_beRsrc): ' .  $options['endpoint'] . ': ' . $responseText);
       }
