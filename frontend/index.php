@@ -77,6 +77,8 @@ definePipeline('PIPELINE_BOARD_SETTING_NAV',  'board_setting_nav');
 definePipeline('PIPELINE_BOARD_SETTING_TMPL', 'board_setting_tmpl');
 definePipeline('PIPELINE_BOARD_SETTING_GENERAL',  'board_setting_general');
 
+definePipeline('PIPELINE_POST_TEXT_FORMATTING',  'post_text_formatting');
+
 definePipeline('PIPELINE_ADMIN_NAV',          'admin_nav');
 definePipeline('PIPELINE_ADMIN_HEADER_TMPL',  'admin_heading_tmpl');
 definePipeline('PIPELINE_ADMIN_SETTING_GENERAL',  'admin_setting_general');
