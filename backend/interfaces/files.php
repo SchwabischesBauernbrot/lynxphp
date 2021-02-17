@@ -13,6 +13,11 @@ function fileDBtoAPI(&$row) {
   if (file_exists($fp) && filesize($fp)) {
     //echo "[$thumb] exists<br>\n";
     $row['thumbnail_path'] = $thumb;
+  } else {
+    // request generation
+    global $workqueue;
+    $workqueue->addWork(PIPELINE_FILE, $row);
+    // but how do we not loop?
   }
 
   unset($row['fileid']);
@@ -56,6 +61,12 @@ function parsePath($filePath) {
   $parts = explode('/', $filePath);
   $filename = array_pop($parts);
   $path = join('/', $parts);
+
+  // ensure jpg thumbnail output
+  $parts = explode('.', $filename);
+  $ext = array_pop($parts);
+  $filename = join('.', $parts) . '.jpg';
+
   return array(
     'file' => $filename,
     'thumb' => $path . '/t_' . $filename,
@@ -63,36 +74,118 @@ function parsePath($filePath) {
   );
 }
 
-function make_thumbnail($filePath, $duration = 1) {
-  $fileIn = escapeshellarg($filePath);
+function scaleSize($w, $h, $maxh = 240) {
+  // calculate thumbnail size
+  $tn_w = $w;
+  $tn_h = $h;
+  while($tn_w > $maxh) {
+    $tn_w *= 0.9;
+    $tn_h *= 0.9;
+  }
+  return array($tn_w, $tn_h);
+}
+
+function make_thumbnail($fileData, $duration = 1) {
+  /*
+  $w = $fileData['w'];
+  $h = $fileData['h'];
+  while($w > 240) {
+    $w *= 0.9;
+    $h *= 0.9;
+  }
+  */
+  $m6 = substr($fileData['mime_type'], 0, 6);
+
+  $isImage = $m6 === 'image/';
+  $isVideo = $m6 === 'video/';
+  $isAudio = $m6 === 'audio/';
+
+  echo "isImage[$isImage]<br>\n";
+  echo "<pre>", print_r($fileData, 1), "</pre>\n";
+
+  $updateThumbSize = false;
+  if (empty($fileData['tn_w']) || empty($fileData['tn_h'])) {
+    list($fileData['tn_w'], $fileData['tn_h']) = scaleSize($fileData['w'], $fileData['h'], 240);
+    echo "Calcing thumbnail size [", $fileData['tn_w'], "x", $fileData['tn_h'], "]<br>\n";
+    $updateThumbSize = true;
+  }
+
+  if (!make_image_thumbnail_ffmpeg($fileData['path'], $fileData['tn_w'], $fileData['tn_h'], $duration)) {
+    // fail
+    echo "Failed<br>\n";
+    return;
+  }
+  // get final size?
+  // may not save any writes at all if the size differes
+  if ($updateThumbSize) {
+    // write thumbnail size to db
+    if (!$fileData['boardUri']) {
+      echo "Would update thumbsize but no boardUri<br>\n";
+      return;
+    }
+    global $db;
+    $post_files_model = getPostFilesModel($fileData['boardUri']);
+    $urow = array(
+      'tn_w' => (int)$fileData['tn_w'],
+      'tn_h' => (int)$fileData['tn_h'],
+    );
+    echo "Updating[", $fileData['boardUri'], "] [", $fileData['fileid'], "] to [", print_r($urow, 1), "]<br>\n";
+    $db->update($post_files_model, $urow, array('criteria' =>  array('fileid' => $fileData['fileid'])));
+  }
+}
+
+function make_image_thumbnail_ffmpeg($filePath, $width, $height, $duration = 1) {
+  $fileIn = $filePath;
+  if (!$fileIn || !file_exists($fileIn)) {
+    echo "Source file does not exists[$fileIn]<br>\n";
+    return false;
+  }
+  $sFileIn = escapeshellarg($filePath);
 
   $path = parsePath($filePath);
 
-  $fileOut = escapeshellarg($path['thumb']);
+  $fileOut = $path['thumb'];
 
-  $width  = 320;
-  $height = 200;
-  //$ffmpeg
+  // clean up zero byte files to prevent prompt
+  $outExists = file_exists($fileOut);
+  if ($outExists && !filesize($fileOut)) {
+    unlink($fileOut);
+    $outExists = false;
+  }
+  if ($outExists) {
+    echo "File[$fileOut] already exists<br>\n";
+    return false;
+  }
+
+  $sFileOut = escapeshellarg($fileOut);
+  $ffmpegPath = '/usr/bin/ffmpeg';
+
+  $width = (int)$width;
+  $height = (int)$height;
 
   $ffmpeg_out = array();
   $try = floor($duration / 2);
-  $ffmpegPath = '/usr/bin/ffmpeg';
   //exec('$ffmpegPath -strict -2 -ss ' . $try . ' -i ' . $fileIn . ' -v quiet -an -vframes 1 -f mjpeg -vf scale=' . $width . ':' . $height .' ' . $fileOut . ' 2>&1', $ffmpeg_out, $ret);
-  exec($ffmpegPath . ' -i ' . $fileIn . ' -vf scale=' . $width . ':' . $height .' ' . $fileOut . ' 2>&1', $ffmpeg_out, $ret);
-  //echo "ret[$ret]<br>\n";
-  if (!$ret) {
-    print_r($ffmpeg_out);
-  }
-  /*
+  exec($ffmpegPath . ' -i ' . $sFileIn . ' -vf scale=' . $width . ':' . $height .' ' . $sFileOut . ' 2>&1', $ffmpeg_out, $ret);
+  echo "ret[$ret]<br>\n";
+  // failure seems to be 1 (if the file already exists)
+  // ret === 0 on success
+  //if (!$ret) {
+    echo "<pre>", print_r($ffmpeg_out, 1), "</pre>\n";
+  //}
   // if duration fails
-  if (!filesize($fileOut) && $try) {
+  if (!file_exists($fileOut) || !filesize($fileOut)) {
+    echo "file does not exist or empty [$fileOut] ret[$ret]<br>\n";
+    return false;
+    //  && $trg
+    /*
     exec("$ffmpegPath -y -strict -2 -ss 0 -i $filename -v quiet -an -vframes 1 -f mjpeg -vf scale=$width:$height $thumbnailfc 2>&1", $ffmpeg_out, $ret);
     clearstatcache();
     if (!filesize($fileOut)) {
       return false;
     }
+    */
   }
-  */
   return true;
 }
 
@@ -168,10 +261,16 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       // FIXME: strip exif from JPG
     }
     if ($isVideo) {
+      // FIXME: get sizes
     }
     if ($isAudio) {
+      // FIXME: wHat are we using?
     }
 
+    // calculate thumbnail size
+    list($tn_w, $tn_h) = scaleSize($sizes[0], $sizes[1], 240);
+
+    // prepare database record
     $fileData = array(
       'postid' => $postid,
       'sha256' => $file['hash'],
@@ -184,19 +283,32 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       'size' => $size,
       'w' => $sizes[0],
       'h' => $sizes[1],
+      'tn_w' => (int)$tn_w,
+      'tn_h' => (int)$tn_h,
       'filedeleted' => 0,
       'spoiler' => 0,
     );
 
     // FIXME: thumbnail?
-    global $workqueue;
-    // farm it out
-    $workqueue->addWork(PIPELINE_FILE, $fileData);
 
     $id = $db->insert($post_files_model, array($fileData));
     if (!$id) {
       $issues[] = $num . ' - '.$file['hash'] . ' database error';
+      continue;
     }
+
+    // farm out thumbnailing
+    global $workqueue;
+    /*
+    $extFileData = array_merge(array(
+      'boardUri' => $boardUri,
+      'fileid' => $id,
+    ), $fileData);
+    print_r($extFileData);
+    //$workqueue->addWork(PIPELINE_FILE, $extFileData);
+    */
+    $workqueue->addWork(PIPELINE_FILE, $fileData);
+
   }
   return $issues;
 }
