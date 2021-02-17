@@ -195,16 +195,23 @@ class database_driver_base_class {
       // should be the same field
       $rootField = $field;
       $joinField = $field;
-      // unles...
+      // unless...
       if (!empty($join['srcField'])) $rootField = $join['srcField'];
       if (!empty($join['useField'])) $joinField = $join['useField'];
       // set up join table/alias
       $joinTable = modelToTableName($join['model']);
       if (!empty($join['tableOverride'])) $tableName = $join['tableOverride'];
       $joinAlias = $joinTable;
+      if (!empty($join['alias'])) {
+        $joinAlias = $join['alias'];
+      } else
+      // FIXME: well if it's used anywhere else...
       if ($joinTable === $tableName) {
         $this->joinCount++;
         $joinAlias = 'jt' . $this->joinCount;
+      }
+      if ($joinTable !== $joinAlias) {
+        // maybe should be a different var
         $joinTable .= ' as ' . $joinAlias;
       }
       $joinStr = (empty($join['type']) ? '' : $join['type'] . ' ' ) . 'join ' .
@@ -305,9 +312,9 @@ class database_driver_base_class {
     }
 
     if ($this->btTables && !isset($rootModel['query'])) {
-      $sql = 'select '. join(',', $useFields) . "\n" . 'from `' . $tableName . '`';
+      $sql = 'select '. join("\n" . ',', $useFields) . "\n" . 'from `' . $tableName . '`';
     } else {
-      $sql = 'select '. join(',', $useFields) . "\n" . 'from ' . $tableName;
+      $sql = 'select '. join("\n" . ',', $useFields) . "\n" . 'from ' . $tableName;
     }
     $useAlias = '';
     if (count($data['joins'])) {
