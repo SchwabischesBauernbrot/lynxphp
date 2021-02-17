@@ -4,6 +4,6 @@ $params = $getModule();
 
 $fileData = $io;
 
-make_thumbnail($fileData['path']);
+make_thumbnail($fileData);
 
 ?>
