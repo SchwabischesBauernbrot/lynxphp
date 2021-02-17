@@ -28,8 +28,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   function __construct() {
     $this->conn = null;
     $this->modelToSQL = array(
-      'str'     => 'VARCHAR NOT NULL DEFAULT "",',
-      'string'  => 'VARCHAR NOT NULL DEFAULT "",',
+      'str'     => 'VARCHAR NOT NULL DEFAULT \'\',',
+      'string'  => 'VARCHAR NOT NULL DEFAULT \'\,',
       'int'     => 'BIGINT NOT NULL DEFAULT 0,',
       'integer' => 'BIGINT NOT NULL DEFAULT 0,',
       'boolean' => 'Boolean DEFAULT false,',
