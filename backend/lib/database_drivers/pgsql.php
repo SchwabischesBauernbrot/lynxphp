@@ -28,13 +28,13 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   function __construct() {
     $this->conn = null;
     $this->modelToSQL = array(
-      'str' => 'VARCHAR NOT NULL,',
-      'string' => 'VARCHAR NOT NULL,',
-      'int' => 'BIGINT NOT NULL,',
-      'integer' => 'BIGINT NOT NULL,',
+      'str'     => 'VARCHAR NOT NULL DEFAULT "",',
+      'string'  => 'VARCHAR NOT NULL DEFAULT "",',
+      'int'     => 'BIGINT NOT NULL DEFAULT 0,',
+      'integer' => 'BIGINT NOT NULL DEFAULT 0,',
       'boolean' => 'Boolean DEFAULT false,',
-      'bool' => 'Boolean DEFAULT false,',
-      'text' => 'TEXT NOT NULL,',
+      'bool'    => 'Boolean DEFAULT false,',
+      'text'    => 'TEXT NOT NULL,', // maybe it should be null
       //'bigtext' => 'TEXT NOT NULL,',
     );
     $this->sqlToModel = array(
@@ -192,7 +192,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       $res = pg_query($this->conn, $sql);
       $err = pg_last_error($this->conn);
       if ($err) {
-        echo "pgsql::autoupdate - err[$err]<br>\n";
+        echo "pgsql::autoupdate - change err[$err]<br>\nSQL[$sql]<br>\n";
         return false;
       }
       return true;
@@ -265,11 +265,12 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   //              array(field, comparison, field/constant)
   public function find($rootModel, $options = false, $fields = '*') {
     $sql = $this->makeSelectQuery($rootModel, $options, $fields);
+    //echo "<pre>sql[$sql]</pre>\n";
     $res = pg_query($this->conn, $sql);
     //$err = pg_result_error($res);
     $err = pg_last_error($this->conn);
     if ($err) {
-      echo "pgsql::find - err[$err]<br>\nSQL[<code>$sql</code>]<br>\n";
+      echo "pgsql::find - err[$err]<br>\nSQL[<pre>$sql</pre>]<br>\n";
       return false;
     }
     return $res;
