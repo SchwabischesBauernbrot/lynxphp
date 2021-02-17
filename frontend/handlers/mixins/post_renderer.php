@@ -113,6 +113,8 @@ function renderPost($boardUri, $p, $options = false) {
 
   global $pipelines;
   // pass in p and get it back modified
+  $p['safeCom'] = htmlspecialchars($p['com']);
+  $p['boardUri'] = $boardUri; // communicate what board we're on
   $pipelines[PIPELINE_POST_TEXT_FORMATTING]->execute($p);
 
   $tags = array(
@@ -121,7 +123,7 @@ function renderPost($boardUri, $p, $options = false) {
     'threadNum' => $p['threadid'] ? $p['threadid'] : $p['no'],
     'no'        => $p['no'],
     'subject'   => htmlspecialchars($p['sub']),
-    'message'   => htmlspecialchars($p['com']),
+    'message'   => $p['safeCom'],
     'name'      => htmlspecialchars($p['name']),
     'postmeta'  => $postmeta,
     'files'     => $files_html,
