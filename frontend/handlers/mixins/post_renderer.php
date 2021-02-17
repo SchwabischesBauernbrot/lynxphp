@@ -39,8 +39,10 @@ function renderPost($boardUri, $p, $options = false) {
     $postmeta .= $tmp;
   }
   // FIXME: this wrappers need to be controlled...
-  if (!empty($p['subject'])) {
-    $postmeta .= '<span class="post-subject">' . htmlspecialchars($p['subject']) . '</span>';
+  // why was this subject? the field is sub...
+  if (!empty($p['sub'])) {
+    // needs trailing space to let name breathe on it's own
+    $postmeta .= '<span class="post-subject">' . htmlspecialchars($p['sub']) . '</span> ';
   }
   if (!empty($p['name'])) {
     $postmeta .= '<span class="post-name">' . htmlspecialchars($p['name']) . '</span>';
@@ -108,6 +110,10 @@ function renderPost($boardUri, $p, $options = false) {
   }
 
   $replies_html = '';
+
+  global $pipelines;
+  // pass in p and get it back modified
+  $pipelines[PIPELINE_POST_TEXT_FORMATTING]->execute($p);
 
   $tags = array(
     'op'        => $p['threadid'] === $p['no'] ? 'op': '',
