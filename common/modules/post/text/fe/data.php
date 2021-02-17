@@ -29,6 +29,14 @@ return array(
         'pipeline' => 'PIPELINE_POST_TEXT_FORMATTING',
         'module' => 'format',
       ),
+      array(
+        'pipeline' => 'PIPELINE_POST_PREPROCESS',
+        'module' => 'preformat',
+      ),
+      array(
+        'pipeline' => 'PIPELINE_POST_POSTPREPROCESS',
+        'module' => 'postpreformat',
+      ),
     ),
   ),
 );
