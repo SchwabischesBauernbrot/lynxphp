@@ -396,6 +396,7 @@ class frontend_package {
     $this->pkg->registerFrontendPackage($this);
     $this->handlers = array();
     $this->modules = array();
+    $this->ranOnce = false;
   }
   // could make a addCRUD (optional update)
   // could make an addForm that has a get/post
@@ -426,8 +427,38 @@ class frontend_package {
     if ($file === false) $file = $pipeline_name;
     $path = strtolower($this->pkg->dir) . 'fe/modules/' . strtolower($file) . '.php';
     $pkg = &$this->pkg;
-    $bsn->attach($pipeline_name, function(&$io, $options = false) use ($pipeline_name, $path, $pkg) {
-      $getModule = function() use ($pipeline_name, $options) {
+    $module_path = strtolower($this->pkg->dir);
+    // incorrect because a fePkg can have multiple modules...
+    /*
+    $bsn->runOnce($pipeline_name, function() use ($module_path) {
+      if (is_readable($module_path . 'fe/common.php')) {
+        $this->common = include $module_path . 'fe/common.php';
+      } else {
+        if (file_exists($module_path . 'fe/common.php')) {
+          echo "lulwat [$module_path]fe/common.php<br>\n";
+        }
+      }
+    });
+    */
+    $ref = &$this;
+    $bsn->attach($pipeline_name, function(&$io, $options = false) use ($pipeline_name, $path, $pkg, &$ref, $module_path) {
+      $getModule = function() use ($pipeline_name, $options, &$ref, $module_path) {
+        // $this is the bsn...
+        if (!$ref->ranOnce) {
+          if (is_readable($module_path . 'fe/common.php')) {
+            //
+            $ref->common = include $module_path . 'fe/common.php';
+          } else {
+            if (file_exists($module_path . 'fe/common.php')) {
+              echo "lulwat [$module_path]fe/common.php<br>\n";
+            }
+          }
+          $ref->ranOnce = true;
+        }
+        if (isset($ref->common)) {
+          $common = $ref->common;
+        }
+
         //echo "Set up module for [$pipeline_name]<br>\n";
         return array(
           'options' => $options,
