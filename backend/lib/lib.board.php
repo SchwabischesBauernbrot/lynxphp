@@ -137,8 +137,8 @@ function getPostFilesModel($boardUri) {
       //'md5' => array('type'=>'str', 'length'=>24),
       'w' => array('type'=>'int'),
       'h' => array('type'=>'int'),
-      //'tn_w' => array('type'=>'int'),
-      //'tn_h' => array('type'=>'int'),
+      'tn_w' => array('type'=>'int'),
+      'tn_h' => array('type'=>'int'),
       'filedeleted' => array('type'=>'bool'),
       'spoiler' => array('type'=>'bool'),
       // custom_spoiler
