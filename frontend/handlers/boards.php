@@ -159,6 +159,11 @@ function getOverboardHandler() {
   wrapContent($content);
 }
 
+function preprocessPost(&$p) {
+  global $pipelines;
+  $pipelines[PIPELINE_POST_PREPROCESS]->execute($p);
+}
+
 // /:uri/
 function getBoardThreadListing($boardUri, $pagenum = 1) {
   $boardThreads = backendGetBoardThreadListing($boardUri, $pagenum);
@@ -200,6 +205,22 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   */
   $boardnav_html = renderBoardNav($boardUri, $boardThreads['pageCount'], $pagenum);
 
+  // used to look at text, so we can queue up another backend query if needed
+  // FIXME: check count of PIPELINE_POST_PREPROCESS
+  foreach($pageData as $i => $thread) {
+    if (!isset($thread['posts'])) continue;
+    $posts = $thread['posts'];
+    foreach($posts as $j => $post) {
+      preprocessPost($pageData[$i]['posts'][$j]);
+    }
+  }
+  global $pipelines;
+  $data = array(
+    'boardThreads' => $boardThreads,
+    'pagenum' => $pagenum
+  );
+  $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
+
   $threads_html = '';
   foreach($pageData as $thread) {
     if (!isset($thread['posts'])) continue;
@@ -218,7 +239,6 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
     'boardUri' => $boardUri,
     'tags' => array()
   );
-  global $pipelines;
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
   foreach($p['tags'] as $s => $r) {
     $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
