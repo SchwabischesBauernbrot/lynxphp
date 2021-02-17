@@ -12,7 +12,11 @@ Make API requests using the same protocol as the app. Only use SSL when a user i
 // https://a.4cdn.org/boards.json
 $router->get('/boards.json', function($request) {
   $boards = listBoards();
-  echo json_encode($boards);
+  if (getQueryField('prettyPrint')) {
+    echo '<pre>', json_encode($boards, JSON_PRETTY_PRINT), "</pre>\n";
+  } else {
+    echo json_encode($boards);
+  }
 });
 
 // https://a.4cdn.org/po/catalog.json
@@ -32,7 +36,11 @@ $router->get('/:board/catalog.json', function($request) {
       'threads' => $page[$i],
     );
   }
-  echo json_encode($res);
+  if (getQueryField('prettyPrint')) {
+    echo '<pre>', json_encode($res, JSON_PRETTY_PRINT), "</pre>\n";
+  } else {
+    echo json_encode($res);
+  }
 });
 
 // Thread list
@@ -64,7 +72,11 @@ $router->get('/:board/threads.json', function($request) {
       'threads' => $threads,
     );
   }
-  echo json_encode($res);
+  if (getQueryField('prettyPrint')) {
+    echo '<pre>', json_encode($res, JSON_PRETTY_PRINT), "</pre>\n";
+  } else {
+    echo json_encode($res);
+  }
 });
 
 // FIXME: https://a.4cdn.org/archive.json
@@ -78,7 +90,11 @@ $router->get('/:board/:page', function($request) {
   $res = array(
     'threads' => $threads,
   );
-  echo json_encode($res);
+  if (getQueryField('prettyPrint')) {
+    echo '<pre>', json_encode($res, JSON_PRETTY_PRINT), "</pre>\n";
+  } else {
+    echo json_encode($res);
+  }
 });
 
 // Thread endpoint
@@ -87,7 +103,11 @@ $router->get('/:board/thread/:thread', function($request) {
   $boardUri = $request['params']['board'];
   $threadNum = (int)str_replace('.json', '', $request['params']['thread']);
   $posts = getThread($boardUri, $threadNum);
-  echo json_encode(array('posts'=>$posts));
+  if (getQueryField('prettyPrint')) {
+    echo '<pre>', json_encode($posts, JSON_PRETTY_PRINT), "</pre>\n";
+  } else {
+    echo json_encode($posts);
+  }
 });
 
 return $router;
