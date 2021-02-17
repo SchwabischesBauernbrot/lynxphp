@@ -10,7 +10,7 @@ class db_queue_driver extends queue_implementation_base_class implements queue_i
       'fields' => array(
         'queue' => array('type' => 'str'),
         'type'  => array('type' => 'str'),
-        'job'   => array('type' => 'str'),
+        'job'   => array('type' => 'text'),
         // how would we handle broadcast expiration?
         // we'd need to register all the active listeners
         // but in a web framework theoretic workers and active workers are two different things
