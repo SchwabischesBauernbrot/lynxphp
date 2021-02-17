@@ -27,6 +27,18 @@ function processFiles($filter_fields = false) {
       $files[$field] = array();
       if (is_array($_FILES[$field]['tmp_name'])) {
         foreach($_FILES[$field]['tmp_name'] as $i=>$path) {
+          if (!$path) {
+            if (isset($_FILES[$field]['error'][$i])) {
+              // usually means no file upload...
+              if ($_FILES[$field]['error'][$i] !== 4) {
+                echo "File upload error: ", $phpFileUploadErrors[$_FILES[$field]['error'][$i]], "<br>\n";
+                echo "<pre>empty file[", print_r($_FILES[$field], 1), "</pre>\n";
+              }
+            } else {
+              echo "<pre>empty file[", print_r($_FILES[$field], 1), "</pre>\n";
+            }
+            continue;
+          }
           $res = sendFile($path, $_FILES[$field]['type'][$i], $_FILES[$field]['name'][$i]);
           // check for error
           if (empty($res['data']['hash'])) {
