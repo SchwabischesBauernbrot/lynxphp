@@ -3,18 +3,16 @@ return array(
   'name' => 'post_text',
   'version' => 1,
   'resources' => array(
-    /*
     array(
-      'name' => 'settings',
+      'name' => 'boardthreadlookup',
       'params' => array(
-        'endpoint' => 'opt/settings',
+        'endpoint' => 'opt/boardthreadlookup',
+        'method' => 'POST',
         'sendSession' => true,
         'unwrapData' => true,
-        'requires' => array(),
-        'params' => 'querystring',
+        'params' => 'postdata',
       ),
     ),
-    */
   ),
 );
 ?>
