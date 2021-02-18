@@ -228,7 +228,7 @@ function make_thumbnail($fileData, $duration = 1) {
       'tn_w' => (int)$fileData['tn_w'],
       'tn_h' => (int)$fileData['tn_h'],
     );
-    echo "Updating[", $fileData['boardUri'], "] [", $fileData['fileid'], "] to [", print_r($urow, 1), "]<br>\n";
+    //echo "Updating[", $fileData['boardUri'], "] [", $fileData['fileid'], "] to [", print_r($urow, 1), "]<br>\n";
     $db->update($post_files_model, $urow, array('criteria' =>  array('fileid' => $fileData['fileid'])));
   }
 }
