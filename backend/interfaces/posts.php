@@ -47,7 +47,8 @@ function getThread($boardUri, $threadNum) {
   //$filesFields[] = 'fileid';
 
   $filesFields = array('postid', 'sha256', 'path', 'browser_type', 'mime_type',
-    'type', 'filename', 'size', 'ext', 'w', 'h', 'filedeleted', 'spoiler', 'fileid');
+    'type', 'filename', 'size', 'ext', 'w', 'h', 'filedeleted', 'spoiler',
+    'tn_w', 'tn_h', 'fileid');
 
 
   $posts_model['children'] = array(
@@ -76,7 +77,7 @@ function getThread($boardUri, $threadNum) {
     if (!empty($row['file_fileid'])) {
       if (!isset($posts[$row['postid']]['files'][$row['file_fileid']])) {
         $frow = $row;
-        fileDBtoAPI($frow);
+        fileDBtoAPI($frow, $boardUri);
         $posts[$row['postid']]['files'][$row['file_fileid']] = $frow;
       }
     }
@@ -98,7 +99,7 @@ function getThread($boardUri, $threadNum) {
     if (!empty($orow['file_fileid'])) {
       if (!isset($posts[$orow['postid']]['files'][$orow['file_fileid']])) {
         $frow = $orow;
-        fileDBtoAPI($frow);
+        fileDBtoAPI($frow, $boardUri);
         $posts[$orow['postid']]['files'][$orow['file_fileid']] = $frow;
       }
     }
