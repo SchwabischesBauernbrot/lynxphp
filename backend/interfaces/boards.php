@@ -209,7 +209,7 @@ function boardPage($boardUri, $page = 1) {
           return $f11 ==='threadfile_';
         }, ARRAY_FILTER_USE_BOTH));
         //echo "<pre>", print_r($threads[$row['thread_postid']]['files'][$row['threadfile_fileid']], 1), "</pre>\n";
-        fileDBtoAPI($threads[$row['thread_postid']]['files'][$row['threadfile_fileid']]);
+        fileDBtoAPI($threads[$row['thread_postid']]['files'][$row['threadfile_fileid']], $boardUri);
       }
 
       // don't stomp files from last record
@@ -231,7 +231,7 @@ function boardPage($boardUri, $page = 1) {
         */
         $threads[$row['thread_postid']]['posts'][$row['file_postid']]['files'][$row['file_fileid']] = $row;
         // process file
-        fileDBtoAPI($threads[$row['thread_postid']]['posts'][$row['file_postid']]['files'][$row['file_fileid']]);
+        fileDBtoAPI($threads[$row['thread_postid']]['posts'][$row['file_postid']]['files'][$row['file_fileid']], $boardUri);
       }
     }
     $db->free($res);
@@ -306,7 +306,7 @@ function boardPage($boardUri, $page = 1) {
     // do we have this file?
     if (!empty($orow['file_fileid']) && !isset($threads[$row['postid']]['posts'][0]['files'][$orow['file_fileid']])) {
       $threads[$row['postid']]['posts'][0]['files'][$orow['file_fileid']] = $orow;
-      fileDBtoAPI($threads[$row['postid']]['posts'][0]['files'][$orow['file_fileid']]);
+      fileDBtoAPI($threads[$row['postid']]['posts'][0]['files'][$orow['file_fileid']], $boardUri);
     }
 
     // add remaining posts
@@ -327,7 +327,7 @@ function boardPage($boardUri, $page = 1) {
       // do we have this file
       if (!empty($post['file_fileid']) && !isset($threads[$orow['postid']]['posts'][$post['postid']]['files'][$post['file_fileid']])) {
         $threads[$orow['postid']]['posts'][$post['postid']]['files'][$post['file_fileid']] = $post;
-        fileDBtoAPI($threads[$orow['postid']]['posts'][$post['postid']]['files'][$post['file_fileid']]);
+        fileDBtoAPI($threads[$orow['postid']]['posts'][$post['postid']]['files'][$post['file_fileid']], $boardUri);
       }
     }
   }
@@ -419,7 +419,7 @@ function boardCatalog($boardUri) {
     // handle files
     if (!empty($row['file_fileid']) && !isset($threads[$page][$row['postid']]['files'][$row['file_fileid']])) {
       $threads[$page][$row['postid']]['files'][$row['file_fileid']] = $row;
-      fileDBtoAPI($threads[$page][$row['postid']]['files'][$row['file_fileid']]);
+      fileDBtoAPI($threads[$page][$row['postid']]['files'][$row['file_fileid']], $boardUri);
     }
     // do we need to add a page...
     if (count($threads[$page]) === $tpp) {
