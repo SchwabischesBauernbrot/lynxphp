@@ -37,6 +37,16 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       'text'    => 'TEXT NOT NULL,', // maybe it should be null
       //'bigtext' => 'TEXT NOT NULL,',
     );
+    $this->changeModelToSQL = array(
+      'str'     => array('TYPE VARCHAR', 'SET NOT NULL DEFAULT \'\''),
+      'string'  => array('TYPE VARCHAR', 'SET NOT NULL DEFAULT \'\''),
+      'int'     => array('TYPE BIGINT', 'SET NOT NULL DEFAULT 0'),
+      'integer' => array('TYPE BIGINT', 'SET NOT NULL DEFAULT 0'),
+      'boolean' => array('TYPE Boolean DEFAULT false'),
+      'bool'    => array('TYPE Boolean DEFAULT false'),
+      'text'    => array('TYPE TEXT', 'SET NOT NULL'), // maybe it should be null
+      //'bigtext' => 'TEXT NOT NULL,',
+    );
     $this->sqlToModel = array(
       'bigint' => 'int',
       'integer' => 'int',
@@ -169,7 +179,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       if ($haveAll && $noChanges) {
         return true;
       }
-      $sql = 'alter table "' . $tableName . '" ';
+      $sql = 'alter table ' . $tableName . ' ';
       if (!$haveAll) {
         //echo "Need to create<br>\n";
         // ALTER TABLE
@@ -181,11 +191,18 @@ class pgsql_driver extends database_driver_base_class implements database_driver
         $sql = substr($sql, 0, -2);
       }
       if (!$noChanges) {
-        echo "pgsql::autoupdate - Need to change<br>\n";
+        //echo "pgsql::autoupdate - Need to change<br>\n";
         foreach($changes as $fieldName => $f) {
           //echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
-          //$sql .= 'MODIFY ' . $fieldName . ' ' .modelToSQL($f['type']);
+          if (is_array($this->changeModelToSQL[$f['type']])) {
+            foreach($this->changeModelToSQL[$f['type']] as $f) {
+              $sql .= 'ALTER COLUMN ' . $fieldName . ' ' . $f . ', ';
+            }
+          } else {
+            $sql .= 'ALTER COLUMN ' . $fieldName . ' TYPE ' . $this->changeModelToSQL[$f['type']] . ' ';
+          }
         }
+        $sql = substr($sql, 0, -2);
       }
       $sql .= '';
       //echo "sql[$sql]<br>\n";
