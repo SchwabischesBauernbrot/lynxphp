@@ -390,7 +390,7 @@ function boardCatalog($boardUri) {
       'type' => 'left',
       'model' => $post_files_model,
       'alias' => 'files2',
-      'tableOverride' => 'board_test_public_posts',
+      'tableOverride' => $postTable,
       'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields),
       //'pluck' => array('count(ALIAS.fileid) as file_count'),
       //'groupby' => $postTable . '.postid',
