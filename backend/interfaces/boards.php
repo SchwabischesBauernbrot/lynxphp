@@ -339,6 +339,8 @@ function boardPage($boardUri, $page = 1) {
       $threads[$tk]['posts'][$pk]['files'] = array_values($p['files']);
     }
     $threads[$tk]['posts'] = array_values($t['posts']);
+    // set threadid to match postid on OP
+    $threads[$tk]['posts'][0]['threadid'] = $threads[$tk]['posts'][0]['no'];
   }
   $threads = array_values($threads);
   return $threads;
