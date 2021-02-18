@@ -249,7 +249,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "mysql::find - err[$err]<br>\nSQL[$sql]<br>\n";
+      echo "<pre>mysql::find - err[$err]\nSQL[$sql]</ore>\n";
       return false;
     }
     return $res;
