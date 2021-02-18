@@ -117,10 +117,12 @@ function renderPost($boardUri, $p, $options = false) {
   $p['boardUri'] = $boardUri; // communicate what board we're on
   $pipelines[PIPELINE_POST_TEXT_FORMATTING]->execute($p);
 
+  $threadid = $p['threadid'] ? $p['threadid'] : $p['no'];
+
   $tags = array(
-    'op'        => $p['threadid'] === $p['no'] ? 'op': '',
+    'op'        => $threadid === $p['no'] ? 'op': '',
     'uri'       => $boardUri,
-    'threadNum' => $p['threadid'] ? $p['threadid'] : $p['no'],
+    'threadNum' => $threadid,
     'no'        => $p['no'],
     'subject'   => htmlspecialchars($p['sub']),
     'message'   => $p['safeCom'],
