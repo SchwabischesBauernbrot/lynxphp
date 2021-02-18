@@ -207,19 +207,23 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
 
   // used to look at text, so we can queue up another backend query if needed
   // FIXME: check count of PIPELINE_POST_PREPROCESS
+  $nPosts = array();
   foreach($pageData as $i => $thread) {
     if (!isset($thread['posts'])) continue;
     $posts = $thread['posts'];
     foreach($posts as $j => $post) {
       preprocessPost($pageData[$i]['posts'][$j]);
+      $nPosts[] = $post;
     }
   }
   global $pipelines;
   $data = array(
+    'posts' => $nPosts,
     'boardThreads' => $boardThreads,
     'pagenum' => $pagenum
   );
   $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
+  unset($nPosts);
 
   $threads_html = '';
   foreach($pageData as $thread) {
@@ -272,6 +276,18 @@ function getThreadHandler($boardUri, $threadNum) {
   $boardnav_html = $tmp;
 
   $boardData = getBoardThread($boardUri, $threadNum);
+
+  foreach($boardData['posts'] as $j => $post) {
+    preprocessPost($boardData['posts'][$j]);
+  }
+  global $pipelines;
+  $data = array(
+    'posts' => $boardData['posts'],
+    'boardData' => $boardData,
+    'threadNum' => $threadNum
+  );
+  $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
+
   $posts_html = '';
   $files = 0;
   foreach($boardData['posts'] as $post) {
@@ -307,6 +323,68 @@ function getThreadHandler($boardUri, $threadNum) {
   wrapContent($tmpl);
 }
 
+function getThumbnail($file, $maxW = 0) {
+  $type = $file['type'] ? $file['type'] : 'image';
+  if ($type === 'audio') {
+    $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg';
+    if (!$isPlayable) {
+      $type = 'file';
+    }
+  }
+  if ($type === 'video') {
+    $isPlayable = $file['mime_type'] === 'video/mp4' || $file['mime_type'] === 'video/webm' || $file['mime_type'] === 'video/ogg';
+    if (!$isPlayable) {
+      $type = 'image';
+    }
+  }
+  // normalized
+  if ($type === 'file' || $type === 'image') $type = 'img';
+
+  // set default, no thumb
+  $thumb = $file['path'];
+
+  // thumbnailable?
+  if ($type === 'img' || $type === 'audio' || $type === 'video') {
+    if (isset($file['thumbnail_path'])) {
+      $thumb = $file['thumbnail_path'];
+      $type = 'img';
+    }
+  }
+
+  // figure out thumb size
+  if (empty($file['tn_w']) || empty($file['tn_h'])) {
+    $w = $file['w'];
+    $h = $file['h'];
+    while($h > 240) {
+      $w *= 0.9;
+      $h *= 0.9;
+    }
+  } else {
+    $w = $file['tn_w'];
+    $h = $file['tn_h'];
+  }
+
+  if ($maxW !== 0) {
+    $w = $file['w'];
+    $h = $file['h'];
+    // audio/video won't have these set yet... but thumbnail will be
+    if (empty($file['w']) || empty($file['h'])) {
+      $w = $file['tn_w'];
+      $h = $file['tn_h'];
+    }
+    while($w > $maxW) {
+      $w *= 0.9;
+      $h *= 0.9;
+    }
+  }
+  if (!$w || !$h) {
+    $w = 240;
+    $h = 240;
+  }
+
+  return '<' . $type . ' class="file-thumb" src="backend/'.$thumb.'" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />';
+}
+
 function getBoardCatalogHandler($boardUri) {
   $catalog = getBoardCatalog($boardUri);
   if (!empty($catalog['meta']['err'])) {
@@ -326,13 +404,28 @@ function getBoardCatalogHandler($boardUri) {
   $tile_template  = $templates['loop2'];
 
   $maxPage = 0;
-  foreach($catalog as $obj) {
+  $posts = array();
+  foreach($catalog as $i=>$obj) {
     if (isset($obj['page'])) {
       $maxPage = max($obj['page'], $maxPage);
     } else {
       echo "<pre>No page set in [", print_r($obj, 1), "]</pre>\n";
     }
+    foreach($obj['threads'] as $j => $post) {
+      preprocessPost($catalog[$i]['threads'][$j]);
+      $posts[] = $post;
+    }
   }
+
+  global $pipelines;
+  $data = array(
+    'posts'    => $posts,
+    'catalog'  => $catalog,
+    'boardUri' => $boardUri,
+  );
+  $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
+  unset($posts);
+
   $boardnav_html = renderBoardNav($boardUri, $maxPage, '[Catalog]');
 
   $tiles_html = '';
@@ -352,7 +445,8 @@ function getBoardCatalogHandler($boardUri) {
         $tile_image = $image_template;
         $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
         $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
-        $tile_image = str_replace('{{file}}', 'backend/'.$thread['files'][0]['path'], $tile_image);
+        $tile_image = str_replace('{{file}}', 'backend/' . $thread['files'][0]['path'], $tile_image);
+        $tile_image = str_replace('{{thumb}}', getThumbnail($thread['files'][0], 209), $tile_image);
         /*
         $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
         $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
