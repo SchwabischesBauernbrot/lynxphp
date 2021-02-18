@@ -84,11 +84,26 @@ function renderPost($boardUri, $p, $options = false) {
     }
     if ($type === 'file' || $type === 'image') $type = 'img';
     $thumb = $file['path'];
-    if ($type === 'img') {
+    if ($type === 'img' || $type === 'audio' || $type === 'video') {
       if (isset($file['thumbnail_path'])) {
         $thumb = $file['thumbnail_path'];
+        $type = 'img';
       }
     }
+
+    // figure out thumb size
+    if (empty($file['tn_w']) || empty($file['tn_h'])) {
+      $w = $file['w'];
+      $h = $file['h'];
+      while($w > 240) {
+        $w *= 0.9;
+        $h *= 0.9;
+      }
+    } else {
+      $w = $file['tn_w'];
+      $h = $file['tn_h'];
+    }
+
     //print_r($file);
     // disbale images until we can mod...
     $ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
@@ -97,12 +112,6 @@ function renderPost($boardUri, $p, $options = false) {
       $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
     }
     //$ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
-    $w = $file['w'];
-    $h = $file['h'];
-    while($w > 240) {
-      $w *= 0.9;
-      $h *= 0.9;
-    }
     $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
     $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
     $ftmpl = str_replace('{{thumb}}', '<' . $type . ' class="file-thumb" src="backend/'.$thumb.'" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />', $ftmpl);
