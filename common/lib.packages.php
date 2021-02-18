@@ -82,6 +82,7 @@ class package {
     $this->resources[$label] = $rsrcArr;
   }
   function useResource($label, $params = false, $options = false) {
+    $label = strtolower($label); // UX but also camelcase is nice to make something clear
     if (empty($this->resources[$label])) {
       echo "<pre>lib.pacakge:::package::useResource - Cannot call [$label] no such resource: ", print_r(array_keys($this->resources), 1), "</pre>\n";
       return;
