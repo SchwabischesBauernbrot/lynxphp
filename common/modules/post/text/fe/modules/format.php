@@ -2,6 +2,41 @@
 
 $params = $getModule();
 
+// non-quote stuff...
+
+// spoiler
+$io['safeCom'] = preg_replace('/\[spoiler\]([\s\S]+?)\[\/spoiler\]/', '<span class="spoiler">\1</span>',$io['safeCom']);
+$io['safeCom'] = preg_replace('/\|\|([\s\S]+?)\|\|/', '<span class="spoiler">\1</span>',$io['safeCom']);
+
+// redText / title
+$io['safeCom'] = preg_replace('/==([\s\S]+?)==/', '<span class="title">\1</span>',$io['safeCom']);
+// bold
+$io['safeCom'] = preg_replace('/\'\'\'([\s\S]+?)\'\'\'/', '<span class="bold">\1</span>',$io['safeCom']);
+// italics/em
+$io['safeCom'] = preg_replace('/\*\*([\s\S]+?)\*\*/', '<span class="em">\1</span>',$io['safeCom']);
+$io['safeCom'] = preg_replace('/\'\'([\s\S]+?)\'\'/', '<span class="em">\1</span>',$io['safeCom']);
+// underline
+$io['safeCom'] = preg_replace('/__([\s\S]+?)__/', '<span class="underline">\1</span>',$io['safeCom']);
+// strike
+$io['safeCom'] = preg_replace('/~~([\s\S]+?)~~/', '<span class="strike">\1</span>',$io['safeCom']);
+// endchan memes
+$io['safeCom'] = preg_replace('/\[meme\]([\s\S]+?)\[\/meme\]/', '<span class="meme">\1</span>',$io['safeCom']);
+$io['safeCom'] = preg_replace('/\[autism\]([\s\S]+?)\[\/autism\]/', '<span class="autism">\1</span>',$io['safeCom']);
+// aa
+$io['safeCom'] = preg_replace('/\[aa\]([\s\S]+?)\[\/aa\]/', '<span class="aa">\1</span>',$io['safeCom']);
+// code
+$io['safeCom'] = preg_replace('/\[code\]([\s\S]+?)\[\/code\]/', '<span class="code">\1</span>',$io['safeCom']);
+
+// greentext
+$io['safeCom'] = preg_replace('/^&gt; ?((?!&gt;\d+|&gt;&gt;\/\w+()?|&gt;&gt;#\/).*)/m', '<span class="greentext">&gt; \1</span>',$io['safeCom']);
+// orangetext
+$io['safeCom'] = preg_replace('/^&lt; ?((?!&gt;\d+|&gt;&gt;\/\w+()?|&gt;&gt;#\/).*)/m', '<span class="orangetext">&lt; \1</span>',$io['safeCom']);
+// monospaced
+$io['safeCom'] = preg_replace('/`(.+?)`/m', '<span class="mono">\1</span>',$io['safeCom']);
+// detected
+$io['safeCom'] = preg_replace('/\(\(\((.+?)\)\)\)/m', '<span class="detected">\1</span>',$io['safeCom']);
+
+
 // <a class="quote" href="/test/thread/121.html#124">&gt;&gt;124</a>
 
 // skip quote processing if we can
