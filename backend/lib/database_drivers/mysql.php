@@ -257,6 +257,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function count($rootModel, $options = false) {
     $res = $this->find($rootModel, $options, 'count(*)');
     list($cnt) = mysqli_fetch_row($res);
+    mysqli_free_result($res);
     return $cnt;
   }
   public function findById($rootModel, $id, $options = false) {
