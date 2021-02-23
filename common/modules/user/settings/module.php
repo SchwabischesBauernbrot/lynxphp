@@ -13,39 +13,17 @@ return array(
         'params' => 'querystring',
       ),
     ),
-/*
     array(
-      'name' => 'list',
+      'name' => 'save_settings',
       'params' => array(
-        'endpoint' => 'opt/admin/users',
-        'unwrapData' => true,
-        'requireSession'=> true,
-        //'requires' => array('boardUri'),
-        //'params' => 'querystring',
-      ),
-    ),
-    array(
-      'name' => 'listgroups',
-      'params' => array(
-        'endpoint' => 'opt/admin/groups',
-        'unwrapData' => true,
-        'requireSession'=> true,
-        //'requires' => array('boardUri'),
-        //'params' => 'querystring',
-      ),
-    ),
-    array(
-      'name' => 'updateusergroups',
-      'params' => array(
-        'endpoint' => 'opt/admin/users/:id/groups',
+        'endpoint' => 'opt/users/settings',
         'method' => 'POST',
+        'sendSession' => true,
         'unwrapData' => true,
-        'requireSession'=> true,
-        'requires' => array('groups'),
+        'requires' => array(),
         'params' => 'postdata',
       ),
     ),
-*/
   ),
 );
 ?>
