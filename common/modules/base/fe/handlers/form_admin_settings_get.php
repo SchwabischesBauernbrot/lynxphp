@@ -2,7 +2,8 @@
 
 $params = $getHandler();
 
-$values = $pkg->useResource('settings');
+$data = $pkg->useResource('settings');
+$values = $data['site'];
 //echo "<pre>[", print_r($values, 1), "]</pre>\n";
 
 global $pipelines;
