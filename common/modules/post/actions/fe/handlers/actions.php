@@ -63,14 +63,12 @@ if (count($result['issues'])) {
   wrapContent(print_r($result['issues'], 1)."<br>\n<pre>".print_r($result, 1)."</pre>\n");
 } else {
   $boardUri = $result['request'][0]['board'];
-  wrapContent('<pre>' . print_r($result, 1) . '</pre>');
-  /*
+  //wrapContent('<pre>' . print_r($result, 1) . '</pre>');
   if ($result['request'][0]['threadid'] !== 'ThreadNum') {
     redirectTo('/'. $boardUri . '/thread/' . $result['request'][0]['threadid'] . '.html');
   } else {
     redirectTo('/'. $boardUri . '/');
   }
-  */
 }
 
 
