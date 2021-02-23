@@ -32,7 +32,8 @@ function generateForm($action, $fields, $values) {
       case 'select':
         $html .= '<select name="' . $field . '">';
         foreach($details['options'] as $v => $l) {
-          $html .= '<option value="' . $v . '">' . $l;
+          $sel = $v === $value ? 'selected ' : '';
+          $html .= '<option value="' . $v . '"' . $sel . '>' . $l;
         }
         $html .= '</select>';
       break;
