@@ -80,16 +80,32 @@ function loadTemplatesFile2($path) {
   return $templates;
 }
 
-function wrapContent($content, $siteSettings = '') {
+function wrapContent($content, $options = '') {
   // how do we hook in our admin group?
   // the data is only there if we asked for it...
   // could be a: global, pipeline or ??
-  if ($siteSettings === '') {
+  if (empty($options['settings'])) {
     global $packages;
     // this can cause an infinite loop if backend has an error...
-    $siteSettings = $packages['base']->useResource('settings', false, array('inWrapContent'=>true));
+    $settings = $packages['base']->useResource('settings', false, array('inWrapContent'=>true));
+  } else {
+    $settings = $options['settings'];
   }
+  $siteSettings = $settings['site'];
+  $userSettings = $settings['user'];
   $enableJs = true;
+
+  $themes = array('yotsuba-b', 'snerx');
+  if (empty($userSettings['current_theme']) || $userSettings['current_theme'] === 'default') $userSettings['current_theme'] = $themes[0];
+
+  $themesHtml = '';
+  foreach($themes as $theme) {
+    if ($userSettings['current_theme'] === $theme) {
+      $themesHtml .= '<link id="theme" rel="stylesheet" data-theme="' . $theme . '" href="css/themes/' . $theme . '.css">';
+    } else {
+      $themesHtml .= '<link rel="alternate stylesheet" type="text/css" data-theme="' . $theme . '" title="' . $theme . '" href="css/themes/' . $theme . '.css">';
+    }
+  }
 
   $templates = loadTemplates('header');
   // how and when does this change?
@@ -98,6 +114,8 @@ function wrapContent($content, $siteSettings = '') {
     'nav' => '',
     'basehref' => BASE_HREF,
     'title' => empty($siteSettings['siteName']) ? '': $siteSettings['siteName'],
+    // maybe head insertions is better?
+    'themes' => $themesHtml,
     'jsenable' => $enableJs ? '' : '<!-- ',
     'jsenable2' => $enableJs ? '' : ' -->',
   );
