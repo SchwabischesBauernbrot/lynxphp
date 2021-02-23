@@ -1,10 +1,13 @@
 <?php
 $params = $get();
 
-$pass = getUserID() ? userInGroup($user_id, array('admin')) : false;
-if (!$pass) {
-  return sendResponse(getPublicSiteSettings());
-}
+$userid = getUserID();
+$settings = getUserSettings($userid);
 
-sendResponse(getAllSiteSettings());
+sendResponse(array(
+  'settings' => $settings['settings'],
+  'loggedin' => $userid ? true : false,
+  'session'  => $settings['session'],
+));
+
 ?>
