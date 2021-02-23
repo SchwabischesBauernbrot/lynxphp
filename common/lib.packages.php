@@ -172,7 +172,7 @@ class package {
           $rsrc['formData'][$f] = $v;
         }
       }
-      if ($options['inWrapContent']) {
+      if (!empty($options['inWrapContent'])) {
         $rsrc['inWrapContent'] = true;
       }
     }
