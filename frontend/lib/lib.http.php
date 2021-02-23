@@ -17,7 +17,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
 
   if (is_array($fields) && $method === 'AUTO') {
     $fields_string='';
-    foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+    foreach($fields as $key=>$value) { $fields_string .= $key . '=' . urlencode($value) . '&'; }
     $fields_string=rtrim($fields_string, '&');
   } else {
     $fields_string=$fields;
