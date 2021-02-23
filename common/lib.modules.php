@@ -236,15 +236,29 @@ class orderable_module {
   var $dependencies; // these have to be completed
   var $preempt; // I must be before these modules
   var $name; // what my name is
+  var $code;
+  var $doOnceCode;
+  var $ranOnce;
   function __construct() {
     $this->dependencies = array();
     $this->preempt      = array();
+    $this->doOnceCode   = array();
+    $this->ranOnce = false;
+  }
+  function runOnce($pipeline, $code) {
+    $this->doOnceCode[] = $code;
   }
   function attach($pipeline, $code) {
     // deps and preempt are set
     $this->code = $code;
   }
   function exec(&$param) {
+    if (!$this->ranOnce) {
+      foreach($this->doOnceCode as $code) {
+        $code();
+      }
+      $this->ranOnce = true;
+    }
     $code = $this->code;
     $code($param);
   }
@@ -257,6 +271,7 @@ class orderable_module {
 // data vs code: Site/BO/Users options
 class pipeline_module extends orderable_module {
   function __construct($name) {
+    parent::__construct();
     $this->name = $name;
   }
   // FIXME: convert to external file
