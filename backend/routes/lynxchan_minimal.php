@@ -53,22 +53,32 @@ $router->post('/login', function($request) {
   if (!password_verify($_POST['password'], $row['password'])) {
     return sendResponse(array(), 401, 'Incorrect login - bad pass');
   }
-  // we should create a session token for this user
-  $session = md5(uniqid());
-  $ttl = time() + 86400; // 1 day from now
-  // FIXME: check to make sure session isn't already used...
-  $db->insert($models['session'], array(array(
-    'session' => $session,
-    'user_id' => $row['userid'],
-    'expires' => $ttl,
-    'ip'      => getip(),
-  )));
+
+  $sesRow = getSession();
+  if ($sesRow) {
+    if ($sesRow['userid']) {
+      return sendResponse(array(), 500, 'Already logged in');
+    } else {
+      // upgrade session
+      if (!sessionSetUserID($sesRow['session'], $row['userid'])) {
+        return sendResponse(array(), 500, 'Could not upgrade session');
+      }
+      $ses['session'] = $sesRow['session'];
+      $ses['ttl'] = $sesRow['expires'];
+    }
+  } else {
+    // we should create a session token for this user
+    $ses = createSession($row['userid']);
+    if (!$ses) {
+      return sendResponse(array(), 500, 'Could not create session');
+    }
+  }
 
   // and return it
   $data = array(
     'username' => $row['username'],
-    'session'  => $session,
-    'ttl'      => $ttl,
+    'session'  => $ses['session'],
+    'ttl'      => $ses['ttl'],
   );
   sendResponse($data);
 });
