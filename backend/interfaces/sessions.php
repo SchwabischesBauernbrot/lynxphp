@@ -69,6 +69,7 @@ function ensureSession($userid = 0) {
     $_SERVER['HTTP_SID'] = $ses['session'];
     // normalize
     $sesRow = getSession();
+    // ttl is in expires
     $sesRow['created'] = $now;
   }
   return $sesRow;

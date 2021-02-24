@@ -98,7 +98,9 @@ function curl_log_report() {
   echo '<ol>';
   foreach($curlLog as $l) {
     $m = ($l['method'] === 'AUTO' ? 'GET' : $l['method']);
-    echo '<li>' . $m . ' <a target=_blank href="' . $l['url'] . '?prettyPrint=1">' . $l['url'] . '</a> took ' . $l['took'] . 'ms';
+    $joinChar = array(true => '&', false => '?');
+    $hasQ = strpos($l['url'], '?') !== false;
+    echo '<li>' . $m . ' <a target=_blank href="' . $l['url'] . $joinChar[$hasQ] . 'prettyPrint=1">' . $l['url'] . '</a> took ' . $l['took'] . 'ms';
     if ($m === 'POST' && isset($l['postData'])) {
       if (is_array($l['postData'])) {
         echo ' [', print_r($l['postData'], 1), ']';

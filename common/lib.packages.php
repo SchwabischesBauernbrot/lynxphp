@@ -84,7 +84,7 @@ class package {
   function useResource($label, $params = false, $options = false) {
     $label = strtolower($label); // UX but also camelcase is nice to make something clear
     if (empty($this->resources[$label])) {
-      echo "<pre>lib.pacakge:::package::useResource - Cannot call [$label] no such resource: ", print_r(array_keys($this->resources), 1), "</pre>\n";
+      echo "<pre>lib.package:::package::useResource - Cannot call [$label] no such resource: ", print_r(array_keys($this->resources), 1), "</pre>\n";
       return;
     }
     $rsrc = $this->resources[$label];
@@ -97,7 +97,7 @@ class package {
         }
       }
       if (count($missing)) {
-        echo "<pre>lib.pacakge:::package::useResource - Cannot call [$label] because ", join(', ', $missing), " are missing from parameters: ", print_r($params, 1), "</pre>\n";
+        echo "<pre>lib.package:::package::useResource - Cannot call [$label] because ", join(', ', $missing), " are missing from parameters: ", print_r($params, 1), "</pre>\n";
         return;
       }
     }
@@ -121,7 +121,7 @@ class package {
           } else if (isset($fd[$k])) {
             $rsrc['formData'][$k] = $v;
           } else {
-            echo "lib.pacakge:::package::useResource - Don't know what to do with $k in $label<br>\n";
+            echo "lib.package:::package::useResource - Don't know what to do with $k in $label<br>\n";
           }
         }
       } else
@@ -130,10 +130,10 @@ class package {
         if (is_array($params)) {
           foreach($params as $k=>$v) {
             // should we urlencode k too?
-            if (is_string($v) || is_bool($v)) {
+            if (is_string($v) || is_bool($v) || is_numeric($v)) {
               $rsrc['querystring'][] = $k . '=' . urlencode($v);
             } else {
-              echo "<pre>lib.pacakge:::package::useResource($label) - What do I do with [$k] of type [",gettype($v),"]=[", print_r($v, 1),"]</pre>\n";
+              echo "<pre>lib.package:::package::useResource($label) - What do I do with [$k] of type [",gettype($v),"]=[", print_r($v, 1),"]</pre>\n";
             }
           }
         }
@@ -148,7 +148,7 @@ class package {
           }
         }
       } else {
-        echo "lib.pacakge:::package::useResource - Unknown parameter type[", $params['params'], "]<br>\n";
+        echo "lib.package:::package::useResource - Unknown parameter type[", $params['params'], "]<br>\n";
       }
     }
     // does endpoint has params?
@@ -176,8 +176,8 @@ class package {
         $rsrc['inWrapContent'] = true;
       }
     }
-    //echo "<pre>lib.pacakge:::package::useResource - cookie: ", print_r($_COOKIE, 1), "</pre>\n";
-    //echo "<pre>lib.pacakge:::package::useResource - out: ", print_r($rsrc, 1), "</pre>\n";
+    //echo "<pre>lib.package:::package::useResource - cookie: ", print_r($_COOKIE, 1), "</pre>\n";
+    //echo "<pre>lib.package:::package::useResource - out: ", print_r($rsrc, 1), "</pre>\n";
 
     // make the call
     $result = consume_beRsrc($rsrc, $params);
