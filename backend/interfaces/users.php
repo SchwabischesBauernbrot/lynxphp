@@ -52,5 +52,30 @@ function userInGroup($user_id, $group) {
   return in_array($group, $usergroups);
 }
 
+// allow threadNum to be 0
+// p/boardUri/threadNum/postId
+function isUserPermitted($user_id, $permission, $target = false) {
+  // is user a admin or global?
+  $isAdmin  = userInGroup($user_id, 'admin');
+  $isGlobal = userInGroup($user_id, 'global');
+  if ($isAdmin || $isGlobal) {
+    return true;
+  }
+
+  $access = false;
+  // does target object include boardUri (check for BO)
+  if ($target) {
+    $parts = explode('/', $target);
+    if ($parts[0] === 'p') {
+      $boardUri = $parts[1];
+      $access = isBO($boardUri, $user_id);
+      if (!$access) {
+        // password match post password?
+      }
+    }
+  }
+
+  return $access;
+}
 
 ?>
