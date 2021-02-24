@@ -7,38 +7,41 @@ function fileDBtoAPI(&$row, $boardUri) {
     return $f5 ==='file_';
   }, ARRAY_FILTER_USE_BOTH));
 
-  // fix size
-  if (empty($row['size']) && $row['fileid']) {
-    global $db;
-    $post_files_model = getPostFilesModel($boardUri);
-    $size = filesize($row['path']);
-    $urow = array('size' => $size);
-    $db->update($post_files_model, $urow, array('criteria' =>  array('fileid' => $row['fileid'])));
-    $row['size'] = $size;
-  }
-  // fix mime_type since it drives thumbnailing
-  if (empty($row['mime_type']) && $row['fileid']) {
-    global $db;
-    $post_files_model = getPostFilesModel($boardUri);
+  // if file exists
+  if (file_exists($row['path']) && filesize($row['path'])) {
+    // fix size
+    if (empty($row['size']) && $row['fileid']) {
+      global $db;
+      $post_files_model = getPostFilesModel($boardUri);
+      $size = filesize($row['path']);
+      $urow = array('size' => $size);
+      $db->update($post_files_model, $urow, array('criteria' =>  array('fileid' => $row['fileid'])));
+      $row['size'] = $size;
+    }
+    // fix mime_type since it drives thumbnailing
+    if (empty($row['mime_type']) && $row['fileid']) {
+      global $db;
+      $post_files_model = getPostFilesModel($boardUri);
 
-    $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
-    // php 5.3+ has this by default...
-    $mime = finfo_file($finfo, $row['path']);
-    $urow = array('mime_type' => $mime);
-    $db->update($post_files_model, $urow, array('criteria' =>  array('fileid' => $row['fileid'])));
-    $row['mime_type'] = $mime;
-  }
-  $m6 = substr($row['mime_type'], 0, 6);
-  $isImage = $m6 === 'image/';
-  // fix image size
-  if ((empty($row['w']) || empty($row['h'])) && $row['fileid'] && $isImage) {
-    global $db;
-    $post_files_model = getPostFilesModel($boardUri);
-    $sizes = getimagesize($row['path']);
-    $urow = array('w' => $sizes[0], 'h' => $sizes[1]);
-    $db->update($post_files_model, $urow, array('criteria' =>  array('fileid' => $row['fileid'])));
-    $row['w'] = $sizes[0];
-    $row['h'] = $sizes[1];
+      $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+      // php 5.3+ has this by default...
+      $mime = finfo_file($finfo, $row['path']);
+      $urow = array('mime_type' => $mime);
+      $db->update($post_files_model, $urow, array('criteria' =>  array('fileid' => $row['fileid'])));
+      $row['mime_type'] = $mime;
+    }
+    $m6 = substr($row['mime_type'], 0, 6);
+    $isImage = $m6 === 'image/';
+    // fix image size
+    if ((empty($row['w']) || empty($row['h'])) && $row['fileid'] && $isImage) {
+      global $db;
+      $post_files_model = getPostFilesModel($boardUri);
+      $sizes = getimagesize($row['path']);
+      $urow = array('w' => $sizes[0], 'h' => $sizes[1]);
+      $db->update($post_files_model, $urow, array('criteria' =>  array('fileid' => $row['fileid'])));
+      $row['w'] = $sizes[0];
+      $row['h'] = $sizes[1];
+    }
   }
 
   $path = parsePath($row['path']);
@@ -46,6 +49,7 @@ function fileDBtoAPI(&$row, $boardUri) {
   $fp = getcwd() . '/' .  $thumb;
 
   //echo "path[$thumb] [", getcwd(), "] fp[$fp]<br>\n";
+  // if thumb exits
   if (file_exists($fp) && filesize($fp)) {
     //echo "[$thumb] exists<br>\n";
     $row['thumbnail_path'] = $thumb;
