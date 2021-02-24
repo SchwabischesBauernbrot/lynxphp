@@ -14,6 +14,29 @@ if (($req_path !== '/login.php' && $req_method !== 'POST') || $req_path === '/lo
 // load frontend config
 include 'config.php';
 
+if (DEV_MODE) {
+  ini_set('display_errors', true);
+  error_reporting(E_ALL);
+}
+
+// work around nginx weirdness with PHP and querystrings
+$isNginx = stripos($_SERVER["SERVER_SOFTWARE"], 'nginx') !== false;
+if ($isNginx) {
+  $parts = explode('?', $_SERVER['REQUEST_URI']);
+  $querystring = $parts[1];
+  $chunks = explode('&', $querystring);
+  $qs = array();
+  foreach($chunks as $c) {
+    list($k, $v) = explode('=', $c);
+    $qs[$k] = $v;
+    if (empty($_GET[$k])) {
+      $_GET[$k] = $v;
+      $_REQUEST[$k] = $v;
+    }
+  }
+  //print_r($qs);
+}
+
 // set up backend url, cache
 
 // if OPTIONS
@@ -123,6 +146,7 @@ include 'handlers/mixins/user_portal.php';
 include 'handlers/mixins/post_renderer.php';
 include 'handlers/mixins/post_form.php';
 include 'handlers/mixins/post_actions.php';
+include 'handlers/mixins/tabs.php'; // maybe more of a lib...
 
 // handlers
 include 'handlers/login.php';
