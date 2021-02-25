@@ -1,12 +1,11 @@
 <?php
 
 function getControlPanel() {
-  $check = checkSession();
-  if (isset($check['meta']) && $check['meta']['code'] === 401) {
+  $account = backendLynxAccount();
+  if (!$account || $account['meta'] && $account['meta']['code'] === 401) {
     redirectTo(BASE_HREF . 'login.php');
     return;
   }
-  $account = backendLynxAccount();
 
   $templates = loadTemplates('account');
   $tmpl = $templates['header'];
