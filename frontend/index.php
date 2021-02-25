@@ -20,8 +20,8 @@ if (DEV_MODE) {
 }
 
 // work around nginx weirdness with PHP and querystrings
-$isNginx = stripos($_SERVER["SERVER_SOFTWARE"], 'nginx') !== false;
-if ($isNginx) {
+$isNginx = stripos(getServerField('SERVER_SOFTWARE'), 'nginx') !== false;
+if ($isNginx && strpos($_SERVER['REQUEST_URI'], '?') !== false) {
   $parts = explode('?', $_SERVER['REQUEST_URI']);
   $querystring = $parts[1];
   $chunks = explode('&', $querystring);
