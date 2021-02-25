@@ -8,7 +8,8 @@ $router = new router;
 
 $router->post('/registerAccount', function($request) {
   if (!hasPostVars(array('login', 'password', 'email'))) {
-    return sendResponse(array(), 400, 'Needs login, password, and email');
+    // hasPostVars already outputs
+    return; // sendResponse(array(), 400, 'Needs login, password, and email');
   }
   global $db, $models;
   $email = strtolower($_POST['email']);
@@ -39,7 +40,8 @@ $router->post('/login', function($request) {
   global $db, $models;
   // login, password, remember
   if (!hasPostVars(array('login', 'password'))) {
-    return sendResponse(array(), 400, 'Requires login and password');
+    // hasPostVars already outputs
+    return; // sendResponse(array(), 400, 'Requires login and password');
   }
   $res = $db->find($models['user'], array('criteria' => array(
     array('username', '=', $_POST['login']),
@@ -91,7 +93,8 @@ $router->post('/createBoard', function($request) {
     return;
   }
   if (!hasPostVars(array('boardUri', 'boardName', 'boardDescription'))) {
-    return sendResponse(array(), 400, 'Requires boardUri, boardName and boardDescription');
+    // hasPostVars already outputs
+    return; // sendResponse(array(), 400, 'Requires boardUri, boardName and boardDescription');
   }
   $boardUri = strtolower($_POST['boardUri']);
   $res = $db->find($models['board'], array('criteria'=>array(
@@ -100,7 +103,8 @@ $router->post('/createBoard', function($request) {
   if ($db->num_rows($res)) {
     return sendResponse(array(), 403, 'Board already exists');
   }
-  if (!mkdir('storage/boards/' . $boardUri)) {
+  $fupPath = 'storage/boards/' . $boardUri;
+  if (!file_exists($fupPath) && !mkdir($fupPath)) {
     return sendResponse(array(), 500, 'Can not create board directory for file uploads');
   }
 
@@ -136,7 +140,8 @@ $router->post('/newThread', function($request) {
   global $db;
   // require image with each thread
   if (!hasPostVars(array('boardUri', 'files'))) {
-    return sendResponse(array(), 400, 'Requires boardUri and files');
+    // hasPostVars already outputs
+    return; //sendResponse(array(), 400, 'Requires boardUri and files');
   }
   $user_id = (int)getUserID();
   $boardUri = $_POST['boardUri'];
@@ -164,7 +169,8 @@ $router->post('/newThread', function($request) {
 $router->post('/replyThread', function($request) {
   global $db;
   if (!hasPostVars(array('boardUri', 'threadId'))) {
-    return sendResponse(array(), 400, 'Requires boardUri and threadId');
+    // hasPostVars already outputs
+    return; //sendResponse(array(), 400, 'Requires boardUri and threadId');
   }
   $user_id = (int)getUserID();
   $boardUri = $_POST['boardUri'];
