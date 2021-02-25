@@ -66,9 +66,11 @@ function consume_beRsrc($options, $params = '') {
     $obj = json_decode($responseText, true);
     if ($obj === NULL) {
       if (!empty($options['inWrapContent'])) {
-        echo 'Backend error (consume_beRsrc): ' .  $options['endpoint'] . ': <pre>' . $responseText, "</pre>\n";
+        echo 'Backend error (consume_beRsrc): ' .  $options['endpoint'] .
+          ': ' . $responseText, "\n";
       } else {
-        wrapContent('Backend error (consume_beRsrc): ' .  $options['endpoint'] . ': ' . $responseText);
+        wrapContent('Backend error (consume_beRsrc): ' .  $options['endpoint']
+          . ': ' . $responseText . '' . "\n");
       }
       return;
     }
@@ -98,6 +100,13 @@ function getExpectJson($endpoint) {
   $json = curlHelper(BACKEND_BASE_URL . $endpoint);
   return expectJson($json, $endpoint);
 }
+
+/*
+function postExpectJson($endpoint, $postData) {
+  $json = curlHelper(BACKEND_BASE_URL . $endpoint, $postData, '', '', '', 'POST');
+  return expectJson($json, $endpoint);
+}
+*/
 
 function getBoards() {
   //$boards = getExpectJson('4chan/boards.json');
@@ -182,8 +191,24 @@ function backendCreateBoard() {
 
 function backendLynxAccount() {
   $json = backendAuthedGet('lynx/account');
+  // means not logged in...
+  if (!$json) return false;
   return expectJson($json, 'lynx/account');
 }
 
+function backendGetPerm($perm, $target = false) {
+  $options = array(
+    'endpoint'    => 'opt/perms/' . $perm,
+    //'method'      => 'POST',
+    'sendSession' => true,
+    'sendIP'      => true,
+    'unwrapData'  => true,
+  );
+  if ($target) {
+    $options['querystring'] = array('target'=>$target);
+  }
+  $res = consume_beRsrc($options);
+  return $res;
+}
 
 ?>
