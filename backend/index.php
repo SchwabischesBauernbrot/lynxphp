@@ -36,7 +36,7 @@ $tpp = 10; // threads per page
 if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
   exit(1);
 }
-
+// maybe don't output SQL if devmode is off
 
 include '../common/lib.modules.php'; // module functions and classes
 // transformations (x => y)
