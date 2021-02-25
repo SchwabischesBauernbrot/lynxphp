@@ -54,7 +54,7 @@ function getPublicSiteSettings() {
   global $db, $models;
   $row1 = $db->findById($models['setting'], 1);
   // create ID 1 if needed
-  if ($row1 === false) {
+  if ($row1 === null) {
     $db->insert($models['setting'], array(
       // 'settingid'=>1,
       array('changedby' => 0),
