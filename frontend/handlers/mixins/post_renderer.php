@@ -14,7 +14,7 @@ function renderPost($boardUri, $p, $options = false) {
   $reply_template     = $templates['loop5'];
 
   $postmeta = '';
-  if ($options['checkable']) {
+  if ($options && $options['checkable']) {
     $postmeta .= replace_tags($checkable_template, array('no' => $p['no']));
   }
   // FIXME: pipeline...
