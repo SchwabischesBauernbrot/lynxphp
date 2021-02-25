@@ -38,6 +38,10 @@
   - cp backend/config_.php backend/config_localhost.php
   - touch frontend/config_.php
   - cp frontend/config_.php frontend/config_localhost.php
+  - mkdir backend/storage
+  - mkdir backend/storage/tmp
+  - mkdir backend/storage/backend
+  - chmod -R 777 backend/storage
 
 .default-webserver: &default-webserver
   - mv /var/www/html /var/www/old && cd .. && mv lynxphp /var/www && ln -s /var/www/lynxphp/frontend /var/www/html && ln -s /var/www/lynxphp/backend /var/www/html/backend && cd /var/www/lynxphp
