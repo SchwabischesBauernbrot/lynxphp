@@ -473,7 +473,6 @@ function getBoardPostCount($boardUri) {
 
 function getBoardSettings($boardUri) {
   global $db, $models;
-  global $db, $models;
   $res = $db->find($models['board'], array('criteria'=>array(
     array('uri', '=', $boardUri),
   )));
