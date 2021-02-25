@@ -5,6 +5,11 @@ $curlLog = array();
 // we could reuse the curl handle
 // but we'd need to reset certain settings each time
 // but ultimately we should rather aim for one curl request per page total
+
+function request($options = array()) {
+  // just call curlHelper
+}
+
 function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='AUTO') {
   if (DEV_MODE) {
     $start = microtime(true);
