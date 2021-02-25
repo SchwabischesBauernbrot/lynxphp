@@ -214,12 +214,15 @@ class database_driver_base_class {
         $this->joinCount++;
         $joinAlias = 'jt' . $this->joinCount;
       }
+      if ($this->btTables) {
+        $joinTable = '`' . $joinTable . '`';
+      }
       if ($joinTable !== $joinAlias) {
         // maybe should be a different var
         $joinTable .= ' as ' . $joinAlias;
       }
-      $joinStr = (empty($join['type']) ? '' : $join['type'] . ' ' ) . 'join ' .
-        $joinTable . ' on (';
+      $joinStr = (empty($join['type']) ? '' : $join['type'] . ' ' ) . 'join ';
+      $joinStr .= $joinTable . ' on (';
       if (!empty($join['on'])) {
         $onAlias = $joinAlias;
         if (!empty($join['onAlias'])) $onAlias = $join['onAlias'];
