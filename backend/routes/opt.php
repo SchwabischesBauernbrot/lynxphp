@@ -20,6 +20,16 @@ $router->get('/session', function($request) {
   sendResponse(array('session' => 'ok'));
 });
 
+/*
+function handleCFE($request) {
+  global $db, $models;
+  echo "Thank you for choosing PHPLynx<br>\n";
+}
+
+$router->get('/createFrontEnd', handleCFE); // official
+$router->get('/createfrontend', handleCFE); // ux
+*/
+
 $router->get('/boards/:uri/:page', function($request) {
   global $tpp;
 
@@ -86,17 +96,18 @@ $router->get('/boards.json', function($request) {
   $boards = listBoards();
   $res = array();
   foreach($boards as $b) {
-    // FIXME: N+1s...
+    // FIXME: N+1s... (yea page is almost at 1s for 40 boards)
     // include posts, threads, last_activity
-    $b['threads'] = getBoardThreadCount($b['uri']);
-    $b['posts'] = getBoardPostCount($b['uri']);
+    $b['threads'] = getBoardThreadCount($b['uri']); // 1 query
+    $b['posts'] = getBoardPostCount($b['uri']); // 1 query
 
     if ($b['threads']) {
       $posts_model = getPostsModel($b['uri']);
       $newestThreadRes = $db->find($posts_model, array('criteria'=>array(
           array('threadid', '=', 0),
-      ), 'limit' => '1', 'order'=>'updated_at desc'));
+      ), 'limit' => '1', 'order'=>'updated_at desc')); // 1 query
       $newestThread = $db->toArray($newestThreadRes);
+      $db->free($newestThreadRes);
       $b['last'] = $newestThread[0];
     }
     $res[] = $b;
@@ -112,6 +123,21 @@ $router->get('/myBoards', function($request) {
   }
   $boards = userBoards($user_id);
   sendResponse($boards);
+});
+
+// does this user have this perms
+// on optional object?
+$router->get('/perms/:perm', function($request) {
+  $user_id = loggedIn();
+  if (!$user_id) {
+    // well if you anon you don't get EXTRA permissions
+    return; // already sends something...
+  }
+  $access = isUserPermitted($user_id, $request['params']['perm'], $request['target']);
+  sendResponse(array(
+    'access' => $access,
+    'user_id' => $user_id,
+  ));
 });
 
 // non-standard 4chan api - lets disable for now
