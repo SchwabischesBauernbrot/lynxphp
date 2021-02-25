@@ -104,7 +104,7 @@ $router->post('/createBoard', function($request) {
     return sendResponse(array(), 403, 'Board already exists');
   }
   $fupPath = 'storage/boards/' . $boardUri;
-  if (!file_exists($fupPath) && !mkdir($fupPath)) {
+  if (!file_exists($fupPath) && !@mkdir($fupPath)) {
     return sendResponse(array(), 500, 'Can not create board directory for file uploads');
   }
 
@@ -124,6 +124,9 @@ $router->post('/files', function($request) {
   // make sure tmp is made
   if (!file_exists('storage/tmp')) {
     return sendResponse(array(), 400, 'Backend server is not ready for files');
+  }
+  if (!isset($_FILES['files'])) {
+    return sendRepsonse(array(), 400, 'no file upload set in files field');
   }
   $hash = hash_file('sha256', $_FILES['files']['tmp_name']);
   move_uploaded_file($_FILES['files']['tmp_name'], 'storage/tmp/'.$hash);
