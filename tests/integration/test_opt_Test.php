@@ -3,7 +3,7 @@ use PHPUnit\Framework\TestCase;
 
 final class test_opt_Test extends TestCase {
   public function testCheck(): void {
-    $res = getExpectJson('check');
+    $res = getExpectJson('opt/check');
     //print_r($check);
     $this->assertIsArray($res);
     $this->assertIsArray($res['meta']);
@@ -22,7 +22,7 @@ final class test_opt_Test extends TestCase {
   */
 
   public function testNoSession(): void {
-    $res = getExpectJson('session');
+    $res = getExpectJson('opt/session');
     $this->assertIsArray($res);
     $this->assertIsArray($res['meta']);
     $this->assertSame(401, $res['meta']['code']);
@@ -30,7 +30,7 @@ final class test_opt_Test extends TestCase {
   }
 
   public function testBoardsJson(): array {
-    $res = getExpectJson('boards.json');
+    $res = getExpectJson('opt/boards.json');
     $this->assertIsArray($res);
     $this->assertIsArray($res['meta']);
     $this->assertSame(200, $res['meta']['code']);
@@ -41,17 +41,48 @@ final class test_opt_Test extends TestCase {
   /**
    * @depends testBoardsJson
    */
-  public function testBoardPage(array $boards): void {
-    if (!count($boards)) return;
+  public function testBoardPage(array $boards): array {
+    if (!count($boards)) return array();
     shuffle($boards);
     $board = array_shift($boards);
-    $boardPage = getExpectJson('boards/' . $board['uri'] . '/1.json');
+    $boardPage = getExpectJson('opt/boards/' . $board['uri'] . '/1.json');
     $this->assertIsArray($boardPage);
     $this->assertSame(200, $boardPage['meta']['code']);
     $this->assertIsArray($boardPage['data']['board']);
     // make sure we fetched the right board
     $this->assertSame($board['uri'], $boardPage['data']['board']['uri']);
     $this->assertIsArray($boardPage['data']['page1']);
+    $threads = array();
+    if (count($boardPage['data']['page1'])) {
+      $threads = $boardPage['data']['page1'][0]['posts'];
+    }
+    return array(
+      'boards'  => $boards,
+      'threads' => $threads,
+    );
+  }
+
+  /**
+   * @depends testBoardPage
+   */
+  public function testBoardThread(array $arr): void {
+    // need a thread to test with...
+    if (!count($arr['threads'])) {
+      return;
+    }
+    $boards = $arr['boards'];
+    if (!count($boards)) return;
+    shuffle($boards);
+    $board = array_shift($boards);
+    $boardPage = getExpectJson('opt/' . $board['uri'] . '/thread/' . $arr['threads'][0]['no']);
+    $this->assertIsArray($boardPage);
+    $this->assertSame(200, $boardPage['meta']['code']);
+    $this->assertIsArray($boardPage['data']);
+    // make sure we fetched the right board
+    $this->assertSame($board['uri'], $boardPage['data']['uri']);
+    $this->assertIsArray($boardPage['data']['posts']);
+    //print_r($boardPage['data']);
+    //$this->assertSame($arr['threads'][0]['no'], $boardPage['data']['posts'][0]['no']);
   }
 
   /*
