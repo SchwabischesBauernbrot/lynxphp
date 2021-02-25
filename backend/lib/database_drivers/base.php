@@ -9,6 +9,7 @@ interface database_driver_base {
   public function make_direct($value);
   public function insert($rootModel, $recs);
   public function update($rootModel, $urow, $options);
+  public function delete($rootModel, $options);
   // options
   //   fields = if not set, give all fields, else expect an array
   //   criteria = if set, an array
@@ -172,6 +173,9 @@ class database_driver_base_class {
       $sql = 'delete from `' .$tableName . '`';
     } else {
       $sql = 'delete from ' .$tableName;
+    }
+    if (isset($options['critera']) && !isset($options['criteria'])) {
+      $options['criteria'] = $options['critera'];
     }
     if (isset($options['criteria'])) {
       $sql .= ' where ' . $this->build_where($options['criteria']);
