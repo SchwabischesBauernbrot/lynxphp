@@ -99,6 +99,9 @@ final class test_lynxchan_minimum_Test extends TestCase {
     $headers = array('sid' => $session);
     $json = curlHelper(BACKEND_BASE_URL . $endpoint, $postData, $headers, '', '', 'POST');
     $res = json_decode($json, true);
+    if ($res === null) {
+      echo "lynx/testCreateBoard - failed to parse [$json] as json\n";
+    }
     //usesSendResponse($this, $res);
     $this->assertIsArray($res);
     $this->assertArrayHasKey('meta', $res);
@@ -115,6 +118,9 @@ final class test_lynxchan_minimum_Test extends TestCase {
     $postData = array();
     $json = curlHelper(BACKEND_BASE_URL . $endpoint, $postData, '', '', '', 'POST');
     $res = json_decode($json, true);
+    if ($res === null) {
+      echo "lynx/testFiles - failed to parse [$json] as json\n";
+    }
     usesSendResponse($this, $res);
     $this->assertSame(200, $res['meta']['code']);
   }
@@ -169,6 +175,9 @@ final class test_lynxchan_minimum_Test extends TestCase {
     //$headers = array('sid' => $session);
     $json = backendAuthedGet('lynx/account');
     $res = json_decode($json, true);
+    if ($res === null) {
+      echo "lynx/testFiles - failed to parse [$json] as json\n";
+    }
     $this->assertIsArray($res);
     $this->assertArrayHasKey('noCaptchaBan', $res);
     $this->assertArrayHasKey('login', $res);
