@@ -17,6 +17,14 @@ function tagify($tag) {
 }
 
 function replace_tags($template, $tags) {
+  if (!is_string($template)) {
+    echo "replace_tags - Template isn't an string\n";
+    return $template;
+  }
+  if (!is_array($tags)) {
+    echo "replace_tags - Tags isn't an array\n";
+    return $template;
+  }
   return str_replace(array_map('tagify', array_keys($tags)), array_values($tags), $template);
 }
 
@@ -91,11 +99,16 @@ function wrapContent($content, $options = '') {
   } else {
     $settings = $options['settings'];
   }
-  $siteSettings = $settings['site'];
-  $userSettings = $settings['user'];
+  if (empty($settings) || !is_array($settings)) {
+    $siteSettings = array();
+    $userSettings = array();
+  } else {
+    $siteSettings = $settings['site'];
+    $userSettings = $settings['user'];
+  }
   $enableJs = true;
 
-  $themes = array('yotsuba-b', 'snerx');
+  $themes = array('yotsuba-b', 'yotsuba', 'amoled', 'army-green', 'cancer', 'chaos', 'choc', 'darkblue', 'gurochan', 'lain', 'miku', 'mushroom', 'navy', 'pink', 'rei-zero', 'solarized-dark', 'solarized-light', 'tempus-cozette', 'tomorrow', 'tomorrow2', 'vapor', 'win95', 'snerx');
   if (empty($userSettings['current_theme']) || $userSettings['current_theme'] === 'default') $userSettings['current_theme'] = $themes[0];
 
   $themesHtml = '';
@@ -143,6 +156,10 @@ function wrapContent($content, $options = '') {
     if ($result) {
       echo "<pre>worker result [$result]</pre>\n";
     }
+    echo "<h4>input</h4>";
+    if (count($_GET)) echo "GET", print_r($_GET, 1), "<br>\n";
+    if (count($_POST)) echo "POST", print_r($_POST, 1), "<br>\n";
+    //echo "SERVER", print_r($_SERVER, 1), "<br>\n";
   }
 }
 
