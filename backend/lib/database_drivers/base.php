@@ -215,6 +215,9 @@ class database_driver_base_class {
         $joinAlias = 'jt' . $this->joinCount;
       }
       if ($this->btTables) {
+        if ($joinTable === $joinAlias) {
+          $joinAlias = '`' . $joinAlias . '`';
+        }
         $joinTable = '`' . $joinTable . '`';
       }
       if ($joinTable !== $joinAlias) {
