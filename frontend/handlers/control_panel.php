@@ -2,7 +2,8 @@
 
 function getControlPanel() {
   $account = backendLynxAccount();
-  if (!$account || $account['meta'] && $account['meta']['code'] === 401) {
+  // you only get meta if error
+  if (!$account || (!empty($account['meta']) && $account['meta']['code'] === 401)) {
     redirectTo(BASE_HREF . 'login.php');
     return;
   }
