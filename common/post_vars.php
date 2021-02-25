@@ -3,7 +3,7 @@
 function hasPostVars($fields) {
   foreach($fields as $field) {
     if (empty($_POST[$field])) {
-      wrapContent('Field "' . $field . '" required');
+      wrapContent('Detected field "' . $field . '" is missing; ' . join(',', $fields) . ' are required');
       return false;
     }
   }
