@@ -39,7 +39,7 @@
   - touch frontend/config_.php
   - cp frontend/config_.php frontend/config_localhost.php
   - mkdir backend/storage/tmp
-  - mkdir backend/storage/backend
+  - mkdir backend/storage/boards
   - chmod -R 777 backend/storage
 
 .default-webserver: &default-webserver
