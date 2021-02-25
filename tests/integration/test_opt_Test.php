@@ -94,7 +94,7 @@ final class test_opt_Test extends TestCase {
   */
 
   public function testNoMyBoards(): void {
-    $res = getExpectJson('/myBoards');
+    $res = getExpectJson('/opt/myBoards');
     $this->assertIsArray($res);
     $this->assertIsArray($res['meta']);
     $this->assertSame(401, $res['meta']['code']);
@@ -108,7 +108,7 @@ final class test_opt_Test extends TestCase {
     if (!count($boards)) return;
     shuffle($boards);
     $board = array_shift($boards);
-    $res = getExpectJson('/' . $board['uri']);
+    $res = getExpectJson('/opt/' . $board['uri']);
     $this->assertIsArray($res);
     $this->assertIsArray($res['meta']);
     $this->assertSame(200, $res['meta']['code']);
