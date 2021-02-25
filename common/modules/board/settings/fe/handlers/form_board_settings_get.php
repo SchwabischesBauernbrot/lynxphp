@@ -15,7 +15,9 @@ foreach($fields as $fn => $f) {
   if (substr($fn, 0, 9) === 'settings_') {
     //$k = substr($fn, 9);
     //echo "k[$k]<br>\n";
-    $values[$fn] = $values['json'][$fn];
+    if (isset($values['json'][$fn])) {
+      $values[$fn] = $values['json'][$fn];
+    }
   }
 }
 
