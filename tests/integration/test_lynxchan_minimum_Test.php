@@ -146,7 +146,7 @@ final class test_lynxchan_minimum_Test extends TestCase {
     $this->assertArrayHasKey('code', $res['meta']);
     $this->assertSame(200, $res['meta']['code']);
     // should be first post since it's a new board...
-    $this->assertSame('1', $res['data']);
+    $this->assertSame(1, $res['data']);
     return array(
       'board' => $boardUri,
       'thread' => $res['data'],
@@ -172,7 +172,7 @@ final class test_lynxchan_minimum_Test extends TestCase {
     $this->assertArrayHasKey('code', $res['meta']);
     $this->assertSame(200, $res['meta']['code']);
     // should be 2nd post since it's a new board...
-    $this->assertSame('2', $res['data']);  }
+    $this->assertSame(2, $res['data']);  }
 
   public function testAccount(): void {
     //$headers = array('sid' => $session);
