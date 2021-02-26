@@ -246,11 +246,7 @@ class database_driver_base_class {
         $data['fields'] = array_merge($data['fields'], $clean);
       } else {
         // if no pluck, then grab all
-        if ($this->btTables) {
-          $data['fields'][] = '`' . $joinAlias . '`.*';
-        } else {
-          $data['fields'][] = $joinAlias . '.*';
-        }
+        $data['fields'][] = $joinAlias . '.*';
       }
       if (!empty($join['groupby'])) {
         $data['groupbys'] = array_merge($data['groupbys'], explode(',', $join['groupby']));
