@@ -165,7 +165,7 @@ $router->post('/newThread', function($request) {
     'deleted' => 0,
   )));
   processFiles($boardUri, $_POST['files'], $id, $id);
-  $data = $id;
+  $data = (int)$id;
   sendResponse($data);
 });
 
@@ -195,7 +195,7 @@ $router->post('/replyThread', function($request) {
     'country' => '',
     'deleted' => 0,
   )));
-  $data = $id;
+  $data = (int)$id;
   $issues = processFiles($boardUri, $_POST['files'], $threadid, $id);
 
   // bump thread
