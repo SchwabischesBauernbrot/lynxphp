@@ -40,7 +40,7 @@ function postSignup() {
   //echo "json[$json]<br>\n";
   $result = expectJson($json, 'lynx/registerAccount');
   // echo "<pre>[", print_r($result, 1), "]",gettype($result),"</pre>\n";
-  if (!empty($result['data']['username'])) {
+  if (!empty($result['data']['id'])) {
     $result = backendLogin($user, $pass);
     if ($login === true) {
       redirectTo('control_panel.php');
