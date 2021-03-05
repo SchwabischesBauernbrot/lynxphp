@@ -124,10 +124,12 @@ NOTE: x and y are used a placeholder, come up with something unique
 
 then backend config will need some database settings set
 ```
+<?php
 define('DB_HOST', 'localhost');
 define('DB_USER', 'x');
 define('DB_PWD', 'y');
 define('DB_NAME', 'lynxphp');
+?>
 ```
 
 also you'll need to make these directories and make sure they're web server writable (chown www-data or chmod 777)
@@ -155,6 +157,22 @@ You'll likely need to go into postgres, create the db and user:
 `CREATE USER x WITH PASSWORD 'y';`
 `CREATE DATABASE lynxphp;`
 `\q` to quit
+
+then you need to make config_HOSTNAME.php in frontend and backend
+
+NOTE: x and y are used a placeholder, come up with something unique
+
+then backend config will need some database settings set
+```
+<?php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'x');
+define('DB_PWD', 'y');
+define('DB_NAME', 'lynxphp');
+define('DB_DRIVER', 'pgsql');
+?>
+```
+
 
 # Installation Help
 
