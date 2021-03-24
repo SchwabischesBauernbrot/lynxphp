@@ -105,7 +105,7 @@ function boardPage($boardUri, $page = 1) {
       'model' => $posts_model,
       'srcField' => 'threadid',
       'pluck' => array('count(ALIAS.postid) as cnt'),
-      'groupby' => $postTable . '.postid',
+      'groupby' => array('MODEL.postid'),
       'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.postid)>0))',
       'where' => array(
         array('deleted', '=', 0)
@@ -375,7 +375,7 @@ function boardCatalog($boardUri) {
       'model' => $posts_model,
       'useField' => 'threadid',
       'pluck' => array('count(ALIAS.postid) as reply_count'),
-      'groupby' => $postTable . '.postid, files2.fileid',
+      'groupby' => array('MODEL.postid', 'files2.fileid'),
       //'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.postid)>0))',
       'where' => array(
         array('deleted', '=', 0)
