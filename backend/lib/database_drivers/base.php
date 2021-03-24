@@ -205,7 +205,20 @@ class database_driver_base_class {
       // set up join table/alias
       $joinTable = modelToTableName($join['model']);
       if (!empty($join['tableOverride'])) $tableName = $join['tableOverride'];
-      $joinAlias = $joinTable;
+      if ($this->btTables) {
+        $joinTable = '`' . $joinTable . '`';
+      }
+      if ($this->btTables) {
+        $tableName = '`' . $tableName . '`';
+      }
+      /*
+      if ($this->btTables) {
+        $joinAlias = '`' . $joinTable . '`';
+      } else {
+      */
+        $joinAlias = $joinTable;
+      //}
+
       if (!empty($join['alias'])) {
         $joinAlias = $join['alias'];
       } else
@@ -214,12 +227,14 @@ class database_driver_base_class {
         $this->joinCount++;
         $joinAlias = 'jt' . $this->joinCount;
       }
+      /*
       if ($this->btTables) {
         if ($joinTable === $joinAlias) {
           $joinAlias = '`' . $joinAlias . '`';
         }
         $joinTable = '`' . $joinTable . '`';
       }
+      */
       if ($joinTable !== $joinAlias) {
         // maybe should be a different var
         $joinTable .= ' as ' . $joinAlias;
@@ -246,16 +261,36 @@ class database_driver_base_class {
         $data['fields'] = array_merge($data['fields'], $clean);
       } else {
         // if no pluck, then grab all
-        $data['fields'][] = $joinAlias . '.*';
+        /*
+        if ($this->btTables) {
+          $data['fields'][] = '`' . $joinAlias . '`.*';
+        } else {
+        */
+          $data['fields'][] = $joinAlias . '.*';
+        //}
       }
       if (!empty($join['groupby'])) {
-        $data['groupbys'] = array_merge($data['groupbys'], explode(',', $join['groupby']));
+        // this is a problem...
+        // not longer a string...
+        $useGroupBys = $join['groupby'];
+        if (!is_array($useGroupBys)) {
+          echo "Warning, string into groupby, fix this!<br>\n";
+          //$useGroupBys = explode(',', $useGroupBys);
+        }
+        if ($this->btTables) {
+          $useGroupBys = array_map(function($val) use ($tableName) {
+            return str_replace('MODEL.', $tableName . '.', $val);
+          }, $useGroupBys);
+          //echo "<pre>", print_r($useGroupBys, 1), "</pre>\n";
+        }
+        $data['groupbys'] = array_merge($data['groupbys'], $useGroupBys);
       }
       if (!empty($join['having'])) {
         $data['having'] .= ' ' . str_replace('ALIAS', $joinAlias, $join['having']);
       }
       $data = $this->expandJoin($join['model'], $data);
     }
+    //echo "<pre>", print_r($data, 1), "</pre>\n";
     return $data;
   }
 
@@ -295,7 +330,12 @@ class database_driver_base_class {
         echo "<pre>model is missing a name[", print_r($rootModel, 1), "]</pre>\n";
         return;
       }
-      $tableAlias = $tableName;
+      if ($this->btTables) {
+        $tableAlias = '`' . $tableName . '`';
+        $tableName = '`' . $tableName . '`';
+      } else {
+        $tableAlias = $tableName;
+      }
     }
     $groupbys = array();
     if (!empty($options['groupby'])) {
@@ -317,11 +357,13 @@ class database_driver_base_class {
       }, explode(',', $fields)), $data['fields']);
     }
 
+    /*
     if ($this->btTables && !isset($rootModel['query'])) {
       $sql = 'select '. join("\n" . ',', $useFields) . "\n" . 'from `' . $tableName . '`';
     } else {
+    */
       $sql = 'select '. join("\n" . ',', $useFields) . "\n" . 'from ' . $tableName;
-    }
+    //}
     $useAlias = '';
     if (count($data['joins'])) {
       $sql .= "\n" . join("\n", $data['joins']);
