@@ -339,7 +339,11 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   public function groupAgg($field) {
     return 'string_agg(' . $field . ', \',\')';
   }
-  public function unixtime() {
+  public function unixtime($val = '') {
+    if ($val) {
+      // attempt to see if this works...
+      return 'cast(extract(epoch from ' . $val . ') as integer)';
+    }
     return 'cast(extract(epoch from CURRENT_TIMESTAMP) as integer)';
   }
 }
