@@ -2,6 +2,13 @@
 
 $host = getenv('USE_CONFIG');
 // argument overrides environment
+
+// ./phpunit-nightly.phar tests/ dev.wrongthink.net
+if (isset($GLOBALS['argv'][2])) {
+  $host = $GLOBALS['argv'][2];
+}
+// ./phpunit-nightly.phar --testdox tests/ dev.wrongthink.net
+// 3 will override $host if --testdox is set
 if (isset($GLOBALS['argv'][3])) {
   $host = $GLOBALS['argv'][3];
 }
