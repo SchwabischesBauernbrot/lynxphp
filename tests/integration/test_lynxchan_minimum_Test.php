@@ -92,12 +92,13 @@ final class test_lynxchan_minimum_Test extends TestCase {
     $endpoint = 'lynx/createBoard';
     $uniq = uniqid();
     $postData = array(
-      'boardUri' => 'test_' . $uniq,
+      'boardUri' => 'test-' . $uniq,
       'boardName' => 'test_' . $uniq,
       'boardDescription' => 'Unit test made this in order to make sure the code is stronk',
     );
     $headers = array('sid' => $session);
     $json = curlHelper(BACKEND_BASE_URL . $endpoint, $postData, $headers, '', '', 'POST');
+    //echo $json;
     $res = json_decode($json, true);
     if ($res === null) {
       echo "lynx/testCreateBoard - failed to parse [$json] as json\n";
