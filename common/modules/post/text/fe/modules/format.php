@@ -13,7 +13,7 @@ $io['safeCom'] = preg_replace('/==([\s\S]+?)==/', '<span class="title">\1</span>
 // bold
 $io['safeCom'] = preg_replace('/\'\'\'([\s\S]+?)\'\'\'/', '<span class="bold">\1</span>',$io['safeCom']);
 // italics/em
-$io['safeCom'] = preg_replace('/\*\*([\s\S]+?)\*\*/', '<span class="em">\1</span>',$io['safeCom']);
+$io['safeCom'] = preg_replace('/\*\*([\s\S]+?)\*\*'.'/', '<span class="em">\1</span>',$io['safeCom']);
 $io['safeCom'] = preg_replace('/\'\'([\s\S]+?)\'\'/', '<span class="em">\1</span>',$io['safeCom']);
 // underline
 $io['safeCom'] = preg_replace('/__([\s\S]+?)__/', '<span class="underline">\1</span>',$io['safeCom']);
@@ -28,14 +28,14 @@ $io['safeCom'] = preg_replace('/\[aa\]([\s\S]+?)\[\/aa\]/', '<span class="aa">\1
 $io['safeCom'] = preg_replace('/\[code\]([\s\S]+?)\[\/code\]/', '<span class="code">\1</span>',$io['safeCom']);
 
 // greentext
-$io['safeCom'] = preg_replace('/^&gt; ?((?!&gt;\d+|&gt;&gt;\/\w+()?|&gt;&gt;#\/).*)/m', '<span class="greentext">&gt; \1</span>',$io['safeCom']);
+$io['safeCom'] = preg_replace('/^&gt; ?((?!&gt;\/?\d+|&gt;&gt;\/?\w+()?|&gt;&gt;#\/).*)/m', '<span class="greentext">&gt; \1</span>',$io['safeCom']);
+
 // orangetext
-$io['safeCom'] = preg_replace('/^&lt; ?((?!&gt;\d+|&gt;&gt;\/\w+()?|&gt;&gt;#\/).*)/m', '<span class="orangetext">&lt; \1</span>',$io['safeCom']);
+$io['safeCom'] = preg_replace('/^&lt; ?((?!&gt;\/?\d+|&gt;&gt;\/?\w+()?|&gt;&gt;#\/).*)/m', '<span class="orangetext">&lt; \1</span>',$io['safeCom']);
 // monospaced
 $io['safeCom'] = preg_replace('/`(.+?)`/m', '<span class="mono">\1</span>',$io['safeCom']);
 // detected
 $io['safeCom'] = preg_replace('/\(\(\((.+?)\)\)\)/m', '<span class="detected">\1</span>',$io['safeCom']);
-
 
 // <a class="quote" href="/test/thread/121.html#124">&gt;&gt;124</a>
 
