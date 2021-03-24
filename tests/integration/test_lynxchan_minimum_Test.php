@@ -229,7 +229,7 @@ final class test_lynxchan_minimum_Test extends TestCase {
     foreach($boards as $b) {
       $uri = $b['uri'];
       $f5 = substr($uri, 0, 5);
-      if ($f5 === 'test_') {
+      if ($f5 === 'test-') {
         echo "Cleaning up [$uri]\n";
         deleteBoard($uri);
       }
