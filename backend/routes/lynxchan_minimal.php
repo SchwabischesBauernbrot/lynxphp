@@ -97,6 +97,24 @@ $router->post('/createBoard', function($request) {
     return; // sendResponse(array(), 400, 'Requires boardUri, boardName and boardDescription');
   }
   $boardUri = strtolower($_POST['boardUri']);
+
+  // RFC1738: a-z0-9 $-_.~+!*'(),
+  // RFC3986: a-z0-9 -_.~
+  // now reserved: :/?#[]@!$&'()*+,;=
+  // {}^\~ are unsafe
+  // but some can be urlencoded...
+  // _ takes a shift and we don't need another separator like -
+  // ~ takes a shift but also unsafe...
+  $allowedChars = array('-', '.');
+  for($p = 0; $p < strlen($boardUri); $p++) {
+    if (preg_match('/^a-z0-9$/', $boardUri[$p])) {
+      continue;
+    }
+    if (!in_array($boardUri[$p], $allowedChars)) {
+      return sendResponse(array(), 400, 'boardUri has invalid characters');
+    }
+  }
+
   $res = $db->find($models['board'], array('criteria'=>array(
     array('uri', '=', $boardUri),
   )));
