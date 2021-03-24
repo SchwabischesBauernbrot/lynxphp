@@ -28,10 +28,11 @@ $io['safeCom'] = preg_replace('/\[aa\]([\s\S]+?)\[\/aa\]/', '<span class="aa">\1
 $io['safeCom'] = preg_replace('/\[code\]([\s\S]+?)\[\/code\]/', '<span class="code">\1</span>',$io['safeCom']);
 
 // greentext
-$io['safeCom'] = preg_replace('/^&gt; ?((?!&gt;\/?\d+|&gt;&gt;\/?\w+()?|&gt;&gt;#\/).*)/m', '<span class="greentext">&gt; \1</span>',$io['safeCom']);
+// \d+
+$io['safeCom'] = preg_replace('/^&gt; ?((?!&gt;\/?|&gt;&gt;\/?\w+()?|&gt;&gt;#\/).*)/m', '<span class="greentext">&gt; \1</span>',$io['safeCom']);
 
 // orangetext
-$io['safeCom'] = preg_replace('/^&lt; ?((?!&gt;\/?\d+|&gt;&gt;\/?\w+()?|&gt;&gt;#\/).*)/m', '<span class="orangetext">&lt; \1</span>',$io['safeCom']);
+$io['safeCom'] = preg_replace('/^&lt; ?((?!&gt;\/?|&gt;&gt;\/?\w+()?|&gt;&gt;#\/).*)/m', '<span class="orangetext">&lt; \1</span>',$io['safeCom']);
 // monospaced
 $io['safeCom'] = preg_replace('/`(.+?)`/m', '<span class="mono">\1</span>',$io['safeCom']);
 // detected
@@ -98,9 +99,9 @@ $replaces = array(
       $matches[1] . '/">&gt;&gt;&gt;#/' . $matches[1].'/</a>' . $matches[2];
   },
 // we need the thread number for that post on that board
-  '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/(\d+)\/?(\s*)/m' => function ($matches) use ($io) {
+  '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/(\d+)\/?(\s*)/m' => function ($matches) {
     global $btLookups;
-    $threadId = $btLookups[$io['boardUri']][$matches[2]];
+    $threadId = $btLookups[$matches[1]][$matches[2]];
     return '<a class="quote"
       href="' . $matches[1] . '/thread/' . $threadId . '#' . $matches[2] . '">&gt;&gt;&gt;/' .
       $matches[1] . '/' . $matches[2] . '</a>' . $matches[3];
@@ -111,10 +112,20 @@ $replaces = array(
       $matches[1] . '/</a>' . $matches[2];
   },
 // hrm could verify the post exists...
-  '/' . preg_quote('&gt;&gt;') . '(\d+)\/?(\s+)/m' => function ($matches) {
+  '/' . preg_quote('&gt;&gt;') . '(\d+)\/?(\s+)/m' => function ($matches) use ($io) {
+    global $btLookups;
+    $threadId = $btLookups[$io['boardUri']][$matches[1]];
     return '<a class="quote"
-      href="#' . $matches[1] . '">&gt;&gt;/' .
+      href="' . $io['boardUri'] . '/thread/' . $threadId . '#' . $matches[1] . '">&gt;&gt;/' .
       $matches[1] . '/</a>' . $matches[2];
+  },
+  // >>/malform/35
+  '/' . preg_quote('&gt;&gt;') . '\/?(\w+)\/(\d+)\/?(\s*)/m' => function ($matches) {
+    global $btLookups;
+    $threadId = $btLookups[$matches[1]][$matches[2]];
+    return '<a class="quote"
+      href="' . $matches[1] . '/thread/' . $threadId . '#' . $matches[2] . '">&gt;&gt;/' .
+      $matches[1] . '/' . $matches[2] . '/</a>' . $matches[3];
   },
 );
 
