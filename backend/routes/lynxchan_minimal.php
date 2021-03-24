@@ -105,13 +105,18 @@ $router->post('/createBoard', function($request) {
   // but some can be urlencoded...
   // _ takes a shift and we don't need another separator like -
   // ~ takes a shift but also unsafe...
+  // - is not allowed in postgres table names...
+  // postgres allows a-z ( also letters with diacritical marks and non-Latin letters)
+  // _$[0-9]
+  // $ aren't SQL standard
+  // mysql [0-9a-zAz]$_
   $allowedChars = array('-', '.');
   for($p = 0; $p < strlen($boardUri); $p++) {
-    if (preg_match('/^a-z0-9$/', $boardUri[$p])) {
+    if (preg_match('/^[a-z0-9]$/', $boardUri[$p])) {
       continue;
     }
     if (!in_array($boardUri[$p], $allowedChars)) {
-      return sendResponse(array(), 400, 'boardUri has invalid characters');
+      return sendResponse(array(), 400, 'boardUri has invalid characters: [' . $boardUri[$p] . ']'. $boardUri);
     }
   }
 
