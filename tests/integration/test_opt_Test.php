@@ -44,7 +44,7 @@ final class test_opt_Test extends TestCase {
   public function testBoardPage(array $boards): array {
     if (!count($boards)) {
       $this->assertIsArray(array());
-      return array();
+      return array('threads'=>array());
     }
     shuffle($boards);
     $board = array_shift($boards);
