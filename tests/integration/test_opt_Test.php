@@ -42,7 +42,10 @@ final class test_opt_Test extends TestCase {
    * @depends testBoardsJson
    */
   public function testBoardPage(array $boards): array {
-    if (!count($boards)) return array();
+    if (!count($boards)) {
+      $this->assertIsArray(array());
+      return array();
+    }
     shuffle($boards);
     $board = array_shift($boards);
     $boardPage = getExpectJson('opt/boards/' . $board['uri'] . '/1.json');
@@ -105,7 +108,10 @@ final class test_opt_Test extends TestCase {
    * @depends testBoardsJson
    */
   public function testBoard(array $boards): void {
-    if (!count($boards)) return;
+    if (!count($boards)) {
+      $this->assertIsArray(array());
+      return array();
+    }
     shuffle($boards);
     $board = array_shift($boards);
     $res = getExpectJson('/opt/' . $board['uri']);
