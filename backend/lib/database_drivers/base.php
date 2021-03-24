@@ -277,12 +277,10 @@ class database_driver_base_class {
           echo "Warning, string into groupby, fix this!<br>\n";
           //$useGroupBys = explode(',', $useGroupBys);
         }
-        if ($this->btTables) {
-          $useGroupBys = array_map(function($val) use ($tableName) {
-            return str_replace('MODEL.', $tableName . '.', $val);
-          }, $useGroupBys);
-          //echo "<pre>", print_r($useGroupBys, 1), "</pre>\n";
-        }
+        //echo "<pre>", print_r($useGroupBys, 1), "</pre>\n";
+        $useGroupBys = array_map(function($val) use ($tableName) {
+          return str_replace('MODEL.', $tableName . '.', $val);
+        }, $useGroupBys);
         $data['groupbys'] = array_merge($data['groupbys'], $useGroupBys);
       }
       if (!empty($join['having'])) {
@@ -460,7 +458,7 @@ function modelToTableName($model) {
     echo "<pre>base::modelToTableName - model is missing a name[", print_r($model, 1), "] $trace</pre>\n";
     return;
   }
-  return $model['name'].'s';
+  return str_replace('-', '_', $model['name'].'s');
 }
 function modelToId($model) {
   if (!isset($model['name'])) {
