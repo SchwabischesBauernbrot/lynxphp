@@ -72,12 +72,16 @@ class mysql_driver extends database_driver_base_class implements database_driver
       echo "Connect debugging error: " . mysqli_connect_error() . "<br>\n";
       return false;
     }
+    $this->hostname = $host;
+    $this->username = $user;
+    $this->password = $pass;
     return true;
   }
   // direct
   private function switch_db($db) {
     // FIXME check result code
     mysqli_select_db($this->conn, $db);
+    $this->sql_current_db = $db;
     return true;
   }
   // easy
@@ -196,7 +200,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       $res = mysqli_query($this->conn, $sql);
       $err = mysqli_error($this->conn);
       if ($err) {
-        echo "mysql::autoupdate - update err[$err]<br>\nSQL[$sql]\n";
+        echo "<pre>mysql::autoupdate - update err[$err]<br>\nSQL[$sql]</pre>\n";
         return false;
       }
       return true;
@@ -204,20 +208,25 @@ class mysql_driver extends database_driver_base_class implements database_driver
   }
   public function insert($rootModel, $recs) {
     $sql = $this->makeInsertQuery($rootModel, $recs);
+    $res = $this->query($sql);
+    if (!$res) return false;
+    /*
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "mysql::insert - err[$err]<br>\n";
+      echo "<pre>mysql::insert - err[$err]\nSQL[$sql]</pre>\n";
       return false;
     }
+    */
     // how does this handle multiple?
     return mysqli_insert_id($this->conn);
-
   }
 
   public function update($rootModel, $urow, $options) {
     $sql = $this->makeUpdateQuery($rootModel, $urow, $options);
     //echo "sql[$sql]<br>\n";
+    return $this->query($sql);
+    /*
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
@@ -225,11 +234,14 @@ class mysql_driver extends database_driver_base_class implements database_driver
       return false;
     }
     return true;
+    */
   }
 
   public function delete($rootModel, $options) {
     $sql = $this->makeDeleteQuery($rootModel, $options);
     //echo "sql[$sql]<br>\n";
+    return $this->query($sql) ? true : false;
+    /*
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
@@ -237,6 +249,44 @@ class mysql_driver extends database_driver_base_class implements database_driver
       return false;
     }
     return true;
+    */
+  }
+
+  private function query($sql) {
+    $res = mysqli_query($this->conn, $sql);
+    $err = mysqli_error($this->conn);
+    if (!$err) return $res;
+    // handle gone away
+    if ($err === 'MySQL server has gone away') {
+      // clear cache
+      if ($this->conn) {
+        mysqli_close($this->conn);
+        $this->conn = false;
+      }
+      //echo "MySQL:Reconnecting<br>\n"; flush();
+      $reconnect_retries = 0;
+      while(!$this->conn) {
+        $this->conn = mysqli_connect($this->hostname, $this->username, $this->password);
+        $reconnect_retries++;
+        if ($reconnect_retries > 3) {
+          echo "Could not reconnect, aborting<br>\n";
+          exit(1);
+          break;
+        }
+        // only delay retry if we didn't connect
+        if (!$this->conn) {
+          // 5, 20, 45
+          sleep($reconnect_retries * $reconnect_retries * 5);
+        }
+      }
+      // check connection
+      mysqli_select_db($this->conn, $this->sql_current_db);
+      return query($sql);
+    } else
+    if ($err) {
+      echo "<pre>mysql::query - err[$err]\nSQL[$sql]</ore>\n";
+      return false;
+    }
   }
 
   // options
@@ -246,6 +296,8 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function find($rootModel, $options = false, $fields = '*') {
     $sql = $this->makeSelectQuery($rootModel, $options, $fields);
     //echo "sql[$sql]<br>\n";
+    return $this->query($sql);
+    /*
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
@@ -253,15 +305,18 @@ class mysql_driver extends database_driver_base_class implements database_driver
       return false;
     }
     return $res;
+    */
   }
   public function count($rootModel, $options = false) {
     $res = $this->find($rootModel, $options, 'count(*)');
+    if (!$res) return -1;
     list($cnt) = mysqli_fetch_row($res);
     mysqli_free_result($res);
     return $cnt;
   }
   public function findById($rootModel, $id, $options = false) {
     $res = parent::findById($rootModel, $id, $options);
+    if (!$res) return $res;
     $row = mysqli_fetch_assoc($res);
     mysqli_free_result($res);
     return $row;
@@ -297,8 +352,8 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function groupAgg($field) {
     return 'group_concat(' . $field . ')';
   }
-  public function unixtime() {
-    return 'UNIX_TIMESTAMP()';
+  public function unixtime($val = '') {
+    return 'UNIX_TIMESTAMP(' . $val . ')';
   }
 }
 
