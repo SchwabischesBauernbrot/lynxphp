@@ -861,9 +861,14 @@ input:invalid, textarea:invalid {
 	margin: 0;
 }
 
+
 .post-message {
 	text-align: left;
+	max-width: 400px;
 }
+
+/* aceofdiamonds edit */
+
 
 .post-container {
 	box-sizing: border-box;
