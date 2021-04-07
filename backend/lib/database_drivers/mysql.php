@@ -281,7 +281,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       }
       // check connection
       mysqli_select_db($this->conn, $this->sql_current_db);
-      return query($sql);
+      return $this->query($sql);
     } else
     if ($err) {
       echo "<pre>mysql::query - err[$err]\nSQL[$sql]</ore>\n";
