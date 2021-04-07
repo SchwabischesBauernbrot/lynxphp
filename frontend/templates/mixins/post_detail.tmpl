@@ -15,6 +15,7 @@
         <option value="fid">Filter ID</option>
         <option value="fname">Filter Name</option>
       </select>
+      {{links}}
     </span>
   </div>
   <div class="post-data">
@@ -24,7 +25,7 @@
   </div>
 </div>
 <!-- loop -->
-        <input class="post-check" type="checkbox" name="checkedposts" value="{{no}}"/>
+        <input class="post-check" type="checkbox" name="checkedposts[]" value="{{no}}"/>
 <!-- end -->
 <!-- loop -->
         <span class="post-icons">
