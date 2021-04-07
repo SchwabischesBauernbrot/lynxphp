@@ -7,7 +7,8 @@ include '../common/post_vars.php';
 $req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 
-if (($req_path !== '/login.php' && $req_method !== 'POST') || $req_path === '/logout.php') {
+//echo "req_path[$req_path]<br>\n";
+if ((($req_path !== '/login.php' && $req_method !== 'POST') || $req_path === '/logout.php') && strpos($req_path, '/.youtube') === false) {
   echo '<div style="height: 40px;"></div>', "\n"; flush();
 }
 
@@ -95,6 +96,7 @@ definePipeline('PIPELINE_HOMEPAGE_BOARDS_FIELDS',  'homepage_boards_fields');
 
 definePipeline('PIPELINE_BOARD_HEADER_TMPL',  'board_header_tmpl');
 definePipeline('PIPELINE_BOARD_NAV',          'board_nav');
+definePipeline('PIPELINE_BOARD_STICKY_NAV',   'board_sticky_nav');
 definePipeline('PIPELINE_BOARD_DETAILS_TMPL', 'board_details_tmpl');
 definePipeline('PIPELINE_BOARD_SETTING_NAV',  'board_setting_nav');
 definePipeline('PIPELINE_BOARD_SETTING_TMPL', 'board_setting_tmpl');
@@ -138,8 +140,7 @@ include 'lib/middlewares.php';
 // frontend handlers
 
 // mixins
-include 'handlers/mixins/board_header.php';
-include 'handlers/mixins/board_nav.php';
+include 'handlers/mixins/board_portal.php';
 include 'handlers/mixins/admin_portal.php';
 include 'handlers/mixins/global_portal.php';
 include 'handlers/mixins/user_portal.php';
@@ -147,6 +148,7 @@ include 'handlers/mixins/post_renderer.php';
 include 'handlers/mixins/post_form.php';
 include 'handlers/mixins/post_actions.php';
 include 'handlers/mixins/tabs.php'; // maybe more of a lib...
+
 
 // handlers
 include 'handlers/login.php';
