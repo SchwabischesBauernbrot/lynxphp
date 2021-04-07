@@ -36,10 +36,12 @@ $fePkgs = array(
         'module' => 'banner',
       ),
       // add {{banner}} tag to board_details_tmpl
+      /*
       array(
         'pipeline' => 'PIPELINE_BOARD_DETAILS_TMPL',
         'module' => 'banner',
       ),
+      */
       // adds banners to nav settings
       array(
         'pipeline' => 'PIPELINE_BOARD_SETTING_NAV',
