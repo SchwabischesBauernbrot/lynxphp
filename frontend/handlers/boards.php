@@ -166,6 +166,7 @@ function preprocessPost(&$p) {
 
 // /:uri/
 function getBoardThreadListing($boardUri, $pagenum = 1) {
+  //echo "pagenum[$pagenum]<br>\n";
   $boardThreads = backendGetBoardThreadListing($boardUri, $pagenum);
   if (!$boardThreads) {
     wrapContent("There is a problem with the backend");
@@ -203,7 +204,14 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   $boardnav_html = str_replace('{{pages}}', $pages_html, $boardnav_html);
   $boardnav_html = str_replace('{{uri}}',   $boardUri,   $boardnav_html);
   */
-  $boardnav_html = renderBoardNav($boardUri, $boardThreads['pageCount'], $pagenum);
+  //$boardnav_html = renderBoardNav($boardUri, $boardThreads['pageCount'], $pagenum);
+  // FIXME: register/push a portal with wrapContent
+  // so it can fast out efficiently
+  // also should wrapContent be split into header/footer for efficiency? yes
+  // and we need keying too, something like ESI
+  $boardData['pageCount'] = $boardThreads['pageCount'];
+  $boardHeader = renderBoardPortalHeader($boardUri, $boardData, array('pagenum' => $pagenum));
+  $boardnav_html = '';
 
   // used to look at text, so we can queue up another backend query if needed
   // FIXME: check count of PIPELINE_POST_PREPROCESS
@@ -248,16 +256,17 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
     $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
   }
 
+  // need this for form actions
   $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
-  $tmpl = str_replace('{{title}}', htmlspecialchars($boardData['title']), $tmpl);
-  $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
+  //$tmpl = str_replace('{{title}}', htmlspecialchars($boardData['title']), $tmpl);
+  //$tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
   $tmpl = str_replace('{{threads}}', $threads_html, $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
   // mixin
-  $tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/'), $tmpl);
+  //$tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/'), $tmpl);
   $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
 
-  wrapContent($tmpl);
+  wrapContent($boardHeader . $tmpl);
 }
 
 function getThreadHandler($boardUri, $threadNum) {
@@ -265,15 +274,17 @@ function getThreadHandler($boardUri, $threadNum) {
   $templates = loadTemplates('thread_details');
   $tmpl = $templates['header'];
 
-  $boardNav_template = $templates['loop0'];
+  //$boardNav_template = $templates['loop0'];
   $file_template = $templates['loop1'];
   $hasReplies_template = $templates['loop2'];
   $reply_template = $templates['loop3'];
   $post_template = $templates['loop4'];
 
+  /*
   $tmp = $boardNav_template;
   $tmp = str_replace('{{uri}}', $boardUri, $tmp);
   $boardnav_html = $tmp;
+  */
 
   $boardData = getBoardThread($boardUri, $threadNum);
 
@@ -311,7 +322,7 @@ function getThreadHandler($boardUri, $threadNum) {
   $tmpl = str_replace('{{threadNum}}', $threadNum, $tmpl);
   $tmpl = str_replace('{{title}}', htmlspecialchars($boardData['title']), $tmpl);
   $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
-  $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
+  //$tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
   $tmpl = str_replace('{{posts}}', $posts_html, $tmpl);
 
   $tmpl = str_replace('{{replies}}', count($boardData['posts']) - 1, $tmpl);
@@ -320,7 +331,12 @@ function getThreadHandler($boardUri, $threadNum) {
   // mixins
   $tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/thread/' . $threadNum . '.html', array('reply' => $threadNum)), $tmpl);
   $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
-  wrapContent($tmpl);
+
+  $boardHeader = renderBoardPortalHeader($boardUri, $boardData, array(
+    'isThread' => true,
+    'threadNum' => $threadNum,
+  ));
+  wrapContent($boardHeader . $tmpl);
 }
 
 function getThumbnail($file, $maxW = 0) {
@@ -426,7 +442,8 @@ function getBoardCatalogHandler($boardUri) {
   $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
   unset($posts);
 
-  $boardnav_html = renderBoardNav($boardUri, $maxPage, '[Catalog]');
+  //$boardnav_html = renderBoardNav($boardUri, $maxPage, '[Catalog]');
+  $boardnav_html = '';
 
   $tiles_html = '';
   foreach($catalog as $pageNum => $page) {
@@ -462,6 +479,10 @@ function getBoardCatalogHandler($boardUri) {
     }
   }
   $boardData = getBoard($boardUri);
+  //$boardData['pageCount'] = $boardThreads['pageCount'];
+  $boardHeader = renderBoardPortalHeader($boardUri, $boardData, array(
+    'isCatalog' => true,
+  ));
 
   $p = array(
     'boardUri' => $boardUri,
@@ -480,7 +501,7 @@ function getBoardCatalogHandler($boardUri) {
   // mixin
   $tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/catalog'), $tmpl);
   $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
-  wrapContent($tmpl);
+  wrapContent($boardHeader . $tmpl);
 }
 
 function getBoardSettingsHandler($boardUri) {
