@@ -66,6 +66,15 @@ function isUserPermitted($user_id, $permission, $target = false) {
   // does target object include boardUri (check for BO)
   if ($target) {
     $parts = explode('/', $target);
+    //
+    if ($parts[0] === 'b') {
+      $boardUri = $parts[1];
+      // BOs can do anything...
+      $access = isBO($boardUri, $user_id);
+      if (!$access) {
+        // password match post password?
+      }
+    } else
     if ($parts[0] === 'p') {
       $boardUri = $parts[1];
       $access = isBO($boardUri, $user_id);
