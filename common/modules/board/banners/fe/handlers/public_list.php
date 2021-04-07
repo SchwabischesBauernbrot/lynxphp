@@ -16,10 +16,10 @@ $tmpl = $templates['header'];
 $banner_tmpl = $templates['loop0'];
 $boardData = getBoard($boardUri);
 
-// FIXME: portal middleware?
-$boardHeader_html = renderBoardHeader($boardData);
-$boardNav_html = renderBoardNav($boardUri, $boardData['pageCount'], '[Banners]');
-$tmpl = $boardHeader_html . $boardNav_html . $tmpl;
+//$boardHeader_html = renderBoardHeader($boardData);
+//$boardNav_html = renderBoardNav($boardUri, $boardData['pageCount'], '[Banners]');
+//$tmpl = $boardHeader_html . $boardNav_html . $tmpl;
+
 
 $banners_html = '';
 foreach($banners as $banner) {
@@ -48,5 +48,8 @@ foreach($banners as $banner) {
 }
 $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
 $tmpl = str_replace('{{banners}}', $banners_html, $tmpl);
-wrapContent($tmpl);
+
+$boardHeader = renderBoardPortalHeader($boardUri, $boardData);
+
+wrapContent($boardHeader . $tmpl);
 ?>
