@@ -101,7 +101,7 @@ class playlist {
     }
     */
     //navElem.appendChild(viewerElem)
-    viewerElem.style.float = 'left'
+    //viewerElem.style.float = 'left'
     navElem.insertBefore(viewerElem, navElem.childNodes[0])
     //}
   }
@@ -137,6 +137,9 @@ class playlist {
     }
     var ref = this
 
+    var spaceElem = document.createElement('div')
+    navElem.insertBefore(spaceElem, navElem.childNodes[0])
+
     var prevTrackElem = document.createElement('a')
     prevTrackElem.className = 'nav-item prevTrack'
     prevTrackElem.innerHTML = '[&#9664;&#9664;]'
@@ -154,6 +157,25 @@ class playlist {
       ref.nextTrack()
     }
     navElem.appendChild(nextTrackElem)
+
+    /*
+    var space2Elem = document.createElement('div')
+    //space2Elem.className = 'nav-item'
+    //space2Elem.innerHTML = '&nbsp;'
+    space2Elem.style.clear = 'both';
+    navElem.appendChild(space2Elem)
+
+    var trackListElem = document.createElement('select')
+    trackListElem.id = "trackList"
+    for(var i in this.tracks) {
+      var embedder = this.tracks[i]
+      var elem = document.createElement('option')
+      elem.value = embedder.videoId
+      elem.innerText = embedder.videoId
+      trackListElem.appendChild(elem)
+    }
+    navElem.appendChild(trackListElem)
+    */
   }
   enableUI() {
     var navElem = document.querySelector('nav.stickynav')
