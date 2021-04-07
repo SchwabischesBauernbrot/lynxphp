@@ -1,4 +1,68 @@
-<details class="toggle-label" id="actionform">
+<br>
+Post(s) action: {{actions}}
+<!-- loop -->
+    <div class="actions">
+      <label>
+        <input id="password" type="password" name="postpassword" placeholder="Post password" autocomplete="chrome-off">
+      </label>
+    </div>
+<!-- loop -->
+    <div class="actions">
+      <label>
+        <select name="level">
+          <option value="">Not sure
+          <option value="cancer">Cancer
+          <option value="spam">Spam / Advertisement
+          <option value="flood">Flood
+          <option value="board">Board Rule Violation
+          <option value="global">Site Rule Violation
+          <option value="copyright">Copyright Violation
+          <option value="illegal">Illegal Content
+          <option value="other">Other
+        </select>
+      </label>
+      <label>
+        <input id="report" type="text" name="report_reason" placeholder="Report reason" autocomplete="chrome-off">
+      </label>
+    </div>
+<!-- loop -->
+    <div class="actions">
+      <label>
+        <input class="post-check" type="radio" name="media" value="spoiler">
+        Spoiler Files
+      </label>
+      <label>
+        <input class="post-check" type="radio" name="media" value="delete">
+        Remove Files
+      </label>
+      <label>
+        <input class="post-check" type="radio" name="media" value="ban">
+        Ban Files
+      </label>
+    </div>
+<!-- loop -->
+    <div class="actions">
+      <a href="">Moderation Help</a>
+      <label>
+        Scope: Site-Wide, Board-Wide
+      </label>
+      <label>
+        Duration
+        Days / Hours / Minutes
+      </label>
+      <label>
+        <input id="report" type="text" name="ban_message" placeholder="Ban Message" autocomplete="chrome-off">
+      </label>
+      <label>
+        Ban Type (Single IP, Narrow Range, Wide Range)
+      </label>
+    </div>
+<!-- loop -->
+{{captcha}}
+<br>
+<input type="submit" value="Submit">
+<!-- loop -->
+<!-- details class="toggle-label" id="actionform">
   <summary class="toggle-summary">Show Post Actions</summary>
   <div class="actions">
     <h4 class="no-m-p">Actions:</h4>
@@ -20,108 +84,17 @@
     <label>
       <input class="post-check" type="checkbox" name="report" value="1">
       Report
-    </label>
-    <label>
+    </label -->
+    <!-- label>
       <input class="post-check" type="checkbox" name="global_report" value="1">
       Global Report
-    </label>
-    <label>
-    <input id="report" type="text" name="report_reason" placeholder="Report reason" autocomplete="chrome-off">
+    </label -->
+    <!-- label>
+      <input id="report" type="text" name="report_reason" placeholder="Report reason" autocomplete="chrome-off">
     </label>
   </div>
-  <div class="actions">
-    <h4 class="no-m-p">Captcha:</h4>
-    <a class="text-center" href="/faq.html#captcha">Instructions</a>
-    <div class="catalog">
-      <noscript class="no-m-p">
-        <iframe class="captcha" src="/captcha.html" width="150" height="150" scrolling="no" loading="lazy">
-        </iframe>
-      </noscript>
-      <div class="jsonly captcha" style="display:none">
-      </div>
-      <div class="captchafield noselect">
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="0">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="1">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="2">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="3">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="4">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="5">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="6">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="7">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="8">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="9">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="10">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="11">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="12">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="13">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="14">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-        <label class="captchachecklabel">
-        <input type="checkbox" name="captcha" value="15">
-        <span class="captchacheckbox">
-        </span>
-        </label>
-      </div>
-    </div>
-  </div>
+  <div class="actions" -->
+    <!-- captcha -->
+  <!-- /div>
   <input type="submit" value="submit">
-</details>
+</details -->
