@@ -16,10 +16,12 @@ $tmpl = $templates['header'];
 $log_tmpl = $templates['loop0'];
 $boardData = getBoard($boardUri);
 
+/*
 // FIXME: portal middleware?
 $boardHeader_html = renderBoardHeader($boardData);
 $boardNav_html = renderBoardNav($boardUri, $boardData['pageCount'], '[Logs]');
 $tmpl = $boardHeader_html . $boardNav_html . $tmpl;
+*/
 
 $logs_html = '';
 if (is_array($logs)) {
@@ -31,5 +33,7 @@ if (is_array($logs)) {
 }
 $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
 $tmpl = str_replace('{{logs}}', $logs_html, $tmpl);
-wrapContent($tmpl);
+
+$boardHeader = renderBoardPortalHeader($boardUri, $boardData);
+wrapContent($boardHeader . $tmpl);
 ?>
