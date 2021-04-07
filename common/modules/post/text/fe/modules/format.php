@@ -114,7 +114,7 @@ $replaces = array(
 // hrm could verify the post exists...
   '/' . preg_quote('&gt;&gt;') . '(\d+)\/?(\s+)/m' => function ($matches) use ($io) {
     global $btLookups;
-    $threadId = $btLookups[$io['boardUri']][$matches[1]];
+    $threadId = isset($btLookups[$io['boardUri']][$matches[1]]) ? $btLookups[$io['boardUri']][$matches[1]] : '';
     return '<a class="quote"
       href="' . $io['boardUri'] . '/thread/' . $threadId . '#' . $matches[1] . '">&gt;&gt;/' .
       $matches[1] . '/</a>' . $matches[2];
