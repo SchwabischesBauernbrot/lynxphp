@@ -131,14 +131,14 @@ class playlist {
   }
   openViewer() {
     var navElem = document.querySelector('nav.stickynav')
-    var hasViewer = navElem.querySelector('.playlistViewer')
+    var hasViewer = navElem.querySelector('.prevTrack')
     if (hasViewer) {
       return
     }
     var ref = this
 
     var prevTrackElem = document.createElement('a')
-    prevTrackElem.className = 'nav-item'
+    prevTrackElem.className = 'nav-item prevTrack'
     prevTrackElem.innerHTML = '[&#9664;&#9664;]'
     prevTrackElem.style.cursor = 'hand'
     prevTrackElem.onclick = function() {
@@ -147,7 +147,7 @@ class playlist {
     navElem.appendChild(prevTrackElem)
 
     var nextTrackElem = document.createElement('a')
-    nextTrackElem.className = 'nav-item'
+    nextTrackElem.className = 'nav-item nextTrack'
     nextTrackElem.innerHTML = '[&#9654;&#9654;]'
     nextTrackElem.style.cursor = 'hand'
     nextTrackElem.onclick = function() {
