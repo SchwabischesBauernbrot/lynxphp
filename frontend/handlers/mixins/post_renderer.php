@@ -93,6 +93,9 @@ function renderPost($boardUri, $p, $options = false) {
 
   $threadid = $p['threadid'] ? $p['threadid'] : $p['no'];
 
+  $links_html = '';
+  // are we a BO? is this our post?
+
   $tags = array(
     'op'        => $threadid === $p['no'] ? 'op': '',
     'uri'       => $boardUri,
@@ -106,6 +109,7 @@ function renderPost($boardUri, $p, $options = false) {
     'replies'   => $replies_html,
     'jstime'    => gmdate('Y-m-d', $p['created_at']) . 'T' . gmdate('H:i:s.v', $p['created_at']) . 'Z',
     'human_created_at' => gmdate('n/j/Y H:i:s', $p['created_at']),
+    'links'     => $links_html,
   );
   $tmp = replace_tags($templates['header'], $tags);
 
