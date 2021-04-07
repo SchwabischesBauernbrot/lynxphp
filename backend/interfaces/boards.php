@@ -155,6 +155,7 @@ function boardPage($boardUri, $page = 1) {
   */
   //echo "count [", $db->num_rows($res), "]<br>\n";
   if (get_class($db) === 'pgsql_driver') {
+  	// FIXME: pagination
     $sql = 'select '.join(',', array_map(function ($f) { return 'f.' . $f . ' as file_' . $f; }, $filesFields)).', ranked_post.*
               from
               (
