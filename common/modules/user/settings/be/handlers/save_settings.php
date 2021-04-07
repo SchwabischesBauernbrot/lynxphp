@@ -25,7 +25,7 @@ if ($userid) {
     // not going to have a username to send
     $setCookie = array(
       'session' => $sesRow['session'],
-      'ttl'     => $sesRow['ttl'],
+      'ttl'     => $sesRow['expires'],
     );
   }
   // put it into our session
