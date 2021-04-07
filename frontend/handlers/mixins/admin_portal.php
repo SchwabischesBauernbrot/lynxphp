@@ -1,5 +1,6 @@
 <?php
 
+// FIXME: split into header/footer functions
 function renderAdminPortal() {
   global $pipelines;
 
