@@ -19,8 +19,11 @@ $result = $pkg->useResource('close_reports', array(
 );
 
 if ($result['success'] === 'ok') {
+  // nice to confirm removedPosts isn't 0...
   // redirect
   redirectTo('/'. $boardUri . '/settings/reports');
+} else {
+  echo "Error: ", print_r($result, 1);
 }
 
 ?>
