@@ -27,7 +27,7 @@ foreach($boards as $uri => $t) {
 
 $removedThreads = 0;
 $removedPosts   = 0;
-
+$added  = 0;
 $issues = array();
 
 switch($action) {
@@ -63,26 +63,64 @@ switch($action) {
   break;
   case 'report':
     // so create reports for these posts...
+    $userid = getUserID();
+    $ip = getip();
     foreach($posts as $r) {
       // lock? group by board?
       $data = getBoardByUri($r['board']);
-      $report = array(
-        'id' => uniqid(), // prevent race issues
-        'ip' => getip(),
-        'userid' => getUserID(),
-        'postid' => $r['postid'],
-        'created_at' => time(),
-        'status' => 'open',
-      );
-      if (getOptionalPostField('reasonReport')) $report['reason'] = getOptionalPostField('reasonReport');
-      // make sure reason is unique?
-      $data['json']['reports'][] = $report;
-      updateBoard($r['board'], $data);
+
+      // make sure we don't already have this post in an open report
+      $add = true;
+      foreach($data['json']['reports'] as $k=>$er) {
+        if ($er['status'] !== 'open') continue;
+        if ($r['postid'] === $er['postid']) {
+          // add if reason is the same
+          $reason = getOptionalPostField('reasonReport');
+          // update
+          $add = false;
+          // if reporter is different, don't do anything...
+          if ($er['userid'] === $userid) {
+            if ($reason) {
+              if ($reason === $er['reason']) continue;
+            } else {
+              if (empty($er['erason'])) continue;
+            }
+          }
+          if (!isset($data['json']['reports'][$k]['addition_reporter'])) {
+            $data['json']['reports'][$k]['addition_reporter'] = array();
+          }
+          // already have id, postid, status
+          $rec = array(
+            'created_at' => time(),
+            'ip' => $ip,
+            'userid' => $userid,
+          );
+          if ($reason) $rec['reason'] = $reason;
+          $data['json']['reports'][$k]['addition_reporter'][] = $rec;
+        }
+      }
+
+      if ($add) {
+        $report = array(
+          'id' => uniqid(), // prevent race issues
+          'ip' => $ip,
+          'userid' => $userid,
+          'postid' => $r['postid'],
+          'created_at' => time(),
+          'status' => 'open',
+        );
+        if (getOptionalPostField('reasonReport')) $report['reason'] = getOptionalPostField('reasonReport');
+
+        $data['json']['reports'][] = $report;
+        $added++;
+        updateBoard($r['board'], $data);
+      }
     }
     // FIXME: global report
-    if (getOptionalPostField('globalReport')) {
+    // always make a global report too?
+    //if (getOptionalPostField('globalReport')) {
       // also make a global report
-    }
+    //}
   break;
   default:
     // FIXME:
@@ -92,6 +130,7 @@ switch($action) {
 sendResponse(array(
   'removedThreads' => $removedThreads,
   'removedPosts' => $removedPosts,
+  'reportsAdded' => $added,
   'request' => $posts,
   'hasDeleteAccess' => $hasDeleteAccess,
   'issues' => $issues,
