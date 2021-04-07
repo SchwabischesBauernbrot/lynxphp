@@ -23,7 +23,7 @@ $boards_html = '';
 if (is_array($boards)) {
   foreach($boards as $c => $b) {
     $last = $b['last'];
-    $b['lastCom'] = $last['com'];
+    $b['lastCom'] = isset($last['com']) ? $last['com'] : 0;
     unset($b['last']); // can't pass an array value into replace_tags
     $boards_html .= replace_tags($board_template, $b) . "\n";
     if ($c > 10) break;
