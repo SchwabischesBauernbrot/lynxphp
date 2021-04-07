@@ -8,6 +8,8 @@ $params = $getHandler();
 // category filter?
 $result = $pkg->useResource('open_reports', array('global' => true));
 
+//echo "<pre>Result[", print_r($result, 1), "]</pre>\n";
+
 $templates = moduleLoadTemplates('report_listing', __DIR__);
 
 $header = $templates['header'];
@@ -33,6 +35,7 @@ foreach ($result['reports'] as $r) {
   $tmp = str_replace('{{_id}}', $r['_id'], $tmp);
   $tmp = str_replace('{{zebra}}', ($r['_id'] % 2 === 1) ? 'odd' : 'even', $tmp);
   $tmp = str_replace('{{global}}', $r['global'], $tmp);
+  $tmp = str_replace('{{boardUri}}', $r['boardUri'], $tmp);
   $tmp = str_replace('{{threadId}}', $r['threadId'], $tmp);
   $tmp = str_replace('{{postId}}', $r['postId'], $tmp);
   $tmp = str_replace('{{creation}}', $r['creation'], $tmp);
