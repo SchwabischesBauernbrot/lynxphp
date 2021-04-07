@@ -9,11 +9,16 @@ $pipelines[PIPELINE_BOARD_SETTING_GENERAL]->execute($fields);
 
 // FIXME: get from formdata...
 $res = processFiles();
-wrapContent('Please wait...');
+// we can't do this because of the cookie settings...
+//wrapContent('Please wait...');
 
 $res = $pkg->useResource('save_settings', array(),
   array('addPostFields' => $_POST)
 );
+
+if (!empty($res['setCookie'])) {
+  setcookie('session', $res['setCookie']['session'], $res['setCookie']['ttl'], '/');
+}
 
 if ($res['success']) {
   // maybe a js alert?
