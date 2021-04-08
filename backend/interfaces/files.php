@@ -180,7 +180,7 @@ function make_thumbnail($fileData, $duration = 1) {
   $isAudio = $m6 === 'audio/';
 
   //echo "isImage[$isImage]<br>\n";
-  echo "<pre>", print_r($fileData, 1), "</pre>\n";
+  //echo "<pre>", print_r($fileData, 1), "</pre>\n";
 
   $updateThumbSize = false;
   $sizes = getThumbnailSize($fileData);
@@ -220,7 +220,7 @@ function make_thumbnail($fileData, $duration = 1) {
   }
   // get final size?
   // may not save any writes at all if the size differes
-  if ($updateThumbSize) {
+  if ($updateThumbSize && $fileData['fileid']) {
     // write thumbnail size to db
     if (empty($fileData['boardUri'])) {
       echo "Would update thumbsize but no boardUri<br>\n";
@@ -465,6 +465,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     print_r($extFileData);
     //$workqueue->addWork(PIPELINE_FILE, $extFileData);
     */
+    $fileData['fileid'] = $id; // set fileid
     $fileData['boardUri'] = $boardUri;
     $workqueue->addWork(PIPELINE_FILE, $fileData);
 
