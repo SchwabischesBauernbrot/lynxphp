@@ -262,6 +262,7 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   //$tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
   $tmpl = str_replace('{{threads}}', $threads_html, $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
+  $tmpl = str_replace('{{pagenum}}', $pagenum, $tmpl);
   // mixin
   //$tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/'), $tmpl);
   $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
