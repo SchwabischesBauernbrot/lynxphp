@@ -59,10 +59,16 @@ function renderPostForm($boardUri, $url, $options = false) {
   $type = 'Thread';
   $tagThread = '';
   if ($options) {
-    if ($options['reply']) {
+    if (!empty($options['reply'])) {
       $type = 'Reply';
       $tagThread = '<input type="hidden" name="thread" value="' . $options['reply'] . '">';
     }
+    // this is for posting...
+    /*
+    if ($options['page']) {
+      $tagThread = '<input type="hidden" name="page" value="' . $options['page'] . '">';
+    }
+    */
   }
 
   $tmp = $templates['header'];
