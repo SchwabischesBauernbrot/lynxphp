@@ -20,9 +20,12 @@ foreach($_POST as $k => $v) {
   }
 }
 
+// are they logged in?
+$user_id = loggedIn();
+
 $hasDeleteAccess = array();
 foreach($boards as $uri => $t) {
-  $hasDeleteAccess[$uri] = isBO($uri);
+  $hasDeleteAccess[$uri] = isUserPermitted($user_id, 'delete_post', 'b/' . $uri);
 }
 
 $removedThreads = 0;
