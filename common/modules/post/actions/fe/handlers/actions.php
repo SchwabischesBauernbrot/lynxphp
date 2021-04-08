@@ -35,6 +35,9 @@ switch($action) {
       );
       if ($result['removedPosts'] + $result['removedThreads'] === count($postFields)) {
         echo "Successful!<bR>\n"; flush();
+        if (!empty($_POST['page'])) {
+          return redirectTo('/' . $boardUri . '/page/' . $_POST['page']);
+        } else
         if ($threadNum === 'ThreadNum') {
           return redirectTo('/' . $boardUri . '/');
         } else {
@@ -112,6 +115,9 @@ if (count($result['issues'])) {
   }
 
   if ($ok) {
+    if (!empty($_POST['page'])) {
+      redirectTo('/' . $boardUri . '/page/' . $_POST['page']);
+    } else
     if ($result['request'][0]['threadid'] !== 'ThreadNum') {
       redirectTo('/'. $boardUri . '/thread/' . $result['request'][0]['threadid'] . '.html');
     } else {
