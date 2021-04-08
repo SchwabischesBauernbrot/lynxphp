@@ -26,7 +26,7 @@ function sqlToType($sqlType) {
 
 class pgsql_driver extends database_driver_base_class implements database_driver_base {
   function __construct() {
-    $this->conn = null;
+    parent::__construct();
     $this->modelToSQL = array(
       'str'     => 'VARCHAR NOT NULL DEFAULT \'\',',
       'string'  => 'VARCHAR NOT NULL DEFAULT \'\,',
