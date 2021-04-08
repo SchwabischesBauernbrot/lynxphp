@@ -95,7 +95,7 @@ function getBoardThreadsModel($boardUri) {
     ),
     // if you join, you'll lose this ordering..
     //'order' =>'updated_at desc',
-  ));
+  ), 'postid');
 }
 
 // get board thread
@@ -407,6 +407,7 @@ function boardCatalog($boardUri) {
     array(
       'type' => 'left',
       'model' => $posts_model,
+      'alias' => 'replies',
       'useField' => 'threadid',
       'pluck' => array('count(ALIAS.postid) as reply_count'),
       'groupby' => array('MODEL.postid'),
@@ -430,9 +431,17 @@ function boardCatalog($boardUri) {
       'groupby' => array('file_lister.fileid'),
     ),
   );
+  // so we don't have to group by all the fields we just want to pass through
+  $pgWrapper = $db->makeSubselect($threadModel, array(), 'postid');
+  $pgWrapper['children'] = array(
+    array(
+      'model' => $posts_model,
+      'alias' => 'thread_alias',
+    ),
+  );
 
   // get all threads
-  $res = $db->find($threadModel, array('order'=>'updated_at desc'));
+  $res = $db->find($pgWrapper, array('orderNoAlias'=>'thread_alias.updated_at desc'));
 
 /*
   $posts_model = getPostsModel($boardUri);
