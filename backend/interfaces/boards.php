@@ -194,7 +194,6 @@ function boardPage($boardUri, $page = 1) {
   */
   //echo "count [", $db->num_rows($res), "]<br>\n";
   if (get_class($db) === 'pgsql_driver') {
-    // FIXME: pagination
     $sql = 'select '.join(',', array_map(function ($f) { return 'f.' . $f . ' as file_' . $f; }, $filesFields)).', ranked_post.*
               from
               (
@@ -217,7 +216,8 @@ function boardPage($boardUri, $page = 1) {
               ) as ranked_post
               left join '.$filesTable.' f on f.postid = ranked_post.replyid
             where rank <= ' . $lastXreplies . '
-            order by ranked_post.thread_postid desc, ranked_post.replyid asc';
+            order by ranked_post.thread_postid desc, ranked_post.replyid asc
+            limit ' . $tpp . ($limitPage ? ' OFFSET ' . ($limitPage * $tpp) : '');
     $res = pg_query($db->conn, $sql);
     $err = pg_last_error($db->conn);
     if ($err) {
