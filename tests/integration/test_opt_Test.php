@@ -71,6 +71,7 @@ final class test_opt_Test extends TestCase {
   public function testBoardThread(array $arr): void {
     // need a thread to test with...
     if (!count($arr['threads'])) {
+      $this->assertIsArray(array());
       return;
     }
     $boards = $arr['boards'];
