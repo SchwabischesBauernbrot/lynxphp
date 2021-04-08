@@ -74,7 +74,7 @@ function gettrace() {
   array_shift($calls); // remove the call to self
   $trace = '';
   foreach($calls as $i => $call) {
-    if ($i > 2) break;
+    if ($i > 3) break;
     $trace .= ' <- ' . $call['file'] . ':' . $call['line'];
   }
   return $trace;
