@@ -412,6 +412,7 @@ class database_driver_base_class {
         $sql .= "\n" . 'order by ' . $alias . $options['order'];
       }
     }
+    // FIXME: make an array (postgres doesn't like offset,max)
     if (isset($options['limit'])) {
       $sql .= "\n" . ' limit ' . $options['limit'];
     }
