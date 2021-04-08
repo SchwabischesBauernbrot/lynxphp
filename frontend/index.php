@@ -95,6 +95,7 @@ include '../common/lib.pipeline.php';
 definePipeline('PIPELINE_HOMEPAGE_BOARDS_FIELDS',  'homepage_boards_fields');
 
 definePipeline('PIPELINE_BOARD_HEADER_TMPL',  'board_header_tmpl');
+definePipeline('PIPELINE_BOARD_FOOTER_TMPL',  'board_footer_tmpl');
 definePipeline('PIPELINE_BOARD_NAV',          'board_nav');
 definePipeline('PIPELINE_BOARD_STICKY_NAV',   'board_sticky_nav');
 definePipeline('PIPELINE_BOARD_DETAILS_TMPL', 'board_details_tmpl');
