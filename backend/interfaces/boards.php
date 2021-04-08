@@ -60,6 +60,44 @@ function getBoards($boardUris) {
   return $row;
 }
 
+function getBoardThreadsModel($boardUri) {
+  global $db;
+  $posts_model = getPostsModel($boardUri);
+  if ($posts_model === false) {
+    return;
+  }
+
+  $postTable = modelToTableName($posts_model);
+  $posts_extended_model = $posts_model;
+  if ($db->btTables) {
+    $postTable = '`' . $postTable . '`';
+  }
+
+  $posts_extended_model['children'] = array(
+    array(
+      'type' => 'left',
+      'model' => $posts_model,
+      'pluck' => array('count(ALIAS.postid) as replies'),
+      'on' => array(
+        array('threadid', '=', $db->make_direct($postTable . '.postid')),
+        array('deleted', '=', 0),
+      ),
+      'groupby' => array($postTable . '.postid'),
+      'having' => '(' . $postTable . '.deleted = \'0\' or (' . $postTable . '.deleted = \'1\' and count(ALIAS.postid) > 0))',
+    )
+  );
+
+  // make it composable and then you can hang joins like files off of it
+  return $db->makeSubselect($posts_extended_model, array('criteria'=>array(
+      array('threadid', '=', 0),
+      // we need the thread tombstones...
+      //array('deleted', '=', 0),
+    ),
+    // if you join, you'll lose this ordering..
+    //'order' =>'updated_at desc',
+  ));
+}
+
 // get board thread
 // create board
 
@@ -76,6 +114,7 @@ function boardPage($boardUri, $page = 1) {
   }
   $post_files_model = getPostFilesModel($boardUri);
   $limitPage = $page - 1; // make it start at 0
+  if ($limitPage < 0) $limitPage = 0;
   //echo "page[$page] limitPage[$limitPage]<br>\n";
 
 
@@ -155,7 +194,7 @@ function boardPage($boardUri, $page = 1) {
   */
   //echo "count [", $db->num_rows($res), "]<br>\n";
   if (get_class($db) === 'pgsql_driver') {
-  	// FIXME: pagination
+    // FIXME: pagination
     $sql = 'select '.join(',', array_map(function ($f) { return 'f.' . $f . ' as file_' . $f; }, $filesFields)).', ranked_post.*
               from
               (
@@ -267,6 +306,7 @@ function boardPage($boardUri, $page = 1) {
   // MySQL version
   //
 
+  // for per thread
   $posts_model['children'] = array(
     array(
       'type' => 'left',
@@ -274,22 +314,21 @@ function boardPage($boardUri, $page = 1) {
       'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
     )
   );
-  $posts_extended_model['children'] = array(
+
+  // for thread list
+  $threadModel = getBoardThreadsModel($boardUri);
+  $threadModel['children'] = array(
     array(
       'type' => 'left',
       'model' => $post_files_model,
       'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
-    )
-  );
-
-  $res = $db->find($posts_extended_model, array('criteria'=>array(
-      array('threadid', '=', 0),
-      // we need the thread tombstones...
-      //array('deleted', '=', 0),
     ),
-    'order'=>'updated_at desc',
+  );
+  $res = $db->find($threadModel, array(
+    'order' =>'updated_at desc',
     'limit' => ($limitPage ? ($limitPage * $tpp) . ',' : '') . $tpp,
   ));
+
   $threads = array();
   while($row = $db->get_row($res)) {
     $orow = $row;
@@ -313,7 +352,7 @@ function boardPage($boardUri, $page = 1) {
     // add remaining posts
     $postRes = $db->find($posts_model, array('criteria'=>array(
       array('threadid', '=', $orow['postid']),
-      array('deleted', '=', 0),
+      array('deleted' , '=', 0),
     ), 'order'=>'created_at desc', 'limit' => $lastXreplies));
     $posts = array_reverse($db->toArray($postRes));
     $db->free($postRes);
@@ -342,6 +381,13 @@ function boardPage($boardUri, $page = 1) {
     $threads[$tk]['posts'] = array_values($t['posts']);
     // set threadid to match postid on OP
     $threads[$tk]['posts'][0]['threadid'] = $threads[$tk]['posts'][0]['no'];
+    // this breaks paging
+    /*
+    // hide deleted ops with no replies...
+    if (count($threads[$tk]['posts']) === 1 && $threads[$tk]['posts'][0]['deleted']) {
+      unset($threads[$tk]);
+    }
+    */
   }
   $threads = array_values($threads);
   return $threads;
@@ -349,6 +395,46 @@ function boardPage($boardUri, $page = 1) {
 
 function boardCatalog($boardUri) {
   global $db, $tpp;
+  $threadModel = getBoardThreadsModel($boardUri);
+
+  $posts_model = getPostsModel($boardUri);
+  $post_files_model = getPostFilesModel($boardUri);
+  $fileTable = modelToTableName($post_files_model);
+  $filesFields = array_keys($post_files_model['fields']);
+  $filesFields[] = 'fileid';
+
+  $threadModel['children'] = array(
+    array(
+      'type' => 'left',
+      'model' => $posts_model,
+      'useField' => 'threadid',
+      'pluck' => array('count(ALIAS.postid) as reply_count'),
+      'groupby' => array('MODEL.postid'),
+      //'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.postid)>0))',
+      'where' => array(
+        array('deleted', '=', 0)
+      ),
+    ),
+    array(
+      'type' => 'left',
+      'model' => $post_files_model,
+      'alias' => 'file_counter',
+      'pluck' => array('count(ALIAS.fileid) as file_count'),
+      //'groupby' => array('MODEL.postid'),
+    ),
+    array(
+      'type' => 'left',
+      'model' => $post_files_model,
+      'alias' => 'file_lister',
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields),
+      'groupby' => array('file_lister.fileid'),
+    ),
+  );
+
+  // get all threads
+  $res = $db->find($threadModel, array('order'=>'updated_at desc'));
+
+/*
   $posts_model = getPostsModel($boardUri);
   // make sure board exists...
   if ($posts_model === false) {
@@ -404,9 +490,8 @@ function boardCatalog($boardUri) {
   $res = $db->find($posts_model, array('criteria' => array(
     array('threadid', '=', 0),
   ), 'order'=>'updated_at desc'));
+*/
   $page = 1;
-  // FIXME: rewrite to be more memory efficient
-  // How?
   $threads = array();
   while($row = $db->get_row($res)) {
     // handle thread
@@ -439,6 +524,7 @@ function boardCatalog($boardUri) {
   return $threads;
 }
 
+// shouldn't we use the new permissions system?
 function isBO($boardUri, $userid = false) {
   if ($userid === false) {
     $userid = getUserID();
@@ -458,16 +544,17 @@ function isBO($boardUri, $userid = false) {
 // optimization
 function getBoardThreadCount($boardUri) {
   global $db;
-  $posts_model = getPostsModel($boardUri);
-  $threadCount = $db->count($posts_model, array('criteria'=>array(
-      array('threadid', '=', 0),
-  )));
+  $threadModel = getBoardThreadsModel($boardUri);
+  $threadCount = $db->count($threadModel);
+
   return $threadCount;
 }
 
 function getBoardPostCount($boardUri) {
   global $db;
   $posts_model = getPostsModel($boardUri);
+  // include deleted posts?
+  // just max(postid) then...
   $postCount = $db->count($posts_model);
   return $postCount;
 }
