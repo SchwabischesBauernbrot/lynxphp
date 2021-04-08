@@ -77,13 +77,13 @@ function getBoardThreadsModel($boardUri) {
     array(
       'type' => 'left',
       'model' => $posts_model,
-      'pluck' => array('count(ALIAS.postid) as replies'),
+      'pluck' => array('count(ALIAS.postid) as replies', 'ALIAS.deleted'),
       'on' => array(
         array('threadid', '=', $db->make_direct($postTable . '.postid')),
         array('deleted', '=', 0),
       ),
       'groupby' => array($postTable . '.postid'),
-      'having' => '(' . $postTable . '.deleted = \'0\' or (' . $postTable . '.deleted = \'1\' and count(ALIAS.postid) > 0))',
+      'having' => '(ALIAS.deleted = \'0\' or (ALIAS.deleted = \'1\' and count(ALIAS.postid) > 0))',
     )
   );
 
@@ -317,15 +317,24 @@ function boardPage($boardUri, $page = 1) {
 
   // for thread list
   $threadModel = getBoardThreadsModel($boardUri);
-  $threadModel['children'] = array(
+
+  $groupbyWrapper = $db->makeSubselect($threadModel, array(), 'postid');
+  $groupbyWrapper['children'] = array(
     array(
       'type' => 'left',
       'model' => $post_files_model,
+      //'tableOverride' => 't2',
+      'alias' => 'theadfiles',
       'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
     ),
+    array(
+      'model' => $posts_extended_model2,
+      'alias' => 'thread_alias',
+    ),
   );
-  $res = $db->find($threadModel, array(
-    'order' =>'updated_at desc',
+
+  $res = $db->find($groupbyWrapper, array(
+    'orderNoAlias' =>'updated_at desc',
     'limit' => ($limitPage ? ($limitPage * $tpp) . ',' : '') . $tpp,
   ));
 
@@ -555,7 +564,6 @@ function getBoardThreadCount($boardUri) {
   global $db;
   $threadModel = getBoardThreadsModel($boardUri);
   $threadCount = $db->count($threadModel);
-
   return $threadCount;
 }
 
