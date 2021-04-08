@@ -51,18 +51,23 @@ class database_driver_base_class {
     $sets = array();
     $alias = $defAlias ? $defAlias . '.' : '';
     foreach($criteria as $k => $set) {
+      //echo "k[$k] [", print_r($set, 1), "]<bR>\n";
       if (is_numeric($k)) {
         // flexible criteria
-        $one = $alias;
         if (is_array($set[0])) {
-          $one .= $set[0][0];
+          $left = $set[0][0];
         } else {
           // $this->make_constant()
           // postgres can't put quotes around fields
-          $one .= $set[0];
+          $left = $set[0];
+        }
+        if (strpos($left, '(') !== false) {
+          $one = $left;
+        } else {
+          $one = $alias . $left;
         }
         $operand = $set[1];
-        if ($operand === 'IN') {
+        if (strtoupper($operand) === 'IN') {
           // list operands
           if (!is_array($set[2])) {
             // auto promote to array or abort?
@@ -187,7 +192,10 @@ class database_driver_base_class {
 
   // what's the minium in join? model
   private function handleJoin($models, $data, $tableName, $useField = '') {
+    //echo "tableName[$tableName]<br>\n";
+    $originalTableName = $tableName;
     foreach($models as $join) {
+      $tableName = $originalTableName;
       // same field in both tables
       if ($useField) {
         // use from root table
@@ -254,8 +262,13 @@ class database_driver_base_class {
         }
       }
       $data['joins'][] = $joinStr . ')';
+      //echo "joinTable[$joinTable] joinAlias[$joinAlias] tableName[$tableName] joinField[$joinField]\n";
+
       // support an empty array
-      if (isset($join['pluck']) && is_array($join['pluck'])) {
+      if (isset($join['pluck'])) {
+        if (!is_array($join['pluck'])) {
+          echo "Warning, string detect in pluck, fix this!<br>\n";
+        }
         // probably integrate the alias...
         $clean = str_replace('ALIAS', $joinAlias, $join['pluck']);
         $data['fields'] = array_merge($data['fields'], $clean);
@@ -294,10 +307,12 @@ class database_driver_base_class {
 
   protected function expandJoin($rootModel, $data) {
     if (isset($rootModel['query'])) {
-      $tableName = 't';
+      // FIXME: this could be tigher
+      $tableName = 't' . ($this->subselectCounter - 1);
     } else {
       $tableName = modelToTableName($rootModel);
     }
+    //echo "expandJoin tableName[$tableName]<br>\n";
     if (!empty($rootModel['children']) && is_array($rootModel['children'])) {
       if (isset($rootModel['query'])) {
         if (isset($rootModel['model']['query'])) {
@@ -328,6 +343,7 @@ class database_driver_base_class {
         echo "<pre>model is missing a name[", print_r($rootModel, 1), "]</pre>\n";
         return;
       }
+      // FIXME: a way to give an alias to the initial table...
       if ($this->btTables) {
         $tableAlias = '`' . $tableName . '`';
         $tableName = '`' . $tableName . '`';
@@ -345,6 +361,9 @@ class database_driver_base_class {
       'having'   => '',
       'fields'   => array(),
     );
+    if (!empty($options['having'])) {
+      $data['having'] = $options['having'];
+    }
     $data = $this->expandJoin($rootModel, $data);
     // FIXME: renaming support
     if ($fields === false) {
@@ -387,7 +406,8 @@ class database_driver_base_class {
       if (!empty($options['orderNoAlias'])) {
         $sql .= "\n" . 'order by ' . $options['orderNoAlias'];
       } else {
-        $defAlias = count($data['joins']) ? $tableName : '';
+        //echo "tablename[$tableName]<br>\n";
+        $defAlias = count($data['joins']) ? $tableAlias : '';
         $alias = $defAlias ? $defAlias . '.' : '';
         $sql .= "\n" . 'order by ' . $alias . $options['order'];
       }
