@@ -79,6 +79,10 @@ function renderBoardPortalHeader($boardUri, $boardData = false, $options = false
   if ($threadNum) {
     $renderPostFormOptions['reply'] = $threadNum;
     $renderPostFormUrl .= 'thread/' . $threadNum . '.html';
+  } else
+  if ($pagenum) {
+    $renderPostFormOptions['page'] = $pagenum;
+    $renderPostFormUrl .= 'page/' . $pagenum;
   }
 
   return replace_tags($tmpl, array_merge($p['tags'], array(
