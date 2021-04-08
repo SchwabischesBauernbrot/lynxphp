@@ -402,7 +402,7 @@ class database_driver_base_class {
       $sql .= ' having ' . $options['having'];
     }
     */
-    if (isset($options['order'])) {
+    if (isset($options['order']) || isset($options['orderNoAlias'])) {
       if (!empty($options['orderNoAlias'])) {
         $sql .= "\n" . 'order by ' . $options['orderNoAlias'];
       } else {
