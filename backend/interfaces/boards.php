@@ -17,9 +17,29 @@ function boardDBtoAPI(&$row) {
 }
 
 // get list of boards
-function listBoards() {
+function listBoards($sort = 'popularity', $search = '') {
   global $db, $models;
-  $res = $db->find($models['board']);
+  $options = array();
+  if ($search) {
+    $options['criteria'] = array(
+      '(',
+      'or',
+      array('uri', 'like', '%' . $search . '%'),
+      array('title', 'like', '%' . $search . '%'),
+      array('description', 'like', '%' . $search . '%'),
+      ')',
+    );
+  }
+  $boardsModel = $models['board'];
+  /*
+  if ($sort === 'popularity') {
+    $options['order'] = 'updated_at desc';
+  } else {
+    // popularity
+    $options['order'] = 'updated_at';
+  }
+  */
+  $res = $db->find($boardsModel, $options);
   $boards = array();
   while($row = $db->get_row($res)) {
     boardDBtoAPI($row);
@@ -77,12 +97,13 @@ function getBoardThreadsModel($boardUri) {
     array(
       'type' => 'left',
       'model' => $posts_model,
+      'alias' => 'threads',
       'pluck' => array('count(ALIAS.postid) as replies', 'ALIAS.deleted'),
       'on' => array(
         array('threadid', '=', $db->make_direct($postTable . '.postid')),
         array('deleted', '=', 0),
       ),
-      'groupby' => array($postTable . '.postid'),
+      'groupby' => array($postTable . '.postid', 'threads.deleted'),
       'having' => '(ALIAS.deleted = \'0\' or (ALIAS.deleted = \'1\' and count(ALIAS.postid) > 0))',
     )
   );
