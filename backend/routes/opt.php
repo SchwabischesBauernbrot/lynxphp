@@ -93,7 +93,13 @@ $router->get('/boards/:uri/catalog', function($request) {
 
 $router->get('/boards.json', function($request) {
   global $db;
-  $boards = listBoards();
+  $search = empty($_GET['search']) ? '' : $_GET['search'];
+  $sort = empty($_GET['sort']) ? 'popularity' : $_GET['sort'];
+
+  $sortByField = $sort === 'popularity' ? 'posts' : 'updated_at';
+  //echo "sortByField[$sortByField]<br>\n";
+
+  $boards = listBoards($sort, $search);
   $res = array();
   foreach($boards as $b) {
     // FIXME: N+1s... (yea page is almost at 1s for 40 boards)
@@ -110,9 +116,15 @@ $router->get('/boards.json', function($request) {
       $db->free($newestThreadRes);
       $b['last'] = $newestThread[0];
     }
-    $res[] = $b;
+    //echo "sortby[", print_r($b[$sortByField], 1), "]<br>\n";
+    $res[$b[$sortByField]] = $b;
   }
-  sendResponse($res);
+  if ($sortByField === 'popularity') {
+    krsort($res);
+  } else {
+    ksort($res);
+  }
+  sendResponse(array_values($res));
 });
 
 
