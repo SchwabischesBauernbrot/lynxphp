@@ -47,9 +47,14 @@ class database_driver_base_class {
   }
   // convert array into where clause
   public function build_where($criteria, $defAlias = '') {
-    // field, comparator, field
-    $sets = array();
+    // num => array(field, comparator, field),
+    // or
+    // field => field,
     $alias = $defAlias ? $defAlias . '.' : '';
+    $mode = 'and';
+    $tokens = array();
+    $end = count($criteria);
+    $c = 0;
     foreach($criteria as $k => $set) {
       //echo "k[$k] [", print_r($set, 1), "]<bR>\n";
       if (is_numeric($k)) {
@@ -57,9 +62,27 @@ class database_driver_base_class {
         if (is_array($set[0])) {
           $left = $set[0][0];
         } else {
+          if (strtolower($set) === 'or') {
+            //echo "Changing mode<br>\n";
+            $mode = 'or';
+            $c++;
+            continue;
+          }
+          if (strtolower($set) === 'and') {
+            //echo "Changing mode<br>\n";
+            $mode = 'and';
+            $c++;
+            continue;
+          }
           // $this->make_constant()
           // postgres can't put quotes around fields
           $left = $set[0];
+        }
+        if ($left === '(' || $left === ')') {
+          if ($left === ')') array_pop($tokens); // remove last and/or
+          $tokens[] = $left;
+          $c++;
+          continue;
         }
         if (strpos($left, '(') !== false) {
           $one = $left;
@@ -83,26 +106,36 @@ class database_driver_base_class {
             }
           }
           */
-          $sets[] = $one . ' ' . $operand . ' (' . join(',', $inSet). ')';
+          $tokens[] = $one . ' ' . $operand . ' (' . join(',', $inSet). ')';
         } else {
           if (is_array($set[2])) {
-            $sets[] = $one . ' ' . $operand . ' ' . $set[2][0];
+            $tokens[] = $one . ' ' . $operand . ' ' . $set[2][0];
           } else {
-            $sets[] = $one . ' ' . $operand . ' ' . $this->make_constant($set[2]);
+            $tokens[] = $one . ' ' . $operand . ' ' . $this->make_constant($set[2]);
           }
         }
       } else {
         // named key
         if (is_array($set)) {
           // direct
-          $sets[] = $alias . $k . '=' . $set;
+          $tokens[] = $alias . $k . '=' . $set;
         } else {
           // default: safe
-          $sets[] = $alias . $k . '=' . $this->make_constant($set);
+          $tokens[] = $alias . $k . '=' . $this->make_constant($set);
+        }
+      }
+      $c++;
+      //echo "[$c/$end]<br>\n";
+      if ($c !== $end) {
+        //echo "Adding [$mode]<br>\n";
+        if ($mode === 'and') {
+          $tokens[] = 'AND';
+        } else {
+          $tokens[] = 'OR';
         }
       }
     }
-    return join(' AND ', $sets);
+    return join(' ', $tokens);
   }
 
   protected function makeInsertQuery($rootModel, $recs) {
