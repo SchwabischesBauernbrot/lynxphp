@@ -62,17 +62,19 @@ class database_driver_base_class {
         if (is_array($set[0])) {
           $left = $set[0][0];
         } else {
-          if (strtolower($set) === 'or') {
-            //echo "Changing mode<br>\n";
-            $mode = 'or';
-            $c++;
-            continue;
-          }
-          if (strtolower($set) === 'and') {
-            //echo "Changing mode<br>\n";
-            $mode = 'and';
-            $c++;
-            continue;
+          if (is_string($set)) {
+            if (strtolower($set) === 'or') {
+              //echo "Changing mode<br>\n";
+              $mode = 'or';
+              $c++;
+              continue;
+            }
+            if (strtolower($set) === 'and') {
+              //echo "Changing mode<br>\n";
+              $mode = 'and';
+              $c++;
+              continue;
+            }
           }
           // $this->make_constant()
           // postgres can't put quotes around fields
