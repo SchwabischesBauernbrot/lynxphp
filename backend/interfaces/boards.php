@@ -84,7 +84,7 @@ function getBoardThreadsModel($boardUri) {
   global $db;
   $posts_model = getPostsModel($boardUri);
   if ($posts_model === false) {
-    return;
+    return false;
   }
 
   $postTable = modelToTableName($posts_model);
@@ -111,6 +111,7 @@ function getBoardThreadsModel($boardUri) {
   );
 
   // make it composable and then you can hang joins like files off of it
+  // why hang reply count off it?
   return $db->makeSubselect($posts_extended_model, array('criteria'=>array(
       array('threadid', '=', 0),
       // we need the thread tombstones...
@@ -427,14 +428,18 @@ function boardPage($boardUri, $page = 1) {
 
 function boardCatalog($boardUri) {
   global $db, $tpp;
-  $threadModel = getBoardThreadsModel($boardUri);
-
   $posts_model = getPostsModel($boardUri);
+  if ($posts_model === false) {
+    // this board does not exist
+    sendResponse(array(), 404, 'Board not found');
+    return;
+  }
   $post_files_model = getPostFilesModel($boardUri);
   $fileTable = modelToTableName($post_files_model);
   $filesFields = array_keys($post_files_model['fields']);
   $filesFields[] = 'fileid';
 
+  $threadModel = getBoardThreadsModel($boardUri);
   $threadModel['children'] = array(
     array(
       'type' => 'left',
@@ -593,6 +598,10 @@ function getBoardThreadCount($boardUri) {
 function getBoardPostCount($boardUri) {
   global $db;
   $posts_model = getPostsModel($boardUri);
+  if ($posts_model === false) {
+    // this board does not exist
+    return 0;
+  }
   // include deleted posts?
   // just max(postid) then...
   $postCount = $db->count($posts_model);
