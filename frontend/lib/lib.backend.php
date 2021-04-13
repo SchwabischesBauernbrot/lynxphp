@@ -77,8 +77,11 @@ function consume_beRsrc($options, $params = '') {
     // let's just handle 401s globally here
     if (!empty($obj['meta']) && $obj['meta']['code'] === 401) {
       //echo "<hr><hr><hr>\n";
-      //echo "<pre>Got a 401 [$responseText] for [", $options['endpoint'], ']via[', $options['method'],"]</pre>\n";
-      return redirectTo('/login.php');
+      if (DEV_MODE) {
+        echo "<pre>Got a 401 [$responseText] for [", $options['endpoint'], ']via[', $options['method'],"]</pre>\n";
+      } else {
+        return redirectTo('/login.php');
+      }
     }
     // this hides 401s... we need to handle and pass back problems better...
     if (!empty($options['unwrapData'])) return $obj['data'];
@@ -108,9 +111,16 @@ function postExpectJson($endpoint, $postData) {
 }
 */
 
-function getBoards() {
+function getBoards($params = false) {
   //$boards = getExpectJson('4chan/boards.json');
-  $boards = getExpectJson('opt/boards.json');
+  $qstr = '';
+  if ($params) {
+    $qstr = '?';
+    foreach($params as $k => $v) {
+      $qstr .= $k . '=' . $v . '&';
+    }
+  }
+  $boards = getExpectJson('opt/boards.json'.$qstr);
   return $boards;
 }
 
