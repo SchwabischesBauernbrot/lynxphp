@@ -22,29 +22,31 @@ $boardData = getBoard($boardUri);
 
 
 $banners_html = '';
-foreach($banners as $banner) {
-  $tmp = $banner_tmpl;
-  $tmp = str_replace('{{backend}}', 'backend', $tmp);
-  $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-  $tmp = str_replace('{{id}}', $banner['bannerid'], $tmp);
+if (is_array($banners)) {
+  foreach($banners as $banner) {
+    $tmp = $banner_tmpl;
+    $tmp = str_replace('{{backend}}', 'backend', $tmp);
+    $tmp = str_replace('{{uri}}', $boardUri, $tmp);
+    $tmp = str_replace('{{id}}', $banner['bannerid'], $tmp);
 
-  $w = $banner['w'];
-  $h = $banner['h'];
-  while($w > 640) {
-    $h *= 0.9;
-    $w *= 0.9;
-  }
-  while($h > 240) {
-    $h *= 0.9;
-    $w *= 0.9;
-  }
-  $ih = (int)$h;
-  $iw = (int)$w;
+    $w = $banner['w'];
+    $h = $banner['h'];
+    while($w > 640) {
+      $h *= 0.9;
+      $w *= 0.9;
+    }
+    while($h > 240) {
+      $h *= 0.9;
+      $w *= 0.9;
+    }
+    $ih = (int)$h;
+    $iw = (int)$w;
 
-  $tmp = str_replace('{{w}}', $iw, $tmp);
-  $tmp = str_replace('{{h}}', $ih, $tmp);
-  $tmp = str_replace('{{image}}', $banner['image'], $tmp);
-  $banners_html .= $tmp;
+    $tmp = str_replace('{{w}}', $iw, $tmp);
+    $tmp = str_replace('{{h}}', $ih, $tmp);
+    $tmp = str_replace('{{image}}', $banner['image'], $tmp);
+    $banners_html .= $tmp;
+  }
 }
 $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
 $tmpl = str_replace('{{banners}}', $banners_html, $tmpl);
