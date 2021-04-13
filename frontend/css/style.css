@@ -877,6 +877,31 @@ input:invalid, textarea:invalid {
 	min-width: 30em;
 }
 
+/* aceofdiamonds edit for thread date & time */
+.post-date {
+	cursor: default;
+}
+ 
+/* aceofdiamonds edit for the post actions */
+#tab_delete.tab + label {
+	cursor: pointer;
+}
+ 
+#tab_report.tab + label {
+	cursor: pointer;
+}
+ 
+#tab_media.tab + label {
+	cursor: pointer;
+}
+ 
+#tab_ban.tab + label {
+		cursor: pointer;
+}
+ 
+/* end edit*/
+
+
 .postmenu {
 	-webkit-appearance: none;
 	-moz-appearance: none;
