@@ -3,6 +3,8 @@ Requirements
 - php5.x+
 - mysql or postgres extension
 - curl extension
+- ffmpeg (for thumbnails)
+- imagemagick (for catpcha)
 
 # Shared hosting help
 download the zip from GitGud.IO
