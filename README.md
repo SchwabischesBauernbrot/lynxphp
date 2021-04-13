@@ -1,7 +1,11 @@
+LynxPHP aims to be the Wordpress of imageboards that's easily installable on shared hosting
+with the features of LynxChan. While designed for small communities it can be used for larger ones.
+
 Goals
 - 3 distinct pieces
+- all similar functionality grouped into modules
 - Works on shared hosting and is easy to install as any PHP/MySQL web app
-- Raw php/js, no framework to learn
+- Raw php/js, in hopes to require less frameworks to learn
 - documentation before code
 - aim for the lynxchan feature set
 - backend REST API that mobile clients can talk to directly
@@ -10,12 +14,12 @@ Goals
 
 We'll focus on the backend Layer first
 
-Frontend Layer (2nd)
+Frontend Layer
 
-Backend Layer (1st)
+Backend Layer
 REST API
 
-Storage Layer (3rd)
+Storage Layer
 REST API
 Handles storage in a NoSQL fashion
 
