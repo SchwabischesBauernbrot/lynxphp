@@ -59,12 +59,13 @@ function getThread($boardUri, $threadNum) {
     )
   );
 
+  // get OP
   // FIXME: only gets first image on OP
-  $posts = array();
-
+  // why? /:board/thread/:thread uses this too
   $res = $db->find($posts_model, array('criteria'=>array(
     array('postid', '=', $threadNum),
   )));
+  $posts = array();
   while($row = $db->get_row($res)) {
     //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
     if (!isset($posts[$row['postid']])) {
