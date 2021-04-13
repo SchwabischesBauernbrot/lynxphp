@@ -94,7 +94,7 @@ function expectJson($json, $endpoint = '') {
   $obj = json_decode($json, true);
   if ($obj === NULL) {
     wrapContent('Backend JSON parsing error: ' .  $endpoint . ': ' . $json);
-    return;
+    return false;
   }
   return $obj;
 }
@@ -126,6 +126,9 @@ function getBoards($params = false) {
 
 function getBoard($boardUri) {
   $boardData = getExpectJson('opt/' . $boardUri . '.json');
+  if (!isset($boardData['data'])) {
+    return false;
+  }
   return $boardData['data'];
 }
 
