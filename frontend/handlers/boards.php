@@ -53,8 +53,29 @@ function relativeColor($relativeTo) {
 
 function getBoardsHandler() {
   global $now;
-  $res = getBoards();
+
+  $params = array(
+    'search' => '',
+    'sort' => '',
+  );
+  if (!empty($_POST['search'])) {
+    $params['search'] = $_POST['search'];
+  }
+  if (!empty($_POST['sort'])) {
+    $params['sort'] = $_POST['sort'];
+  }
+  $reverse_list = false;
+  if (!empty($_POST['direction'])) {
+    //$params['direction'] = $_GET['direction'];
+    $reverse_list = $_POST['direction'] == 'asc';
+  }
+
+  //print_r($params);
+  $res = getBoards($params);
   $boards = $res['data'];
+  if ($reverse_list) {
+    $boards = array_reverse($boards);
+  }
 
   $templates = loadTemplates('board_listing');
   $overboard_template = $templates['loop0'];
@@ -128,6 +149,14 @@ function getBoardsHandler() {
   $content = str_replace('{{overboard}}', '', $content);
   $content = str_replace('{{fields}}', '', $content);
 
+  $content = str_replace('{{search}}', $params['search'], $content);
+  $content = str_replace('{{popularitySelected}}', $params['sort'] === 'popularity' ? ' selected' : '', $content);
+  $content = str_replace('{{latestSelected}}', $params['sort'] === 'activity' ? ' selected' : '', $content);
+
+  $content = str_replace('{{descSelected}}', $reverse_list ? '' : ' selected', $content);
+  $content = str_replace('{{ascSelected}}', $reverse_list ? ' selected' : '', $content);
+
+
   $page_html = '';
   $tmp = $page_template;
   $tmp = str_replace('{{page}}', 1, $tmp);
@@ -189,28 +218,12 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
 
   //echo "test[", htmlspecialchars(print_r($templates, 1)),"]<br>\n";
 
-  /*
-  $pages_html = '';
-  //echo "pages[", $boardThreads['pageCount'], "]<br>\n";
-  for($p = 1; $p <= $boardThreads['pageCount']; $p++) {
-    $tmp = $page_template;
-    $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-    // bold
-    $tmp = str_replace('{{class}}', $pagenum == $p ? 'bold' : '', $tmp);
-    $tmp = str_replace('{{pagenum}}', $p, $tmp);
-    $pages_html .= $tmp;
-  }
-
-  $boardnav_html = str_replace('{{pages}}', $pages_html, $boardnav_html);
-  $boardnav_html = str_replace('{{uri}}',   $boardUri,   $boardnav_html);
-  */
-  //$boardnav_html = renderBoardNav($boardUri, $boardThreads['pageCount'], $pagenum);
   // FIXME: register/push a portal with wrapContent
   // so it can fast out efficiently
   // also should wrapContent be split into header/footer for efficiency? yes
   // and we need keying too, something like ESI
   $boardData['pageCount'] = $boardThreads['pageCount'];
-  $boardHeader = renderBoardPortalHeader($boardUri, $boardData, array('pagenum' => $pagenum));
+  $boardPortal = getBoardPortal($boardUri, $boardData, array('pagenum' => $pagenum));
   $boardnav_html = '';
 
   // used to look at text, so we can queue up another backend query if needed
@@ -267,7 +280,7 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   //$tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/'), $tmpl);
   $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
 
-  wrapContent($boardHeader . $tmpl);
+  wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer']);
 }
 
 function getThreadHandler($boardUri, $threadNum) {
@@ -330,14 +343,14 @@ function getThreadHandler($boardUri, $threadNum) {
   $tmpl = str_replace('{{files}}', $files, $tmpl);
 
   // mixins
-  $tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/thread/' . $threadNum . '.html', array('reply' => $threadNum)), $tmpl);
+  //$tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/thread/' . $threadNum . '.html', array('reply' => $threadNum)), $tmpl);
   $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
 
-  $boardHeader = renderBoardPortalHeader($boardUri, $boardData, array(
+  $boardPortal = getBoardPortal($boardUri, $boardData, array(
     'isThread' => true,
     'threadNum' => $threadNum,
   ));
-  wrapContent($boardHeader . $tmpl);
+  wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer']);
 }
 
 function getThumbnail($file, $maxW = 0) {
