@@ -92,30 +92,37 @@ include '../common/lib.pipeline.php';
 
 // I could move the PIPELINE_ prefix into the definePipeline function
 // but then you couldn't locate these in grep
-definePipeline('PIPELINE_HOMEPAGE_BOARDS_FIELDS',  'homepage_boards_fields');
+definePipeline('PIPELINE_HOMEPAGE_BOARDS_FIELDS');
 
-definePipeline('PIPELINE_BOARD_HEADER_TMPL',  'board_header_tmpl');
-definePipeline('PIPELINE_BOARD_FOOTER_TMPL',  'board_footer_tmpl');
-definePipeline('PIPELINE_BOARD_NAV',          'board_nav');
-definePipeline('PIPELINE_BOARD_STICKY_NAV',   'board_sticky_nav');
-definePipeline('PIPELINE_BOARD_DETAILS_TMPL', 'board_details_tmpl');
-definePipeline('PIPELINE_BOARD_SETTING_NAV',  'board_setting_nav');
-definePipeline('PIPELINE_BOARD_SETTING_TMPL', 'board_setting_tmpl');
-definePipeline('PIPELINE_BOARD_SETTING_GENERAL',  'board_setting_general');
+definePipeline('PIPELINE_BOARD_HEADER_TMPL');
+definePipeline('PIPELINE_BOARD_FOOTER_TMPL');
+definePipeline('PIPELINE_BOARD_NAV');
+definePipeline('PIPELINE_BOARD_STICKY_NAV');
+definePipeline('PIPELINE_BOARD_DETAILS_TMPL');
+definePipeline('PIPELINE_BOARD_SETTING_NAV');
+definePipeline('PIPELINE_BOARD_SETTING_TMPL');
+definePipeline('PIPELINE_BOARD_SETTING_GENERAL');
 
-definePipeline('PIPELINE_POST_PREPROCESS',  'post_preprocess');
-definePipeline('PIPELINE_POST_POSTPREPROCESS',  'post_postpreprocess');
-definePipeline('PIPELINE_POST_TEXT_FORMATTING',  'post_text_formatting');
+definePipeline('PIPELINE_FORM_CAPTCHA');
 
-definePipeline('PIPELINE_ADMIN_NAV',          'admin_nav');
-definePipeline('PIPELINE_ADMIN_HEADER_TMPL',  'admin_heading_tmpl');
-definePipeline('PIPELINE_ADMIN_SETTING_GENERAL',  'admin_setting_general');
+definePipeline('PIPELINE_POST_PREPROCESS');
+definePipeline('PIPELINE_POST_POSTPREPROCESS');
+definePipeline('PIPELINE_POST_TEXT_FORMATTING');
+definePipeline('PIPELINE_POST_FORM_FIELDS');
+definePipeline('PIPELINE_POST_FORM_OPTIONS');
+definePipeline('PIPELINE_POST_FORM_TAGS');
+definePipeline('PIPELINE_POST_FORM_VALUES');
+definePipeline('PIPELINE_POST_VALIDATION');
 
-definePipeline('PIPELINE_GLOBALS_NAV', 'globals_nav');
-definePipeline('PIPELINE_GLOBALS_HEADER_TMPL', 'globals_heading_tmpl');
+definePipeline('PIPELINE_ADMIN_NAV');
+definePipeline('PIPELINE_ADMIN_HEADER_TMPL');
+definePipeline('PIPELINE_ADMIN_SETTING_GENERAL');
 
-definePipeline('PIPELINE_USER_NAV', 'user_nav');
-definePipeline('PIPELINE_USER_HEADER_TMPL', 'user_heading_tmpl');
+definePipeline('PIPELINE_GLOBALS_NAV');
+definePipeline('PIPELINE_GLOBALS_HEADER_TMPL');
+
+definePipeline('PIPELINE_USER_NAV');
+definePipeline('PIPELINE_USER_HEADER_TMPL');
 
 
 // forms pipelines
@@ -165,6 +172,7 @@ registerPackageGroup('board');
 registerPackageGroup('post');
 registerPackageGroup('user');
 registerPackageGroup('site');
+registerPackageGroup('protection');
 // build routes (and activate frontend_handlers.php)
 foreach($packages as $pkg) {
   $pkg->buildFrontendRoutes($router, $req_method);
@@ -176,6 +184,9 @@ foreach($packages as $pkg) {
 
 // FIXME: we should be getting page content and wrapping it here...
 // FIXME: move into routes and the caching layer can go here too
+$router->post('/boards.php', function() {
+  getBoardsHandler();
+});
 $router->get('/boards.php', function() {
   getBoardsHandler();
 });
@@ -216,70 +227,75 @@ $router->get('/:uri/thread/:num', function($request) {
 
 
 $router->post('/:uri/post', function($request) {
+  global $pipelines;
   $boardUri = $request['params']['uri'];
-  // valid board name
-  // validate results
+
   $res = processFiles();
   $files = isset($res['handles']['file']) ? $res['handles']['file'] : array();
 
+  $endpoint = 'lynx/newThread';
+  $redir = BASE_HREF . $boardUri . '/';
+  $headers = array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session'));
+  $row = array(
+    // noFlag
+    'name'     => getOptionalPostField('name'),
+    'email'    => getOptionalPostField('email'),
+    'message'  => $_POST['message'],
+    'subject'  => getOptionalPostField('subject'),
+    'boardUri' => $boardUri,
+    'password' => $_POST['postpassword'],
+    // captcha
+    'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
+    'files'    => json_encode($files),
+    // flag
+  );
+  if (!empty($_POST['thread'])) {
+    $row['threadId'] = $_POST['thread'];
+    $endpoint = 'lynx/replyThread';
+    $redir .= 'thread/' . $_POST['thread'];
+  }
+  $io = array(
+    'boardUri' => $boardUri,
+    'endpoint' => $endpoint,
+    'headers'  => $headers,
+    'values'   => $row,
+    'redir'    => $redir,
+    'error'    => false,
+    'redirNow' => false,
+  );
+  // validate results
+  $pipelines[PIPELINE_POST_VALIDATION]->execute($io);
+  //print_r($io);
+  $row     = $io['values'];
+  $headers = $io['headers'];
+  $redir   = $io['redir'];
+  if (!empty($io['error'])) {
+    echo "error";
+    //print_r($io);
+    wrapContent($io['error']);
+    return;
+  }
+  if (!empty($io['redirNow'])) {
+    echo "redirNow";
+    redirectTo($io['redirNow']);
+    return;
+  }
+
   // make post...
-  if (empty($_POST['thread'])) {
-    // new thead
-    //echo "boardUri[$boardUri]<br>\n";
-    $json = curlHelper(BACKEND_BASE_URL . 'lynx/newThread', array(
-      // noFlag
-      'name'     => getOptionalPostField('name'),
-      'email'    => getOptionalPostField('email'),
-      'message'  => $_POST['message'],
-      'subject'  => getOptionalPostField('subject'),
-      'boardUri' => $boardUri,
-      'password' => $_POST['postpassword'],
-      // captcha
-      'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
-      'files'    => json_encode($files),
-      // flag
-    ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session')));
-    //echo "json[$json]<Br>\n";
-    $result = json_decode($json, true);
-    if ($result === false) {
-      wrapContent('Post Error: <pre>' . $json . '</pre>');
-    }
-    //echo "<pre>thread", print_r($result, 1), "</pre>\n";
-    //return;
-    if (is_numeric($result['data'])) {
-      // success
-      redirectTo(BASE_HREF . $boardUri . '/');
-    } else {
-      wrapContent('Post Error: ' . print_r($result, 1));
-    }
+  $json = curlHelper(BACKEND_BASE_URL . $endpoint, $row, $headers);
+  // can't use this because we need better handling of results...
+  //$result = expectJson($json, $endpoint)
+  //echo "json[$json]<br>\n";
+  $result = json_decode($json, true);
+  if ($result === false) {
+    wrapContent('Post Error: <pre>' . $json . '</pre>');
   } else {
-    // reply
-    //echo "boardUri[$boardUri]<br>\n";
-    $json = curlHelper(BACKEND_BASE_URL . 'lynx/replyThread', array(
-      // noFlag
-      'threadId' => $_POST['thread'],
-      'name'     => getOptionalPostField('name'),
-      'email'    => getOptionalPostField('email'),
-      'message'  => $_POST['message'],
-      'subject'  => getOptionalPostField('subject'),
-      'boardUri' => $boardUri,
-      'password' => $_POST['postpassword'],
-      // captcha
-      'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
-      // flag
-      'files'    => json_encode($files),
-    ), array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session')));
-    //echo "json[$json]<Br>\n";
-    $result = json_decode($json, true);
-    // can't parse
-    if ($result === false) {
-      wrapContent('Post Error: <pre>' . $json . '</pre>');
-    }
-    //echo "<pre>reply", print_r($result, 1), "</pre>\n";
+    //echo "<pre>", $endpoint, print_r($result, 1), "</pre>\n";
+    //echo "redir[$redir]<br>\n";
     //return;
     if (is_numeric($result['data'])) {
       // success
-      redirectTo(BASE_HREF . $boardUri . '/thread/' . $_POST['thread']);
+      redirectTo($redir);
     } else {
       wrapContent('Post Error: ' . print_r($result, 1));
     }
