@@ -1,29 +1,29 @@
 <h1 class="board-title">Board List</h1>
 {{overboard}}
-<!-- div class="flexcenter mv-10">
-  <form class="form-post" action="boards.php" method="GET">
-    <input type="hidden" value="1">
+<div class="flexcenter mv-10">
+  <form class="form-post" action="boards.php" method="POST">
+    <!-- hide nsfw, languages, filter out abandoned boards -->
     <div class="row">
       <div class="label">Search</div>
-      <input type="text" name="search" placeholder="Uri or tags">
+      <input type="text" name="search" placeholder="Uri or tags" value="{{search}}">
     </div>
     <div class="row">
       <div class="label">Sort</div>
       <select name="sort">
-        <option value="popularity">Popularity</option>
-        <option value="activity">Latest Activity</option>
+        <option value="popularity"{{popularitySelected}}>Popularity</option>
+        <option value="activity"{{latestSelected}}>Latest Activity</option>
       </select>
     </div>
     <div class="row">
       <div class="label">Order</div>
       <select name="direction">
-        <option value="desc">Descending</option>
-        <option value="asc">Ascending</option>
+        <option value="desc"{{descSelected}}>Descending</option>
+        <option value="asc"{{ascSelected}}>Ascending</option>
       </select>
     </div>
     <input type="submit" value="Filter">
   </form>
-</div -->
+</div>
 <h4 class="board-description">
 Local Boards</h4>
 <div class="table-container flex-center mv-10 text-center">
