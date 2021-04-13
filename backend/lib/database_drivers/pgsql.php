@@ -287,7 +287,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     //$err = pg_result_error($res);
     $err = pg_last_error($this->conn);
     if ($err) {
-      echo "pgsql::find - err[$err]<br>\nSQL[<pre>$sql</pre>]<br>\n";
+      $trace = gettrace();
+      echo "pgsql::find - err[$err]<br>\nSQL[<pre>$sql</pre>]", $trace, "<br>\n";
       return false;
     }
     return $res;
