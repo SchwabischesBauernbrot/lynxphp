@@ -7,10 +7,21 @@
 // the data is likely useless without the lib.packages
 
 $pipelines = array();
-function definePipeline($constant, $str) {
+function definePipeline($constant, $str = false) {
   global $pipelines;
+  if ($str === false) $str = strtolower($constant);
   define($constant, $str);
   $pipelines[$str] = new pipeline_registry;
 }
+
+function definePipelines($constants) {
+  global $pipelines;
+  foreach($constants as $constant) {
+    $str = strtolower($constant);
+    define($constant, $str);
+    $pipelines[$str] = new pipeline_registry;
+  }
+}
+
 
 ?>
