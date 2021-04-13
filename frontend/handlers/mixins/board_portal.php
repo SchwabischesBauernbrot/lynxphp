@@ -1,12 +1,7 @@
 <?php
 
-// portals? header/footer split?
-// is this function responsible for boardData? can't be if we're to be efficient
-function renderBoardPortalHeader($boardUri, $boardData = false, $options = false) {
+function renderBoardPortalHeaderData($boardUri, $boardData, $options = false) {
   global $pipelines;
-  if ($boardData === false) {
-    // FIXME: look up board data on-demand
-  }
   $pagenum   = 0;
   $isCatalog = 0;
   $isThread  = 0;
@@ -64,8 +59,6 @@ function renderBoardPortalHeader($boardUri, $boardData = false, $options = false
     $boardNav = $nav_html;
   }
 
-  $stickNav_html = '';
-  $pipelines[PIPELINE_BOARD_STICKY_NAV]->execute($stickNav_html);
 
   $p = array(
     'tags' => array(),
@@ -74,36 +67,72 @@ function renderBoardPortalHeader($boardUri, $boardData = false, $options = false
   // banner is injected here:
   $pipelines[PIPELINE_BOARD_HEADER_TMPL]->execute($p);
 
+  return array(
+    'tmpl' => $tmpl,
+    'tags' => $p['tags'],
+    'isCatalog' => $isCatalog,
+    'threadNum' => $threadNum,
+    'pagenum' => $pagenum,
+    'boardNav' => $boardNav,
+  );
+}
+
+function renderBoardPortalHeaderEngine($row, $boardUri, $boardData) {
+  global $pipelines;
+  $isCatalog = $row['isCatalog'];
+  $threadNum = $row['threadNum'];
+  $pagenum   = $row['pagenum'];
+  //$tmpl      = $row['tmpl'];
+
   $renderPostFormOptions = array();
-  $renderPostFormUrl = $boardUri . '/';
+  //$renderPostFormUrl = $boardUri . '/';
   if ($threadNum) {
     $renderPostFormOptions['reply'] = $threadNum;
-    $renderPostFormUrl .= 'thread/' . $threadNum . '.html';
+    //$renderPostFormUrl .= 'thread/' . $threadNum . '.html';
   } else
   if ($pagenum) {
     $renderPostFormOptions['page'] = $pagenum;
-    $renderPostFormUrl .= 'page/' . $pagenum;
+    //$renderPostFormUrl .= 'page/' . $pagenum;
   }
+  $renderPostFormUrl = $_SERVER['REQUEST_URI'];
 
-  return replace_tags($tmpl, array_merge($p['tags'], array(
+  $stickNav_html = '';
+  $pipelines[PIPELINE_BOARD_STICKY_NAV]->execute($stickNav_html);
+
+  return replace_tags($row['tmpl'], array_merge($row['tags'], array(
     'uri' => $boardUri,
     'url' => $_SERVER['REQUEST_URI'],
     'title' => $isCatalog ? '' : ' - ' . htmlspecialchars($boardData['title']),
     'description' => htmlspecialchars($boardData['description']),
     'postform' => renderPostForm($boardUri, $renderPostFormUrl, $renderPostFormOptions),
     'sticknav' => $stickNav_html,
-    'boardNav' => $boardNav,
+    'boardNav' => $row['boardNav'],
     'pretitle' => $isCatalog ? 'Catalog(' : '',
     'posttitle' => $isCatalog ? ')' : '',
     'linkStyle' => $isCatalog ? '' : ' style="color: var(--board-title)"',
   )));
 }
 
-function renderBoardPortalFooter($boardUri, $pageTotal, $pagenum = 0) {
+function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
   global $pipelines;
 
   $templates = loadTemplates('mixins/board_footer');
   $tmpl = $templates['header'];
+  $threadstats_tmpl = $templates['loop0'];
+
+  $threadstats_html = '';
+
+  if (isset($boardData['posts']) && is_array($boardData['posts'])) {
+    $files = 0;
+    //echo "[", print_r($boardData['posts'], 1), "]<br>\n";
+    foreach($boardData['posts'] as $post) {
+      $files += count($post['files']);
+    }
+    $threadstats_html = replace_tags($threadstats_tmpl, array(
+      'replies' => count($boardData['posts']) - 1,
+      'files'   => $files,
+    ));
+  }
 
   $p = array(
     'tags' => array()
@@ -113,10 +142,38 @@ function renderBoardPortalFooter($boardUri, $pageTotal, $pagenum = 0) {
   return replace_tags($tmpl, array_merge($p['tags'], array(
     'uri' => $boardUri,
     'url' => $_SERVER['REQUEST_URI'],
-    'title' => htmlspecialchars($boardData['title']),
-    'description' => htmlspecialchars($boardData['description']),
-    'boardNav' => $nav_html,
+    'boardNav' => $row['boardNav'],
+    'threadstats' => $threadstats_html,
+    'postactions' => renderPostActions($boardUri),
   )));
+}
+
+// this isn't chainable
+// it doesn't return a str
+function getBoardPortal($boardUri, $boardData = false, $options = false) {
+  $row = renderBoardPortalHeaderData($boardUri, $boardData, $options);
+  return array(
+    'header' => renderBoardPortalHeaderEngine($row, $boardUri, $boardData),
+    'footer' => renderBoardPortalFooterEngine($row, $boardUri, $boardData)
+  );
+}
+
+// portals? header/footer split?
+// is this function responsible for boardData? can't be if we're to be efficient
+function renderBoardPortalHeader($boardUri, $boardData = false, $options = false) {
+  if ($boardData === false) {
+    // FIXME: look up board data on-demand
+  }
+  $row = renderBoardPortalHeaderData($boardUri, $boardData, $options);
+  return renderBoardPortalHeaderEngine($row, $boardUri, $boardData);
+}
+
+function renderBoardPortalFooter($boardUri, $boardData = false, $options = false) {
+  if ($boardData === false) {
+    // FIXME: look up board data on-demand
+  }
+  $row = renderBoardPortalHeaderData($boardUri, $boardData, $options);
+  echo renderBoardPortalFooterEngine($row, $boardUri, $boardData);
 }
 
 ?>
