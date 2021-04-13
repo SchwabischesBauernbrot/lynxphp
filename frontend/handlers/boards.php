@@ -435,15 +435,17 @@ function getBoardCatalogHandler($boardUri) {
 
   $maxPage = 0;
   $posts = array();
-  foreach($catalog as $i=>$obj) {
-    if (isset($obj['page'])) {
-      $maxPage = max($obj['page'], $maxPage);
-    } else {
-      echo "<pre>No page set in [", print_r($obj, 1), "]</pre>\n";
-    }
-    foreach($obj['threads'] as $j => $post) {
-      preprocessPost($catalog[$i]['threads'][$j]);
-      $posts[] = $post;
+  if (is_array($catalog)) {
+    foreach($catalog as $i=>$obj) {
+      if (isset($obj['page'])) {
+        $maxPage = max($obj['page'], $maxPage);
+      } else {
+        echo "<pre>No page set in [", print_r($obj, 1), "]</pre>\n";
+      }
+      foreach($obj['threads'] as $j => $post) {
+        preprocessPost($catalog[$i]['threads'][$j]);
+        $posts[] = $post;
+      }
     }
   }
 
@@ -460,36 +462,38 @@ function getBoardCatalogHandler($boardUri) {
   $boardnav_html = '';
 
   $tiles_html = '';
-  foreach($catalog as $pageNum => $page) {
-    foreach($page['threads'] as $thread) {
-      $tmp = $tile_template;
-      $tmp = str_replace('{{subject}}', htmlspecialchars($thread['sub']),  $tmp);
-      $tmp = str_replace('{{message}}', htmlspecialchars($thread['com']),  $tmp);
-      $tmp = str_replace('{{name}}',    htmlspecialchars($thread['name']), $tmp);
-      $tmp = str_replace('{{no}}',      $thread['no'], $tmp);
-      $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-      $tmp = str_replace('{{jstime}}', gmdate('Y-m-d', $thread['created_at']) . 'T' . gmdate('H:i:s.v', $thread['created_at']) . 'Z', $tmp);
-      $tmp = str_replace('{{human_created_at}}', gmdate('n/j/Y H:i:s', $thread['created_at']), $tmp);
-      // FIXME: enable image
-      $tile_image = '';
-      if (isset($thread['files']) && count($thread['files'])) {
-        $tile_image = $image_template;
-        $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
-        $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
-        $tile_image = str_replace('{{file}}', 'backend/' . $thread['files'][0]['path'], $tile_image);
-        $tile_image = str_replace('{{thumb}}', getThumbnail($thread['files'][0], 209), $tile_image);
-        /*
-        $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
-        $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
-        $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
-        $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
-      */
+  if (is_array($catalog)) {
+    foreach($catalog as $pageNum => $page) {
+      foreach($page['threads'] as $thread) {
+        $tmp = $tile_template;
+        $tmp = str_replace('{{subject}}', htmlspecialchars($thread['sub']),  $tmp);
+        $tmp = str_replace('{{message}}', htmlspecialchars($thread['com']),  $tmp);
+        $tmp = str_replace('{{name}}',    htmlspecialchars($thread['name']), $tmp);
+        $tmp = str_replace('{{no}}',      $thread['no'], $tmp);
+        $tmp = str_replace('{{uri}}', $boardUri, $tmp);
+        $tmp = str_replace('{{jstime}}', gmdate('Y-m-d', $thread['created_at']) . 'T' . gmdate('H:i:s.v', $thread['created_at']) . 'Z', $tmp);
+        $tmp = str_replace('{{human_created_at}}', gmdate('n/j/Y H:i:s', $thread['created_at']), $tmp);
+        // FIXME: enable image
+        $tile_image = '';
+        if (isset($thread['files']) && count($thread['files'])) {
+          $tile_image = $image_template;
+          $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
+          $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
+          $tile_image = str_replace('{{file}}', 'backend/' . $thread['files'][0]['path'], $tile_image);
+          $tile_image = str_replace('{{thumb}}', getThumbnail($thread['files'][0], 209), $tile_image);
+          /*
+          $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
+          $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
+          $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
+          $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
+        */
+        }
+        $tmp = str_replace('{{tile_image}}', $tile_image, $tmp);
+        $tmp = str_replace('{{replies}}', $thread['reply_count'], $tmp);
+        $tmp = str_replace('{{files}}', $thread['file_count'], $tmp);
+        $tmp = str_replace('{{page}}', $page['page'], $tmp);
+        $tiles_html .= $tmp;
       }
-      $tmp = str_replace('{{tile_image}}', $tile_image, $tmp);
-      $tmp = str_replace('{{replies}}', $thread['reply_count'], $tmp);
-      $tmp = str_replace('{{files}}', $thread['file_count'], $tmp);
-      $tmp = str_replace('{{page}}', $page['page'], $tmp);
-      $tiles_html .= $tmp;
     }
   }
   $boardData = getBoard($boardUri);
