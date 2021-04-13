@@ -98,13 +98,15 @@ function getBoardThreadsModel($boardUri) {
       'type' => 'left',
       'model' => $posts_model,
       'alias' => 'threads',
-      'pluck' => array('count(ALIAS.postid) as replies', 'ALIAS.deleted'),
+      'pluck' => array('count(ALIAS.postid) as replies', $postTable . '.deleted'),
       'on' => array(
         array('threadid', '=', $db->make_direct($postTable . '.postid')),
         array('deleted', '=', 0),
       ),
       'groupby' => array($postTable . '.postid', 'threads.deleted'),
-      'having' => '(ALIAS.deleted = \'0\' or (ALIAS.deleted = \'1\' and count(ALIAS.postid) > 0))',
+      // ALIAS for postTable is wrong here
+      'having' => '(' . $postTable . '.deleted = \'0\' or
+        (' . $postTable . '.deleted = \'1\' and count(ALIAS.postid) > 0))',
     )
   );
 
