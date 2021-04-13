@@ -28,6 +28,20 @@ function convertPHPSizeToBytes($sSize) {
   return (int)$iValue;
 }
 
+function formatBytes($bytes, $precision = 2) {
+  $units = array('B', 'KB', 'MB', 'GB', 'TB');
+
+  $bytes = max($bytes, 0);
+  $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+  $pow = min($pow, count($units) - 1);
+
+  // Uncomment one of the following alternatives
+  //$bytes /= pow(1024, $pow);
+  $bytes /= (1 << (10 * $pow));
+
+  return round($bytes, $precision) . ' ' . $units[$pow];
+}
+
 // https://stackoverflow.com/a/19570313
 function asBytes($ini_v) {
   $ini_v = trim($ini_v);
@@ -56,14 +70,17 @@ function renderPostForm($boardUri, $url, $options = false) {
 
   $templates = loadTemplates('mixins/post_form');
 
+  $values = array();
   $type = 'Thread';
   $tagThread = '';
   if ($options) {
     if (!empty($options['reply'])) {
       $type = 'Reply';
       $tagThread = '<input type="hidden" name="thread" value="' . $options['reply'] . '">';
+      $values['thread'] = $options['reply'];
     }
     // this is for posting...
+    // moved into board_portal
     /*
     if ($options['page']) {
       $tagThread = '<input type="hidden" name="page" value="' . $options['page'] . '">';
@@ -71,21 +88,57 @@ function renderPostForm($boardUri, $url, $options = false) {
     */
   }
 
-  $tmp = $templates['header'];
-  // used to set the post action
-  $tmp = str_replace('{{uri}}',       $boardUri, $tmp);
-  $tmp = str_replace('{{type}}',      $type,     $tmp);
-  // inject what it's a reply to
-  $tmp = str_replace('{{tagThread}}', $tagThread, $tmp);
-  $tmp = str_replace('{{action}}',    $url,       $tmp);
   // FIXME: we need to be able to override webserver...
-  $tmp = str_replace('{{maxlength}}', '4096', $tmp);
   $maxfiles = convertPHPSizeToBytes(ini_get('max_file_uploads'));
-  $tmp = str_replace('{{maxfiles}}', $maxfiles, $tmp);
   $maxfilesize = min(convertPHPSizeToBytes(ini_get('post_max_size')), convertPHPSizeToBytes(ini_get('upload_max_filesize')));
-  $tmp = str_replace('{{maxfilesize}}', number_abbr($maxfilesize) . 'B',  $tmp);
 
-  return $tmp;
+  $formfields = array(
+    'thread'   => array('type' => 'hidden'),
+    //''         => array('type' => 'title', 'label' => 'New ' . $type, 'wrapClass' => 'jsonly', 'labelClass'=> 'noselect', 'wrapId' => 'dragHandle'),
+    'name'     => array('type' => 'text',          'label' => 'Name', 'maxlength' => 100),
+    'email'    => array('type' => 'text',          'label' => 'Email',
+      'maxlength' => 255, 'autocomplete' => 'off'),
+    'sage'     => array('type' => 'checkbox',      'label' => 'Sage'),
+    'subject'  => array('type' => 'text',          'label' => 'Subject',
+      'maxlength' => 150, 'autocomplete' => 'off'),
+    'message'  => array('type' => 'textarea',      'label' => 'Message', 'autocomplete' => 'off'),
+    'files'    => array('type' => 'multidropfile', 'label' => 'Files',
+      'postlabel' => 'Max ' . $maxfiles . ' files</small><small>' . number_abbr($maxfilesize) . ' total'),
+    'postpassword' => array('type' => 'password',      'label' => 'Passwords', 'maxlength' => 50),
+  );
+  $formOptions = array(
+    'buttonLabel' => 'New ' . $type,
+    'useSections' => true,
+    'wrapClass'   => 'row',
+    'labelClass'  => 'label',
+    'formClass'   => 'form-post',
+    'formId'      => 'postform',
+    'postFormTag' => '
+    <section class="row jsonly">
+      <div class="noselect" id="dragHandle">New ' . $type . '</div>
+      <a class="close postform-style" href="' . $_SERVER['REQUEST_URI'] . '#!">X</a>
+    </section>',
+    //'labelwrap' => 'div',
+    //'labelwrapclass' => 'label',
+  );
+  $pipelines[PIPELINE_POST_FORM_FIELDS]->execute($formfields);
+  $pipelines[PIPELINE_POST_FORM_OPTIONS]->execute($formOptions);
+  $pipelines[PIPELINE_POST_FORM_VALUES]->execute($values);
+
+  $tags = array(
+    'form' => generateForm($boardUri . '/post', $formfields, $values, $formOptions),
+    'type' => $type,
+    'action'      => $url,
+    /*
+    'uri'  => $boardUri,
+    'tagThread'   => $tagThread,
+    'maxlength'   => 4096,
+    'maxfiles'    => $maxfiles,
+    'maxfilesize' => $maxfilesize,
+    */
+  );
+  $pipelines[PIPELINE_POST_FORM_TAGS]->execute($tags);
+  return replace_tags($templates['header'], $tags);
 }
 
 ?>
