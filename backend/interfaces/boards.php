@@ -50,14 +50,52 @@ function listBoards($sort = 'popularity', $search = '') {
 }
 
 // get single board
-function getBoard($boardUri) {
+function getBoardRaw($boardUri) {
   global $db, $models;
   $res = $db->find($models['board'], array('criteria'=>array(
     array('uri', '=', $boardUri),
   )));
   $row = $db->get_row($res);
   $db->free($res);
+  /*
+  $settings = $db->findById($models['setting'], 1);
+  // create ID 1 if needed
+  if ($settings === false) {
+    $db->insert($models['setting'], array(
+      // 'settingid'=>1,
+      array('changedby' => 0),
+    ));
+    $settings = array('json' => '[]', 'changedby' => 0, 'settingsid' => 1);
+  }
+  return json_decode($settings['json'], true);
+  */
+  return $row;
+}
+
+function boardRowFilter(&$row, $json, $options = false) {
   boardDBtoAPI($row);
+  if ($json) {
+    if (isset($options['jsonFields'])) {
+      if (!is_array($options['jsonFields'])) $options['jsonFields'] = array($options['jsonFields']);
+      foreach($options['jsonFields'] as $field) {
+        if (isset($json[$field])) {
+          $row[$field] = $json[$field];
+        } else {
+          // most are arrays
+          $row[$field] = array();
+        }
+      }
+    }
+  }
+}
+
+function getBoard($boardUri, $options = false) {
+  $row = getBoardRaw($boardUri);
+  $json = false;
+  if ($options !== false) {
+    $json = json_decode($row['json'], true);
+  }
+  boardRowFilter($row, $json, $options);
   return $row;
 }
 
@@ -606,29 +644,6 @@ function getBoardPostCount($boardUri) {
   // just max(postid) then...
   $postCount = $db->count($posts_model);
   return $postCount;
-}
-
-function getBoardSettings($boardUri) {
-  global $db, $models;
-  $res = $db->find($models['board'], array('criteria'=>array(
-    array('uri', '=', $boardUri),
-  )));
-  $row = $db->get_row($res);
-  $db->free($res);
-  //boardDBtoAPI($row);
-  /*
-  $settings = $db->findById($models['setting'], 1);
-  // create ID 1 if needed
-  if ($settings === false) {
-    $db->insert($models['setting'], array(
-      // 'settingid'=>1,
-      array('changedby' => 0),
-    ));
-    $settings = array('json' => '[]', 'changedby' => 0, 'settingsid' => 1);
-  }
-  return json_decode($settings['json'], true);
-  */
-  return $row;
 }
 
 ?>
