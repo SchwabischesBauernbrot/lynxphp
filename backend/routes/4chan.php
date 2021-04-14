@@ -102,7 +102,13 @@ $router->get('/:board/:page', function($request) {
 $router->get('/:board/thread/:thread', function($request) {
   $boardUri = $request['params']['board'];
   $threadNum = (int)str_replace('.json', '', $request['params']['thread']);
+  $posts_model = getPostsModel($boardUri);
+  if (!$posts_model) {
+    echo '[]';
+    return;
+  }
   $posts = getThread($boardUri, $threadNum);
+  // board doesn't not exist
   if (getQueryField('prettyPrint')) {
     echo '<pre>', json_encode($posts, JSON_PRETTY_PRINT), "</pre>\n";
   } else {
