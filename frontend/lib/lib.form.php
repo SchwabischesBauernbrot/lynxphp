@@ -144,7 +144,8 @@ function generateForm($action, $fields, $values, $options = false) {
       break;
       case 'captcha':
         $io = array(
-          'details'   => $details,
+          'field'   => $field,
+          'details' => $details,
         );
         // generate/store/send captcha challange, image, and possibly an ID
         $pipelines[PIPELINE_FORM_CAPTCHA]->execute($io);
