@@ -34,7 +34,15 @@ if (!defined('BASE_HREF')) {
 }
 
 // includes :PORT if needed
-if (!defined('BASE_HOST')) { define('BASE_HOST', getServerField('HTTP_HOST')); }
+if (!defined('BASE_HOST')) define('BASE_HOST', getServerField('HTTP_HOST'));
 // BASE_PATH is basically BASE_HREF
-if (!defined('DEV_MODE')) { define('DEV_MODE', false); }
+if (!defined('DEV_MODE')) define('DEV_MODE', false);
+if (!defined('SCRATCH_DRIVER')) define('SCRATCH_DRIVER', 'auto');
+if (!defined('FILE_SCRATCH_DIRECTORY')) define('FILE_SCRATCH_DIRECTORY', '../frontend_storage/');
+
+if (!defined('REDIS_HOST')) define('REDIS_HOST', 'localhost');
+if (!defined('REDIS_PORT')) define('REDIS_PORT', '127.0.0.1');
+if (!defined('REDIS_SOCKET')) define('REDIS_SOCKET', '/tmp/redis.sock');
+if (!defined('REDIS_FORCE_HOST')) define('REDIS_FORCE_HOST', false);
+
 ?>
