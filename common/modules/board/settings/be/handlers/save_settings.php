@@ -7,7 +7,7 @@ $boardUri = boardOwnerMiddleware($request);
 if (!$boardUri) return;
 
 global $db, $models;
-$row = getBoardSettings($boardUri);
+$row = getBoardRaw($boardUri);
 //if (!is_array($settings['json'])) $settings['json'] = array();
 
 //echo "<pre>GET[", print_r($_GET, 1), "]</pre>\n";
@@ -24,13 +24,14 @@ foreach($_POST as $k => $v) {
   if (in_array($k, $dbFields)) {
     $row[$k] = $v;
   } else {
-    $row['json'][$k] = $v;
+    $row['json']['settings'][substr($k, 9)] = $v;
   }
 }
 foreach($shared['fields'] as $f => $t) {
   //echo "type[", print_r($t, 1), "]<br>\n";
   if ($t['type'] === 'checkbox') {
-    $row['json'][$f] = getOptionalPostField($f);
+    $sf = substr($f, 9); // just assuming no checkbox dbFields
+    $row['json']['settings'][$sf] = getOptionalPostField($f);
   }
 }
 
