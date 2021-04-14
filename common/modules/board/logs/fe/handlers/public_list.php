@@ -14,7 +14,11 @@ $templates = moduleLoadTemplates('log_listing', __DIR__);
 
 $tmpl = $templates['header'];
 $log_tmpl = $templates['loop0'];
-$boardData = getBoard($boardUri);
+//$boardData = getBoard($boardUri);
+global $boardData;
+if (empty($boardData)) {
+  $boardData = getBoard($boardUri);
+}
 
 /*
 // FIXME: portal middleware?
