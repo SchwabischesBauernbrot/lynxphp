@@ -74,13 +74,24 @@ function consume_beRsrc($options, $params = '') {
       }
       return;
     }
-    // let's just handle 401s globally here
-    if (!empty($obj['meta']) && $obj['meta']['code'] === 401) {
-      //echo "<hr><hr><hr>\n";
-      if (DEV_MODE) {
-        echo "<pre>Got a 401 [$responseText] for [", $options['endpoint'], ']via[', $options['method'],"]</pre>\n";
-      } else {
-        return redirectTo('/login.php');
+    // meta processing?
+    if (!empty($obj['meta'])) {
+      if (isset($obj['meta']['board'])) {
+        global $boardData;
+        $boardData = $obj['meta']['board'];
+      }
+      if (isset($obj['meta']['board']['settings'])) {
+        global $board_settings;
+        $board_settings = $obj['meta']['board']['settings'];
+      }
+      // let's just handle 401s globally here
+      if ($obj['meta']['code'] === 401) {
+        //echo "<hr><hr><hr>\n";
+        if (DEV_MODE) {
+          echo "<pre>Got a 401 [$responseText] for [", $options['endpoint'], ']via[', $options['method'],"]</pre>\n";
+        } else {
+          return redirectTo('/login.php');
+        }
       }
     }
     // this hides 401s... we need to handle and pass back problems better...
@@ -129,12 +140,21 @@ function getBoard($boardUri) {
   if (!isset($boardData['data'])) {
     return false;
   }
+  //echo "<pre>", print_r($boardData, 1), "</pre>\n";
+  if (isset($boardData['data']['settings'])) {
+    global $board_settings;
+    $board_settings = $boardData['data']['settings'];
+  }
   return $boardData['data'];
 }
 
 function backendGetBoardThreadListing($boardUri, $pageNum = 1) {
   $threadListing = getExpectJson('opt/boards/' . $boardUri . '/' . $pageNum);
   if ($threadListing === null) return;
+  if (isset($threadListing['data']['board']['settings'])) {
+    global $board_settings;
+    $board_settings = $threadListing['data']['board']['settings'];
+  }
   return $threadListing['data'];
 }
 
@@ -144,12 +164,20 @@ function getBoardPage($boardUri, $page = 1) {
 }
 
 function getBoardCatalog($boardUri) {
-  $pages = getExpectJson('4chan/' . $boardUri . '/catalog.json');
-  return $pages;
+  $result = getExpectJson('opt/' . $boardUri . '/catalog.json');
+  if (isset($result['data']['board']['settings'])) {
+    global $board_settings;
+    $board_settings = $result['data']['board']['settings'];
+  }
+  return $result['data'];
 }
 
 function getBoardThread($boardUri, $threadNum) {
   $result = getExpectJson('opt/' . $boardUri . '/thread/' . $threadNum . '.json');
+  if (isset($result['data']['settings'])) {
+    global $board_settings;
+    $board_settings = $result['data']['settings'];
+  }
   return $result['data'];
 }
 
@@ -184,6 +212,10 @@ function backendLogin($user, $pass) {
     'password' => $pass,
   ), array('HTTP_X_FORWARDED_FOR' => getip()));
   $res = expectJson($json, 'lynx/login');
+  if ($res === false) {
+    // couldn't parse json
+    return;
+  }
   if (!empty($res['data']['session'])) {
     setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
     //redirectTo('control_panel.php');
