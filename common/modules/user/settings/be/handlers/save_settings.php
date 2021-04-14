@@ -21,7 +21,7 @@ if ($userid) {
   $ok = $db->updateById($models['user'], $userid, array('json'=>$userRow['json']));
 } else {
   $sesRow = ensureSession();
-  if ($sesRow['created'] === $now) {
+  if (isset($sesRow['created']) && (int)$sesRow['created'] === (int)$now) {
     // not going to have a username to send
     $setCookie = array(
       'session' => $sesRow['session'],
