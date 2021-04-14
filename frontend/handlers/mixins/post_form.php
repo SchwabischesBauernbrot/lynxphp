@@ -121,7 +121,13 @@ function renderPostForm($boardUri, $url, $options = false) {
     //'labelwrap' => 'div',
     //'labelwrapclass' => 'label',
   );
-  $pipelines[PIPELINE_POST_FORM_FIELDS]->execute($formfields);
+  $io = array(
+    'boardUri'   => $boardUri,
+    'type'       => $type,
+    'formfields' => $formfields,
+  );
+  $pipelines[PIPELINE_POST_FORM_FIELDS]->execute($io);
+  $formfields = $io['formfields'];
   $pipelines[PIPELINE_POST_FORM_OPTIONS]->execute($formOptions);
   $pipelines[PIPELINE_POST_FORM_VALUES]->execute($values);
 
