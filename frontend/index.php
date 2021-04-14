@@ -1,5 +1,6 @@
 <?php
 $now = microtime(true);
+$board_settings = false;
 
 include '../common/post_vars.php';
 
@@ -48,6 +49,12 @@ if ($isNginx && strpos($_SERVER['REQUEST_URI'], '?') !== false) {
 // well the backend could...
 
 $router = include '../common/router.php';
+
+// connect to scatch
+include '../common/scratch_implementations/' . SCRATCH_DRIVER . '.php';
+$scratch_type_class = SCRATCH_DRIVER . '_scratch_driver';
+$scratch = new $scratch_type_class;
+
 
 // nav, pages
 // routes make a page exist
@@ -123,6 +130,8 @@ definePipeline('PIPELINE_GLOBALS_HEADER_TMPL');
 
 definePipeline('PIPELINE_USER_NAV');
 definePipeline('PIPELINE_USER_HEADER_TMPL');
+definePipeline('PIPELINE_AFTER_WORK');
+
 
 
 // forms pipelines
@@ -353,6 +362,7 @@ $router->get('/:uri', function($request) {
 });
 
 $res = $router->exec($req_method, $req_path);
+// work is called in wrapContent
 if (!$res) {
   http_response_code(404);
   echo "404 Page not found<br>\n";
