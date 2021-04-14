@@ -56,18 +56,21 @@ function getBoardsHandler() {
 
   $params = array(
     'search' => '',
-    'sort' => '',
+    'sort' => 'activity',
   );
+  // popularity desc is the default
+  // popularity desc should be highest post at the top
+  // prettier if Latest activity is the default
   if (!empty($_POST['search'])) {
     $params['search'] = $_POST['search'];
   }
   if (!empty($_POST['sort'])) {
     $params['sort'] = $_POST['sort'];
   }
-  $reverse_list = false;
+  $reverse_list = true;
   if (!empty($_POST['direction'])) {
     //$params['direction'] = $_GET['direction'];
-    $reverse_list = $_POST['direction'] == 'asc';
+    $reverse_list = $_POST['direction'] !== 'asc';
   }
 
   //print_r($params);
@@ -153,8 +156,8 @@ function getBoardsHandler() {
   $content = str_replace('{{popularitySelected}}', $params['sort'] === 'popularity' ? ' selected' : '', $content);
   $content = str_replace('{{latestSelected}}', $params['sort'] === 'activity' ? ' selected' : '', $content);
 
-  $content = str_replace('{{descSelected}}', $reverse_list ? '' : ' selected', $content);
-  $content = str_replace('{{ascSelected}}', $reverse_list ? ' selected' : '', $content);
+  $content = str_replace('{{descSelected}}', $reverse_list ? ' selected' : '', $content);
+  $content = str_replace('{{ascSelected}}', $reverse_list ? '' : ' selected', $content);
 
 
   $page_html = '';
