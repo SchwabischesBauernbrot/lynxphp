@@ -97,14 +97,16 @@ $router->get('/:board/catalog.json', function($request) {
 
 $router->get('/boards.json', function($request) {
   global $db;
+  // default is popularity (desc)
   $search = empty($_GET['search']) ? '' : $_GET['search'];
-  $sort = empty($_GET['sort']) ? 'popularity' : $_GET['sort'];
+  $sort = empty($_GET['sort']) ? 'activity' : $_GET['sort'];
 
-  $sortByField = $sort === 'popularity' ? 'posts' : 'updated_at';
-  //echo "sortByField[$sortByField]<br>\n";
+  // updated_at isn't good enough, last
+  $sortByField = $sort === 'popularity' ? 'posts' : 'last';
 
   $boards = listBoards($sort, $search);
   $res = array();
+  $noLast = array();
   foreach($boards as $b) {
     // FIXME: N+1s... (yea page is almost at 1s for 40 boards)
     // include posts, threads, last_activity
@@ -120,14 +122,18 @@ $router->get('/boards.json', function($request) {
       $db->free($newestThreadRes);
       $b['last'] = $newestThread[0];
     }
-    //echo "sortby[", print_r($b[$sortByField], 1), "]<br>\n";
-    $res[$b[$sortByField]] = $b;
+    if ($sortByField === 'last') {
+      if (isset($b[$sortByField])) {
+        $res[$b[$sortByField]['updated_at']] = $b;
+      } else {
+        $noLast[] = $b;
+      }
+    } else {
+      $res[$b[$sortByField]] = $b;
+    }
   }
-  if ($sortByField === 'popularity') {
-    krsort($res);
-  } else {
-    ksort($res);
-  }
+  ksort($res);
+  $res = array_merge($noLast, $res);
   sendResponse(array_values($res));
 });
 
