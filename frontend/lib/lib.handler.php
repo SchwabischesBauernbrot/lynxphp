@@ -89,6 +89,7 @@ function loadTemplatesFile2($path) {
 }
 
 function wrapContent($content, $options = '') {
+  global $pipelines;
   // how do we hook in our admin group?
   // the data is only there if we asked for it...
   // could be a: global, pipeline or ??
@@ -152,9 +153,18 @@ function wrapContent($content, $options = '') {
   }
   $result = $packages['base']->useResource('work', false, array('inWrapContent'=>true));
   if (DEV_MODE) {
+    $start = microtime(true);
+  }
+  $pipelines[PIPELINE_AFTER_WORK]->execute($result);
+  if (DEV_MODE) {
+    $diff = (microtime(true) - $start) * 1000;
     curl_log_report();
     if ($result) {
       echo "<pre>worker result [$result]</pre>\n";
+    }
+    // only show if it takes longer than 10ms
+    if ($diff > 10) {
+      echo 'PIPELINE_AFTER_WORK took ', $diff, "ms <br>\n";
     }
     echo "<h4>input</h4>";
     if (count($_GET)) echo "GET", print_r($_GET, 1), "<br>\n";
