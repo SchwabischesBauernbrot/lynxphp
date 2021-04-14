@@ -143,10 +143,10 @@ class database_driver_base_class {
   protected function makeInsertQuery($rootModel, $recs) {
     global $now;
     $tableName = modelToTableName($rootModel);
-    $date = $now;
+    $date = (int)$now;
     $recs[0]['json'] = '{}';
-    $recs[0]['created_at'] = $now;
-    $recs[0]['updated_at'] = $now;
+    $recs[0]['created_at'] = $date;
+    $recs[0]['updated_at'] = $date;
     $fields = join(',', array_keys($recs[0]));
     if ($this->btTables) {
       $sql = 'insert into `' . $tableName . '` (' . $fields . ') values';
@@ -157,8 +157,8 @@ class database_driver_base_class {
     foreach($recs as $rec) {
       $cleanArr = array();
       $rec['json'] = '{}';
-      $rec['created_at'] = $now;
-      $rec['updated_at'] = $now;
+      $rec['created_at'] = $date;
+      $rec['updated_at'] = $date;
       foreach($rec as $val) {
         if (is_array($val)) {
           $cleanArr[] = $val;
@@ -176,7 +176,7 @@ class database_driver_base_class {
     global $now;
     $tableName = modelToTableName($rootModel);
     $sets = array(
-      'updated_at' => 'updated_at = ' . $now,
+      'updated_at' => 'updated_at = ' . (int)$now,
     );
     if (!empty($urow['json'])) {
       if (!is_string($urow['json'])) {
