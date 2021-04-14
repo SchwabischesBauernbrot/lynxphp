@@ -1,9 +1,6 @@
 <?php
 
-// FIXME: we need access to package
 $params = $getHandler();
-
-// $boardData = boardOwnerMiddleware($request);
 
 $boardUri = $request['params']['uri'];
 
@@ -14,12 +11,14 @@ $templates = moduleLoadTemplates('banner_listing', __DIR__);
 
 $tmpl = $templates['header'];
 $banner_tmpl = $templates['loop0'];
-$boardData = getBoard($boardUri);
+global $boardData;
+if (empty($boardData)) {
+  $boardData = getBoard($boardUri);
+}
 
 //$boardHeader_html = renderBoardHeader($boardData);
 //$boardNav_html = renderBoardNav($boardUri, $boardData['pageCount'], '[Banners]');
 //$tmpl = $boardHeader_html . $boardNav_html . $tmpl;
-
 
 $banners_html = '';
 if (is_array($banners)) {
