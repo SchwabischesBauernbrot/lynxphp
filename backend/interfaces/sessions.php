@@ -2,7 +2,7 @@
 
 function createSession($userid) {
   global $now, $db, $models;
-  $ttl = $now + 86400; // 1 day from now
+  $ttl = (int)$now + 86400; // 1 day from now
   // make sure session is unique
   $cnt = 1;
   while($cnt) {
@@ -70,7 +70,7 @@ function ensureSession($userid = 0) {
     // normalize
     $sesRow = getSession();
     // ttl is in expires
-    $sesRow['created'] = $now;
+    $sesRow['created'] = (int)$now;
   }
   return $sesRow;
 }
