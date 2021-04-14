@@ -80,6 +80,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     $curlLog[] = array(
       'method' => $method,
       'url' => $url,
+      'trace' => gettrace(),
       'postData' => $fields_string,
       'took' => (microtime(true) - $start) * 1000,
     );
@@ -113,10 +114,12 @@ function curl_log_report() {
         echo ' [', $l['postData'], ']';
       }
     }
+    //echo '<span title="', $l['trace'] , '">Trace</span>';
+    echo $l['trace'];
     $ttl += $l['took'];
   }
   echo '</ol>';
-  echo count($curlLog), ' requests took ', $ttl, 'ms';
+  echo count($curlLog), ' requests took ', $ttl, 'ms<br>', "\n";
 }
 
 ?>
