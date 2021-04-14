@@ -41,6 +41,11 @@ function postDBtoAPI(&$row) {
 function getThread($boardUri, $threadNum) {
   global $db;
   $posts_model = getPostsModel($boardUri);
+  if ($posts_model === false) {
+    // this board does not exist
+    sendResponse(array(), 404, 'Board not found');
+    return;
+  }
   $post_files_model = getPostFilesModel($boardUri);
 
   //$filesFields = array_keys($post_files_model['fields']);
