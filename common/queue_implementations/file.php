@@ -1,6 +1,7 @@
 <?php
 
-// another type where two levels would help
+include 'base.php';
+
 class fileQueue extends baseQueue {
   function __construct() {
     // we need to protect site information, such as IP addresses
