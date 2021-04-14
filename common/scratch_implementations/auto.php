@@ -4,7 +4,7 @@
 // iff we find sphinx to be an adequate replacement
 
 if (class_exists('Redis')) {
-  include __DIR__ . 'redis.php';
+  include 'redis.php';
   class auto_scratch_driver extends redis_scratch_driver {
   }
   return;
@@ -30,7 +30,7 @@ if (class_exists('Redis')) {
   }
 */
 
-include __DIR__ . 'file.php';
+include 'file.php';
 class auto_scratch_driver extends file_scratch_driver {
 }
 
