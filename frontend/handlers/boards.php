@@ -416,7 +416,9 @@ function getThumbnail($file, $maxW = 0) {
 }
 
 function getBoardCatalogHandler($boardUri) {
-  $catalog = getBoardCatalog($boardUri);
+  $data = getBoardCatalog($boardUri);
+  $catalog = $data['pages'];
+  $boardData = $data['board'];
   if (!empty($catalog['meta']['err'])) {
     if ($catalog['meta']['err'] === 'Board not found') {
       wrapContent("Board not found");
@@ -496,8 +498,9 @@ function getBoardCatalogHandler($boardUri) {
       }
     }
   }
-  $boardData = getBoard($boardUri);
+  //$boardData = getBoard($boardUri);
   //$boardData['pageCount'] = $boardThreads['pageCount'];
+  $boardData['pageCount'] = $maxPage;
   $boardHeader = renderBoardPortalHeader($boardUri, $boardData, array(
     'isCatalog' => true,
   ));
@@ -517,7 +520,7 @@ function getBoardCatalogHandler($boardUri) {
   $tmpl = str_replace('{{tiles}}',    $tiles_html,    $tmpl);
   $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
   // mixin
-  $tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/catalog'), $tmpl);
+  //$tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/catalog'), $tmpl);
   $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
   wrapContent($boardHeader . $tmpl);
 }
