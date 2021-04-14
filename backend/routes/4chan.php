@@ -25,7 +25,7 @@ $router->get('/:board/catalog.json', function($request) {
   $boardUri = $request['params']['board'];
   $page = boardCatalog($boardUri);
   if (!is_array($page)) {
-    sendResponse(array(), 404, 'Board not found');
+    // boardCatalog handles this
     return;
   }
   $pages = count($page);
