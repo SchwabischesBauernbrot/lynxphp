@@ -6,10 +6,8 @@ if (!$boardUri) {
   return;
 }
 
-$settings = getBoardSettings($boardUri);
-$settings['json'] = json_decode($settings['json'], true);
+$boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
 
-// include owned boards, groups...
-sendResponse($settings);
+sendResponse($boardData);
 
 ?>
