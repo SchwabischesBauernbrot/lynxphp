@@ -36,11 +36,10 @@ $router->get('/boards/:uri/:page', function($request) {
   $boardUri = $request['params']['uri'];
   $pageNum = $request['params']['page'] ? (int)$request['params']['page'] : 1;
 
-  $boardData = getBoard($boardUri);
+  $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
   if (!$boardData) {
     return sendResponse(array(), 404, 'Board does not exist');
   }
-  boardDBtoAPI($boardData);
   $threadCount = getBoardThreadCount($boardUri);
   $threads = boardPage($boardUri, $pageNum);
   sendResponse(array(
@@ -58,7 +57,7 @@ $router->get('/boards/:uri/:page', function($request) {
 $router->get('/:board/thread/:thread', function($request) {
   global $tpp;
   $boardUri = $request['params']['board'];
-  $boardData = getBoard($boardUri);
+  $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
   if (!$boardData) {
     echo '[]';
     return;
@@ -70,26 +69,31 @@ $router->get('/:board/thread/:thread', function($request) {
   sendResponse($boardData);
 });
 
-/*
-$router->get('/boards/:uri/catalog', function($request) {
+// https://a.4cdn.org/po/catalog.json
+$router->get('/:board/catalog.json', function($request) {
   global $tpp;
   $boardUri = $request['params']['board'];
-  $threads = boardCatalog($boardUri);
-  if (!$threads) {
-    sendResponse(array(), 404, 'Board not found');
+  $page = boardCatalog($boardUri);
+  if (!is_array($page)) {
+    // boardCatalog handles this
     return;
   }
-  $pages = ceil(count($threads) / $tpp);
+  $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
+  $pages = count($page);
+  // FIXME: just return a list of threads...
+  // also be able to page count?
   $res = array();
   for($i = 1; $i <= $pages; $i++) {
     $res[] = array(
       'page' => $i,
-      'threads' => $threads[$i],
+      'threads' => $page[$i],
     );
   }
-  echo json_encode($res);
+  sendResponse(array(
+    'pages' => $res,
+    'board' => $boardData,
+  ));
 });
-*/
 
 $router->get('/boards.json', function($request) {
   global $db;
@@ -157,7 +161,7 @@ $router->get('/perms/:perm', function($request) {
 $router->get('/:board', function($request) {
   global $db, $models, $tpp;
   $boardUri = str_replace('.json', '', $request['params']['board']);
-  $boardData = getBoard($boardUri);
+  $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
   if (!$boardData) {
     echo '[]';
     return;
