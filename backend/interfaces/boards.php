@@ -91,7 +91,7 @@ function boardRowFilter(&$row, $json, $options = false) {
 
 function getBoard($boardUri, $options = false) {
   $row = getBoardRaw($boardUri);
-  if ($row === false) return false;
+  if (!$row) return false;
   $json = false;
   if ($options !== false) {
     $json = json_decode($row['json'], true);
