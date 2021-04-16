@@ -20,6 +20,7 @@
   - echo "define('DB_USER', 'root');" >> backend/config_.php
   - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
   - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
+  - echo "define('BACKEND_KEY', 'lynxphp');" >> backend/config_.php
 
 .default-pgsql: &default-pgsql
   # Install required PHP extensions
@@ -32,6 +33,7 @@
   - echo "define('DB_PWD', '');" >> backend/config_.php
   - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
   - echo "define('DB_DRIVER', 'pgsql');" >> backend/config_.php
+  - echo "define('BACKEND_KEY', 'lynxphp');" >> backend/config_.php
 
 .default-post-database: &default-post-database
   - echo "?>"  >> backend/config_.php
