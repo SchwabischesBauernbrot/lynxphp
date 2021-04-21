@@ -35,7 +35,9 @@ final class test_opt_Test extends TestCase {
     $this->assertIsArray($res['meta']);
     $this->assertSame(200, $res['meta']['code']);
     $this->assertIsArray($res['data']);
-    return $res['data'];
+    $this->assertIsArray($res['data']['settings']);
+    $this->assertIsArray($res['data']['boards']);
+    return $res['data']['boards'];
   }
 
   /**
