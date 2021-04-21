@@ -91,6 +91,7 @@ function boardRowFilter(&$row, $json, $options = false) {
 
 function getBoard($boardUri, $options = false) {
   $row = getBoardRaw($boardUri);
+  // postgres is false, mysql is null
   if (!$row) return false;
   $json = false;
   if ($options !== false) {
