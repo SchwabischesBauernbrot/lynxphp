@@ -25,6 +25,12 @@ final class test_lynxchan_minimum_Test extends TestCase {
     );
     $json = curlHelper(BACKEND_BASE_URL . $endpoint, $login, '', '', '', 'POST');
     $res = json_decode($json, true);
+    if ($res === null) {
+      echo "lynx/registerAccount - failed to parse [$json] as json\n";
+    }
+    if (isset($res['meta']) && $res['meta']['code'] !== 200) {
+      echo "lynx/registerAccount - not 200 [", print_r($res, 1), "]\n";
+    }
     usesSendResponse($this, $res);
     $this->assertSame(200, $res['meta']['code']);
     return array(
@@ -180,9 +186,12 @@ final class test_lynxchan_minimum_Test extends TestCase {
     $json = backendAuthedGet('lynx/account');
     $res = json_decode($json, true);
     if ($res === null) {
-      echo "lynx/testFiles - failed to parse [$json] as json\n";
+      echo "lynx/testAccount - failed to parse [$json] as json\n";
     }
     $this->assertIsArray($res);
+    if (isset($res['meta']) && $res['meta']['code'] !== 200) {
+      echo "lynx/testAccount - not 200 [", print_r($res, 1), "]\n";
+    }
     $this->assertArrayHasKey('noCaptchaBan', $res);
     $this->assertArrayHasKey('login', $res);
     $this->assertArrayHasKey('email', $res);
