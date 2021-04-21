@@ -134,7 +134,8 @@ $router->get('/boards.json', function($request) {
   }
   ksort($res);
   $res = array_merge($noLast, $res);
-  sendResponse(array_values($res));
+  // FIXME: not very cacheable like this...
+  sendResponse(array('settings' => getSettings(), 'boards' => array_values($res)));
 });
 
 
@@ -162,6 +163,200 @@ $router->get('/perms/:perm', function($request) {
   ));
 });
 
+$router->post('/getChallenge', function($request) {
+  if (!hasPostVars(array('i'))) {
+    // hasPostVars already outputs
+    return;
+  }
+  include '../common/sodium/autoload.php';
+
+  // so you claim to have this identity, prove it
+  $edSrvKp = \Sodium\crypto_box_keypair();
+  $edSrvSk = \Sodium\crypto_box_secretkey($edSrvKp);
+  $edSrvPk = \Sodium\crypto_box_publickey($edSrvKp);
+  $token =  md5(uniqid());
+  $destEdPk = base64_decode($_POST['i']); // edPk stored as b64
+  $destXPkBin = \Sodium\crypto_sign_ed25519_pk_to_curve25519($destEdPk);
+
+  $symKey = \Sodium\crypto_box_keypair_from_secretkey_and_publickey(
+    $edSrvSk,
+    $destXPkBin
+  );
+  $iv = \Sodium\randombytes_buf(\Sodium\CRYPTO_BOX_NONCEBYTES);
+  $cipherText = \Sodium\crypto_box($token, $iv, $symKey);
+  global $db, $models, $now;
+  $db->insert($models['auth_challenge'], array(array(
+    'challenge' => $token,
+    'publickey' => $_POST['i'], // edPk stored as b64
+    'expires'   => (int)$now,
+    'ip'        => getip(),
+  )));
+
+  // also could send a server public key to encrypt the verify payload
+  // but the TLS transport should take care of that if needed
+  // generate id
+  $data = array(
+    'cipherText64' => base64_encode($iv . $cipherText),
+    'serverPubkey64' => base64_encode($edSrvPk),
+  );
+  // storage it temporarily w/expiration
+  // return it
+  sendResponse($data);
+});
+
+function verifyChallengedSignatureHandler() {
+  if (!hasPostVars(array('chal', 'sig'))) {
+    // hasPostVars already outputs
+    return;
+  }
+  $chal = $_POST['chal'];
+  $sig  = $_POST['sig'];
+  include '../common/sodium/autoload.php';
+  // validate chal is one we issued? why?
+  // so we can't reuse an old chal
+  // well at least
+  // FIXME: make sure it's not expired
+  global $db, $models;
+  $res = $db->find($models['auth_challenge'], array('criteria' =>
+    array('challenge' => $chal)
+  ));
+  if (!$db->num_rows($res)) {
+    $db->free($res);
+    return sendResponse(array(), 401, 'challenge not found');
+  }
+  $row = $db->get_row($res);
+  $db->free($res);
+  // make sure no one can replay
+  $db->deleteById($models['auth_challenge'], $row['challengeid']);
+  $edPkBin = base64_decode($row['publickey']); // it's ed signing key in b64
+
+  // prove payload was from user and not just a guessed challenge
+  if (!\Sodium\crypto_sign_verify_detached($sig, $chal, $edPkBin)) {
+    return sendResponse(array(), 401, 'signature verification failed');
+  }
+  return $edPkBin;
+}
+
+function loginResponseMaker($user_id, $upgradedAccount = false) {
+  if (!$user_id) {
+    return sendResponse(array(), 500, 'logging in as no user');
+  }
+  $sesrow = ensureSession($user_id);
+  if (!isset($sesrow['created']) && $sesrow['userid'] != $user_id) {
+    // there's already a session
+    return sendResponse(array(), 400, 'You passed an active session');
+  }
+  // and return it
+  $data = array(
+    'session' => $sesrow['session'],
+    'ttl'     => $sesrow['expires'],
+    'upgradedAccount' => $upgradedAccount,
+  );
+  sendResponse($data);
+}
+
+// should only work over TLS unless same ip/localhost
+$router->post('/verifyAccount', function($request) {
+  $edPkBin = verifyChallengedSignatureHandler();
+  if (!$edPkBin) {
+    return;
+  }
+  global $db, $models;
+
+  // process account upgrades, remove code later
+  $upgradedAccount = false;
+  if (1) {
+    $u = strtolower(getOptionalPostField('u'));
+    //echo "u[$u]<br>\n";
+    if ($u && isset($_POST['p'])) {
+      $p = $_POST['p'];
+      //echo "Trying to locate user [$u]<br>\n";
+      $res = $db->find($models['user'], array('criteria' => array(
+        array('username', '=', $u),
+      )));
+      $row = $db->get_row($res);
+      $db->free($res);
+      //echo "id[", $row['userid'], "] pk[", $row['publickey'], "] p[$p]<br>\n";
+      if ($row && $row['userid'] && !$row['publickey'] && password_verify($p, $row['password']) && strpos($row['email'], '@') !== false) {
+        // convert users - ONLY DO THIS ONCE
+        // Should we clear out the email?
+        $db->updateById($models['user'], $row['userid'], array('username' => '', 'password' => '', 'publickey' => bin2hex($edPkBin), 'email' => hash('sha512', BACKEND_KEY . $row['email'] . BACKEND_KEY)));
+        $upgradedAccount = true;
+      }
+    }
+  }
+
+  $res = $db->find($models['user'], array('criteria' => array(
+    array('publickey', '=', bin2hex($edPkBin)),
+  )));
+  if (!$db->num_rows($res)) {
+    $db->free($res);
+    return sendResponse(array(), 401, 'Incorrect login - key is not registered, please sign up');
+  }
+  $row = $db->get_row($res);
+  $db->free($res);
+  $id = $row['userid'];
+  loginResponseMaker($id, $upgradedAccount);
+});
+
+$router->post('/registerAccount', function($request) {
+  $edPkBin = verifyChallengedSignatureHandler();
+  if (!$edPkBin) {
+    return;
+  }
+  global $db, $models;
+
+  $res = $db->find($models['user'], array('criteria' => array(
+    array('publickey', '=', bin2hex($edPkBin)),
+  )));
+  if ($db->num_rows($res)) {
+    // FIXME: should we just log in, they proved their key...
+    return sendResponse(array(), 403, 'Already registered');
+  }
+
+  //echo "Creating<br>\n";
+  $row = array('publickey' => bin2hex($edPkBin));
+  $em = getOptionalPostField('email');
+  if ($em) $row['email'] = hash('sha512', BACKEND_KEY . $em . BACKEND_KEY);
+  $id = $db->insert($models['user'], array($row));
+  loginResponseMaker($id);
+});
+
+$router->post('/migrateAccount', function($request) {
+  if (!hasPostVars(array('pk'))) {
+    // hasPostVars already outputs
+    return;
+  }
+  // require being logged in
+  $user_id = loggedIn();
+  if (!$user_id) {
+    return;
+  }
+  global $db, $models;
+  // pass it in as hex, so you can't easily correlate it with challenge request
+  $row = array('publickey' => $_POST['pk']);
+  $res = $db->updateById($models['user'], $user_id, $row);
+  sendResponse($res);
+});
+
+$router->post('/changeEmail', function($request) {
+  if (!hasPostVars(array('em'))) {
+    // hasPostVars already outputs
+    return;
+  }
+  $em = $_POST['em'];
+  // require being logged in
+  $user_id = loggedIn();
+  if (!$user_id) {
+    return;
+  }
+  global $db, $models;
+  $row = array('email' => hash('sha512', BACKEND_KEY . $em . BACKEND_KEY));
+  $res = $db->updateById($models['user'], $user_id, $row);
+  sendResponse($res);
+});
+
+// has to be last...
 // non-standard 4chan api - lets disable for now
 // /opt should have replaced this
 $router->get('/:board', function($request) {
