@@ -21,11 +21,11 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   }
 
   if (is_array($fields) && $method === 'AUTO') {
-    $fields_string='';
+    $fields_string = '';
     foreach($fields as $key=>$value) { $fields_string .= $key . '=' . urlencode($value) . '&'; }
-    $fields_string=rtrim($fields_string, '&');
+    $fields_string = rtrim($fields_string, '&');
   } else {
-    $fields_string=$fields;
+    $fields_string = $fields;
   }
 
   if (!function_exists('curl_init')) {
@@ -37,24 +37,24 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   $ch = curl_init();
 
   //set the url, number of POST vars, POST data
-  curl_setopt($ch,CURLOPT_URL,$url);
+  curl_setopt($ch, CURLOPT_URL, $url);
   if (is_array($fields)) {
-    curl_setopt($ch,CURLOPT_POST,count($fields));
+    curl_setopt($ch, CURLOPT_POST, count($fields));
   } else {
-    curl_setopt($ch,CURLOPT_POST, $fields?true:false);
+    curl_setopt($ch, CURLOPT_POST, $fields?true:false);
   }
-  curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
   //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-  curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   if ($header) {
     $headers = array();
     foreach($header as $k => $v) {
       $headers[] = $k . ': ' . $v;
     }
-    curl_setopt($ch,CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
   }
   if ($user && $pass) {
-    curl_setopt($ch, CURLOPT_USERPWD, $user.':'.$pass);
+    curl_setopt($ch, CURLOPT_USERPWD, $user . ':' . $pass);
     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
   }
   if ($method==='AUTO') {
@@ -83,6 +83,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
       'trace' => gettrace(),
       'postData' => $fields_string,
       'took' => (microtime(true) - $start) * 1000,
+      'result' => $result,
     );
   }
 
@@ -114,8 +115,10 @@ function curl_log_report() {
         echo ' [', $l['postData'], ']';
       }
     }
+    //echo '<span title="', $l['result'] , '">Result</span>';
     //echo '<span title="', $l['trace'] , '">Trace</span>';
     echo $l['trace'];
+    echo '<pre>', json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT), '</pre>', "\n";
     $ttl += $l['took'];
   }
   echo '</ol>';
