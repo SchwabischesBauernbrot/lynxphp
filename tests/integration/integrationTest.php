@@ -47,6 +47,12 @@ function wrapContent($content) {
   echo "wrapContent called[$content]\n";
 }
 
+//if (!function_exists('redirectTo')) {
+function redirectTo($url) {
+  echo "redirectTo called[$url]\n";
+}
+//}
+
 function usesSendResponse($t, $res) {
   $t->assertIsArray($res);
   $t->assertArrayHasKey('meta', $res);
