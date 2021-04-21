@@ -418,6 +418,8 @@ function getThumbnail($file, $maxW = 0) {
     $w = 240;
     $h = 240;
   }
+  $w = (int)$w;
+  $h = (int)$h;
 
   return '<' . $type . ' class="file-thumb" src="backend/'.$thumb.'" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />';
 }
@@ -483,7 +485,9 @@ function getBoardCatalogHandler($boardUri) {
         $tmp = str_replace('{{jstime}}', gmdate('Y-m-d', $thread['created_at']) . 'T' . gmdate('H:i:s.v', $thread['created_at']) . 'Z', $tmp);
         $tmp = str_replace('{{human_created_at}}', gmdate('n/j/Y H:i:s', $thread['created_at']), $tmp);
         // FIXME: enable image
-        $tile_image = '';
+        $tile_image = '<a href="' . BASE_HREF . $boardUri . '/thread/' .
+          $thread['no']. '.html#' . $thread['no'] .
+          '"><img src="images/imagelessthread.png" width=64 height=64></a>';
         if (isset($thread['files']) && count($thread['files'])) {
           $tile_image = $image_template;
           $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
