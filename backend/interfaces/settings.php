@@ -5,10 +5,19 @@ function getUserSettings($userid = 'default') {
   if (!is_numeric($userid)) {
     $userid = getUserID();
   }
+  //echo "userid[$userid]<br>\n";
   // are we logged in?
   if ($userid) {
     // put it into our settings
     $userRow = getAccount($userid);
+    if (!$userRow) {
+      // user record deleted or not found
+      return array(
+        'settings' => array(),
+        'loggedin' => false,
+        'session'  => '',
+      );
+    }
     $settings = json_decode($userRow['json'], true);
   } else {
     $sesRow = getSession();
@@ -63,6 +72,18 @@ function getPublicSiteSettings() {
   }
   $settings = json_decode($row1['json'], true);
   return $settings;
+}
+
+// tough it would be better to only request them when needed
+// and then being granular so that we can cache each resource
+function getSettings() {
+  // need a single row from setting
+  // session => user single row load json field
+  $user = getUserSettings();
+  return array(
+    'site' => getPublicSiteSettings(),
+    'user' => $user['settings'],
+  );
 }
 
 function getAllSiteSettings() {
