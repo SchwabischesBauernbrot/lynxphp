@@ -8,8 +8,10 @@ include '../common/post_vars.php';
 $req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 
-//echo "req_path[$req_path]<br>\n";
-if ((($req_path !== '/login.php' && $req_method !== 'POST') || $req_path === '/logout.php') && strpos($req_path, '/.youtube') === false) {
+//echo "req_path[$req_path] req_method[$req_method]<br>\n";
+if ((($req_path !== '/signup.php' && $req_method !== 'POST') ||
+    ($req_path !== '/login.php' && $req_method !== 'POST') ||
+    $req_path === '/logout.php') && strpos($req_path, '/.youtube') === false) {
   echo '<div style="height: 40px;"></div>', "\n"; flush();
 }
 
@@ -191,9 +193,19 @@ foreach($packages as $pkg) {
 // or define a set of functions
 // functions can be variables...
 
+function getRoute($idealUrl, $noRewrite) {
+  // FIXME: get config value to set this
+  if (0) {
+    return $noRewrite;
+  } else {
+    return $idealUrl;
+  }
+}
+
 // FIXME: we should be getting page content and wrapping it here...
 // FIXME: move into routes and the caching layer can go here too
-$router->post('/boards.php', function() {
+// but each handle is best to determine what portals need to be wrapped
+$router->post(getRoute('/boards', '/boards.php'), function() {
   getBoardsHandler();
 });
 $router->get('/boards.php', function() {
@@ -205,7 +217,7 @@ $router->get('/boards', function() {
 });
 
 // FIXME: move into module
-$router->get('/overboard.php', function() {
+$router->get(getRoute('/overboard', '/overboard.php'), function() {
   getOverboardHandler();
 });
 
@@ -311,43 +323,67 @@ $router->post('/:uri/post', function($request) {
   }
 });
 
-$router->get('/signup.php', function() {
+$signupRoute = getRoute('/signup', '/signup.php');
+$router->get($signupRoute, function() {
   getSignup();
 });
-$router->post('/signup.php', function() {
+$router->post($signupRoute, function() {
   postSignup();
 });
-$router->get('/login.php', function() {
+$loginRoute = getRoute('/forms/login', '/login.php');
+$router->get($loginRoute, function() {
   getLogin();
 });
-$router->post('/forms/login', function() {
+$router->post($loginRoute, function() {
   postLogin();
 });
-$router->get('/control_panel.php', function() {
+
+$router->get(getRoute('/control_panel', '/control_panel.php'), function() {
   getControlPanel();
 });
-$router->get('/create_board.php', function() {
+$router->get(getRoute('/account', '/account.php'), function() {
+  getAccountSettings();
+});
+
+$change_userpassRoute = getRoute('/account/change_userpass', '/account/change_userpass.php');
+$router->get($change_userpassRoute, function() {
+  getChangeUserPass();
+});
+$router->post($change_userpassRoute, function() {
+  postChangeUserPass();
+});
+
+$change_emailRoute = getRoute('/account/change_email', '/account/change_email.php');
+$router->get($change_emailRoute, function() {
+  getChangeEmail();
+});
+$router->post($change_emailRoute, function() {
+  postChangeEmail();
+});
+
+$cbRoute = getRoute('/create_board', '/create_board.php');
+$router->get($cbRoute, function() {
   getCreateBoard();
 });
-$router->post('/create_board.php', function() {
+$router->post($cbRoute, function() {
   postCreateBoard();
 });
 
-$router->get('/admin.php', function() {
+$router->get(getRoute('/admin', '/admin.php'), function() {
   getAdminPage();
 });
-$router->get('/admin/modules', function() {
+$router->get(getRoute('/admin/modules', '/admin/modules.php'), function() {
   getAdminModulesPage();
 });
-$router->get('/admin/install', function() {
+$router->get(getRoute('/admin/install', '/admin/install.php'), function() {
   getAdminInstallPage();
 });
 
-$router->get('/global.php', function() {
+$router->get(getRoute('/global', '/global.php'), function() {
   getGlobalPage();
 });
 
-$router->get('/logout.php', function() {
+$router->get(getRoute('/logout', '/logout.php'), function() {
   getLogout();
 });
 
