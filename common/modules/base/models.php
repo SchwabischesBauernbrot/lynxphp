@@ -21,9 +21,10 @@ $config_model = array(
 $user_model = array(
   'name'   => 'user',
   'fields' => array(
-    'username' => array('type' => 'str'),
-    'email'    => array('type' => 'str'),
-    'password' => array('type' => 'str'),
+    //'username'  => array('type' => 'str'),
+    //'email'     => array('type' => 'str'),
+    //'password'  => array('type' => 'str'),
+    'publickey' => array('type' => 'str'),
   )
 );
 
@@ -35,6 +36,17 @@ $user_session_model = array(
     'expires'  => array('type' => 'int'),
     // if IP gets leaked somehow, make the session invalid
     'ip'       => array('type' => 'str'),
+  )
+);
+
+$auth_challenges_model = array(
+  'name'   => 'auth_challenge',
+  'fields' => array(
+    'challenge' => array('type' => 'str'),
+    'publickey' => array('type' => 'str'),
+    'expires'   => array('type' => 'int'),
+    // if IP gets leaked somehow, make the session invalid
+    'ip'        => array('type' => 'str'),
   )
 );
 
@@ -51,6 +63,7 @@ $board_model = array(
     //'sfw_board' => array('type' => 'bool'),
     // stats? stat summary?
     // super basic settings?
+    //'posts' => array('type' => 'int'),
   )
 );
 
@@ -131,9 +144,9 @@ $board_user_model = array(
   'name' => 'board_user',
   'indexes' => array('boarid', 'userid'),
   'fields' => array(
-    'boardid' => array('type'=>'integer'),
-    'userid' => array('type'=>'integer'),
-    'groupid' => array('type'=>'integer'),
+    'boardid'   => array('type'=>'integer'),
+    'userid'    => array('type'=>'integer'),
+    'groupid'   => array('type'=>'integer'),
   )
 );
 
@@ -173,12 +186,34 @@ $request_model = array(
   )
 );
 
+/*
+// multi-site support
+$sites_model = array(
+  'name' => 'site_sites',
+  'fields' => array(
+    'name' => array('type'=>'str'),
+  ),
+);
+*/
+
 $settings_model = array(
   'name' => 'site_setting',
   'fields' => array(
+    'siteid' => array('type'=>'int'),
     'changedby' => array('type'=>'int'),
   ),
 );
+
+// frontends blacklist option?
+/*
+$frontends_model = array(
+  'name' => 'site_frontends',
+  'fields' => array(
+    'siteid' => array('type'=>'int'),
+    //'key'    => array('type'=>'str'),
+  ),
+);
+*/
 
 global $db, $models;
 
@@ -189,7 +224,10 @@ $db->autoupdate($board_model);
 $db->autoupdate($usergroup_model);
 $db->autoupdate($group_model);
 $db->autoupdate($request_model);
+//$db->autoupdate($sites_model);
 $db->autoupdate($settings_model);
+//$db->autoupdate($frontends_model);
+$db->autoupdate($auth_challenges_model);
 
 // for each board set up:
 // a posts_model table
@@ -208,7 +246,10 @@ $models = array(
   'group'     => $group_model,
   'usergroup' => $usergroup_model,
   'request'   => $request_model,
+  //'site'      => $sites_model,
   'setting'   => $settings_model,
+  'auth_challenge' => $auth_challenges_model,
+  //'frontend'  => $frontends_model,
 );
 
 
