@@ -7,7 +7,7 @@ function getUserSettings($userid = 'default') {
   }
   //echo "userid[$userid]<br>\n";
   // are we logged in?
-  if (!$userid) {
+  if ($userid) {
     // put it into our settings
     $userRow = getAccount($userid);
     if (!$userRow) {
@@ -63,7 +63,7 @@ function getPublicSiteSettings() {
   global $db, $models;
   $row1 = $db->findById($models['setting'], 1);
   // create ID 1 if needed
-  if ($row1) {
+  if (!$row1) {
     $db->insert($models['setting'], array(
       // 'settingid'=>1,
       array('changedby' => 0),
@@ -90,7 +90,7 @@ function getAllSiteSettings() {
   global $db, $models;
   $settings = $db->findById($models['setting'], 1);
   // create ID 1 if needed
-  if ($settings === false) {
+  if (!$settings) {
     $db->insert($models['setting'], array(
       // 'settingid'=>1,
       array('changedby' => 0),
