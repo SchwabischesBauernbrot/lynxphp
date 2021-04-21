@@ -350,7 +350,7 @@ function make_audio_thumbnail_ffmpeg($filePath, $width, $height, $duration = 1) 
 function processFiles($boardUri, $files_json, $threadid, $postid) {
   $issues = array();
   $files = json_decode($files_json, true);
-  if ($files === false) {
+  if ($files === null) {
     $issues[] = 'json decode failure: ' . $files_json;
     return $issues;
   }
