@@ -12,7 +12,7 @@ foreach($boards as $b) {
   if ($b['threads']) {
     $posts_model = getPostsModel($b['uri']);
     $newestThreadRes = $db->find($posts_model, array('criteria'=>array(
-        array('threadid', '=', 0), // 1 query
+      array('threadid', '=', 0), // 1 query
     ), 'limit' => '1', 'order'=>'updated_at desc'));
     $newestThread = $db->toArray($newestThreadRes);
     $db->free($newestThreadRes);
@@ -27,7 +27,9 @@ krsort($res);
 // top 10
 $res = array_slice($res, 0, 10);
 
-$settings = getPublicSiteSettings();
+// FIXME: not very cacheable like this...
+$settings = getSettings();
+
 // recent posts/images?
 // are we trying to be lynxchan compatible?
 sendResponse(array(
