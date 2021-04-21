@@ -104,12 +104,11 @@ function expectJson($json, $endpoint = '', $options = array()) {
     // let's just handle 401s globally here
     if ($obj['meta']['code'] === 401) {
       //echo "<hr><hr><hr>\n";
+      if (IN_TEST) {
+        return $obj;
+      } else
       if (DEV_MODE) {
-        if (IN_TEST) {
-          return $obj;
-        } else {
-          echo "<pre>Got a 401 [$json] for [", $endpoint, ']via[', isset($options['method']) ? $options['method'] : 'AUTO' ,"]</pre>\n";
-        }
+        echo "<pre>Got a 401 [$json] for [", $endpoint, ']via[', isset($options['method']) ? $options['method'] : 'AUTO' ,"]</pre>\n";
       } else {
         // FIXME get named route
         return redirectTo(BASE_HREF . 'forms/login');
