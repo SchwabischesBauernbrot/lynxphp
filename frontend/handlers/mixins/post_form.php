@@ -104,23 +104,18 @@ function renderPostForm($boardUri, $url, $options = false) {
     'message'  => array('type' => 'textarea',      'label' => 'Message', 'autocomplete' => 'off'),
     'files'    => array('type' => 'multidropfile', 'label' => 'Files',
       'postlabel' => 'Max ' . $maxfiles . ' files</small><small>' . number_abbr($maxfilesize) . ' total'),
+    // FIXME: remove if logged in (not needed)
     'postpassword' => array('type' => 'password',      'label' => 'Passwords', 'maxlength' => 50),
   );
-  $formOptions = array(
+  $formOptions = array_merge(jsChanStyle(), array(
     'buttonLabel' => 'New ' . $type,
-    'useSections' => true,
-    'wrapClass'   => 'row',
-    'labelClass'  => 'label',
-    'formClass'   => 'form-post',
     'formId'      => 'postform',
     'postFormTag' => '
     <section class="row jsonly">
       <div class="noselect" id="dragHandle">New ' . $type . '</div>
       <a class="close postform-style" href="' . $_SERVER['REQUEST_URI'] . '#!">X</a>
     </section>',
-    //'labelwrap' => 'div',
-    //'labelwrapclass' => 'label',
-  );
+  ));
   $io = array(
     'boardUri'   => $boardUri,
     'type'       => $type,
