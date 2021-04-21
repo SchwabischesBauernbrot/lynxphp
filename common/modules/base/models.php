@@ -21,9 +21,9 @@ $config_model = array(
 $user_model = array(
   'name'   => 'user',
   'fields' => array(
-    //'username'  => array('type' => 'str'),
-    //'email'     => array('type' => 'str'),
-    //'password'  => array('type' => 'str'),
+    'username'  => array('type' => 'str'),
+    'password'  => array('type' => 'str'),
+    'email'     => array('type' => 'str'),
     'publickey' => array('type' => 'str'),
   )
 );
