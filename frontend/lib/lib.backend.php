@@ -63,49 +63,58 @@ function consume_beRsrc($options, $params = '') {
     $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
   //echo "<pre>responseText[$responseText]</pre>\n";
   if (!empty($options['expectJson']) || !empty($options['unwrapData'])) {
-    $obj = json_decode($responseText, true);
-    if ($obj === NULL) {
-      if (!empty($options['inWrapContent'])) {
-        echo 'Backend error (consume_beRsrc): ' .  $options['endpoint'] .
-          ': ' . $responseText, "\n";
-      } else {
-        wrapContent('Backend error (consume_beRsrc): ' .  $options['endpoint']
-          . ': ' . $responseText . '' . "\n");
-      }
-      return;
+    $obj = expectJson($responseText, $options['endpoint'], $options);
+    if ($obj) {
+      if (!empty($options['unwrapData'])) return $obj['data'];
     }
-    // meta processing?
-    if (!empty($obj['meta'])) {
-      if (isset($obj['meta']['board'])) {
-        global $boardData;
-        $boardData = $obj['meta']['board'];
-      }
-      if (isset($obj['meta']['board']['settings'])) {
-        global $board_settings;
-        $board_settings = $obj['meta']['board']['settings'];
-      }
-      // let's just handle 401s globally here
-      if ($obj['meta']['code'] === 401) {
-        //echo "<hr><hr><hr>\n";
-        if (DEV_MODE) {
-          echo "<pre>Got a 401 [$responseText] for [", $options['endpoint'], ']via[', $options['method'],"]</pre>\n";
-        } else {
-          return redirectTo('/login.php');
-        }
-      }
-    }
-    // this hides 401s... we need to handle and pass back problems better...
-    if (!empty($options['unwrapData'])) return $obj['data'];
     return $obj;
   }
   return $responseText;
 }
 
-function expectJson($json, $endpoint = '') {
+function expectJson($json, $endpoint = '', $options = array()) {
   $obj = json_decode($json, true);
   if ($obj === NULL) {
-    wrapContent('Backend JSON parsing error: ' .  $endpoint . ': ' . $json);
+    if (!empty($options['inWrapContent'])) {
+      echo 'Backend error (consume_beRsrc): ' .  $endpoint . ': ' . $json, "\n";
+    } else {
+      wrapContent('Backend JSON parsing error: ' .  $endpoint . ': ' . $json . "\n");
+    }
     return false;
+  }
+  if (!empty($obj['err']) && $obj['err'] === 'BACKEND_KEY') {
+    if (!empty($options['inWrapContent'])) {
+      echo 'Backend configuration error: ' .  $obj['message'], "\n";
+    } else {
+      wrapContent('Backend configuration error: ' .  $obj['message'] . "\n");
+    }
+    exit(1);
+    return false;
+  }
+  // meta processing?
+  if (!empty($obj['meta'])) {
+    if (isset($obj['meta']['board'])) {
+      global $boardData;
+      $boardData = $obj['meta']['board'];
+    }
+    if (isset($obj['meta']['board']['settings'])) {
+      global $board_settings;
+      $board_settings = $obj['meta']['board']['settings'];
+    }
+    // let's just handle 401s globally here
+    if ($obj['meta']['code'] === 401) {
+      //echo "<hr><hr><hr>\n";
+      if (DEV_MODE) {
+        if (IN_TEST) {
+          return $obj;
+        } else {
+          echo "<pre>Got a 401 [$json] for [", $endpoint, ']via[', isset($options['method']) ? $options['method'] : 'AUTO' ,"]</pre>\n";
+        }
+      } else {
+        // FIXME get named route
+        return redirectTo(BASE_HREF . 'forms/login');
+      }
+    }
   }
   return $obj;
 }
@@ -124,6 +133,7 @@ function postExpectJson($endpoint, $postData) {
 
 function getBoards($params = false) {
   //$boards = getExpectJson('4chan/boards.json');
+  /*
   $qstr = '';
   if ($params) {
     $qstr = '?';
@@ -132,6 +142,14 @@ function getBoards($params = false) {
     }
   }
   $boards = getExpectJson('opt/boards.json'.$qstr);
+  */
+  $boards = consume_beRsrc(array(
+    'endpoint'    => 'opt/boards.json',
+    'querystring' => $params,
+    'sendSession' => true,
+    'expectJson'  => true,
+    //'unwrapData'  => true,
+  ));
   return $boards;
 }
 
@@ -205,6 +223,95 @@ function checkSession() {
   return expectJson($json, 'opt/session');
 }
 
+function getChallenge($pk) {
+  $json = curlHelper(BACKEND_BASE_URL . 'opt/getChallenge', array(
+    'i' => base64_encode($pk),
+  ), array('HTTP_X_FORWARDED_FOR' => getip()));
+  //echo "<pre>getChallenge[$json]</pre>\n";
+  $res = expectJson($json, 'opt/getChallenge');
+  if (empty($res['data']['cipherText64']) || empty($res['data']['serverPubkey64'])) {
+    return false;
+  }
+  return $res['data'];
+}
+
+function backendRegister($chal, $sig, $email = '') {
+  // chal and sig. optional: email
+  $json = curlHelper(BACKEND_BASE_URL . 'opt/registerAccount', array(
+    'chal' => $chal, 'sig' => $sig, 'email' => $email
+  ));
+  //echo "json[$json]<br>\n";
+  $res = expectJson($json, 'opt/registerAccount');
+  //echo "<pre>backendRegister", print_r($res, 1), "</pre>\n";
+  if ($res === false) {
+    // couldn't parse json
+    return;
+  }
+  // session/ttl/upgradedAccount
+  if (!empty($res['data']['session'])) {
+    setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
+    return true;
+  }
+  // error
+  return $res['meta'];
+}
+
+function backendVerify($chal, $sig, $user = '', $pass = '') {
+  // chal and sig. during migration phase: u, p
+  $json = curlHelper(BACKEND_BASE_URL . 'opt/verifyAccount', array(
+    'chal' => $chal, 'sig' => $sig, 'u' => $user, 'p' => $pass,
+  ), array('HTTP_X_FORWARDED_FOR' => getip()));
+  $res = expectJson($json, 'opt/verifyAccount');
+  //echo "<pre>backendVerify", print_r($res, 1), "</pre>\n";
+  if ($res === false) {
+    // couldn't parse json
+    return;
+  }
+  // session/ttl/upgradedAccount
+  if (!empty($res['data']['session'])) {
+    setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
+    //redirectTo('control_panel.php');
+  }
+  if (!empty($res['data']['upgradedAccount'])) {
+    echo "Account upgraded!<br>\n";
+    // ask about clearing out the email field?
+    echo "Your keyphrase is: ";
+  }
+  if (!empty($res['data']['session'])) {
+    return true;
+  }
+  // error
+  return $res['meta'];
+}
+
+function backendMigrateAccount($edPkBin) {
+  $json = curlHelper(BACKEND_BASE_URL . 'opt/migrateAccount', array(
+    'pk' => bin2hex($edPkBin),
+  ), array('sid' => $_COOKIE['session']));
+  $res = expectJson($json, 'opt/migrateAccount');
+  //echo "<pre>backendVerify", print_r($res, 1), "</pre>\n";
+  if ($res === false) {
+    // couldn't parse json
+    return;
+  }
+  return $res;
+}
+
+function backendChangeEmail($em) {
+  $json = curlHelper(BACKEND_BASE_URL . 'opt/changeEmail', array(
+    'em' => $em,
+  ), array('sid' => $_COOKIE['session']));
+  $res = expectJson($json, 'opt/changeEmail');
+  //echo "<pre>backendVerify", print_r($res, 1), "</pre>\n";
+  if ($res === false) {
+    // couldn't parse json
+    return;
+  }
+  return $res;
+}
+
+
+/*
 function backendLogin($user, $pass) {
   // login, password, email
   $json = curlHelper(BACKEND_BASE_URL . 'lynx/login', array(
@@ -223,6 +330,7 @@ function backendLogin($user, $pass) {
   }
   return $res['meta'];
 }
+*/
 
 function backendCreateBoard() {
   $json = curlHelper(BACKEND_BASE_URL . 'lynx/createBoard', array(
