@@ -75,7 +75,9 @@ function getBoardsHandler() {
 
   //print_r($params);
   $res = getBoards($params);
-  $boards = $res['data'];
+  $boards = $res['data']['boards'];
+  // FIXME: not very cacheable like this...
+  $settings = $res['data']['settings'];
   if ($reverse_list) {
     $boards = array_reverse($boards);
   }
@@ -167,8 +169,10 @@ function getBoardsHandler() {
 
   $content = str_replace('{{pages}}',  $page_html, $content);
   $content = str_replace('{{boards}}', $boards_html, $content);
+  // FIXME get named route
+  $content = str_replace('{{action}}', BASE_HREF . 'boards', $content);
 
-  wrapContent($content);
+  wrapContent($content, array('settings' => $settings));
 }
 
 // move into a module...
@@ -201,7 +205,7 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   //echo "pagenum[$pagenum]<br>\n";
   $boardThreads = backendGetBoardThreadListing($boardUri, $pagenum);
   if (!$boardThreads) {
-    wrapContent("There is a problem with the backend");
+    wrapContent("There is a problem with the backend [$boardUri]");
     return;
   }
   //echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
