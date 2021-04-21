@@ -93,7 +93,7 @@ function loggedIn() {
     sendResponse(array(), 401, 'No Session');
     return;
   }
-  if ($userid === null) {
+  if (!$userid) {
     // session does not exist
     sendResponse(array(), 401, 'Invalid Session');
     return;
