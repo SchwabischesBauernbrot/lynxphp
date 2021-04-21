@@ -1,17 +1,20 @@
+account identifier: {{login}}<br>
 {{admin}}
 {{global}}
-<a href="create_board.php">Create Board</a><br>
+<a href="{{account}}">Account Settings</a><br>
+<!-- make tag, userboards are configurable -->
+<a href="{{create_board}}">Create Board</a><br>
 Owned boards
 <ul>
 {{ownedBoards}}
 </ul>
-<a href="logout.php">Log out</a>
+<a href="{{logout}}">Log out</a>
 <!-- loop -->
   <li>{{uri}} <a href="{{uri}}">View</a> <a href="{{uri}}/settings">Settings</a>
 <!-- end -->
 <!-- loop -->
-  <a href="admin.php">Admin interface</a><br>
+  <a href="{{admin}}">Admin interface</a><br>
 <!-- end -->
 <!-- loop -->
-  <a href="global.php">Global interface</a><br>
+  <a href="{{global}}">Global interface</a><br>
 <!-- end -->
