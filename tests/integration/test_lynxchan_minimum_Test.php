@@ -29,7 +29,7 @@ final class test_lynxchan_minimum_Test extends TestCase {
       echo "lynx/registerAccount - failed to parse [$json] as json\n";
     }
     if (isset($res['meta']) && $res['meta']['code'] !== 200) {
-      echo "lynx/registerAccount - not 200 [", print_r($res, 1), "]\n";
+      echo "lynx/registerAccount - not 200 [", print_r($res, true), "]\n";
     }
     usesSendResponse($this, $res);
     $this->assertSame(200, $res['meta']['code']);
@@ -190,7 +190,7 @@ final class test_lynxchan_minimum_Test extends TestCase {
     }
     $this->assertIsArray($res);
     if (isset($res['meta']) && $res['meta']['code'] !== 200) {
-      echo "lynx/testAccount - not 200 [", print_r($res, 1), "]\n";
+      echo "lynx/testAccount - not 200 [", print_r($res, true), "]\n";
     }
     $this->assertArrayHasKey('noCaptchaBan', $res);
     $this->assertArrayHasKey('login', $res);
