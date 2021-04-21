@@ -122,7 +122,7 @@ function deletePost($boardUri, $postid, $options = false, $post = false) {
 
   // ensure post
   $posts_model = getPostsModel($boardUri);
-  if ($post === false) {
+  if ($posts_model === false) {
     $post = $db->findById($posts_model, $postid);
   }
 
