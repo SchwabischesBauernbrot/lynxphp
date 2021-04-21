@@ -16,7 +16,17 @@ if (!function_exists('getallheaders')) {
 function hasPostVars($fields) {
   foreach($fields as $field) {
     if (empty($_POST[$field])) {
-      wrapContent('Detected field "' . $field . '" is missing; ' . join(',', $fields) . ' are required');
+      wrapContent('Detected POST field "' . $field . '" is missing; ' . join(',', $fields) . ' are required');
+      return false;
+    }
+  }
+  return true;
+}
+
+function hasGetVars($fields) {
+  foreach($fields as $field) {
+    if (empty($_GET[$field])) {
+      wrapContent('Detected GET field "' . $field . '" is missing; ' . join(',', $fields) . ' are required');
       return false;
     }
   }
