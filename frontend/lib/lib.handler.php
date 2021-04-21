@@ -89,16 +89,16 @@ function loadTemplatesFile2($path) {
 }
 
 function wrapContent($content, $options = '') {
-  global $pipelines;
+  global $pipelines, $packages;
   // how do we hook in our admin group?
   // the data is only there if we asked for it...
   // could be a: global, pipeline or ??
   if (empty($options['settings'])) {
-    global $packages;
     // this can cause an infinite loop if backend has an error...
     $settings = $packages['base']->useResource('settings', false, array('inWrapContent'=>true));
   } else {
     $settings = $options['settings'];
+    //echo "<pre>", print_r($settings, 1), "</pre>\n";
   }
   if (empty($settings) || !is_array($settings)) {
     $siteSettings = array();
@@ -151,7 +151,7 @@ function wrapContent($content, $options = '') {
     curl_log_report();
     curl_log_clear();
   }
-  $result = $packages['base']->useResource('work', false, array('inWrapContent'=>true));
+  $result = $packages['base']->useResource('work', false, array('inWrapContent' => true));
   if (DEV_MODE) {
     $start = microtime(true);
   }
