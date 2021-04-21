@@ -1,5 +1,7 @@
 <?php
 
+define('IN_TEST', true);
+
 $host = getenv('USE_CONFIG');
 // argument overrides environment
 
