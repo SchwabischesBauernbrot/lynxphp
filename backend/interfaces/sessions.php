@@ -1,5 +1,7 @@
 <?php
 
+// by using a session, the frontend can purge it's secret ed key for nojs clients
+// so system-wide signatures have to be optional and for jsonly
 function createSession($userid) {
   global $now, $db, $models;
   $ttl = (int)$now + 86400; // 1 day from now
