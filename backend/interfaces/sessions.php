@@ -98,11 +98,6 @@ function loggedIn() {
     sendResponse(array(), 401, 'Invalid Session');
     return;
   }
-  if ($userid === false) {
-    // expired
-    sendResponse(array(), 401, 'Invalid Session');
-    return;
-  }
   return $userid;
 }
 
