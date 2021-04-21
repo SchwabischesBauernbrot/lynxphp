@@ -1,5 +1,30 @@
 <?php
 
+function jsChanStyle() {
+  return array(
+    'useSections' => true,
+    'wrapClass'   => 'row',
+    'labelClass'  => 'label',
+    'formClass'   => 'form-post',
+    //'labelwrap' => 'div',
+    //'labelwrapclass' => 'label',
+  );
+}
+
+// FIXME: maybe a width constraint?
+function simpleForm($action, $formFields, $button) {
+  // FIXME: pipeline
+  $formOptions = array_merge(jsChanStyle(), array(
+    'buttonLabel' => $button,
+  ));
+  // FIXME: pipeline
+  $values = array();
+  foreach($formFields as $f => $row) {
+    $values[$f] = getOptionalPostField($f);
+  }
+  return generateForm($action, $formFields, $values, $formOptions);
+}
+
 function generateForm($action, $fields, $values, $options = false) {
   global $pipelines;
   $labelwrap1 = '';
@@ -44,6 +69,7 @@ function generateForm($action, $fields, $values, $options = false) {
       $postFormTag = $options['postFormTag'] . "\n";
     }
   }
+  // FIXME: detect multidropfile/image
   $html = '<form' . $formClass . $formId . ' action="' . $action . '" method="post" enctype="multipart/form-data">' . "\n" . $postFormTag;
 
 
@@ -120,7 +146,7 @@ function generateForm($action, $fields, $values, $options = false) {
       break;
       case 'password':
         // always blank and can't be cleared
-        $html .= '<input type=text name="'.$field.'">';
+        $html .= '<input type=password name="'.$field.'">';
       break;
       case 'integer':
       case 'number':
@@ -143,6 +169,7 @@ function generateForm($action, $fields, $values, $options = false) {
         $html .= '<input id="'.$field.'" type=checkbox name="'.$field.'" value="1"'.$checked.'>';
       break;
       case 'captcha':
+        // great for keeping the size of this file down
         $io = array(
           'field'   => $field,
           'details' => $details,
@@ -179,6 +206,7 @@ function generateForm($action, $fields, $values, $options = false) {
       break;
       default:
         //echo "No such type [", $details['type'], "]<br>\n";
+        // FIXME: registry
         $html .= 'Error unknown type '.$details['type'].', skipping ';
       break;
     }
