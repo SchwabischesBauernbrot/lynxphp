@@ -4,24 +4,32 @@ function getControlPanel() {
   $account = backendLynxAccount();
   // you only get meta if error
   if (!$account || (!empty($account['meta']) && $account['meta']['code'] === 401)) {
-    redirectTo(BASE_HREF . 'login.php');
+    // FIXME get named route
+    redirectTo(BASE_HREF . 'forms/login');
     return;
   }
 
   $templates = loadTemplates('account');
   $tmpl = $templates['header'];
   $board_html = $templates['loop0'];
-  $admin_html = $templates['loop1'];
-  $global_html = $templates['loop2'];
+  $admin_tmpl = $templates['loop1'];
+  $global_tmpl = $templates['loop2'];
 
   $isAdmin = false;
   $isGlobal = false;
+  $admin_html = '';
+  $global_html = '';
   if (isset($account['groups'])) {
     $isAdmin = in_array('admin', $account['groups']);
     $isGlobal = in_array('global', $account['groups']);
+    // FIXME get named route
+    if ($isAdmin) {
+      $admin_html = str_replace('{{admin}}', BASE_HREF . 'admin', $admin_tmpl);
+    }
+    if ($isGlobal) {
+      $global_html = str_replace('{{global}}', BASE_HREF . 'global', $global_tmpl);
+    }
   }
-  $tmpl = str_replace('{{admin}}', $isAdmin ? $admin_html : '', $tmpl);
-  $tmpl = str_replace('{{global}}', $isGlobal ? $global_html : '', $tmpl);
 
   $boards_html = '';
   if (isset($account['ownedBoards']) && is_array($account['ownedBoards'])) {
@@ -31,27 +39,32 @@ function getControlPanel() {
       $boards_html .= $tmp;
     }
   }
-  $tmpl = str_replace('{{ownedBoards}}', $boards_html, $tmpl);
-  wrapContent($tmpl);
+  $tags = array(
+    'login' => $account['login'],
+    // FIXME get named route
+    'account' => BASE_HREF . 'account',
+    'create_board' => BASE_HREF . 'create_board',
+    'logout' => BASE_HREF . 'logout',
+    'admin' => $isAdmin ? $admin_html : '',
+    'global' => $isGlobal ? $global_html : '',
+    'ownedBoards' => $boards_html,
+  );
+  wrapContent(replace_tags($tmpl, $tags));
 }
 
-function getCreateBoardFrom() {
-  return <<< EOB
-<form action="create_board.php" method="POST">
-  <dl>
-    <dt>URI
-    <dd><input type=text name="uri" placeholder="Board URI">
-    <dt>Title
-    <dd><input type=text name="title" placeholder="Board title">
-    <dt>Description
-    <dd><textarea name="description" placeholder="Board description"></textarea>
-  <input type=submit value="create">
-</form>
-EOB;
+function getCreateBoardForm() {
+  $formFields = array(
+    'uri' => array('type' => 'text', 'label' => 'Board URI'),
+    'title' => array('type' => 'text', 'label' => 'Board title'),
+    'description' => array('type' => 'textarea', 'label' => 'Board description'),
+  );
+  // FIXME: pipeline
+  // FIXME get named route
+  return simpleForm(BASE_HREF . 'create_board', $formFields, 'Create board');
 }
 
 function getCreateBoard() {
-  wrapContent(getCreateBoardFrom());
+  wrapContent(getCreateBoardForm());
 }
 
 function postCreateBoard() {
@@ -59,7 +72,8 @@ function postCreateBoard() {
   if ($result['data'] === 'ok') {
     // maybe not display this?
     //wrapContent('Board created!');
-    redirectTo('control_panel.php');
+    // FIXME get named route
+    redirectTo(BASE_HREF . 'control_panel');
     /*
     $uri = $_POST['uri'];
     redirectTo($uri . '/settings');
@@ -67,7 +81,81 @@ function postCreateBoard() {
     return;
   }
   $tmpl = "Error: Board creation error: " . $result['meta']['err'] . "<br>\n";
-  wrapContent($tmpl . getCreateBoardFrom());
+  wrapContent($tmpl . getCreateBoardForm());
+}
+
+function getAccountPortalNav() {
+  // FIXME get named route
+  $navItems = array(
+    'Change username/password' => BASE_HREF . 'account/change_userpass',
+    'Change recovery email' => BASE_HREF . 'account/change_email',
+  );
+  // FIXME: pipeline
+  return getNav2($navItems);
+}
+
+function getAccountPortal($options = false) {
+  return array(
+    'header' => '' . getAccountPortalNav(),
+    'footer' => ''
+  );
+}
+
+function getChangeUserPassForm() {
+  // set up form
+  $formFields = array(
+    'username' => array('type' => 'text', 'label' => 'New Username'),
+    'password' => array('type' => 'password', 'label' => 'New Password (Minimum 16 chars, we recommend using a pass phrase)'),
+  );
+  // FIXME: pipeline
+  // FIXME get named route
+  return simpleForm(BASE_HREF . 'account/change_userpass', $formFields, 'Migrate account');
+}
+
+function getChangeEmailForm() {
+  // set up form
+  $formFields = array(
+    'email' => array('type' => 'email', 'label' => 'Recovery Email (we suggest using a burner/temp one)'),
+  );
+  // FIXME: pipeline
+  // FIXME get named route
+  return simpleForm(BASE_HREF . 'account/change_email', $formFields, 'Change recovery email');
+}
+
+function getChangeUserPass() {
+  $accountPortal = getAccountPortal();
+  wrapContent($accountPortal['header'] . getChangeUserPassForm() . $accountPortal['footer']);
+}
+
+function postChangeUserPass() {
+  $eKp = getEdKeypair($user, $pass);
+  $res = backendMigrateAccount($eKp['pk']);
+  if (!empty($res['data'])) {
+    // FIXME get named route
+    redirectTo(BASE_HREF . 'account?message=' . urlencode('Account migrated'));
+  } else {
+    wrapContent('Error: ' . print_r($res) . getChangeEmailForm());
+  }
+}
+
+function getChangeEmail() {
+  $accountPortal = getAccountPortal();
+  wrapContent($accountPortal['header'] . getChangeEmailForm() . $accountPortal['footer']);
+}
+
+function postChangeEmail() {
+  $res = backendChangeEmail($_POST['email']);
+  if (!empty($res['data'])) {
+    // FIXME get named route
+    redirectTo(BASE_HREF . 'account?message=' . urlencode('Recovery email changed'));
+  } else {
+    wrapContent('Error: ' . print_r($res) .  getChangeEmailForm());
+  }
+}
+
+function getAccountSettings() {
+  $msg = getQueryField('message');
+  wrapContent($msg . getAccountPortalNav());
 }
 
 ?>
