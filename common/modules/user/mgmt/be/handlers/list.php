@@ -26,18 +26,26 @@ $models['user']['children'] = array(
     'type'    => 'left',
     'model'   => $models['usergroup'],
     'pluck'   => array(),
-    'groupby' => 'users.userid',
+    'groupby' => array('users.userid'),
   )
 );
 // we need to group by userid
 
 // FIXME: pagination
-
-$res = $db->find($models['user'], array('order' => 'userid'));
+$criteria = array();
+$pk = getOptionalPostField('publickey');
+if ($pk) {
+  $criteria['publickey'] = $pk;
+}
+$em = getOptionalPostField('email');
+if ($em) {
+  $criteria['email'] = hash('sha512', BACKEND_KEY . $em . BACKEND_KEY);
+}
+$res = $db->find($models['user'], array('criteria' => $criteria, 'order' => 'userid'));
 $arr = $db->toArray($res);
 //print_r($arr);
 $users = pluck($arr, array(
-  'userid', 'username', 'email', 'created_at', 'updated_at', 'groupnames'
+  'userid', 'publickey', 'created_at', 'updated_at', 'groupnames'
 ));
 // include owned boards, groups...
 sendResponse($users);
