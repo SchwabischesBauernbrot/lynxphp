@@ -16,8 +16,10 @@ $pipelines[PIPELINE_BOARD_SETTING_GENERAL]->execute($fields);
 
 // fields will keep the settings_ prefix
 // so we need to flatten our settings
-foreach($values['settings'] as $k => $v) {
-  $values['settings_' . $k] = $v;
+if (isset($values['settings']) && is_array($values['settings'])) {
+  foreach($values['settings'] as $k => $v) {
+    $values['settings_' . $k] = $v;
+  }
 }
 unset($values['settings']);
 
