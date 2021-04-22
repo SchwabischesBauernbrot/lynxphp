@@ -3,8 +3,17 @@
 // FIXME: we need access to package
 $params = $getHandler();
 
-// get a list of users from backend
-$users = $pkg->useResource('list');
+if (isset($_POST['publickey']) || isset($_POST['email'])) {
+  //echo "Searching<br>\n";
+  $users = $pkg->useResource('list_search', array(
+    'publickey' => getOptionalPostField('publickey'),
+    'email'     => getOptionalPostField('email'),
+  ));
+  //echo "users[", gettype($users), "][", print_r($users, 1), "]<br>\n";
+} else {
+  // get a list of users from backend
+  $users = $pkg->useResource('list');
+}
 //print_r($users);
 // userid, username, email, created_at, updated_at
 
@@ -21,20 +30,27 @@ $tmpl = str_replace('{{users}}', $header, $templates['loop2']);
 // add link
 // list
 $users_html = '';
+$formFields = array();
 if (is_array($users)) {
   foreach($users as $user) {
     $tmp = $user_tmpl;
     $tmp = str_replace('{{id}}',         $user['userid'],     $tmp);
-    $tmp = str_replace('{{username}}',   $user['username'],   $tmp);
-    $tmp = str_replace('{{email}}',      $user['email'],      $tmp);
-    $tmp = str_replace('{{groups}}',     $user['groupnames'],     $tmp);
+    $tmp = str_replace('{{publickey}}',  $user['publickey'] ? $user['publickey'] : 'not migrated yet',  $tmp);
+    $tmp = str_replace('{{groups}}',     $user['groupnames'], $tmp);
     $tmp = str_replace('{{created_at}}', $user['created_at'], $tmp);
     $tmp = str_replace('{{updated_at}}', $user['updated_at'], $tmp);
     $users_html .= $tmp;
   }
+  $formFields = array(
+    'publickey' => array('type' => 'text', 'label' => 'Public Key'),
+    'email'     => array('type' => 'text', 'label' => 'Recovery Email'),
+  );
 }
-//$tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
-$tmpl = str_replace('{{users}}', $users_html, $tmpl);
-wrapContent($adminPortalHdr . $tmpl);
+
+$tags = array(
+  'searchForm' => simpleForm('admin/users', $formFields, 'search'),
+  'users' => $users_html,
+);
+wrapContent($adminPortalHdr . replace_tags($tmpl, $tags));
 
 ?>
