@@ -2,7 +2,7 @@
 
 $params = $get();
 
-$boards = listBoards();
+$boards = listBoards(array('publicOnly' => true));
 
 // we need to sort this...
 global $db;
