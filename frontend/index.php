@@ -9,11 +9,19 @@ $req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 
 //echo "req_path[$req_path] req_method[$req_method]<br>\n";
+// not POSTING to this page or this page or ANY this page
+// and reqpath does not have .youtube
 if ((($req_path !== '/signup.php' && $req_method !== 'POST') ||
     ($req_path !== '/login.php' && $req_method !== 'POST') ||
-    $req_path === '/logout.php') && strpos($req_path, '/.youtube') === false) {
+    $req_path !== '/logout.php') && strpos($req_path, '/.youtube') === false) {
   echo '<div style="height: 40px;"></div>', "\n"; flush();
-}
+} /* else {
+  echo "one[", ($req_path !== '/signup.php' && $req_method !== 'POST'), "]<bR>\n";
+  echo "two[", ($req_path !== '/login.php' && $req_method !== 'POST'), "]<bR>\n";
+  echo "333[", ($req_path === '/logout.php' && $req_method !== 'POST'), "]<bR>\n";
+  echo "444[", (strpos($req_path, '/.youtube') === false), "]<bR>\n";
+  echo "req_path[$req_path] req_method[$req_method]<br>\n";
+} */
 
 // load frontend config
 include 'config.php';
