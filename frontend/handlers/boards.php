@@ -484,15 +484,17 @@ function getBoardCatalogHandler($boardUri) {
         $tmp = str_replace('{{uri}}', $boardUri, $tmp);
         $tmp = str_replace('{{jstime}}', gmdate('Y-m-d', $thread['created_at']) . 'T' . gmdate('H:i:s.v', $thread['created_at']) . 'Z', $tmp);
         $tmp = str_replace('{{human_created_at}}', gmdate('n/j/Y H:i:s', $thread['created_at']), $tmp);
-        // FIXME: enable image
+        /*
         $tile_image = '<a href="' . BASE_HREF . $boardUri . '/thread/' .
           $thread['no']. '.html#' . $thread['no'] .
-          '"><img src="images/imagelessthread.png" width=64 height=64></a>';
+          '"><img src="images/imagelessthread.png" width=209 height=64></a><br>';
+        */
+        $tile_image = '';
         if (isset($thread['files']) && count($thread['files'])) {
           $tile_image = $image_template;
           $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
           $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
-          $tile_image = str_replace('{{file}}', 'backend/' . $thread['files'][0]['path'], $tile_image);
+          //$tile_image = str_replace('{{file}}', 'backend/' . $thread['files'][0]['path'], $tile_image);
           $tile_image = str_replace('{{thumb}}', getThumbnail($thread['files'][0], 209), $tile_image);
           /*
           $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
@@ -500,6 +502,11 @@ function getBoardCatalogHandler($boardUri) {
           $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
           $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
         */
+        } else {
+          $tile_image = $image_template;
+          $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
+          $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
+          $tile_image = str_replace('{{thumb}}', '<img src="images/imagelessthread.png" width=209 height=64>', $tile_image);
         }
         $tmp = str_replace('{{tile_image}}', $tile_image, $tmp);
         $tmp = str_replace('{{replies}}', $thread['reply_count'], $tmp);
