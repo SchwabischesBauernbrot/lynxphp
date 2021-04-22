@@ -7,6 +7,11 @@ return array(
         'route'   => '/admin/users',
         'handler' => 'list',
       ),
+      array(
+        'route'   => '/admin/users',
+        'method'  => 'POST',
+        'handler' => 'list',
+      ),
     ),
     'forms' => array(
       array(
