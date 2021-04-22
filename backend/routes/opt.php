@@ -104,7 +104,11 @@ $router->get('/boards.json', function($request) {
   // updated_at isn't good enough, last
   $sortByField = $sort === 'popularity' ? 'posts' : 'last';
 
-  $boards = listBoards($sort, $search);
+  $boards = listBoards(array(
+    'search'     => $search,
+    'sort'       => $sort,
+    'publicOnly' => true,
+  ));
   $res = array();
   $noLast = array();
   foreach($boards as $b) {
