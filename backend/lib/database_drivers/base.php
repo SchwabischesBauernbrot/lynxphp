@@ -421,7 +421,7 @@ class database_driver_base_class {
       $sql .= "\n" . join("\n", $data['joins']);
       $useAlias = $tableName;
     }
-    if (isset($options['criteria'])) {
+    if (isset($options['criteria']) && count($options['criteria'])) {
       // I don' think we need this...
       //$this->typeCriteria($rootModel, $options['criteria']);
       $sql .= "\n" . 'where ' . $this->build_where($options['criteria'], $useAlias);
