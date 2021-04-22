@@ -17,18 +17,29 @@ function boardDBtoAPI(&$row) {
 }
 
 // get list of boards
-function listBoards($sort = 'popularity', $search = '') {
+// $sort = 'popularity', $search = ''
+function listBoards($options = false) {
   global $db, $models;
-  $options = array();
-  if ($search) {
-    $options['criteria'] = array(
-      '(',
-      'or',
-      array('uri', 'like', '%' . $search . '%'),
-      array('title', 'like', '%' . $search . '%'),
-      array('description', 'like', '%' . $search . '%'),
-      ')',
-    );
+
+  $qOptions = array();
+  $filterPublic = false;
+  if ($options !== false && is_array($options)) {
+    if (!empty($options['search'])) {
+      $qOptions['criteria'] = array(
+        '(',
+        'or',
+        array('uri', 'like', '%' . $search . '%'),
+        array('title', 'like', '%' . $search . '%'),
+        array('description', 'like', '%' . $search . '%'),
+        ')',
+      );
+    }
+    // don't need to do this here?
+    //if (!empty($options['sort'])) { }
+    // this will fuck with the paging...
+    if (!empty($options['publicOnly'])) {
+      $filterPublic = true;
+    }
   }
   $boardsModel = $models['board'];
   /*
@@ -39,11 +50,20 @@ function listBoards($sort = 'popularity', $search = '') {
     $options['order'] = 'updated_at';
   }
   */
-  $res = $db->find($boardsModel, $options);
+  $res = $db->find($boardsModel, $qOptions);
   $boards = array();
   while($row = $db->get_row($res)) {
+    if ($filterPublic) {
+      $json = json_decode($row['json'], true);
+    }
     boardDBtoAPI($row);
-    $boards[] = $row;
+    if ($json) {
+      if (empty($json['settings']['notpublic'])) {
+        $boards[] = $row;
+      }
+    } else {
+      $boards[] = $row;
+    }
   }
   $db->free($res);
   return $boards;
