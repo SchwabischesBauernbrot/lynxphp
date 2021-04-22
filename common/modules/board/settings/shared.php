@@ -23,6 +23,10 @@ return array(
       'label' => 'Allow Not Safe For Work content',
       'type'  => 'checkbox',
     ),
+    'settings_notpublic' => array(
+      'label' => 'Hide board',
+      'type'  => 'checkbox',
+    ),
     /*
     'logo' => array(
       'label' => 'Site Logo',
