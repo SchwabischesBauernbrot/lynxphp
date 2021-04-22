@@ -125,7 +125,7 @@ $json = curlHelper(BACKEND_BASE_URL . '/opt/boards.json');
 $result = json_decode($json, true);
 //echo "<pre>", print_r($result, 1), "</pre>";
 echo '<ul>';
-foreach($result['data'] as $b) {
+foreach($result['data']['boards'] as $b) {
   // threads, posts, udpated_at
   echo '<li>', $b['uri'], ' owned by ', $b['owner_id'], "\n";
   $path = 'backend/storage/boards/' . $b['uri'];
@@ -139,6 +139,6 @@ foreach($result['data'] as $b) {
 }
 echo '</ul>';
 
-echo "If it makes it this far in the script, then everything is a-ok<br>\n";
+echo "Everything seems a-ok<br>\n";
 
 ?>
