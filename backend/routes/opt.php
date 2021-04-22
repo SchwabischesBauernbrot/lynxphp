@@ -280,7 +280,9 @@ $router->post('/verifyAccount', function($request) {
       if ($row && $row['userid'] && !$row['publickey'] && password_verify($p, $row['password']) && strpos($row['email'], '@') !== false) {
         // convert users - ONLY DO THIS ONCE
         // Should we clear out the email?
-        $db->updateById($models['user'], $row['userid'], array('username' => '', 'password' => '', 'publickey' => bin2hex($edPkBin), 'email' => hash('sha512', BACKEND_KEY . $row['email'] . BACKEND_KEY)));
+        $db->updateById($models['user'], $row['userid'], array(
+          'username' => '', 'password' => '', 'publickey' => bin2hex($edPkBin),
+          'email' => hash('sha512', BACKEND_KEY . $row['email'] . BACKEND_KEY)));
         $upgradedAccount = true;
       }
     }
