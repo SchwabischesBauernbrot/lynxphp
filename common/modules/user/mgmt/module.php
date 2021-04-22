@@ -14,13 +14,22 @@ return array(
       ),
     ),
     array(
+      'name' => 'list_search',
+      'params' => array(
+        'endpoint' => 'opt/admin/users',
+        'method' => 'POST',
+        'unwrapData' => true,
+        'requireSession'=> true,
+        'requires' => array('publickey', 'email'),
+        'params' => 'postdata',
+      ),
+    ),
+    array(
       'name' => 'listgroups',
       'params' => array(
         'endpoint' => 'opt/admin/groups',
         'unwrapData' => true,
         'requireSession'=> true,
-        //'requires' => array('boardUri'),
-        //'params' => 'querystring',
       ),
     ),
     array(
