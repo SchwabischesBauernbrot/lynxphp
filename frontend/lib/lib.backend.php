@@ -57,6 +57,7 @@ function consume_beRsrc($options, $params = '') {
   if (!empty($options['querystring'])) {
     $querystring = '?' . join('&', $options['querystring']);
   }
+  //echo "querystring[$querystring]<br>\n";
 
   // post login/IP
   $responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
@@ -142,9 +143,15 @@ function getBoards($params = false) {
   }
   $boards = getExpectJson('opt/boards.json'.$qstr);
   */
+  $qs = array();
+  if ($params) {
+    foreach($params as $k => $v) {
+      $qs[] = $k . '=' . urlencode($v);
+    }
+  }
   $boards = consume_beRsrc(array(
     'endpoint'    => 'opt/boards.json',
-    'querystring' => $params,
+    'querystring' => $qs,
     'sendSession' => true,
     'expectJson'  => true,
     //'unwrapData'  => true,
