@@ -27,7 +27,7 @@ $adminPortalHdr = renderAdminPortal();
 
 $tmpl = '<form action="' . $params['action'] . '" method="POST">';
 $tmpl .= '<input type=hidden name=userid value="' . $user['userid'] . '">';
-$tmpl .= 'Username: ' . $user['username'] . "<br>\n";
+$tmpl .= 'Public Key: ' . $user['publickey'] . "<br>\n";
 $tmpl .= 'Groups:<ul>';
 $user_groups = explode(',', $user['groupnames']);
 foreach($groups as $g) {
