@@ -41,6 +41,7 @@ function getServerField($field, $default = '') {
   return empty($_SERVER[$field]) ? $default : $_SERVER[$field];
 }
 
+// if '', '' is passed, so no issue.
 function getQueryField($field) {
   return empty($_GET[$field]) ? '' : $_GET[$field];
 }
