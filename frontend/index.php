@@ -269,8 +269,11 @@ $router->post('/:uri/post', function($request) {
   global $pipelines;
   $boardUri = $request['params']['uri'];
 
+  //echo "<pre>_FILES: ", print_r($_FILES, 1), "</pre>\n";
   $res = processFiles();
-  $files = isset($res['handles']['file']) ? $res['handles']['file'] : array();
+  //echo "<pre>res: ", print_r($res, 1), "</pre>\n";
+  $files = isset($res['handles']['files']) ? $res['handles']['files'] : array();
+  //echo "<pre>files: ", print_r($files, 1), "</pre>\n";
 
   $endpoint = 'lynx/newThread';
   $redir = BASE_HREF . $boardUri . '/';
