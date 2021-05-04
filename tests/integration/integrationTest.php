@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 define('IN_TEST', true);
 
@@ -60,4 +60,12 @@ function usesSendResponse($t, $res) {
   $t->assertArrayHasKey('code', $res['meta']);
   $t->assertArrayHasKey('data', $res);
   $t->assertIsArray($res['data']);
+}
+
+use PHPUnit\Framework\TestCase;
+
+final class integrationTest extends TestCase {
+  public function testTestSetup(): void {
+    $this->assertIsArray(array());
+  }
 }
