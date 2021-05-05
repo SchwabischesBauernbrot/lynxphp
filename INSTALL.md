@@ -8,6 +8,12 @@ Requirements
 
 # Shared hosting help
 download the zip from GitGud.IO
+you'll also need zips from:
+
+- https://github.com/PHPMailer/PHPMailer
+- https://github.com/paragonie/sodium_compat
+
+and place them into the common folder
 
 place into your `public_html/` (usually using FTP/SFTP)
 
@@ -22,15 +28,20 @@ cd /var/www
 mv html old
 git clone https://gitgud.io/odilitime/lynxphp.git
 ln -s lynxphp/frontend html
-cd lynxphp/frontend
+cd lynxphp
+git submodule init
+git submodule update
+mkdir frontend_storage
+chmod -R 777 frontend_storage
+cd frontend
 ln -s ../backend
 ```
 
 
 Now you need to pick a webserver
 
-- NGINX
-- Apache2
+- NGINX (serves fixed limits)
+- Apache2 (serves until it kills your server)
 
 ## NGINX
 
@@ -108,6 +119,8 @@ and restart it `/etc/init.d/nginx restart`
 ```
 apt install apache2 libapache2-mod-php php-curl
 a2enmod rewrite
+a2enmod ssl
+a2ensite default-ssl
 ```
 
 Change AllowOverride to All
@@ -119,6 +132,9 @@ Change AllowOverride to All
   Require all granted
 </Directory>
 ```
+
+And finally, restart apache2 with these new changes:
+`/etc/init.d/apache2 restart`
 
 then you need to make config_HOSTNAME.php in frontend and backend
 
