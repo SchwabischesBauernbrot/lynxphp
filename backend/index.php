@@ -73,12 +73,7 @@ include 'interfaces/files.php';
 include 'interfaces/sessions.php';
 include 'interfaces/settings.php';
 
-$packages = array();
-$packages['base'] = registerPackage('base');
-registerPackageGroup('board');
-registerPackageGroup('post');
-registerPackageGroup('user');
-registerPackageGroup('site');
+registerPackages();
 // build routes (and activate backend_handlers.php/models.php)
 foreach($packages as $pkg) {
   $pkg->buildBackendRoutes();
@@ -91,34 +86,6 @@ $response_template = array(
   'data' => array(
   ),
 );
-
-function checkHeaders($mtime, $filesize = false) {
-  // cached and non-cached need this
-  $headers=array();
-  if (function_exists('apache_request_headers')) {
-    $headers = apache_request_headers();
-  }
-  // we don't always know the size
-  $etag = false;
-  if ($filesize) { // don't generate if not needed
-    $etag = dechex($mtime) . '-' . dechex($filesize);
-  }
-  if ((!isset($headers['Cache-Control']) || (isset($headers['Cache-Control']) && $headers['Cache-Control'] !== 'no-cache'))
-      && (
-        ($etag && isset($headers['If-None-Match']) && $headers['If-None-Match']
-           && strpos($headers['If-None-Match'], $etag)!==false) ||
-        (isset($headers['If-Modified-Since']) && $headers['If-Modified-Since']
-           && $lastmod == $headers['If-Modified-Since']))
-      ) {
-    header('HTTP/1.1 304 Not Modified');
-    // why is this empty?
-    header('Content-Type: ');
-    // maybe just exit?
-    return true;
-  }
-  // maybe return etag so it doesn't have to be generated?
-  return false;
-}
 
 function sendResponse2($data, $options = array()) {
   global $response_template, $now;
@@ -145,42 +112,10 @@ function sendResponse2($data, $options = array()) {
   } else {
     $output = json_encode($resp);
   }
-  $filesize = strlen($output);
-
-  if ($mtime === $now) {
-    // dont cache
-    header ('Expires: '.gmdate('D M d H:i:s Y', 1)); // old
-    header ('Proxy-Connection: keep-alive');
-    header ('Cache-Control: no-store, must-revalidate, post-check=1, pre-check=2');
-  } else {
-    // take control over caching
-
-    $httpauth = isset($_SERVER['PHP_AUTH_USER']);
-    $ssl = false;
-    if (isset($_SERVER['HTTPS'])) {
-      $ssl = $_SERVER['HTTPS'] === 'on';
-    }
-    $public='';
-    if ($httpauth || $ssl) {
-      // public says to cache through SSL & httpauth
-      // otherwise just cached in memory only
-      $public = 'public, ';
-    }
-    $etag = false;
-    if ($filesize) { // don't generate if not needed
-      $etag = dechex($mtime) . '-' . dechex($filesize);
-    }
-    $lastmod = gmdate('D, d M Y H:i:s', $mtime).' GMT';
-    header('Last-Modified: ' . $lastmod);
-    if ($filesize) {
-      header('Content-Length: ' . $filesize);
-    }
-    header('Cache-Control: ' . $public . 'must-revalidate');
-    header('Vary: Accept-Encoding');
-    if ($etag) {
-      header('ETag: "' . $etag . '"');
-    }
-  }
+  // you'd have to be able to calculate the output size
+  // on a 304 check
+  //$filesize = strlen($output);
+  _doHeaders($mtime);
   echo $output;
   return true;
 }
