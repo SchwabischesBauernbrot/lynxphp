@@ -4,44 +4,7 @@
 // loader functions
 //
 
-function registerPackages() {
-}
-
 $module_base = 'common/modules/';
-
-function registerPackageGroup($group) {
-  global $module_base, $packages;
-  $dir = '../' . $module_base . $group;
-  if (!is_dir($dir)) {
-    // does not exists
-    return false;
-  }
-  $dh = opendir($dir);
-  if (!$dh) {
-    // permissions
-    return false;
-  }
-  $loaded = 0;
-  while (($file = readdir($dh)) !== false) {
-    if ($file[0] === '.') continue;
-    //echo "filename: $file : filetype: " . filetype($dir . $file) . "\n";
-    $path = $dir . '/' . $file;
-    if (is_dir($path)) {
-      $loaded++;
-      $pkg = registerPackage($group . '/' . $file);
-      if ($pkg) {
-        $packages[$pkg->name] = $pkg;
-      }
-    } else {
-      // file_exists but not a dir
-      if (!is_readable($path)) {
-        echo "I can't read [$path] please fix the permissions (set execute flag?)<br>\n";
-      }
-    }
-  }
-  closedir($dh);
-  return $loaded;
-}
 
 function registerPackage($pkg_path) {
   global $module_base;
@@ -84,25 +47,86 @@ function registerPackage($pkg_path) {
   return $pkg;
 }
 
+function registerPackageGroup($group) {
+  global $module_base, $packages;
+  $dir = '../' . $module_base . $group;
+  if (!is_dir($dir)) {
+    // does not exists
+    return false;
+  }
+  $dh = opendir($dir);
+  if (!$dh) {
+    // permissions
+    return false;
+  }
+  $loaded = 0;
+  while (($file = readdir($dh)) !== false) {
+    if ($file[0] === '.') continue;
+    //echo "filename: $file : filetype: " . filetype($dir . $file) . "\n";
+    $path = $dir . '/' . $file;
+    if (is_dir($path)) {
+      $loaded++;
+      $pkg = registerPackage($group . '/' . $file);
+      if ($pkg) {
+        $packages[$pkg->name] = $pkg;
+      }
+    } else {
+      // file_exists but not a dir
+      if (!is_readable($path)) {
+        echo "I can't read [$path] please fix the permissions (set execute flag?)<br>\n";
+      }
+    }
+  }
+  closedir($dh);
+  return $loaded;
+}
+
+function registerPackages() {
+  global $packages;
+  $packages = array();
+  $packages['base'] = registerPackage('base');
+
+  // data
+  $groups = array('board', 'post', 'user', 'admin', 'global', 'site', 'protection');
+  foreach($groups as $group) {
+    registerPackageGroup($group);
+  }
+  // code optimization?
+  /*
+  registerPackageGroup('board');
+  registerPackageGroup('post');
+  registerPackageGroup('user');
+  registerPackageGroup('admin');
+  registerPackageGroup('global');
+  registerPackageGroup('site');
+  registerPackageGroup('protection');
+  */
+}
+
+//
+// backend uses this
+//
+
 function getEnabledModules() {
   return array('base');
 }
 
+/*
 function enableModule($module){
   include '../common/modules/' . $module . '/index.php';
 }
+function enableModules() {
+  $modules = getEnabledModules();
+  foreach($modules as $module) {
+    enableModule($module);
+  }
+}
+*/
 
 function enableModuleType($type, $module){
   $path = '../common/modules/' . $module . '/' . $type . '.php';
   if (file_exists($path)) {
     include $path;
-  }
-}
-
-function enableModules() {
-  $modules = getEnabledModules();
-  foreach($modules as $module) {
-    enableModule($module);
   }
 }
 
