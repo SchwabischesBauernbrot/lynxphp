@@ -119,40 +119,43 @@ include '../common/lib.pipeline.php';
 
 // I could move the PIPELINE_ prefix into the definePipeline function
 // but then you couldn't locate these in grep
-definePipeline('PIPELINE_HOMEPAGE_BOARDS_FIELDS');
+$frontEndPipelines = array(
+  'PIPELINE_HOMEPAGE_BOARDS_FIELDS',
 
-definePipeline('PIPELINE_BOARD_HEADER_TMPL');
-definePipeline('PIPELINE_BOARD_FOOTER_TMPL');
-definePipeline('PIPELINE_BOARD_NAV');
-definePipeline('PIPELINE_BOARD_STICKY_NAV');
-definePipeline('PIPELINE_BOARD_DETAILS_TMPL');
-definePipeline('PIPELINE_BOARD_SETTING_NAV');
-definePipeline('PIPELINE_BOARD_SETTING_TMPL');
-definePipeline('PIPELINE_BOARD_SETTING_GENERAL');
+  'PIPELINE_BOARD_HEADER_TMPL',
+  'PIPELINE_BOARD_FOOTER_TMPL',
+  'PIPELINE_BOARD_NAV',
+  'PIPELINE_BOARD_STICKY_NAV',
+  'PIPELINE_BOARD_DETAILS_TMPL',
+  'PIPELINE_BOARD_SETTING_NAV',
+  'PIPELINE_BOARD_SETTING_TMPL',
+  'PIPELINE_BOARD_SETTING_GENERAL',
 
-definePipeline('PIPELINE_FORM_CAPTCHA');
+  'PIPELINE_FORM_CAPTCHA',
+  'PIPELINE_FORM_WIDGET_THEMETHUMBNAILS',
 
-definePipeline('PIPELINE_POST_PREPROCESS');
-definePipeline('PIPELINE_POST_POSTPREPROCESS');
-definePipeline('PIPELINE_POST_TEXT_FORMATTING');
-definePipeline('PIPELINE_POST_FORM_FIELDS');
-definePipeline('PIPELINE_POST_FORM_OPTIONS');
-definePipeline('PIPELINE_POST_FORM_TAGS');
-definePipeline('PIPELINE_POST_FORM_VALUES');
-definePipeline('PIPELINE_POST_VALIDATION');
+  'PIPELINE_POST_PREPROCESS',
+  'PIPELINE_POST_POSTPREPROCESS',
+  'PIPELINE_POST_TEXT_FORMATTING',
+  'PIPELINE_POST_FORM_FIELDS',
+  'PIPELINE_POST_FORM_OPTIONS',
+  'PIPELINE_POST_FORM_TAGS',
+  'PIPELINE_POST_FORM_VALUES',
+  'PIPELINE_POST_VALIDATION',
 
-definePipeline('PIPELINE_ADMIN_NAV');
-definePipeline('PIPELINE_ADMIN_HEADER_TMPL');
-definePipeline('PIPELINE_ADMIN_SETTING_GENERAL');
+  'PIPELINE_ADMIN_NAV',
+  'PIPELINE_ADMIN_HEADER_TMPL',
+  'PIPELINE_ADMIN_SETTING_GENERAL',
 
-definePipeline('PIPELINE_GLOBALS_NAV');
-definePipeline('PIPELINE_GLOBALS_HEADER_TMPL');
+  'PIPELINE_GLOBALS_NAV',
+  'PIPELINE_GLOBALS_HEADER_TMPL',
 
-definePipeline('PIPELINE_USER_NAV');
-definePipeline('PIPELINE_USER_HEADER_TMPL');
-definePipeline('PIPELINE_AFTER_WORK');
+  'PIPELINE_USER_NAV',
+  'PIPELINE_USER_HEADER_TMPL',
+  'PIPELINE_AFTER_WORK',
+);
 
-
+definePipelines($frontEndPipelines);
 
 // forms pipelines
 // - newThreadForm
@@ -165,43 +168,37 @@ definePipeline('PIPELINE_AFTER_WORK');
 // - logout
 
 // frontend libraries
-include 'lib/lib.http.php'; // comms lib
-include 'lib/lib.backend.php'; // comms lib
-include 'lib/lib.handler.php'; // output functions
-include 'lib/lib.files.php'; // file upload functions
-include 'lib/lib.form.php'; // form helper
+include '../frontend_lib/lib/lib.http.php'; // comms lib
+include '../frontend_lib/lib/lib.backend.php'; // comms lib
+include '../frontend_lib/lib/lib.handler.php'; // output functions
+include '../frontend_lib/lib/lib.files.php'; // file upload functions
+include '../frontend_lib/lib/lib.form.php'; // form helper
 // structures
-include 'lib/nav.php'; // nav structure
-include 'lib/middlewares.php';
+include '../frontend_lib/lib/nav.php'; // nav structure
+include '../frontend_lib/lib/middlewares.php';
 
 // frontend handlers
 
 // mixins
-include 'handlers/mixins/board_portal.php';
-include 'handlers/mixins/admin_portal.php';
-include 'handlers/mixins/global_portal.php';
-include 'handlers/mixins/user_portal.php';
-include 'handlers/mixins/post_renderer.php';
-include 'handlers/mixins/post_form.php';
-include 'handlers/mixins/post_actions.php';
-include 'handlers/mixins/tabs.php'; // maybe more of a lib...
+include '../frontend_lib/handlers/mixins/board_portal.php';
+include '../frontend_lib/handlers/mixins/admin_portal.php';
+include '../frontend_lib/handlers/mixins/global_portal.php';
+include '../frontend_lib/handlers/mixins/user_portal.php';
+include '../frontend_lib/handlers/mixins/post_renderer.php';
+include '../frontend_lib/handlers/mixins/post_form.php';
+include '../frontend_lib/handlers/mixins/post_actions.php';
+include '../frontend_lib/handlers/mixins/tabs.php'; // maybe more of a lib...
 
 
 // handlers
-include 'handlers/login.php';
-include 'handlers/signup.php';
-include 'handlers/control_panel.php';
-include 'handlers/boards.php';
-include 'handlers/admin.php';
-include 'handlers/global.php';
+include '../frontend_lib/handlers/login.php';
+include '../frontend_lib/handlers/signup.php';
+include '../frontend_lib/handlers/control_panel.php';
+include '../frontend_lib/handlers/boards.php';
+include '../frontend_lib/handlers/admin.php';
+include '../frontend_lib/handlers/global.php';
 
-$packages = array();
-$packages['base'] = registerPackage('base');
-registerPackageGroup('board');
-registerPackageGroup('post');
-registerPackageGroup('user');
-registerPackageGroup('site');
-registerPackageGroup('protection');
+registerPackages();
 // build routes (and activate frontend_handlers.php)
 foreach($packages as $pkg) {
   $pkg->buildFrontendRoutes($router, $req_method);
@@ -269,11 +266,11 @@ $router->post('/:uri/post', function($request) {
   global $pipelines;
   $boardUri = $request['params']['uri'];
 
-  //echo "<pre>_FILES: ", print_r($_FILES, 1), "</pre>\n";
+  //echo '<pre>_FILES: ', print_r($_FILES, 1), "</pre>\n";
   $res = processFiles();
-  //echo "<pre>res: ", print_r($res, 1), "</pre>\n";
+  //echo '<pre>res: ', print_r($res, 1), "</pre>\n";
   $files = isset($res['handles']['files']) ? $res['handles']['files'] : array();
-  //echo "<pre>files: ", print_r($files, 1), "</pre>\n";
+  //echo '<pre>files: ', print_r($files, 1), "</pre>\n";
 
   $endpoint = 'lynx/newThread';
   $redir = BASE_HREF . $boardUri . '/';
