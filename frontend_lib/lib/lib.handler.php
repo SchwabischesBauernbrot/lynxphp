@@ -108,6 +108,11 @@ function wrapContent($content, $options = '') {
     $userSettings = $settings['user'];
   }
   $enableJs = true;
+  $doWork = true;
+  // only should be used when we know we're opening a ton of requests in parallel
+  if (!empty($options['noWork'])) {
+    $doWork = false;
+  }
 
   $themes = array('yotsuba-b', 'yotsuba', 'amoled', 'army-green', 'cancer', 'chaos', 'choc', 'darkblue', 'gurochan', 'lain', 'miku', 'mushroom', 'navy', 'pink', 'rei-zero', 'solarized-dark', 'solarized-light', 'tempus-cozette', 'tomorrow', 'tomorrow2', 'vapor', 'win95', 'snerx');
   if (empty($userSettings['current_theme']) || $userSettings['current_theme'] === 'default') $userSettings['current_theme'] = $themes[0];
@@ -117,7 +122,8 @@ function wrapContent($content, $options = '') {
     if ($userSettings['current_theme'] === $theme) {
       $themesHtml .= '<link id="theme" rel="stylesheet" data-theme="' . $theme . '" href="css/themes/' . $theme . '.css">';
     } else {
-      $themesHtml .= '<link rel="alternate stylesheet" type="text/css" data-theme="' . $theme . '" title="' . $theme . '" href="css/themes/' . $theme . '.css">';
+      // these are always downloaded in chrome... ugh
+      //$themesHtml .= '<link rel="alternate stylesheet" type="text/css" data-theme="' . $theme . '" title="' . $theme . '" href="css/themes/' . $theme . '.css">';
     }
   }
 
@@ -151,21 +157,30 @@ function wrapContent($content, $options = '') {
     curl_log_report();
     curl_log_clear();
   }
-  $result = $packages['base']->useResource('work', false, array('inWrapContent' => true));
-  if (DEV_MODE) {
-    $start = microtime(true);
+  if ($doWork) {
+    // FIXME: if DEV_MODE use JS to report how long it took to load
+    // use an iframe...
+    echo '<iframe style="display: none" src="backend/opt/work"></iframe>', "\n";
+    //$result = $packages['base']->useResource('work', false, array('inWrapContent' => true));
+    //
+    if (DEV_MODE) {
+      $start = microtime(true);
+    }
+    // expirations happen here...
+    $pipelines[PIPELINE_AFTER_WORK]->execute($result);
+    if (DEV_MODE) {
+      $diff = (microtime(true) - $start) * 1000;
+      curl_log_report();
+      if ($result) {
+        echo "<pre>worker result [$result]</pre>\n";
+      }
+      // only show if it takes longer than 10ms
+      if ($diff > 10) {
+        echo 'PIPELINE_AFTER_WORK took ', $diff, "ms <br>\n";
+      }
+    }
   }
-  $pipelines[PIPELINE_AFTER_WORK]->execute($result);
   if (DEV_MODE) {
-    $diff = (microtime(true) - $start) * 1000;
-    curl_log_report();
-    if ($result) {
-      echo "<pre>worker result [$result]</pre>\n";
-    }
-    // only show if it takes longer than 10ms
-    if ($diff > 10) {
-      echo 'PIPELINE_AFTER_WORK took ', $diff, "ms <br>\n";
-    }
     echo "<h4>input</h4>";
     if (count($_GET)) echo "GET", print_r($_GET, 1), "<br>\n";
     if (count($_POST)) echo "POST", print_r($_POST, 1), "<br>\n";
