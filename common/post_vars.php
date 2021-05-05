@@ -13,6 +13,97 @@ if (!function_exists('getallheaders')) {
   }
 }
 
+// private
+function _doHeaders($mtime, $options = false) {
+  global $now;
+
+  $contentType = '';
+  $fileSize = 0;
+  $lastMod = '';
+  if ($options) {
+    if (isset($options['contentType'])) $contentType = $options['contentType'];
+    if (isset($options['lastMod']))     $lastMod = $options['lastMod'];
+    if (isset($options['fileSize']))    $fileSize = $options['fileSize'];
+  }
+
+  // why is this empty?
+  // being empty in chrome makes html page not render as html in nginx/php-fpm
+  header('Content-Type: ' . $contentType);
+
+  if ($mtime === $now) {
+    // don't cache
+    header ('Expires: ' . gmdate('D M d H:i:s Y', 1)); // old
+    header ('Proxy-Connection: keep-alive');
+    header ('Cache-Control: no-store, must-revalidate, post-check=1, pre-check=2');
+  } else {
+    // cache this
+    if (!$lastMod) {
+      $lastMod = gmdate('D, d M Y H:i:s', $mtime) . ' GMT';
+    }
+    header('Last-Modified: ' . $lastMod);
+    if ($fileSize) {
+      header('Content-Length: ' . $fileSize);
+    }
+    $ssl = false;
+    if (isset($_SERVER['HTTPS'])) {
+      $ssl = $_SERVER['HTTPS'] === 'on';
+    }
+    $public='';
+    if (isset($_SERVER['PHP_AUTH_USER']) || $ssl) {
+      // public says to cache through SSL & httpauth
+      // otherwise just cached in memory only
+      $public = 'public, ';
+    }
+    header('Cache-Control: ' . $public . 'must-revalidate');
+    header('Vary: Accept-Encoding');
+    if ($fileSize) { // don't generate if not needed
+      $etag = dechex($mtime) . '-' . dechex($fileSize);
+      header('ETag: "' . $etag . '"');
+    }
+    // CF is also injecting this without checking for it...
+    //header('X-Frame-Options: SAMEORIGIN');
+  }
+}
+
+function checkCacheHeaders($mtime, $options = false) {
+  $contentType = '';
+  $fileSize = 0;
+  if ($options) {
+    if (isset($options['contentType'])) $contentType = $options['contentType'];
+    if (isset($options['fileSize']))    $fileSize = $options['fileSize'];
+  }
+
+  // polyfill should handle this...
+  /*
+  $headers=array();
+  if (function_exists('getallheaders')) {
+  */
+  $headers = getallheaders();
+  //}
+  // we don't always know the size
+  $etag = false;
+  if ($fileSize) { // don't generate if not needed
+    $etag = dechex($mtime) . '-' . dechex($fileSize);
+  }
+  $lastmod = gmdate('D, d M Y H:i:s', $mtime) . ' GMT';
+  if ((!isset($headers['Cache-Control']) || (isset($headers['Cache-Control']) && $headers['Cache-Control'] !== 'no-cache'))
+      && (
+        ($etag && !empty($headers['If-None-Match'])
+           && strpos($headers['If-None-Match'], $etag) !== false) ||
+        (!empty($headers['If-Modified-Since'])
+           && $lastmod == $headers['If-Modified-Since']))
+      ) {
+    header('HTTP/1.1 304 Not Modified');
+    _doHeaders($mtime, array(
+      'contentType' => $contentType, 'lastMod' => $lastmod));
+    // maybe just exit?
+    return true;
+  }
+  _doHeaders($mtime, array('contentType' => $contentType, 'lastMod' => $lastmod));
+  // maybe return etag so it doesn't have to be generated?
+  return false;
+}
+
 function hasPostVars($fields) {
   foreach($fields as $field) {
     if (empty($_POST[$field])) {
@@ -102,6 +193,16 @@ function gettrace() {
     $trace .= ' <- ' . $call['file'] . ':' . $call['line'];
   }
   return $trace;
+}
+
+// ensure all values are set in res
+function ensureOptions($rules, $data) {
+  $res = array();
+  if (!$data || !is_array($data)) $data = array();
+  foreach($rules as $f => $dv) {
+    $res[$f] = isset($data[$f]) ? $data[$f] : $dv;
+  }
+  return $res;
 }
 
 ?>
