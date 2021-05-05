@@ -7,7 +7,19 @@ $curlLog = array();
 // but ultimately we should rather aim for one curl request per page total
 
 function request($options = array()) {
-  // just call curlHelper
+  extract(ensureOptions(array(
+    'url' => '',
+    'method' => 'AUTO',
+    'headers' => array(),
+    'user' => false,
+    'pass' => false,
+  ), $options));
+  $fields = '';
+  $header = '';
+  if (count($headers)) {
+    $header = $headers;
+  }
+  return curlHelper($url, $fields, $header, $user, $pass, $method);
 }
 
 function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='AUTO') {
@@ -118,7 +130,10 @@ function curl_log_report() {
     //echo '<span title="', $l['result'] , '">Result</span>';
     //echo '<span title="', $l['trace'] , '">Trace</span>';
     echo $l['trace'];
-    echo '<pre>', json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT), '</pre>', "\n";
+    echo '<details>';
+    echo '  <summary>Response</summary>', "\n";
+    echo '  <pre>', json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT), '</pre>', "\n";
+    echo '</details>';
     $ttl += $l['took'];
   }
   echo '</ol>';
