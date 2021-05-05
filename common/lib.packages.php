@@ -224,6 +224,11 @@ class package {
             }
           }
         }
+        if (isset($pData['pipelines']) && is_array($pData['pipelines'])) {
+          foreach($pData['pipelines'] as $m) {
+            $bePkg->addPipeline($m);
+          }
+        }
       }
     }
     /*
@@ -279,15 +284,26 @@ class package {
       // package name is optinal
       foreach($fePkgs as $pName => $pData) {
         $fePkg = $this->makeFrontend();
-        foreach($pData['handlers'] as $h) {
-          //$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
-          $fePkg->addHandler(empty($h['method']) ? 'GET' : $h['method'], $h['route'], $h['handler']);
+        if (isset($pData['handlers']) && is_array($pData['handlers'])) {
+          foreach($pData['handlers'] as $h) {
+            //$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
+            $fePkg->addHandler(empty($h['method']) ? 'GET' : $h['method'], $h['route'], $h['handler']);
+          }
         }
-        foreach($pData['forms'] as $f) {
-          $fePkg->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
+        if (isset($pData['forms']) && is_array($pData['forms'])) {
+          foreach($pData['forms'] as $f) {
+            $fePkg->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
+          }
         }
-        foreach($pData['modules'] as $m) {
-          $fePkg->addModule(constant($m['pipeline']), $m['module']);
+        if (isset($pData['modules']) && is_array($pData['modules'])) {
+          foreach($pData['modules'] as $m) {
+            $fePkg->addModule(constant($m['pipeline']), $m['module']);
+          }
+        }
+        if (isset($pData['pipelines']) && is_array($pData['pipelines'])) {
+          foreach($pData['pipelines'] as $m) {
+            $fePkg->addPipeline($m);
+          }
         }
       }
     }
@@ -364,6 +380,9 @@ class backend_package {
       include $path;
     });
     return $bsn;
+  }
+  function addPipeline($pipeline) {
+    echo "lib.packages.php:::backend_package::addPipeline - Write me<br>\n";
   }
   function toString() {
     $content ='<ul>';
@@ -442,26 +461,43 @@ class frontend_package {
     });
     */
     $ref = &$this;
+    // this function isn't called unless the pipeline is executed
     $bsn->attach($pipeline_name, function(&$io, $options = false) use ($pipeline_name, $path, $pkg, &$ref, $module_path) {
-      $getModule = function() use ($pipeline_name, $options, &$ref, $module_path) {
-        // $this is the bsn...
-        if (!$ref->ranOnce) {
-          if (is_readable($module_path . 'fe/common.php')) {
-            //
-            $ref->common = include $module_path . 'fe/common.php';
-          } else {
-            if (file_exists($module_path . 'fe/common.php')) {
-              echo "lulwat [$module_path]fe/common.php<br>\n";
-            }
+      // $this is the bsn...
+      if (!$ref->ranOnce) {
+        //echo "module_path[$module_path]<Br>\n";
+        if (is_readable($module_path . 'shared.php')) {
+          $ref->shared = include $module_path . 'shared.php';
+        } else {
+          if (file_exists($module_path . 'shared.php')) {
+            echo "lulwat [$module_path]shared.php<br>\n";
           }
-          $ref->ranOnce = true;
         }
-        if (isset($ref->common)) {
-          $common = $ref->common;
+        if (is_readable($module_path . 'fe/common.php')) {
+          //
+          $ref->common = include $module_path . 'fe/common.php';
+        } else {
+          if (file_exists($module_path . 'fe/common.php')) {
+            echo "lulwat [$module_path]fe/common.php<br>\n";
+          }
         }
+        $ref->ranOnce = true;
+      }
+      //$common = false;
+      if (isset($ref->common)) {
+        $common = $ref->common;
+      }
+      //$shared = false;
+      if (isset($ref->shared)) {
+        $shared = $ref->shared;
+      }
 
+      $getModule = function() use ($pipeline_name, $options, &$ref, $module_path) {
+        //echo "module get<br>\n";
         //echo "Set up module for [$pipeline_name]<br>\n";
         return array(
+          //'shared' => $shared,
+          //'common' => $common,
           'options' => $options,
         );
       };
@@ -475,6 +511,9 @@ class frontend_package {
       include $path;
     });
     return $bsn;
+  }
+  function addPipeline($pipeline) {
+    definePipeline($pipeline['name']);
   }
   function buildRoutes(&$router, $method) {
     // do we have any routes in this method
