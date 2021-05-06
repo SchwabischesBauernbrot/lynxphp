@@ -1,0 +1,100 @@
+<br>
+Post(s) action: {{actions}}
+<!-- loop -->
+    <div class="actions">
+      <label>
+        <input id="password" type="password" name="postpassword" placeholder="Post password" autocomplete="chrome-off">
+      </label>
+    </div>
+<!-- loop -->
+    <div class="actions">
+      <label>
+        <select name="level">
+          <option value="">Not sure
+          <option value="cancer">Cancer
+          <option value="spam">Spam / Advertisement
+          <option value="flood">Flood
+          <option value="board">Board Rule Violation
+          <option value="global">Site Rule Violation
+          <option value="copyright">Copyright Violation
+          <option value="illegal">Illegal Content
+          <option value="other">Other
+        </select>
+      </label>
+      <label>
+        <input id="report" type="text" name="report_reason" placeholder="Report reason" autocomplete="chrome-off">
+      </label>
+    </div>
+<!-- loop -->
+    <div class="actions">
+      <label>
+        <input class="post-check" type="radio" name="media" value="spoiler">
+        Spoiler Files
+      </label>
+      <label>
+        <input class="post-check" type="radio" name="media" value="delete">
+        Remove Files
+      </label>
+      <label>
+        <input class="post-check" type="radio" name="media" value="ban">
+        Ban Files
+      </label>
+    </div>
+<!-- loop -->
+    <div class="actions">
+      <a href="">Moderation Help</a>
+      <label>
+        Scope: Site-Wide, Board-Wide
+      </label>
+      <label>
+        Duration
+        Days / Hours / Minutes
+      </label>
+      <label>
+        <input id="report" type="text" name="ban_message" placeholder="Ban Message" autocomplete="chrome-off">
+      </label>
+      <label>
+        Ban Type (Single IP, Narrow Range, Wide Range)
+      </label>
+    </div>
+<!-- loop -->
+{{captcha}}
+<br>
+<input type="submit" value="Submit">
+<!-- loop -->
+<!-- details class="toggle-label" id="actionform">
+  <summary class="toggle-summary">Show Post Actions</summary>
+  <div class="actions">
+    <h4 class="no-m-p">Actions:</h4>
+    <label>
+      <input class="post-check" type="checkbox" name="delete" value="1">
+      Delete Posts
+    </label>
+    <label>
+      <input class="post-check" type="checkbox" name="unlink_file" value="1">
+      Unlink Files
+    </label>
+    <label>
+      <input class="post-check" type="checkbox" name="spoiler" value="1">
+      Spoiler Files
+    </label>
+    <label>
+      <input id="password" type="password" name="postpassword" placeholder="Post password" autocomplete="chrome-off">
+    </label>
+    <label>
+      <input class="post-check" type="checkbox" name="report" value="1">
+      Report
+    </label -->
+    <!-- label>
+      <input class="post-check" type="checkbox" name="global_report" value="1">
+      Global Report
+    </label -->
+    <!-- label>
+      <input id="report" type="text" name="report_reason" placeholder="Report reason" autocomplete="chrome-off">
+    </label>
+  </div>
+  <div class="actions" -->
+    <!-- captcha -->
+  <!-- /div>
+  <input type="submit" value="submit">
+</details -->

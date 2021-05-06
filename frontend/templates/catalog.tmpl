@@ -1,0 +1,50 @@
+<div class="wrapbar">
+  {{boardNav}}
+  <!-- div class="pages jsonly">
+    <input id="catalogfilter" type="text" placeholder="Filter">
+    <select class="ml-5 right" id="catalogsort">
+      <option value="" disabled selected hidden>Sort by</option>
+      <option value="bump">Bump order</option>
+      <option value="date">Creation date</option>
+      <option value="replies">Reply count</option>
+    </select>
+  </div -->
+</div>
+<form target="_blank" action="/forms/board/{{uri}}/actions" method="POST" enctype="application/x-www-form-urlencoded">
+  <hr size="1">
+  <div class="catalog">
+    {{tiles}}
+  </div>
+<!-- loop -->
+  <div class="pages">
+    <a href="{{uri}}/">[Index]</a>
+    <a class="bold" href="{{uri}}/catalog">[Catalog]</a>
+    <a href="{{uri}}/banners">[Banners]</a>
+    <a href="{{uri}}/logs">[Logs]</a>
+  </div>
+<!-- end -->
+<!-- loop -->
+    <!-- could be an on/off tag -->
+    <div class="post-file-src">
+      <a href="{{uri}}/thread/{{no}}.html#{{no}}">
+        {{thumb}}
+      </a>
+    </div>
+<!-- end -->
+<!-- loop -->
+  <div class="catalog-tile" data-board="{{uri}}" data-post-id="{{no}}" data-filter="{{subject}}" data-date="2020-09-23T21:20:28.800Z" data-replies="0" data-bump="2020-09-23T21:20:28.800Z">
+    <div class="post-info">
+      <input class="left post-check" type="checkbox" name="checkedposts" value="{{no}}"/>
+      <a class="no-decoration post-subject" href="{{uri}}/thread/{{no}}.html#{{no}}">{{subject}}</a>
+      <br/>
+      <span title="Replies">R: {{replies}}</span> / <span title="Files">F: {{files}}</span> / <span title="Page">P: {{page}}</span>
+    </div>
+    {{tile_image}}
+    <pre class="no-m-p post-message">{{message}}</pre>
+  </div>
+<!-- end -->
+
+  <hr size="1">
+  {{boardNav}}
+  {{postactions}}
+</form>

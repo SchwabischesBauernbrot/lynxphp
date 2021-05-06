@@ -1,0 +1,57 @@
+youtube thumbnail privacy cache
+thread stats (replies, images, UIDs, pages)
+oekaki
+dice
+voice recorder
+flags
+hide posts (non-js)
+(global) report post
+sage
+IDs
+role signature / trip codes
+captcha
+blockbypass
+tor block
+text only board
+language
+navigation links
+megud
+chat
+rules board
+board subpages
+thread limit
+nsfw / sfw
+board owner transfer
+is claimable
+is deletable
+permission modules (vols vs jannies)
+board reports
+banners
+filters
+rules
+location detection
+r9k
+ads
+overboard
+multiboard
+cms
+graphs
+watched threads (non-js)
+themes
+hide posts/thread (non-js)
+4channel/4chan split
+cyclic
+locked
+multi-file
+markdown
+markdown tag editor
+board fav/bookmark
+layout css
+color css
+hide del option
+time options (local, relative, utc)
+hide board from public
+(you)
+id jumping
+stopforumspam
+spoilers

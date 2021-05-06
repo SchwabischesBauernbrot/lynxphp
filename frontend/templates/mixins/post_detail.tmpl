@@ -1,0 +1,62 @@
+<div class="anchor" id="{{no}}"></div>
+<div class="post-container {{op}}" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
+  <div class="post-info">
+    <span>
+{{postmeta}}
+      <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
+    </span>
+    <span class="post-links">
+      <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">No.</a>
+      <span class="post-quoters">
+        <a class="no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#postform">{{no}}</a>
+      </span>
+      <select class="jsonly postmenu">
+        <option value="single">Hide</option>
+        <option value="fid">Filter ID</option>
+        <option value="fname">Filter Name</option>
+      </select>
+      {{links}}
+    </span>
+  </div>
+  <div class="post-data">
+    <div class="post-files">{{files}}</div>
+    <pre class="post-message">{{message}}</pre>
+    {{replies}}
+  </div>
+</div>
+<!-- loop -->
+        <input class="post-check" type="checkbox" name="checkedposts[]" value="{{no}}"/>
+<!-- end -->
+<!-- loop -->
+        <span class="post-icons">
+          {{icons}}
+        </span>
+<!-- end -->
+<!-- loop -->
+          <img src="/file/{{file}}.png" height="14" width="14" title="{{title}}">
+<!-- end -->
+<!-- loop -->
+  <div class="post-file">
+    <span class="post-file-info">
+    </span>
+    <div class="post-file-src" data-type="image" data-attachment="false">
+      <a target="_blank" href="{{path}}">
+        {{thumb}}
+      </a>
+    </div>
+    <span class="post-file-info">
+      <span>
+        <a href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{filename}}</a>
+      </span>
+      <span>({{size}}, {{width}}x{{height}})</span>
+    </span>
+  </div>
+<!-- end -->
+<!-- loop -->
+      <div class="replies mt-5 ml-5">
+        Replies: {{replies}}
+      </div>
+<!-- end -->
+<!-- loop -->
+  <a class="quote" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">&gt;&gt;{{no}}</a>
+<!-- end -->

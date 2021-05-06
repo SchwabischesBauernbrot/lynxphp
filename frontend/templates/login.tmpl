@@ -1,0 +1,19 @@
+<h1 class="board-title">Log In</h1>
+<div class="form-wrapper flex-center mv-10">
+  <form class="form-post" action="{{action}}" method="POST">
+    <input type="hidden" name="goto" value="{{goto}}">
+    <noscript>If you can enable Javascript, you will get a higher level of security, please consider enabling it</noscript>
+    <div class="row">
+      <div class="label">Username</div>
+      <input type="text" name="username" maxlength="50" required>
+    </div>
+    <div class="row">
+      <div class="label">Password</div>
+      <input type="password" name="password" maxlength="100" required>
+    </div>
+    <input type="submit" value="submit">
+  </form>
+  <!-- p><a href="recoveryphrase.php">use recovery phrase</a></p -->
+  <p><a href="{{forgot_account}}">forgot username/password</a></p>
+  <p><a href="{{signup}}">create account</a></p>
+</div>

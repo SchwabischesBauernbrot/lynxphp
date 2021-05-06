@@ -1,0 +1,6 @@
+[submodule "common/PHPMailer"]
+	path = common/PHPMailer
+	url = https://github.com/PHPMailer/PHPMailer.git
+[submodule "common/sodium"]
+	path = common/sodium
+	url = https://github.com/paragonie/sodium_compat

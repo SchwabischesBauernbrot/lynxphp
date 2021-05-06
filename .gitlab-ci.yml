@@ -1,0 +1,202 @@
+# Select what we should cache
+#cache:
+#  paths:
+#  - vendor/
+
+.init-tests: &init-tests
+  - tests/run.sh
+  - curl http://localhost/backend/
+  - curl http://localhost/backend/4chan/boards.json
+  - curl http://localhost/backend/opt/boards.json
+  - curl http://localhost/
+
+.default-mysql: &default-mysql
+  # Install required PHP extensions
+  - docker-php-ext-install -j$(nproc) mysqli curl
+  # set up config files
+  - touch backend/config_.php
+  - echo "<?php // local config" >> backend/config_.php
+  - echo "define('DB_HOST', 'mysql');" >> backend/config_.php
+  - echo "define('DB_USER', 'root');" >> backend/config_.php
+  - echo "define('DB_PWD', 'mysql');" >> backend/config_.php
+  - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
+  - echo "define('BACKEND_KEY', 'lynxphp');" >> backend/config_.php
+
+.default-pgsql: &default-pgsql
+  # Install required PHP extensions
+  - docker-php-ext-install -j$(nproc) pgsql curl
+  # set up config files
+  - touch backend/config_.php
+  - echo "<?php // local config" >> backend/config_.php
+  - echo "define('DB_HOST', 'pgsql');" >> backend/config_.php
+  - echo "define('DB_USER', 'lynxphp');" >> backend/config_.php
+  - echo "define('DB_PWD', '');" >> backend/config_.php
+  - echo "define('DB_NAME', 'lynxphp');" >> backend/config_.php
+  - echo "define('DB_DRIVER', 'pgsql');" >> backend/config_.php
+  - echo "define('BACKEND_KEY', 'lynxphp');" >> backend/config_.php
+
+.default-post-database: &default-post-database
+  - echo "?>"  >> backend/config_.php
+  - cp backend/config_.php backend/config_localhost.php
+  - touch frontend/config_.php
+  - cp frontend/config_.php frontend/config_localhost.php
+  - mkdir backend/storage/tmp
+  - mkdir backend/storage/boards
+  - chmod -R 777 backend/storage
+
+.default-webserver: &default-webserver
+  - mv /var/www/html /var/www/old && cd .. && mv lynxphp /var/www && ln -s /var/www/lynxphp/frontend /var/www/html && ln -s /var/www/lynxphp/backend /var/www/html/backend && cd /var/www/lynxphp
+
+.default-apache: &default-apache
+  - a2enmod rewrite && sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /etc/apache2/apache2.conf && service apache2 restart
+  - service apache2 restart
+
+.default-nginx: &default-nginx
+  - apk add nginx
+  - adduser -D -g 'www' www
+  - |
+    echo -e "
+    user                            www;
+    worker_processes                1;
+
+    error_log                       /var/log/nginx/error.log warn;
+    pid                             /var/run/nginx.pid;
+
+    events {
+        worker_connections          1024;
+    }
+
+    http {
+        include                     /etc/nginx/mime.types;
+        default_type                application/octet-stream;
+        sendfile                    on;
+        access_log                  /var/log/nginx/access.log;
+        keepalive_timeout           3000;
+        server {
+            listen                  80;
+            root                    /var/www/html;
+            index                   index.php;
+            server_name             localhost;
+            client_max_body_size    100m;
+
+            location /backend {
+              if (!-e \$request_filename){
+                rewrite ^/backend(.*)$ /backend/index.php\$1;
+              }
+            }
+
+            location / {
+              # First attempt to serve request as file, then
+              # as directory, then fall back to displaying a 404.
+              try_files \$uri \$uri/ /index.php\$uri;
+            }
+            location ~ [^/]\.php(/|$) {
+                fastcgi_pass      127.0.0.1:9000;
+                fastcgi_index     index.php;
+                include           fastcgi.conf;
+                fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+                try_files \$fastcgi_script_name /index.php\$args =404;
+                set \$path_info \$fastcgi_path_info;
+                fastcgi_param PATH_INFO \$path_info;
+            }
+        }
+    }
+    "  > /etc/nginx/nginx.conf
+  - cat /etc/nginx/nginx.conf
+  - nginx -t
+  - nginx # start it up
+  - php-fpm -D
+
+# Why use debian if alpine is faster? Robustness tests?
+.debian: &debian
+  - apt-get update -yqq
+  - apt-get install -yqq git libcurl4-openssl-dev libpq-dev wget curl
+
+.alpine: &alpine
+  - apk add curl-dev postgresql-dev wget curl
+
+variables:
+  # Configure mysql service (https://hub.docker.com/_/mysql/)
+  MYSQL_DATABASE: "lynxphp"
+  MYSQL_ROOT_PASSWORD: "mysql"
+  MYSQL_ROOT_HOST: "%"
+  POSTGRES_DB: "lynxphp"
+  POSTGRES_USER: "lynxphp"
+  POSTGRES_PASSWORD: ""
+  POSTGRES_HOST_AUTH_METHOD: trust
+
+# alpine
+
+test:nginx:my:latest:
+  before_script:
+    - *alpine
+    - *default-mysql
+    - *default-post-database
+    - *default-webserver
+    - *default-nginx
+  image: php:8.0.0-fpm-alpine
+  services:
+    - name: mysql/mysql-server:latest
+      alias: mysql
+  tags:
+    - docker
+  script:
+    - *init-tests
+    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar && chmod u+x phpunit
+    - ./phpunit tests/integration
+
+test:nginx:pg:latest:
+  before_script:
+    - *alpine
+    - *default-pgsql
+    - *default-post-database
+    - *default-webserver
+    - *default-nginx
+  image: php:8.0.0-fpm-alpine
+  services:
+    - name: postgres:12.2-alpine
+      alias: pgsql
+  tags:
+    - docker
+  script:
+    - *init-tests
+    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar && chmod u+x phpunit
+    - ./phpunit tests/integration
+
+# debian
+
+test:mod:my:latest:
+  before_script:
+    - *debian
+    - *default-mysql
+    - *default-post-database
+    - *default-webserver
+    - *default-apache
+  image: php:8.0.0-apache
+  services:
+    - name: mysql/mysql-server:latest
+      alias: mysql
+  tags:
+    - docker
+  script:
+    - *init-tests
+    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar && chmod u+x phpunit
+    - ./phpunit tests/integration
+
+test:mod:pg:latest:
+  before_script:
+    - *debian
+    - *default-pgsql
+    - *default-post-database
+    - *default-webserver
+    - *default-apache
+  image: php:8.0.0-apache
+  services:
+    - name: postgres:latest
+      alias: pgsql
+  tags:
+    - docker
+  script:
+    - *init-tests
+    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar && chmod u+x phpunit
+    - ./phpunit tests/integration

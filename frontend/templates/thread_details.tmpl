@@ -1,0 +1,61 @@
+<form action="/forms/board/{{uri}}/actions" method="POST" enctype="application/x-www-form-urlencoded">
+  <input type="hidden" name="thread" value="{{threadNum}}">
+  <hr size="1">
+  <div class="thread">
+    {{posts}}
+  </div>
+<!-- loop -->
+<!-- end -->
+<!-- loop -->
+  <div class="post-file">
+    <span class="post-file-info">
+      <span>
+        <a href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{filename}}</a>
+      </span>
+      <br/>
+      <span>({{size}}, {{width}}x{{height}})</span>
+    </span>
+    <div class="post-file-src" data-type="image" data-attachment="false">
+      <a target="_blank" href="{{path}}">
+        {{thumb}}
+      </a>
+    </div>
+  </div>
+<!-- end -->
+<!-- loop -->
+      <div class="replies mt-5 ml-5">
+        Replies: {{replies}}
+      </div>
+<!-- end -->
+<!-- loop -->
+  <a class="quote" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">&gt;&gt;{{no}}</a>
+<!-- end -->
+<!-- loop -->
+  <div class="anchor" id="{{no}}"></div>
+  <div class="post-container op" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
+    <div class="post-info">
+      <span>
+        <label>
+          <input class="post-check" type="checkbox" name="checkedposts[]" value="{{no}}"/>
+          <span class="post-name">{{name}}</span>
+        </label>
+        <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
+      </span>
+      <span class="post-links">
+        <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">No.</a>
+        <span class="post-quoters">
+          <a class="no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#postform">{{no}}</a>
+        </span>
+        <select class="jsonly postmenu">
+          <option value="single">Hide</option>
+          <option value="fname">Filter Name</option>
+        </select>
+      </span>
+    </div>
+    <div class="post-data">
+      <div class="post-files">{{files}}</div>
+      <pre class="post-message">{{message}}</pre>
+      {{replies}}
+    </div>
+  </div>
+<!-- end -->

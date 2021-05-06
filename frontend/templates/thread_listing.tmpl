@@ -1,0 +1,70 @@
+<form action="/forms/board/{{uri}}/actions" method="POST" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="page" value="{{pagenum}}">
+  {{boardNav}}
+  {{threads}}
+<!-- loop -->
+    <a class="{{class}}" href="{{uri}}/page/{{pagenum}}"> [{{pagenum}}]</a>
+<!-- end -->
+<!-- loop -->
+  <div class="pages">
+    Page:
+    {{pages}} |
+    <a href="{{uri}}/catalog">[Catalog]</a>
+    <a href="{{uri}}/banners">[Banners]</a>
+    <a href="{{uri}}/logs"> [Logs]</a>
+  </div>
+<!-- end -->
+<!-- loop -->
+          <div class="post-file">
+            <span class="post-file-info">
+              <span>
+                <a href="{{path}}}" title="Download {{filename}}.jpg" download="{{filename}}.jpg">{{filename}}</a>
+              </span>
+              <br/>
+              <span>({{size}}, {{width}}x{{height}})</span>
+            </span>
+            <div class="post-file-src" data-type="image" data-attachment="false">
+              <a target="_blank" href="{{path}}">
+                {{thumb}}
+              </a>
+            </div>
+          </div>
+<!-- end -->
+<!-- loop -->
+  <hr size="1">
+  <div class="thread">
+<!-- end -->
+<!-- loop -->
+  </div>
+<!-- end -->
+<!-- loop -->
+    <div class="anchor" id="{{no}}"></div>
+    <div class="post-container {{op}}" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}">
+      <div class="post-info">
+        <span>
+          <label>
+            <input class="post-check" type="checkbox" name="checkedposts[]" value="{{no}}"/>
+            <span class="post-subject">{{subject}}</span>
+            <span class="post-name">{{name}}</span>
+            <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
+          </label>
+        </span>
+        <span class="post-links">
+          <a class="noselect no-decoration" href="{{uri}}/thread/{{threadNum}}.html#{{no}}">No.</a>
+          <span class="post-quoters"><a class="no-decoration" href="{{uri}}/thread/{{threadNum}}.html#{{no}}">{{no}}</a>
+            <span class="noselect"><small><a href="{{uri}}/thread/{{threadNum}}.html#postform">[Reply]</a></small></span>
+          </span>
+          <select class="jsonly postmenu">
+            <option value="hide">Hide</option>
+            <option value="name">Filter Name</option>
+          </select>
+        </span>
+      </div>
+      <div class="post-data">
+        <div class="post-files fn">
+          {{files}}
+        </div>
+        <pre class="post-message">{{message}}</pre>
+      </div>
+    </div>
+<!-- end -->

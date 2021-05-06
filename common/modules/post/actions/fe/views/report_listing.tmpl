@@ -1,0 +1,32 @@
+<div class="catalog">
+  <form action="{{uri}}/settings/reports" method="POST">
+    <ol>
+{{reports}}
+    </ol>
+    <label><input type="checkbox" name="closeSelected" CHECKED>Close report</label>
+    <label><input type="checkbox" name="deleteSelected">Delete content</label>
+    <!-- label><input type="checkbox" name="banPosterSelected">Ban posters</label>
+    <label><input type="checkbox" name="banReportSelected">Ban reporter</label -->
+    <input type=submit value="mass handle">
+  </form>
+</div>
+<a href="{{backURL}}">Back to settings</a>
+<!-- loop -->
+      <li class="{{zebra}}">
+        <label>
+          <input type=checkbox name="report-{{_id}}">
+          id: {{_id}}<br>
+          created: {{creation}}<br>
+          global: {{global}}<br>
+
+          <a target=_blank href="{{uri}}/thread/{{threadId}}.html#{{postId}}">&gt;&gt;&gt;{{uri}}/{{postId}}</a><br>
+          <p>{{post}}</p>
+
+          <ul>
+            <li><a href="{{uri}}/settings/reports/{{_id}}/close">close report</a>
+            <li><a href="{{uri}}/settings/reports/{{_id}}/delete">delete post</a> <!-- |
+            <a href="{{uri}}/settings/reports/{{_id}}/banPoster">Ban poster</a> |
+            <a href="{{uri}}/settings/reports/{{_id}}/banReport">Ban reporter</a -->
+          </ul>
+        </label>
+<!-- end -->
