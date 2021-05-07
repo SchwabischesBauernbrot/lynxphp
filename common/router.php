@@ -23,6 +23,7 @@ class Router {
     $this->methods['HEAD'] = array();
     $this->methods['PUT'] = array();
     $this->methods['DELETE'] = array();
+    $this->cacheSettings = array();
     $this->debug = array();
   }
   // used for attaching routers
@@ -117,13 +118,14 @@ class Router {
     //echo "Installing [$method][$cond]<br>\n";
     $this->methods[$method][$cond] = $func;
   }
-  // anything use this?
+  // anything use this? no, it's forward looking
   function getExternal($group, $name, $cond, $file) {
     $key = $group.'_'.$name;
     $this->methods['GET'][$cond] = is_array($key, $file);
   }
-  function get($cond, $func) {
+  function get($cond, $func, $cacheSettings = false) {
     $this->methods['GET'][$cond] = $func;
+    $this->cacheSettings['GET_' . $cond] = $cacheSettings;
   }
   function post($cond, $func) {
     $this->methods['POST'][$cond] = $func;
@@ -144,7 +146,39 @@ class Router {
       $method . '_routes' => array_keys($this->methods[$method]),
     );
   }
+  function isCached($key) {
+    if (!isset($this->cacheSettings[$key])) {
+      return true; // render content
+    }
+    //echo "key[$key]<br>\n";
+    //print_r($this->cacheSettings[$key]);
+    $cacheSettings = $this->cacheSettings[$key];
+    if (!isset($cacheSettings['databaseTables'])) {
+      return true; // render content
+    }
+    global $db;
+    $mtime = $db->getLast($cacheSettings['databaseTables']);
+    // backend hack
+    if (getQueryField('prettyPrint')) {
+      $cacheSettings['contentType'] = 'text/html';
+    }
+    $options = array(
+      'contentType' => isset($cacheSettings['contentType']) ? $cacheSettings['contentType'] : 'application/json',
+    );
+    if (checkCacheHeaders($mtime, $options)) {
+      // it's cached!
+      // roughly 120ms rn
+      // not any faster tbh
+      return false;
+    }
+    return true; // render content
+  }
   function exec($method, $path, $level = 0) {
+    $isHead = false;
+    if ($method === 'HEAD') {
+      $method = 'GET';
+      $isHead = true;
+    }
     $methods = $this->methods[$method];
     // could strip & but that's non-standard
     $segments = explode('/', $path);
@@ -246,7 +280,10 @@ class Router {
       if (count($matches) === 1) {
         $func = $matches[0]['func'];
         $request['params'] = $matches[0]['params'];
-        $func($request);
+        // if (not cache) && (not head)
+        if ($this->isCached($method . '_' . $matches[0]['cond']) && !$isHead) {
+          $func($request);
+        }
         return true;
       } else {
         $use = false;
@@ -262,11 +299,16 @@ class Router {
         if ($use) {
           $func = $use['func'];
           $request['params'] = $use['params'];
-          $func($request);
+          if ($this->isCached($method . '_' . $matches[0]['cond']) && !$isHead) {
+            $func($request);
+          }
         } else {
+          // not sure, just use first
           $func = $matches[0]['func'];
           $request['params'] = $matches[0]['params'];
-          $func($request);
+          if ($this->isCached($method . '_' . $matches[0]['cond']) && !$isHead) {
+            $func($request);
+          }
         }
         return true;
       }
