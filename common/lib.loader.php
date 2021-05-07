@@ -65,6 +65,7 @@ function registerPackageGroup($group) {
     //echo "filename: $file : filetype: " . filetype($dir . $file) . "\n";
     $path = $dir . '/' . $file;
     if (is_dir($path)) {
+      // usually fe/be dir
       $loaded++;
       $pkg = registerPackage($group . '/' . $file);
       if ($pkg) {
