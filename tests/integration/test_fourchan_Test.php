@@ -29,3 +29,5 @@ final class test_fourchan_Test extends TestCase
     }
 
 }
+
+?>
