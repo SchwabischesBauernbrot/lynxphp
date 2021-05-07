@@ -1,31 +1,333 @@
+/*army green*/
+
 :root {
-	--icon-color:invert(17%) sepia(89%) saturate(7057%) hue-rotate(2deg) brightness(93%) contrast(120%);
-	--alt-label-color:#6e7e46;
-	--alt-font-color:black;
-	--background-top:#2a401b;
-	--background-rest:#5b7744;
-	--navbar-color:#2a401b;
-	--post-color:#4e5e36;
-	--post-outline-color:#1a401b;
-	--label-color:#6e7e46;
-	--box-border-color:#1a401b;
-	--darken:#00000030;
-	--highlighted-post-color:#4e4e26;
-	--highlighted-post-outline-color:#411;
-	--board-title:#af0a0f;
-	--hr:#c2c888;
-	--font-color:#fff;
-	--name-color:#dd0;
-	--capcode-color:#f00;
-	--subject-color:#ff0;
-	--post-link-color:#f00;
-	--link-color:#d2d888;
-	--link-hover:#fff;
-	--input-borders:#a9a9a9;
-	--input-color:#000;
-	--input-background:white;
-	--dice-color:darkorange;
-	--title-color:#fd0;
-	--greentext-color:#de6;
+	--icon-color:invert(17%)sepia(89%)saturate(7057%)hue-rotate(2deg)brightness(93%)contrast(120%);
+	--alt-label-color: #475c4c; /*main element for the 'welcome to...'*/
+	--alt-font-color: #0f130b;
+	--background-top: #b1b9a2;
+	--background-rest: #b1b9a2;
+	--navbar-color: #526b4e;
+	--post-color: #f0f0f0;
+	--post-outline-color: #B7C5D9;
+	--label-color: #9aab8b; /*board/description BG color*/
+	--box-border-color: #313e35; /* the border*/ /* the border*/
+	--darken: #00000010;
+	--highlighted-post-color: #d6bad0;
+	--highlighted-post-outline-color: #ba9dbf;
+	--board-title: #324e3b;
+	--hr: lightgray;
+	--font-color: #0f130b;
+	--name-color: black;
+	--capcode-color: #f00;
+	--subject-color: #051b05;
+	--link-color: #2c3c2d;
+	--post-link-color: #d00;
+	--link-hover: black;
+	--input-borders: #324e3b;
+	--input-color: #324e3b;
+	--input-background: white;
+	--dice-color: darkorange;
+	--title-color: #d70000;
+	--greentext-color: green;
 	--pinktext-color:#E0727F;
+    --navbar-hover-element: #9aab8b;
+    --navbar-default-font-color: #d4e0ca;
 }
+
+style {}
+
+/*This is complicated af because of the borders, 
+and the navigation bar being a different link color.
+
+Styled specifically with some action hover links being complimtary colors,
+and to encourage certain actions while discouraging others.
+
+Everything is written in order which it is viewed, and is
+easy to style differently based on per-page designing if anyone 
+wants to modify it in the future. 
+
+If anyone is modifying this as a base for later, the suggested way of doing 
+this would be 
+
+>navigation bar 
+>then front page 
+>then thread view 
+>then catalog view
+>then login 
+>then settings
+
+Considered putting a table of contents here, but my notes are already 
+overkill.
+
+The only thing I didn't care to modify was the post reply color border,
+which has a padding of 5px. It looks less crowed this way, but styling 
+it would take a while to fix with the way the css is setup on the 
+main stylesheet. 
+
+It's also written so that you can just change the root colors and everything 
+will flow perfectly using the var for the rest of the stylesheet, assuming 
+you also want things to flow in this direction. 
+Otherwise it will become a massive PITA, don't bother.
+
+*/
+
+.navbar  {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	border: 0px solid;
+}
+
+
+.navbar a {
+	color: var(--navbar-default-font-color);
+}
+
+.navbar a:hover {
+	background-color: var(--navbar-hover-element);
+	border-radius: 10px;
+	color: var(--link-color) !important;
+}
+
+
+table {
+	overflow: hidden;
+	border-radius: 5px;
+	background-color: none;
+}
+
+th {
+
+	background-color: var(	--alt-label-color);
+	border-radius: 5px 5px px 0px;
+}
+
+a {
+	font-weight: bold;
+	text-decoration: none;
+}
+
+td {
+		border-top: 1px solid;
+		border-color: var(--box-border-color); /*30363d*/
+	overflow: hidden;
+	background-color: var(--label-color);
+}
+
+
+.toggle-summary {
+	color: var(--navbar-default-font-color) !important;
+	border-radius: 5px;
+	background-color: var(	--navbar-color);
+	border: 1px solid;
+	border-color:var(--box-border-color);
+}
+
+
+.toggle-summary:hover {
+	color: #ead6e0 !important;
+	background-color: #4e3245;
+
+}
+.catalog-tile {
+		margin-top: 5px;
+	border-radius: 5px;
+border: 1px solid;
+border-color: var(--box-border-color) !important;
+background-color: var(--label-color);
+
+
+/*
+	--label-color: #21262d; /*board/description BG color
+	--box-border-color:
+
+*/
+
+}
+
+.post-container, .post-container.op {
+	border-radius: 5px !important;
+	background-color: var(	--background-rest);
+	border: 1px solid;
+	border-color: var(--box-border-color);
+	padding: 5px;
+}
+
+.pages {
+		border-radius: 5px !important;
+	background-color: var(--label-color);
+	border: 1px solid;
+	border-color: var(--box-border-color);
+	padding: 10px;
+}
+
+/*be careful messing with this too much, or you'll get annoying 3px in the corner
+it triggers my perfectionism*/
+
+.form-post {
+	border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid;
+	border-color: var(  --box-border-color) !important;
+}
+
+#draghandle {
+	border: 1px solid; 
+	border-radius: 5px 0px 0px 0px;
+	background-color: var(--label-color);
+	border-color: var(--box-border-color);
+}
+
+
+/*encourage people to post, discourage them from closing a reply;
+no complimentary colors are added here*/
+
+.close {
+		color: var(--subject-color) !important;
+		border-radius: 0px 5px 0px 0px;
+		background-color: var(--label-color);
+	border-color: var(--box-border-color);
+}
+
+.close:hover {
+	color: var(--subject-color);
+	background-color: var(--navbar-hover-element) !important;
+	border: 1px solid #30363d !important;
+	border-color: var(  --font-color) !important;
+}
+
+
+/* 
+
+Come back to getting autistic about buttons later
+
+input[type="button"] {
+	  display: inline-block;
+  background: linear-gradient(top, #f9f9f9, #e3e3e3);
+  border: 1px solid #999;
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #fff;
+  font-weight: 700;
+  font-size: 10pt;
+} 
+
+*/
+
+
+input[type="text"],input[type="password"], input[type="number"], textarea {
+  border: 1px solid;
+  border-color: var(--box-border-color);
+  color: var(--linkcolor);
+  background-color : var(--background-rest); 
+
+}
+
+.form-post {
+	padding: 5px;
+}
+
+
+/*copy and paste from above (input types), otherwise it will look like trash and we're not trash*/
+select { 
+  border: 1px solid;
+  border-color: var(--box-border-color);
+  color: var(--linkcolor);
+  background-color : var(--background-rest); 
+}
+
+hr {
+	border: 0px;
+}
+
+
+
+
+.thread {
+    border-radius: 5px !important;
+    background-color: var(	--label-color);
+	border: 1px solid;
+	border-color: var(--box-border-color);
+	padding: 1px 5px 5px 5px;
+}
+
+.stickynav {
+	border-radius: 5px !important;
+	background-color: var(--label-color) !important;
+	border: 1px solid;
+	border-color: var(--box-border-color) !important;
+
+}
+
+#tab_delete.tab + label {
+	color: var(--name-color);
+	  border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid #30363d !important;
+	/*I don't really think writing yotsuba b into and hardstyling border styles is a good idea*/
+    	font-weight: bold;
+}
+
+#tab_delete.tab + label:hover {
+background-color: #4e3245 !important;
+border: 1px solid black !important;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+/* Make post(s) actions act like links
+the hover elements are to make it easier on mods and users */
+        
+#tab_report.tab + label {
+		color: var(--name-color);
+	  border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid #30363d !important;
+	border-color: var(  --font-color) !important;
+    	font-weight: bold;
+ }
+
+ #tab_report.tab + label:hover {
+background-color: #4e3245 !important;
+border: 1px solid black !important;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+#tab_media.tab + label {
+		color: var(--name-color);
+  border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid #30363d !important;
+	border-color: var(  --font-color) !important;
+    	font-weight: bold;
+    
+}
+
+#tab_media.tab + label:hover {
+background-color: #4e3245 !important;
+border: 1px solid black !important;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+#tab_ban.tab + label {
+		color: var(--name-color);
+ border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid #30363d !important;
+	border-color: var(  --font-color) !important;
+    	font-weight: bold;
+}
+
+#tab_ban.tab + label:hover {
+background-color: #4e3245 !important;
+border: 1px solid black !important;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+
