@@ -1,0 +1,241 @@
+
+
+
+:root {
+	--icon-color:invert(17%)sepia(89%)saturate(7057%)hue-rotate(2deg)brightness(93%)contrast(120%);
+	--alt-label-color: #f0f0f0; /*main element for the 'welcome to...'*/
+	--alt-font-color: #444444;
+	--background-top: #ffffff;
+	--background-rest: #ffffff;
+	--navbar-color: #196b7b;
+	--post-color: #f0f0f0;
+	--post-outline-color: #B7C5D9;
+	--label-color: #e4e4e4; /*board/description BG color*/
+	--box-border-color: #dbdbdb; /* the border*/
+	--darken: #00000010;
+	--highlighted-post-color: #d6bad0;
+	--highlighted-post-outline-color: #ba9dbf;
+	--board-title: #208681;
+	--hr: lightgray;
+	--font-color: #303030;
+	--name-color: #111111;
+	--capcode-color: #f00;
+	--subject-color: #0c3f5d;
+	--link-color: #333333;
+	--post-link-color: #d00;
+	--link-hover: #208681;
+	--input-borders: #a9a9a9;
+	--input-color: #333333;
+	--input-background: white;
+	--dice-color: darkorange;
+	--title-color: #d70000;
+	--greentext-color: green;
+	--pinktext-color:#E0727F;
+}
+
+/*I intentionally left this one without the var colors 
+because I think someone may find it useful to have more control
+over the original stylesheet in the distant future if they are 
+using lynxphp. This one has all the elements listed as actual colors,
+instead of using all (*mostly, some elements weren't possible) var 
+root colors like in army-green. 
+
+Everything is written in order which it is viewed, and is
+easy to style differently based on per-page designing if anyone 
+wants to modify it in the future. 
+
+If anyone is modifying this as a base for later, the suggested way of doing 
+this would be 
+
+>navigation bar 
+>then front page 
+>then thread view 
+>then catalog view
+>then login 
+>then settings
+
+Considered putting a table of contents here, but my notes are already 
+overkill. Just go in order, and you'll see the exact workflow.
+
+*/
+
+style {}
+
+.navbar  {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	border-bottom: 0px solid #30a88d;
+}
+
+
+.navbar a {
+	color: #afe3e4;
+}
+
+.navbar a:hover {
+	background-color: #2e8284;
+	border-radius: 10px;
+	color: #ffffff !important;
+}
+
+
+table {
+	overflow: hidden;
+	border: 1px solid #dbdbdb;
+	border-radius: 5px;
+	background-color: none;
+}
+
+th {
+
+	background-color: #f0f0f0;
+	border-radius: 5px 5px px 0px;
+}
+
+a {
+	font-weight: bold;
+	text-decoration: none;
+}
+
+td {
+		border-top: 1px solid #dbdbdb;
+	overflow: hidden;
+	background-color: #ffffff;
+}
+
+.catalog-tile {
+		margin-top: 5px;
+	border-radius: 5px;
+border: 1px solid #dbdbdb;
+
+}
+
+.post-container, .post-container.op {
+	border-radius: 5px !important;
+	background-color: #ffffff;
+	border: 1px solid #dbdbdb;
+	padding: 5px;
+}
+
+.pages {
+		border-radius: 5px !important;
+	background-color: #f0f0f0;
+	border: 1px solid #dbdbdb;
+	padding: 10px;
+}
+
+.form-post {
+	padding: 5px;
+	border-radius: 5px !important;
+	background-color: #ffffff !important;
+	border: 1px solid #dbdbdb !important;
+}
+
+#draghandle {
+	border: 1px solid  #dbdbdb !important;
+	border-radius: 5px 0px 0px 0px;
+	background-color: #dbdbdb;
+}
+
+.close {
+		border-radius: 0px 5px 0px 0px;
+	background-color: #dbdbdb;
+
+}
+
+
+/*
+
+get autistic about the buttons later
+
+
+input[type="button"] {
+	  display: inline-block;
+  background: linear-gradient(top, #f9f9f9, #e3e3e3);
+  border: 1px solid #999;
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #fff;
+  font-weight: 700;
+  font-size: 10pt;
+}
+
+*/
+hr {
+	border: 0px;
+}
+
+
+.thread {
+    border-radius: 5px !important;
+    background-color: #f0f0f0;
+	border: 1px solid #dbdbdb;
+	padding: 1px 5px 5px 5px;
+}
+
+.stickynav {
+	    border-radius: 5px !important;
+    background-color: #f0f0f0;
+	border: 1px solid #dbdbdb;
+
+}
+
+#tab_delete.tab + label {
+	border: 1px solid #dbdbdb !important;
+    border-radius: 5px;
+    	font-weight: bold;
+}
+
+#tab_delete.tab + label:hover {
+background-color: #f70a74;
+border: 1px solid #f70a74;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+/* Make post(s) actions act like links */
+        
+#tab_report.tab + label {
+		border: 1px solid #dbdbdb !important;
+    border-radius: 5px;
+        	font-weight: bold;
+ }
+
+ #tab_report.tab + label:hover {
+background-color: #f70a74;
+border: 1px solid #f70a74;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+#tab_media.tab + label {
+    border: 1px solid #dbdbdb !important;
+    border-radius: 5px;
+        	font-weight: bold;
+    
+}
+
+#tab_media.tab + label:hover {
+background-color: #f70a74;
+border: 1px solid #f70a74;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+#tab_ban.tab + label {
+	border: 1px solid #dbdbdb !important;
+    border-radius: 5px;
+        	font-weight: bold;
+    
+}
+
+#tab_ban.tab + label:hover {
+background-color: #f70a74;
+border: 1px solid #f70a74;
+	color: #ead6e0;
+	font-weight: bold;
+}

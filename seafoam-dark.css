@@ -1,0 +1,296 @@
+
+
+
+:root {
+	--icon-color:invert(17%)sepia(89%)saturate(7057%)hue-rotate(2deg)brightness(93%)contrast(120%);
+	--alt-label-color: #21262d; /*main element for the 'welcome to...'*/
+	--alt-font-color: #c9d1d9;
+	--background-top: #161b22;
+	--background-rest: #161b22;
+	--navbar-color: #196b7b;
+	--post-color: #f0f0f0;
+	--post-outline-color: #B7C5D9;
+	--label-color: #21262d; /*board/description BG color*/
+	--box-border-color: #30363d; /* the border*/ /* the border*/
+	--darken: #00000010;
+	--highlighted-post-color: #d6bad0;
+	--highlighted-post-outline-color: #ba9dbf;
+	--board-title: #36cdd0;
+	--hr: lightgray;
+	--font-color: #c9d1d9;
+	--name-color: #ffffff;
+	--capcode-color: #f00;
+	--subject-color: #1acad4;
+	--link-color: #f0f6fc;
+	--post-link-color: #d00;
+	--link-hover: #36cdd0;
+	--input-borders: #484f58;
+	--input-color: #333333;
+	--input-background: white;
+	--dice-color: darkorange;
+	--title-color: #d70000;
+	--greentext-color: green;
+	--pinktext-color:#E0727F;
+    --navbar-hover-element: #2e8284;
+    --navbar-default-font-color: #afe3e4;
+}
+
+/*I'm going to be honest, I just did this one as an afterthought and 
+got lazy. 
+I'll update it later, half of the elements are using var and other ones
+aren't, and if anyone wants to edit this in the future they won't 
+know what the fuck is going on. 
+It still works perfectly fine.
+
+The only issue with this theme is the small, very hard to see, 3px overlap
+in the login menu, it is driving me insane 
+
+See seafoam-light for more refine notes.*/
+
+style {}
+
+.navbar  {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	border: 0px solid;
+}
+
+
+.navbar a {
+	color: var(--navbar-default-font-color);
+}
+
+.navbar a:hover {
+	background-color: var(--navbar-hover-element);
+	border-radius: 10px;
+	color: var(--link-color) !important;
+}
+
+
+table {
+	overflow: hidden;
+	border-radius: 5px;
+	background-color: none;
+}
+
+th {
+
+	background-color: var(	--alt-label-color);
+	border-radius: 5px 5px px 0px;
+}
+
+a {
+	font-weight: bold;
+	text-decoration: none;
+}
+
+td {
+		border-top: 1px solid;
+		border-color: var(--box-border-color); /*30363d*/
+	overflow: hidden;
+	background-color: #161b22;
+}
+
+
+.toggle-summary {
+	color: var(--navbar-default-font-color) !important;
+	border-radius: 5px;
+	background-color: var(	--navbar-color);
+	border: 1px solid;
+	border-color: transparent;
+}
+
+
+.toggle-summary:hover {
+	color: var(--link-color) !important;
+	background-color: var(--navbar-hover-element);
+
+}
+.catalog-tile {
+		margin-top: 5px;
+	border-radius: 5px;
+border: 1px solid;
+border-color: var(--box-border-color) !important;
+background-color: var(--label-color);
+
+
+/*
+	--label-color: #21262d; /*board/description BG color
+	--box-border-color:
+
+*/
+
+}
+
+.post-container, .post-container.op {
+	border-radius: 5px !important;
+	background-color: var(	--background-rest);
+	border: 1px solid;
+	border-color: var(--box-border-color);
+	padding: 5px;
+}
+
+.pages {
+		border-radius: 5px !important;
+	background-color: var(	--alt-label-color);
+	border: 1px solid;
+	border-color: var(--box-border-color);
+	padding: 10px;
+}
+
+/*come back to me because there are three pixels showing in the corner*/
+
+.form-post {
+	border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid;
+	border-color: var(  --box-border-color) !important;
+}
+
+#draghandle {
+	border: 1px solid; /*come back to me aceie */
+	border-color: var(--input-borders);
+	border-radius: 5px 0px 0px 0px;
+	background-color: var(--box-border-color);
+}
+
+
+.close {
+	border: 1px solid;
+	border-color: var(--input-borders);
+		border-radius: 0px 5px 0px 0px;
+	background-color: var(	--box-border-color);
+}
+
+.close:hover {
+	background-color: var(--navbar-color);
+	border-color: var(--navbar-hover-element) !important;
+}
+
+
+
+/* 
+
+Come back to getting autistic about buttons later
+
+input[type="button"] {
+	  display: inline-block;
+  background: linear-gradient(top, #f9f9f9, #e3e3e3);
+  border: 1px solid #999;
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #fff;
+  font-weight: 700;
+  font-size: 10pt;
+} 
+
+*/
+
+
+input[type="text"],input[type="password"], input[type="number"], textarea {
+  border: 1px solid;
+  border-color: var(--box-border-color);
+  color: var(--linkcolor);
+  background-color : var(--background-rest); 
+
+}
+
+
+/*copy and paste from above (input types), otherwise it will look like trash and we're not trash*/
+select { 
+  border: 1px solid;
+  border-color: var(--box-border-color);
+  color: var(--linkcolor);
+  background-color : var(--background-rest); 
+}
+
+hr {
+	border: 0px;
+}
+
+
+
+
+.thread {
+    border-radius: 5px !important;
+    background-color: var(	--label-color);
+	border: 1px solid;
+	border-color: var(	--box-border-color);
+	padding: 1px 5px 5px 5px;
+}
+
+.stickynav {
+	    border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid;
+	border-color: var(  --box-border-color) !important;
+
+}
+
+#tab_delete.tab + label {
+	  border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid #30363d !important;
+	/*I don't really think writing yotsuba b into and hardstyling border styles is a good idea*/
+	border-color: var(  --box-border-color) !important;
+    	font-weight: bold;
+}
+
+#tab_delete.tab + label:hover {
+background-color: #f70a74;
+border: 1px solid #f70a74;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+/* Make post(s) actions act like links */
+        
+#tab_report.tab + label {
+	  border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid #30363d !important;
+	border-color: var(  --box-border-color) !important;
+    	font-weight: bold;
+ }
+
+ #tab_report.tab + label:hover {
+background-color: #f70a74;
+border: 1px solid #f70a74;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+#tab_media.tab + label {
+  border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid #30363d !important;
+	border-color: var(  --box-border-color) !important;
+    	font-weight: bold;
+    
+}
+
+#tab_media.tab + label:hover {
+background-color: #f70a74;
+border: 1px solid #f70a74;
+	color: #ead6e0;
+	font-weight: bold;
+}
+
+#tab_ban.tab + label {
+ border-radius: 5px !important;
+	background-color: var(--alt-label-color) !important;
+	border: 1px solid #30363d !important;
+	border-color: var(  --box-border-color) !important;
+    	font-weight: bold;
+}
+
+#tab_ban.tab + label:hover {
+background-color: #f70a74;
+border: 1px solid #f70a74;
+	color: #ead6e0;
+	font-weight: bold;
+}
