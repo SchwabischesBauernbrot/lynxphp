@@ -7,6 +7,9 @@
 // persist - not ok lose data, wait for consistency
 //   anything like this should be in the backend/db
 
+// what about big data sets versus small ones
+// maybe only important in the file driver
+
 interface scratch_implementation_interface {
   function inc($key, $step = 1);
   function set($key, $val);
