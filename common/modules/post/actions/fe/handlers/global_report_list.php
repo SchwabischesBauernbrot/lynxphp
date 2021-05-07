@@ -33,7 +33,7 @@ foreach ($result['reports'] as $r) {
   $tmp = str_replace('{{uri}}', $r['boardUri'], $tmp);
 
   $tmp = str_replace('{{_id}}', $r['_id'], $tmp);
-  $tmp = str_replace('{{zebra}}', ($r['_id'] % 2 === 1) ? 'odd' : 'even', $tmp);
+  $tmp = str_replace('{{zebra}}', ((int)$r['_id'] % 2 === 1) ? 'odd' : 'even', $tmp);
   $tmp = str_replace('{{global}}', $r['global'], $tmp);
   $tmp = str_replace('{{boardUri}}', $r['boardUri'], $tmp);
   $tmp = str_replace('{{threadId}}', $r['threadId'], $tmp);
@@ -42,7 +42,9 @@ foreach ($result['reports'] as $r) {
   $tmp = str_replace('{{post}}', renderPost($r['boardUri'], $thisPost), $tmp);
   $reports_html .= $tmp;
 }
-$tmpl = str_replace('{{backURL}}', 'global.php', $tmpl);
+// where to post the form:
+$tmpl = str_replace('{{uri}}', 'global', $tmpl);
+$tmpl = str_replace('{{backURL}}', 'global', $tmpl);
 $tmpl = str_replace('{{reports}}', $reports_html, $tmpl);
 
 wrapContent($tmpl);
