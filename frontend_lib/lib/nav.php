@@ -1,26 +1,7 @@
 <?php
 
 // FIXME: pass in template...
-function getNav($navItems, $replaces, $selected = '', $list = true) {
-  $nav_html = '';
-  if ($list) $nav_html = '<ul>';
-  foreach($navItems as $label => $urlTemplate) {
-    $url = $urlTemplate;
-    foreach($replaces as $s => $r) {
-      $url = str_replace('{{' . $s . '}}', $r, $url);
-    }
-    if ($list) $nav_html .= '<li>';
-    $class = '';
-    if ($selected === $label) {
-      $class = ' class="bold"';
-    }
-    $nav_html .= '<a' . $class . ' href="' . $url . '">' . $label . '</a>' . "\n";
-  }
-  if ($list) $nav_html .= '</ul>';
-  return $nav_html;
-}
-
-function getNav2($navItems, $options = array()) {
+function getNav($navItems, $options = array()) {
   $list = isset($options['list']) ? $options['list'] : true;
   $selected = isset($options['selected']) ? $options['selected'] :'';
   $selectedURL = isset($options['selectedURL']) ? $options['selectedURL'] : false;
@@ -31,10 +12,7 @@ function getNav2($navItems, $options = array()) {
   $nav_html = '';
   if ($list) $nav_html = '<ul>';
   foreach($navItems as $label => $urlTemplate) {
-    $url = $urlTemplate;
-    foreach($replaces as $s => $r) {
-      $url = str_replace('{{' . $s . '}}', $r, $url);
-    }
+    $url = replace_tags($urlTemplate, $replaces);
     if ($list) $nav_html .= '<li>';
     $class = '';
     //echo "selectedURL[$selectedURL] url[$url]<br>\n";
@@ -49,6 +27,42 @@ function getNav2($navItems, $options = array()) {
   if ($list) $nav_html .= '</ul>';
   return $nav_html;
 }
+
+function renderPortalHeader($type, $options = false) {
+  global $pipelines;
+
+  extract(ensureOptions(array(
+     // PIPELINE_type_HEADER_TMPL
+    'headerPipeline' => false,
+     // PIPELINE_type_NAV
+    'navPipeline' => false,
+    'navItems'  => array(),
+    'prelabel'  => '[',
+    'postlabel' => ']',
+  ), $options));
+
+  $templates = loadTemplates('mixins/' . $type . '_header');
+
+  $p = array(
+    'tags' => array()
+  );
+  if ($headerPipeline && isset($pipelines[$headerPipeline])) {
+    $pipelines[$headerPipeline]->execute($p);
+  }
+  if ($navPipeline && isset($pipelines[$navPipeline])) {
+    $pipelines[$navPipeline]->execute($navItems);
+  }
+  $nav_html = getNav($navItems, array(
+    'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
+    'prelabel' => $prelabel,
+    'postlabel' => $postlabel,
+  ));
+
+  return replace_tags($templates['header'], array_merge($p['tags'], array(
+    'nav' => $nav_html,
+  )));
+}
+
 
 /*
 $portal = array(
