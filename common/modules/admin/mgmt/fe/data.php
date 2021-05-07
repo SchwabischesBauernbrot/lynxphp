@@ -14,10 +14,13 @@ return array(
       ),
     ),
     'forms' => array(
+      // not built yet:
+      /*
       array(
         'route' => '/admin/users/add',
         'handler' => 'add',
       ),
+      */
       array(
         'route' => '/admin/users/:id/groups',
         'handler' => 'editgroups',
