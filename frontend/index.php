@@ -150,6 +150,7 @@ $frontEndPipelines = array(
   'PIPELINE_GLOBALS_NAV',
   'PIPELINE_GLOBALS_HEADER_TMPL',
 
+  // SETTINGS be included in the next 2?
   'PIPELINE_USER_NAV',
   'PIPELINE_USER_HEADER_TMPL',
   'PIPELINE_AFTER_WORK',
@@ -192,7 +193,7 @@ include '../frontend_lib/handlers/mixins/tabs.php'; // maybe more of a lib...
 
 // handlers
 include '../frontend_lib/handlers/login.php';
-include '../frontend_lib/handlers/signup.php';
+//include '../frontend_lib/handlers/signup.php';
 include '../frontend_lib/handlers/control_panel.php';
 include '../frontend_lib/handlers/boards.php';
 include '../frontend_lib/handlers/admin.php';
@@ -341,6 +342,7 @@ $router->post('/:uri/post', function($request) {
   }
 });
 
+/*
 $signupRoute = getRoute('/signup', '/signup.php');
 $router->get($signupRoute, function() {
   getSignup();
@@ -348,6 +350,8 @@ $router->get($signupRoute, function() {
 $router->post($signupRoute, function() {
   postSignup();
 });
+*/
+
 $loginRoute = getRoute('/forms/login', '/login.php');
 $router->get($loginRoute, function() {
   getLogin();
