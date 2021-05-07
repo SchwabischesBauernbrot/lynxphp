@@ -119,6 +119,9 @@ function expectJson($json, $endpoint = '', $options = array()) {
       }
     }
   }
+  if ($obj === false) {
+    echo "json[$json] parsed to false<br>\n";
+  }
   return $obj;
 }
 
@@ -177,7 +180,8 @@ function getBoard($boardUri) {
 
 function backendGetBoardThreadListing($boardUri, $pageNum = 1) {
   $threadListing = getExpectJson('opt/boards/' . $boardUri . '/' . $pageNum);
-  if ($threadListing === null) return;
+  //echo "type[", gettype($threadListing), "][$threadListing]\n";
+  if (!$threadListing) return;
   if (isset($threadListing['data']['board']['settings'])) {
     global $board_settings;
     $board_settings = $threadListing['data']['board']['settings'];
