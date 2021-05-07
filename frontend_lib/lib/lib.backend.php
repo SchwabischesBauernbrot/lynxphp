@@ -119,9 +119,11 @@ function expectJson($json, $endpoint = '', $options = array()) {
       }
     }
   }
+  /*
   if ($obj === false) {
     echo "json[$json] parsed to false<br>\n";
   }
+  */
   return $obj;
 }
 
