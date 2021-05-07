@@ -38,13 +38,15 @@ function postDBtoAPI(&$row) {
   // decode user_id
 }
 
-function getThread($boardUri, $threadNum) {
+function getThread($boardUri, $threadNum, $posts_model) {
   global $db;
-  $posts_model = getPostsModel($boardUri);
   if ($posts_model === false) {
-    // this board does not exist
-    sendResponse(array(), 404, 'Board not found');
-    return;
+    $posts_model = getPostsModel($boardUri);
+    if ($posts_model === false) {
+      // this board does not exist
+      sendResponse(array(), 404, 'Board not found');
+      return;
+    }
   }
   $post_files_model = getPostFilesModel($boardUri);
 
