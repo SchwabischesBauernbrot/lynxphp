@@ -98,11 +98,13 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $model['fields']['json'] = array('type'=>'text');
     // get name
     $tableName = modelToTableName($model);
+    $this->registeredTables[] = $tableName;
     //echo "Checking [$tableName]<br>\n";
     $res = mysqli_query($this->conn, 'describe `' . $tableName. '`');
     $err = mysqli_error($this->conn);
     // do we need to create table?
     if ($err && strpos($err, 'doesn\'t exist') !== false) {
+      mysqli_free_result($res);
       // don't need to clean failed query in mysql
       // create table
       //echo "creating table ", $tableName, "\n";
@@ -142,6 +144,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
         //print_r($row);
         $haveFields[ $row['Field'] ] = sqlToType($row['Type']);
       }
+      mysqli_free_result($res);
       $haveAll = true;
       $missing = array();
       $noChanges = true;
@@ -219,12 +222,16 @@ class mysql_driver extends database_driver_base_class implements database_driver
     }
     */
     // how does this handle multiple?
+    $this->markWriten($rootModel);
     return mysqli_insert_id($this->conn);
   }
 
   public function update($rootModel, $urow, $options) {
     $sql = $this->makeUpdateQuery($rootModel, $urow, $options);
     //echo "sql[$sql]<br>\n";
+    if ($rootModel['name'] !== 'table_tracker') {
+      $this->markWriten($rootModel);
+    }
     return $this->query($sql);
     /*
     $res = mysqli_query($this->conn, $sql);
@@ -240,6 +247,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function delete($rootModel, $options) {
     $sql = $this->makeDeleteQuery($rootModel, $options);
     //echo "sql[$sql]<br>\n";
+    $this->markWriten($rootModel);
     return $this->query($sql) ? true : false;
     /*
     $res = mysqli_query($this->conn, $sql);
