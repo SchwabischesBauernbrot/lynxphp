@@ -189,7 +189,7 @@ function getBoardThreadsModel($boardUri, $posts_model = false) {
 // get board thread
 // create board
 
-function boardPage($boardUri, $page = 1, $posts_model) {
+function boardPage($boardUri, $posts_model, $page = 1) {
   global $db, $tpp;
   $page = (int)$page;
   $lastXreplies = 5;
