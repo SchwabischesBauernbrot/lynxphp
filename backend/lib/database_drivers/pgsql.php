@@ -81,12 +81,27 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     $model['fields']['json'] = array('type'=>'text');
     // get name
     $tableName = modelToTableName($model);
-    $sql = 'SELECT column_name, data_type
-      FROM information_schema.columns
-      WHERE table_name = $1';
-    $res = pg_query_params($this->conn, $sql, array($tableName));
+    $this->registeredTables[] = $tableName;
+    // DEV_MODE is only a fe concept atm...
+    if (0) {
+      // just make things slower...
+      $sql = 'SELECT column_name, data_type
+        FROM information_schema.columns
+        WHERE table_name = $1';
+      //echo "sql[$sql]<br>\n";
+      $res = pg_query_params($this->conn, $sql, array($tableName));
+    } else {
+      // much faster? is it tho? 20ms faster
+      $sql = 'SELECT column_name, data_type
+        FROM information_schema.columns
+        WHERE table_name = \'' . $tableName . '\'';
+      //echo "sql[$sql]<br>\n";
+      $res = pg_query($this->conn, $sql);
+    }
     $err = pg_result_error($res);
+    if ($err) echo "pgsql::autoupdate - err[$err]\n";
     $rows = pg_num_rows($res);
+    //echo "rows[$rows] for [$tableName]<br>\n";
     // do we need to create table?
     if (!$rows) {
       pg_free_result($res);
@@ -131,13 +146,14 @@ class pgsql_driver extends database_driver_base_class implements database_driver
         return;
       }
       while($row = pg_fetch_assoc($res)) {
-        // Field, Type, Null, Key, Default, Extra
-        //print_r($row);
+        // column_name, data_type
+        //echo '<pre>', print_r($row, 1), "</pre>\n";
         if (!isset($this->sqlToModel[$row['data_type']])) {
           echo "pgsql::autoupdate - sql type[", $row['data_type'], "] is missing<br>\n";
         }
         $haveFields[ $row['column_name'] ] = $this->sqlToModel[$row['data_type']];
       }
+      pg_free_result($res);
       $haveAll = true;
       $missing = array();
       $noChanges = true;
@@ -216,18 +232,63 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     }
   }
 
+  function query($sqls) {
+    if (!is_array($sqls)) $sqls = array($sqls);
+    if (count($sqls) === 1) {
+      $res = pg_query($this->conn, $sqls[0]);
+      $err = pg_last_error($this->conn);
+      if ($err) {
+        echo "pgsql::insert - err[$err] [$sql]<br>\n";
+        return false;
+      }
+      return $res;
+    } else {
+      if (pg_connection_busy($this->conn)) {
+        echo "PostGres is busy<br>\n";
+        return false;
+      }
+      $line = join('; ', $sqls) . ';';
+      pg_trace('/tmp/trace.log', 'w', $this->conn);
+      pg_send_query($this->conn, $line);
+      return pg_get_result($this->conn); // $res
+      /*
+      $results = array();
+      while($res = pg_get_result($this->conn)) {
+        $results[] = $res;
+      }
+      pg_untrace($this->conn);
+      return $results;
+      */
+    }
+  }
+
   public function insert($rootModel, $recs) {
+    if (!count($recs)) {
+      echo "pgsql::insert - no records passed in<br>\n";
+      return;
+    }
     $sql = $this->makeInsertQuery($rootModel, $recs);
     //echo "sql[$sql]<br>\n";
-    $res = pg_query($this->conn, $sql . ' returning ' . modelToId($rootModel));
-    $err = pg_last_error($this->conn);
-    if ($err) {
-      echo "pgsql::insert - err[$err] [$sql]<br>\n";
-      return false;
+    if (0) {
+      // doesn't return the id...
+      $sqls = array($sql, 'select * from table_trackers;');
+      $res = $this->query($sqls);
+      list($id) = pg_fetch_row($res);
+      pg_free_result($res);
+      $res2 = pg_get_result($this->conn);
+      pg_free_result($res2);
+      pg_untrace($this->conn);
+    } else {
+      $res = pg_query($this->conn, $sql . ' returning ' . modelToId($rootModel));
+      $err = pg_last_error($this->conn);
+      if ($err) {
+        echo "pgsql::insert - err[$err] [$sql]<br>\n";
+        return false;
+      }
+      list($id) = pg_fetch_row($res);
+      pg_free_result($res);
+      $this->markWriten($rootModel);
     }
-    list($id) = pg_fetch_row($res);
-    pg_free_result($res);
-
     //echo "res[$res]<br>\n";
     // how does this handle multiple?
     return $id;
@@ -242,6 +303,9 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       echo "pgsql::update - err[$err]<br>\n";
       return false;
     }
+    if ($rootModel['name'] !== 'table_tracker') {
+      $this->markWriten($rootModel);
+    }
     return true;
   }
 
@@ -254,9 +318,12 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       echo "pgsql::delete - err[$err]<br>\n";
       return false;
     }
+    $this->markWriten($rootModel);
     return true;
   }
 
+  // not currently used
+  /*
   private function typeCriteria($model, &$crit) {
     $fields = $model['fields']; // $fieldname => $f['type']
     foreach($crit as $k => $set) {
@@ -275,6 +342,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       }
     }
   }
+  */
 
   // options
   //   fields = if not set, give all fields, else expect an array
