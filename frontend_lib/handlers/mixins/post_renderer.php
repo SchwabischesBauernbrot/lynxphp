@@ -70,7 +70,12 @@ function renderPost($boardUri, $p, $options = false) {
     //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
 
     // disbale images until we can mod...
-    $ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
+    $path = $file['path'];
+    // if not an absolute URL
+    if (strpos($path, '://') === false) {
+      $path = 'backend/' . $path;
+    }
+    $ftmpl = str_replace('{{path}}', $path, $ftmpl);
     $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
     if (isset($file['size'])) {
       $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
