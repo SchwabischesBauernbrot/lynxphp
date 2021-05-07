@@ -91,7 +91,7 @@ function getAccountPortalNav() {
     'Change recovery email' => BASE_HREF . 'account/change_email',
   );
   // FIXME: pipeline
-  return getNav2($navItems);
+  return getNav($navItems);
 }
 
 function getAccountPortal($options = false) {
