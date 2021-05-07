@@ -7,6 +7,17 @@ $migration_model = array(
   )
 );
 
+$table_model = array(
+  'name' => 'table_tracker',
+  'fields' => array(
+    'table_name' => array('type' => 'str'),
+    'structure_version' => array('type' => 'int'),
+    // structural date
+    // we could store a list fields? and a version?
+    // we can use the updated_at
+  ),
+);
+
 // config
 
 $config_model = array(
@@ -218,6 +229,7 @@ $frontends_model = array(
 global $db, $models;
 
 $db->autoupdate($migration_model);
+$db->autoupdate($table_model);
 $db->autoupdate($user_model);
 $db->autoupdate($user_session_model);
 $db->autoupdate($board_model);
@@ -239,6 +251,7 @@ $db->autoupdate($auth_challenges_model);
 
 $models = array(
   'migration' => $migration_model,
+  'table'     => $table_model,
   'config'    => $config_model,
   'board'     => $board_model,
   'session'   => $user_session_model,
