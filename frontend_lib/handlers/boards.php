@@ -265,28 +265,24 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
     $threads_html .= $threadftr_template;
   }
 
-  $tmpl = $templates['header'];
-
   $p = array(
     'boardUri' => $boardUri,
-    'tags' => array()
+    'tags' => array(
+      // need this for form actions
+      'uri' => $boardUri,
+      // title, description?
+      //'title' => htmlspecialchars($boardData['title']),
+      //'description' => htmlspecialchars($boardData['description']),
+      'threads' => threads_html,
+      'boardNav' => $boardnav_html,
+      'pagenum' => $pagenum,
+      // mixin
+      //'postform' => renderPostForm($boardUri, $boardUri . '/catalog'),
+      'postactions' => renderPostActions($boardUri),
+    ),
   );
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
-  foreach($p['tags'] as $s => $r) {
-    $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
-  }
-
-  // need this for form actions
-  $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
-  //$tmpl = str_replace('{{title}}', htmlspecialchars($boardData['title']), $tmpl);
-  //$tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
-  $tmpl = str_replace('{{threads}}', $threads_html, $tmpl);
-  $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
-  $tmpl = str_replace('{{pagenum}}', $pagenum, $tmpl);
-  // mixin
-  //$tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/'), $tmpl);
-  $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
-
+  $tmpl = replace_tags($templates['header'], $p['tags']);
   wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer']);
 }
 
@@ -331,28 +327,24 @@ function getThreadHandler($boardUri, $threadNum) {
 
   $p = array(
     'boardUri' => $boardUri,
-    'tags' => array()
+    'tags' => array(
+      // need this for form actions
+      'uri' => $boardUri,
+      'threadNum' => $threadNum,
+      'title' => htmlspecialchars($boardData['title']),
+      'description' => htmlspecialchars($boardData['description']),
+      //$tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
+      'posts' => $posts_html,
+      'replies' => count($boardData['posts']) - 1,
+      'files' => $files,
+      // mixins
+      //'postform' => renderPostForm($boardUri, $boardUri . '/catalog'),
+      'postactions' => renderPostActions($boardUri),
+    )
   );
   global $pipelines;
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
-  foreach($p['tags'] as $s => $r) {
-    $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
-  }
-
-  $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
-  $tmpl = str_replace('{{threadNum}}', $threadNum, $tmpl);
-  $tmpl = str_replace('{{title}}', htmlspecialchars($boardData['title']), $tmpl);
-  $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
-  //$tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
-  $tmpl = str_replace('{{posts}}', $posts_html, $tmpl);
-
-  $tmpl = str_replace('{{replies}}', count($boardData['posts']) - 1, $tmpl);
-  $tmpl = str_replace('{{files}}', $files, $tmpl);
-
-  // mixins
-  //$tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/thread/' . $threadNum . '.html', array('reply' => $threadNum)), $tmpl);
-  $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
-
+  $tmpl = replace_tags($tmpl, $p['tags']);
   $boardPortal = getBoardPortal($boardUri, $boardData, array(
     'isThread' => true,
     'threadNum' => $threadNum,
@@ -421,7 +413,10 @@ function getThumbnail($file, $maxW = 0) {
   $w = (int)$w;
   $h = (int)$h;
 
-  return '<' . $type . ' class="file-thumb" src="backend/'.$thumb.'" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />';
+  if (strpos($thumb, '://') === false) {
+    $thumb = 'backend/' . $thumb;
+  }
+  return '<' . $type . ' class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />';
 }
 
 function getBoardCatalogHandler($boardUri) {
@@ -474,45 +469,39 @@ function getBoardCatalogHandler($boardUri) {
 
   $tiles_html = '';
   if (is_array($catalog)) {
+    $tile_tags = array('uri' => $boardUri);
     foreach($catalog as $pageNum => $page) {
       foreach($page['threads'] as $thread) {
-        $tmp = $tile_template;
-        $tmp = str_replace('{{subject}}', htmlspecialchars($thread['sub']),  $tmp);
-        $tmp = str_replace('{{message}}', htmlspecialchars($thread['com']),  $tmp);
-        $tmp = str_replace('{{name}}',    htmlspecialchars($thread['name']), $tmp);
-        $tmp = str_replace('{{no}}',      $thread['no'], $tmp);
-        $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-        $tmp = str_replace('{{jstime}}', gmdate('Y-m-d', $thread['created_at']) . 'T' . gmdate('H:i:s.v', $thread['created_at']) . 'Z', $tmp);
-        $tmp = str_replace('{{human_created_at}}', gmdate('n/j/Y H:i:s', $thread['created_at']), $tmp);
         /*
         $tile_image = '<a href="' . BASE_HREF . $boardUri . '/thread/' .
           $thread['no']. '.html#' . $thread['no'] .
           '"><img src="images/imagelessthread.png" width=209 height=64></a><br>';
         */
-        $tile_image = '';
+
+        // update thread number
+        $tile_tags['no'] = $thread['no'];
+        //$tile_image = str_replace('{{file}}', 'backend/' . $thread['files'][0]['path'], $tile_image);
+        // filename, size, w, h
+        // thumb to be set
         if (isset($thread['files']) && count($thread['files'])) {
-          $tile_image = $image_template;
-          $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
-          $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
-          //$tile_image = str_replace('{{file}}', 'backend/' . $thread['files'][0]['path'], $tile_image);
-          $tile_image = str_replace('{{thumb}}', getThumbnail($thread['files'][0], 209), $tile_image);
-          /*
-          $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
-          $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
-          $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
-          $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
-        */
+          $tile_tags['thumb'] = getThumbnail($thread['files'][0], 209);
         } else {
-          $tile_image = $image_template;
-          $tile_image = str_replace('{{uri}}', $boardUri, $tile_image);
-          $tile_image = str_replace('{{no}}', $thread['no'], $tile_image);
-          $tile_image = str_replace('{{thumb}}', '<img src="images/imagelessthread.png" width=209 height=64>', $tile_image);
+          $tile_tags['thumb'] = '<img src="images/imagelessthread.png" width=209 height=64>';
         }
-        $tmp = str_replace('{{tile_image}}', $tile_image, $tmp);
-        $tmp = str_replace('{{replies}}', $thread['reply_count'], $tmp);
-        $tmp = str_replace('{{files}}', $thread['file_count'], $tmp);
-        $tmp = str_replace('{{page}}', $page['page'], $tmp);
-        $tiles_html .= $tmp;
+        $tags = array(
+          'uri' => $boardUri,
+          'subject' => htmlspecialchars($thread['sub']),
+          'message' => htmlspecialchars($thread['com']),
+          'name' => htmlspecialchars($thread['name']),
+          'no' => $thread['no'],
+          'jstime' => gmdate('Y-m-d', $thread['created_at']) . 'T' . gmdate('H:i:s.v', $thread['created_at']) . 'Z',
+          'human_created_at' => gmdate('n/j/Y H:i:s', $thread['created_at']),
+          'replies' => $thread['reply_count'],
+          'files' => $thread['file_count'],
+          'page' => $thread['page'],
+          'tile_image' => replace_tags($image_template, $tile_tags),
+        );
+        $tiles_html .= replace_tags($tile_template, $tags);
       }
     }
   }
@@ -525,21 +514,19 @@ function getBoardCatalogHandler($boardUri) {
 
   $p = array(
     'boardUri' => $boardUri,
-    'tags' => array()
+    'tags' => array(
+      'uri' => $boardUri,
+      'description' => htmlspecialchars($boardData['description']),
+      'tiles' => $tiles_html,
+      'boardNav' => $boardnav_html,
+      // mixin
+      //'postform' => renderPostForm($boardUri, $boardUri . '/catalog'),
+      'postactions' => renderPostActions($boardUri),
+    ),
   );
   global $pipelines;
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
-  foreach($p['tags'] as $s => $r) {
-    $tmpl = str_replace('{{' . $s . '}}', $r, $tmpl);
-  }
-
-  $tmpl = str_replace('{{uri}}',      $boardUri,      $tmpl);
-  $tmpl = str_replace('{{description}}', htmlspecialchars($boardData['description']), $tmpl);
-  $tmpl = str_replace('{{tiles}}',    $tiles_html,    $tmpl);
-  $tmpl = str_replace('{{boardNav}}', $boardnav_html, $tmpl);
-  // mixin
-  //$tmpl = str_replace('{{postform}}', renderPostForm($boardUri, $boardUri . '/catalog'), $tmpl);
-  $tmpl = str_replace('{{postactions}}', renderPostActions($boardUri), $tmpl);
+  $tmpl = replace_tags($tmpl, $p['tags']);
   wrapContent($boardHeader . $tmpl);
 }
 
@@ -554,7 +541,7 @@ function getBoardSettingsHandler($boardUri) {
   );
   $pipelines[PIPELINE_BOARD_SETTING_NAV]->execute($io);
   $nav_html = getNav($io['navItems'], array(
-    'uri' => $boardUri,
+    'replaces' => array('uri' => $boardUri),
   ));
 
   $tmpl = str_replace('{{nav}}', $nav_html, $tmpl);
