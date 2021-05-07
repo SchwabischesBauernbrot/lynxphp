@@ -21,6 +21,8 @@ include 'lib/database_drivers/' . DB_DRIVER . '.php';
 $driver_name = DB_DRIVER . '_driver';
 $db = new $driver_name;
 
+// FIXME: we need wrapper functions because, these should just be singleton/globals
+
 // make a queue
 // don't auto-detect, just get configuration
 // FIXME: make configurable
@@ -31,6 +33,10 @@ $queue = new $queue_type_class;
 // set up workqueue
 include '../common/workqueue.php';
 $workqueue = new work_queue;
+
+// set up cache tracker
+include 'lib/lib.cache_tracker.php';
+$cache_tracker = new cache_tracker;
 
 $tpp = 10; // threads per page
 
@@ -73,11 +79,31 @@ include 'interfaces/files.php';
 include 'interfaces/sessions.php';
 include 'interfaces/settings.php';
 
+$router->all('/4chan/*', $routers['4chan']);
+$router->all('/lynx/*', $routers['lynx']);
+$router->all('/opt/*', $routers['opt']);
+
+$req_method = getServerField('REQUEST_METHOD', 'GET');
+$req_path   = getServerField('PATH_INFO');
+
+// we could check
+if (0) {
+  // saves about 40ms
+  // but all the pipelines aren't set up
+
+  $res = $router->exec($req_method, $req_path);
+  if ($res) {
+    exit();
+  }
+}
+
 registerPackages();
 // build routes (and activate backend_handlers.php/models.php)
 foreach($packages as $pkg) {
   $pkg->buildBackendRoutes();
 }
+
+$db->ensureTables();
 
 $response_template = array(
   'meta' => array(
@@ -145,13 +171,6 @@ function sendResponse($data, $code = 200, $err = '', $meta = false) {
 function wrapContent($error) {
   sendResponse(array(), 400, $error);
 }
-
-$router->all('/4chan/*', $routers['4chan']);
-$router->all('/lynx/*', $routers['lynx']);
-$router->all('/opt/*', $routers['opt']);
-
-$req_method = getServerField('REQUEST_METHOD', 'GET');
-$req_path   = getServerField('PATH_INFO');
 
 $res = $router->exec($req_method, $req_path);
 if (!$res) {
