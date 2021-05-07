@@ -47,6 +47,9 @@ final class test_lynxchan_minimum_Test extends TestCase {
     $json = curlHelper(BACKEND_BASE_URL . $endpoint, $postData, '', '', '', 'POST');
     //echo "json[$json]<br>\n";
     $res = json_decode($json, true);
+    if (isset($res['meta']) && $res['meta']['code'] !== 200) {
+      echo "lynx/login - not 200 [", print_r($res, true), "]\n";
+    }
     usesSendResponse($this, $res);
     $this->assertSame(400, $res['meta']['code']);
     $this->assertArrayHasKey('err', $res['meta']);
@@ -67,6 +70,9 @@ final class test_lynxchan_minimum_Test extends TestCase {
     //echo "json[$json]<br>\n";
     $res = json_decode($json, true);
     //print_r($res);
+    if (isset($res['meta']) && $res['meta']['code'] !== 200) {
+      echo "lynx/login - not 200 [", print_r($res, true), "]\n";
+    }
     usesSendResponse($this, $res);
     $this->assertSame(200, $res['meta']['code']);
     $this->assertArrayHasKey('username', $res['data']);
@@ -212,10 +218,10 @@ final class test_lynxchan_minimum_Test extends TestCase {
     // duplicate symbol (getBoard) in lib.backend
     chdir('backend');
     // detecting the right config host is now important...
-    include 'config.php';
-    include 'lib/database_drivers/' . DB_DRIVER . '.php';
-    include 'lib/lib.board.php';
-    include '../common/lib.loader.php';
+    require 'config.php';
+    require 'lib/database_drivers/' . DB_DRIVER . '.php';
+    require 'lib/lib.board.php';
+    require_once '../common/lib.loader.php';
 
     // connect to db
     $driver_name = DB_DRIVER . '_driver';
