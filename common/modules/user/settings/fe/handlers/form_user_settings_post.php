@@ -2,7 +2,18 @@
 
 $params = $getHandler();
 
-$fields = $shared['fields']; // imported from shared.php
+$category = 'general';
+if (isset($params['request']['params']['category'])) {
+  $category = $params['request']['params']['category'];
+}
+
+global $pipelines;
+if (!isset($shared['CategoryFields'][$category])) {
+  return wrapContent(renderUserPortalHeader() .
+    'Invalid user setting category<br>' . "\n");
+}
+$fields = $shared['CategoryFields'][$category]; // imported from shared.php
+
 global $pipelines;
 // handle hooks for additional settings
 $pipelines[PIPELINE_BOARD_SETTING_GENERAL]->execute($fields);
