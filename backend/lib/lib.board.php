@@ -73,13 +73,21 @@ function boardDealer($connections, $boardUri) {
   return $connections[$v % count($connections)];
 }
 
+$getPostsModel = array();
 function getPostsModel($boardUri) {
-  global $db, $models;
+  global $db, $models, $getPostsModel;
 
-  $res = $db->find($models['board'], array('criteria'=>array(
+  if (!empty($getPostsModel[$boardUri])) {
+    echo "getPostsModel called for [$boardUri] last call[$getPostsModel] trace[", gettrace(), "]<br>\n";
+  } else {
+    $getPostsModel[$boardUri] = gettrace();
+  }
+
+  $cnt = $db->count($models['board'], array('criteria'=>array(
       array('uri', '=', $boardUri),
   )));
-  if (!$db->num_rows($res)) {
+  if (!$cnt) {
+    //echo "getPostsModel no such [$boardUri]<br>\n";
     return false;
   }
   $public_post_model = array(
@@ -109,13 +117,20 @@ function getPostsModel($boardUri) {
   return $public_post_model;
 }
 
+$getPostFilesModel = array();
 function getPostFilesModel($boardUri) {
-  global $db, $models;
+  global $db, $models, $getPostFilesModel;
 
-  $res = $db->find($models['board'], array('criteria'=>array(
+  if (!empty($getPostFilesModel[$boardUri])) {
+    echo "getPostFilesModel called for [$boardUri] last call[$getPostFilesModel] trace[", gettrace(), "]<br>\n";
+  } else {
+    $getPostFilesModel[$boardUri] = $boardUri . '_' . gettrace();
+  }
+
+  $cnt = $db->count($models['board'], array('criteria'=>array(
       array('uri', '=', $boardUri),
   )));
-  if (!$db->num_rows($res)) {
+  if (!$cnt) {
     return false;
   }
   $public_post_file_model = array(
