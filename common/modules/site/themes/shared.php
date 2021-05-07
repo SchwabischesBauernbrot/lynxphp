@@ -26,6 +26,8 @@ return array(
     'vapor' => 'Vapor',
     'win95' => 'Windows 95',
     'snerx' => 'SnerxWerx',
+    'seaform-dark' => 'Seaform Dark',
+    'seaform-light' => 'Seaform Light',
   ),
 );
 
