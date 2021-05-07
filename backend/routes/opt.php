@@ -47,7 +47,7 @@ $router->get('/boards/:uri/:page', function($request) {
   $posts_model = getPostsModel($boardUri);
 
   $threadCount = getBoardThreadCount($boardUri, $posts_model);
-  $threads = boardPage($boardUri, $pageNum, $posts_model);
+  $threads = boardPage($boardUri, $posts_model, $pageNum);
   sendResponse(array(
     'board' => $boardData,
     'page1' => $threads,

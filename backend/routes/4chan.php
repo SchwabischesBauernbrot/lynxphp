@@ -86,7 +86,12 @@ $router->get('/:board/threads.json', function($request) {
 $router->get('/:board/:page', function($request) {
   $boardUri = $request['params']['board'];
   $page = str_replace('.json', '', $request['params']['page']);
-  $threads = boardPage($boardUri, $page);
+  $posts_model = getPostsModel($boardUri);
+  if (!$posts_model) {
+    echo '[]';
+    return;
+  }
+  $threads = boardPage($boardUri, $posts_model, $page);
   $res = array(
     'threads' => $threads,
   );
