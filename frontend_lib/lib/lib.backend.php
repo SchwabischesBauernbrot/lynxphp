@@ -3,6 +3,8 @@
 // is this file going to get huge
 // should we specialize or tie to handler?
 
+// FIXME: option for should only work over TLS unless same ip/localhost
+
 /**
  * consume backend resource
  * options
@@ -25,6 +27,7 @@
 //   because then the frontend would have to download it everytime it's called
 //   though you could cache it locally
 // I don't think we need $params at all
+// we don't need to define optional params
 function consume_beRsrc($options, $params = '') {
   if (!isset($options['endpoint'])) return;
   $postData = '';
