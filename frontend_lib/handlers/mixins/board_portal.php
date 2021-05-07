@@ -1,16 +1,18 @@
 <?php
 
-function renderBoardPortalHeaderData($boardUri, $boardData, $options = false) {
+function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   global $pipelines;
   $pagenum   = 0;
   $isCatalog = 0;
   $isThread  = 0;
   $threadNum = 0;
+  $noBoardHeaderTmpl = false;
   if (is_array($options)) {
     if (isset($options['pagenum']))   $pagenum   = $options['pagenum'];
     if (isset($options['isCatalog'])) $isCatalog = $options['isCatalog'];
     if (isset($options['isThread']))  $isThread  = $options['isThread'];
     if (isset($options['threadNum'])) $threadNum = $options['threadNum'];
+    if (isset($options['noBoardHeaderTmpl'])) $noBoardHeaderTmpl = $options['noBoardHeaderTmpl'];
   }
 
   $templates = loadTemplates('mixins/board_header');
@@ -25,7 +27,7 @@ function renderBoardPortalHeaderData($boardUri, $boardData, $options = false) {
   );
   $pipelines[PIPELINE_BOARD_NAV]->execute($navItems);
 
-  $nav_html = getNav2($navItems, array(
+  $nav_html = getNav($navItems, array(
     'list' => false,
     // handle no pages...
     //'selected' => $pageCount ? $selected : NULL,
@@ -41,7 +43,7 @@ function renderBoardPortalHeaderData($boardUri, $boardData, $options = false) {
 
     $pages_html = '';
     // FIXME: wire this up
-    for($p = 1; $p <= $boardData['pageCount']; $p++) {
+    for($p = 1; $p <= $pageCount; $p++) {
       $tmp = $pageLink_tmpl;
       // FIXME: use replace_tags
       $tmp = str_replace('{{uri}}', $boardUri, $tmp);
@@ -59,13 +61,15 @@ function renderBoardPortalHeaderData($boardUri, $boardData, $options = false) {
     $boardNav = $nav_html;
   }
 
-
   $p = array(
     'tags' => array(),
     'boardUri' => $boardUri,
   );
-  // banner is injected here:
-  $pipelines[PIPELINE_BOARD_HEADER_TMPL]->execute($p);
+  //echo "noBoardHeaderTmpl[$noBoardHeaderTmpl]<Br>\n";
+  if (!$noBoardHeaderTmpl) {
+    // banner is injected here:
+    $pipelines[PIPELINE_BOARD_HEADER_TMPL]->execute($p);
+  }
 
   return array(
     'tmpl' => $tmpl,
@@ -151,7 +155,7 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
 // this isn't chainable
 // it doesn't return a str
 function getBoardPortal($boardUri, $boardData = false, $options = false) {
-  $row = renderBoardPortalHeaderData($boardUri, $boardData, $options);
+  $row = renderBoardPortalData($boardUri, $boardData['pageCount'], $options);
   return array(
     'header' => renderBoardPortalHeaderEngine($row, $boardUri, $boardData),
     'footer' => renderBoardPortalFooterEngine($row, $boardUri, $boardData)
@@ -164,7 +168,7 @@ function renderBoardPortalHeader($boardUri, $boardData = false, $options = false
   if ($boardData === false) {
     // FIXME: look up board data on-demand
   }
-  $row = renderBoardPortalHeaderData($boardUri, $boardData, $options);
+  $row = renderBoardPortalData($boardUri, $boardData['pageCount'], $options);
   return renderBoardPortalHeaderEngine($row, $boardUri, $boardData);
 }
 
@@ -172,7 +176,7 @@ function renderBoardPortalFooter($boardUri, $boardData = false, $options = false
   if ($boardData === false) {
     // FIXME: look up board data on-demand
   }
-  $row = renderBoardPortalHeaderData($boardUri, $boardData, $options);
+  $row = renderBoardPortalData($boardUri, $boardData['pageCount'], $options);
   echo renderBoardPortalFooterEngine($row, $boardUri, $boardData);
 }
 
