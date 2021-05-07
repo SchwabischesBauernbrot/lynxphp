@@ -129,6 +129,10 @@ function generateForm($action, $fields, $values, $options = false) {
     if (isset($details['autocomplete'])) {
       $ac = ' autocomplete="chrome-off"';
     }
+    $ph = '';
+    if (isset($details['placeholder'])) {
+      $ph = ' placeholder="' . $details['placeholder'] . '"';
+    }
     switch($details['type']) {
       case 'hidden':
         $html .= '<input type=hidden name="'.$field.'" value="' . $value . '">';
@@ -139,10 +143,14 @@ function generateForm($action, $fields, $values, $options = false) {
       break;
       */
       case 'text':
-        $html .= '<input type=text name="'.$field.'" value="' . $value . '"'.$ac.'>';
+        $html .= '<input type=text name="'.$field.'" value="' . $value . '"'.$ac.$ph.'>';
       break;
       case 'email':
-        $html .= '<input type=email name="'.$field.'" value="' . $value . '"'.$ac.'>';
+        $html .= '<input type=email name="'.$field.'" value="' . $value . '"'.$ac.$ph.'>';
+      break;
+      case 'textpass':
+        // always blank and can't be cleared
+        $html .= '<input type=text name="'.$field.'">';
       break;
       case 'password':
         // always blank and can't be cleared
@@ -176,6 +184,19 @@ function generateForm($action, $fields, $values, $options = false) {
         );
         // generate/store/send captcha challange, image, and possibly an ID
         $pipelines[PIPELINE_FORM_CAPTCHA]->execute($io);
+        if (isset($io['html'])) {
+          $html .= $io['html'];
+        }
+      break;
+      case 'themethumbnails':
+        // great for keeping the size of this file down
+        $io = array(
+          'field'   => $field,
+          'details' => $details,
+          'value'   => $value,
+        );
+        // generate/store/send captcha challange, image, and possibly an ID
+        $pipelines[PIPELINE_FORM_WIDGET_THEMETHUMBNAILS]->execute($io);
         if (isset($io['html'])) {
           $html .= $io['html'];
         }
