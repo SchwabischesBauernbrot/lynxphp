@@ -47,9 +47,6 @@ final class test_lynxchan_minimum_Test extends TestCase {
     $json = curlHelper(BACKEND_BASE_URL . $endpoint, $postData, '', '', '', 'POST');
     //echo "json[$json]<br>\n";
     $res = json_decode($json, true);
-    if (isset($res['meta']) && $res['meta']['code'] !== 200) {
-      echo "lynx/login - not 200 [", print_r($res, true), "]\n";
-    }
     usesSendResponse($this, $res);
     $this->assertSame(400, $res['meta']['code']);
     $this->assertArrayHasKey('err', $res['meta']);
