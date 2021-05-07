@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 interface database_driver_base {
   public function connect_db($host, $user, $pass, $db, $port = 0);
@@ -32,6 +32,7 @@ class database_driver_base_class {
     $this->modelToSQL = array();
     $this->sqlToModel = array();
     $this->subselectCounter = 0;
+    $this->registeredTables = array();
   }
   public function connect_db($host, $user, $pass, $db, $port = 0) {
     if (!$this->connect($host, $user, $pass, $port)) {
@@ -58,6 +59,10 @@ class database_driver_base_class {
     foreach($criteria as $k => $set) {
       //echo "k[$k] [", print_r($set, 1), "]<bR>\n";
       if (is_numeric($k)) {
+        if (!is_array($set)) {
+          echo '<pre>base:::database_driver_base_class::build_where - [', $defAlias, '] Criteria[', print_r($criteria, 1), "]</pre>\n";
+          exit(1);
+        }
         // flexible criteria
         if (is_array($set[0])) {
           $left = $set[0][0];
@@ -99,6 +104,9 @@ class database_driver_base_class {
             return false;
           }
           $inSet = $set[2];
+          $inSet = array_map(function($v) {
+            return is_array($v) ? $v[0] : $this->make_constant($v);
+          }, $inSet);
           // we will need to address this...
           /*
           if ($defAlias) {
@@ -110,34 +118,78 @@ class database_driver_base_class {
           */
           $tokens[] = $one . ' ' . $operand . ' (' . join(',', $inSet). ')';
         } else {
-          if (is_array($set[2])) {
-            $tokens[] = $one . ' ' . $operand . ' ' . $set[2][0];
-          } else {
-            $tokens[] = $one . ' ' . $operand . ' ' . $this->make_constant($set[2]);
-          }
+          $tokens[] = $one . ' ' . $operand . ' ' . (is_array($set[2]) ? $set[2][0] : $this->make_constant($set[2]));
         }
       } else {
         // named key
-        if (is_array($set)) {
-          // direct
-          $tokens[] = $alias . $k . '=' . $set;
-        } else {
-          // default: safe
-          $tokens[] = $alias . $k . '=' . $this->make_constant($set);
-        }
+        // direct vs default: safe
+        $tokens[] = $alias . $k . '=' . (is_array($set) ? $set[0] : $this->make_constant($set));
       }
       $c++;
       //echo "[$c/$end]<br>\n";
       if ($c !== $end) {
         //echo "Adding [$mode]<br>\n";
-        if ($mode === 'and') {
-          $tokens[] = 'AND';
-        } else {
-          $tokens[] = 'OR';
-        }
+        $tokens[] = ($mode === 'and') ? 'AND' : 'OR';
       }
     }
     return join(' ', $tokens);
+  }
+
+  function ensureTables() {
+    global $models;
+    if (!isset($models['table'])) {
+      return false;
+    }
+    $res = $this->find($models['table'], array('criteria' => array(
+      array('table_name', 'IN', $this->registeredTables),
+    )));
+    if (!$res) {
+      return false;
+    }
+    // an array, so copy
+    $toCreateNames = array_flip($this->registeredTables);
+    while($row = $this->get_row($res)) {
+      //print_r($row);
+      $table = $row['table_name'];
+      unset($toCreateNames[$table]);
+    }
+    $this->free($res);
+    $rows = array_map(function($tableName) {
+      return array('table_name' => $tableName);
+    }, array_filter(array_keys($toCreateNames), function($v) { return $v; } ));
+    //echo "<pre>Rows[", print_r($rows, 1), "]</pre>\n";
+    if (count($rows)) {
+      $this->insert($models['table'], $rows);
+    }
+    // clear, so we can't ensureTables again
+    $this->registeredTables = array();
+  }
+
+  function getLast($tables) {
+    global $models;
+    if (!is_array($tables)) $tables = array($tables);
+    $res = $this->find($models['table'], array('criteria' => array(
+      array('table_name', 'IN', $tables),
+    )));
+    // memory constrained version
+    $max = 0;
+    while($row = $this->get_row($res)) {
+      $max = max($max, $row['updated_at']);
+    }
+    $this->free($res);
+    return $max;
+  }
+
+  protected function markWriten($rootModel) {
+    global $models;
+    if (!isset($models['table'])) {
+      return false;
+    }
+    $tableName = modelToTableName($rootModel);
+    $this->update($models['table'], array(), array('criteria' => array(
+      'table_name' => $tableName
+    )));
+    return true;
   }
 
   protected function makeInsertQuery($rootModel, $recs) {
@@ -148,11 +200,8 @@ class database_driver_base_class {
     $recs[0]['created_at'] = $date;
     $recs[0]['updated_at'] = $date;
     $fields = join(',', array_keys($recs[0]));
-    if ($this->btTables) {
-      $sql = 'insert into `' . $tableName . '` (' . $fields . ') values';
-    } else {
-      $sql = 'insert into ' . $tableName . ' (' . $fields . ') values';
-    }
+    $sTableName = $this->btTables ? '`' . $tableName . '`' : $tableName;
+    $sql = 'insert into ' . $sTableName . ' (' . $fields . ') values';
     $sets = array();
     foreach($recs as $rec) {
       $cleanArr = array();
@@ -160,11 +209,7 @@ class database_driver_base_class {
       $rec['created_at'] = $date;
       $rec['updated_at'] = $date;
       foreach($rec as $val) {
-        if (is_array($val)) {
-          $cleanArr[] = $val;
-        } else {
-          $cleanArr[] = $this->make_constant($val);
-        }
+        $cleanArr[] = is_array($val) ? $val[0] : $this->make_constant($val);
       }
       $sets[] = '(' . join(',', $cleanArr) . ')';
     }
@@ -185,22 +230,17 @@ class database_driver_base_class {
     }
     foreach($urow as $f=>$v) {
       // updates are always assignments (=, never </>=)
-      if (is_array($v)) {
-        $val = $v[0];
-      } else {
-        $val = $this->make_constant($v);
-      }
+      $val = is_array($v) ? $v[0] : $this->make_constant($v);
       $sets[$f] = $f . '=' . $val;
     }
-    if ($this->forceUnsetIdOnUpdate) {
-      $idf = modelToId($rootModel);
-      unset($sets[$idf]);
-    }
-    if ($this->btTables) {
-      $sql = 'update `' .$tableName . '` set '. join(', ', $sets);
-    } else {
-      $sql = 'update ' .$tableName . ' set '. join(', ', $sets);
-    }
+    // postgres doesn't allow you to set the AI PK
+    // lets make sure other doesn't do this too then
+    //if ($this->forceUnsetIdOnUpdate) {
+    $idf = modelToId($rootModel);
+    unset($sets[$idf]);
+    //}
+    $sTableName = $this->btTables ? '`' . $tableName . '`' : $tableName;
+    $sql = 'update ' .$sTableName . ' set '. join(', ', $sets);
     if (isset($options['criteria'])) {
       $sql .= ' where ' . $this->build_where($options['criteria']);
     }
@@ -209,11 +249,8 @@ class database_driver_base_class {
 
   protected function makeDeleteQuery($rootModel, $options) {
     $tableName = modelToTableName($rootModel);
-    if ($this->btTables) {
-      $sql = 'delete from `' .$tableName . '`';
-    } else {
-      $sql = 'delete from ' .$tableName;
-    }
+    $sTableName = $this->btTables ? '`' . $tableName . '`' : $tableName;
+    $sql = 'delete from ' .$sTableName;
     if (isset($options['critera']) && !isset($options['criteria'])) {
       $options['criteria'] = $options['critera'];
     }
@@ -409,13 +446,7 @@ class database_driver_base_class {
       }, explode(',', $fields)), $data['fields']);
     }
 
-    /*
-    if ($this->btTables && !isset($rootModel['query'])) {
-      $sql = 'select '. join("\n" . ',', $useFields) . "\n" . 'from `' . $tableName . '`';
-    } else {
-    */
-      $sql = 'select '. join("\n" . ',', $useFields) . "\n" . 'from ' . $tableName;
-    //}
+    $sql = 'select '. join("\n" . ',', $useFields) . "\n" . 'from ' . $tableName;
     $useAlias = '';
     if (count($data['joins'])) {
       $sql .= "\n" . join("\n", $data['joins']);
