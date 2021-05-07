@@ -14,7 +14,8 @@ $banners = $db->toArray($res);
 // just pass through the settings for now...
 boardRowFilter($boardData, $boardData['json'], array('jsonFields' => 'settings'));
 // I don't think this is required
-$boardData['threadCount'] = getBoardThreadCount($boardData['uri']);
+$posts_model = getPostsModel($boardUri);
+$boardData['threadCount'] = getBoardThreadCount($boardData['uri'], $posts_model);
 $boardData['pageCount'] = ceil($boardData['threadCount']/$tpp);
 
 sendResponse($banners, 200, '', array('board' => $boardData));

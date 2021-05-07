@@ -8,9 +8,9 @@ $boards = listBoards(array('publicOnly' => true));
 global $db;
 $res = array();
 foreach($boards as $b) {
-  $b['threads'] = getBoardThreadCount($b['uri']); // 1 query
+  $posts_model = getPostsModel($b['uri']);
+  $b['threads'] = getBoardThreadCount($b['uri'], $posts_model); // 1 query
   if ($b['threads']) {
-    $posts_model = getPostsModel($b['uri']);
     $newestThreadRes = $db->find($posts_model, array('criteria'=>array(
       array('threadid', '=', 0), // 1 query
     ), 'limit' => '1', 'order'=>'updated_at desc'));
