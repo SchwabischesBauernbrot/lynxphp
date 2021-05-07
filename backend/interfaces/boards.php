@@ -53,6 +53,7 @@ function listBoards($options = false) {
   $res = $db->find($boardsModel, $qOptions);
   $boards = array();
   while($row = $db->get_row($res)) {
+    $json = false;
     if ($filterPublic) {
       $json = json_decode($row['json'], true);
     }
@@ -140,11 +141,14 @@ function getBoards($boardUris) {
   return $row;
 }
 
-function getBoardThreadsModel($boardUri) {
+function getBoardThreadsModel($boardUri, $posts_model = false) {
   global $db;
-  $posts_model = getPostsModel($boardUri);
-  if ($posts_model === false) {
-    return false;
+
+  if (!$posts_model) {
+    $posts_model = getPostsModel($boardUri);
+    if ($posts_model === false) {
+      return false;
+    }
   }
 
   $postTable = modelToTableName($posts_model);
@@ -185,17 +189,12 @@ function getBoardThreadsModel($boardUri) {
 // get board thread
 // create board
 
-function boardPage($boardUri, $page = 1) {
+function boardPage($boardUri, $page = 1, $posts_model) {
   global $db, $tpp;
   $page = (int)$page;
   $lastXreplies = 5;
+
   // get threads for this page
-  $posts_model = getPostsModel($boardUri);
-  if ($posts_model === false) {
-    // this board does not exist
-    sendResponse(array(), 404, 'Board not found');
-    return;
-  }
   $post_files_model = getPostFilesModel($boardUri);
   $limitPage = $page - 1; // make it start at 0
   if ($limitPage < 0) $limitPage = 0;
@@ -229,7 +228,7 @@ function boardPage($boardUri, $page = 1) {
       'srcField' => 'threadid',
       'pluck' => array('count(ALIAS.postid) as cnt'),
       'groupby' => array('MODEL.postid'),
-      'having' => '('.$postTable.'.deleted=\'0\' or ('.$postTable.'.deleted=\'1\' and count(ALIAS.postid)>0))',
+      'having' => '(' . $postTable . '.deleted=\'0\' or (' . $postTable . '.deleted=\'1\' and count(ALIAS.postid)>0))',
       'where' => array(
         array('deleted', '=', 0)
       ),
@@ -499,7 +498,7 @@ function boardCatalog($boardUri) {
   $filesFields = array_keys($post_files_model['fields']);
   $filesFields[] = 'fileid';
 
-  $threadModel = getBoardThreadsModel($boardUri);
+  $threadModel = getBoardThreadsModel($boardUri, $posts_model);
   $threadModel['children'] = array(
     array(
       'type' => 'left',
@@ -648,20 +647,16 @@ function isBO($boardUri, $userid = false) {
 }
 
 // optimization
-function getBoardThreadCount($boardUri) {
+// could make posts_model optional
+function getBoardThreadCount($boardUri, $posts_model) {
   global $db;
-  $threadModel = getBoardThreadsModel($boardUri);
+  $threadModel = getBoardThreadsModel($boardUri, $posts_model);
   $threadCount = $db->count($threadModel);
   return $threadCount;
 }
 
-function getBoardPostCount($boardUri) {
+function getBoardPostCount($boardUri, $posts_model) {
   global $db;
-  $posts_model = getPostsModel($boardUri);
-  if ($posts_model === false) {
-    // this board does not exist
-    return 0;
-  }
   // include deleted posts?
   // just max(postid) then...
   $postCount = $db->count($posts_model);
