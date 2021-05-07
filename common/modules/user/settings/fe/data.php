@@ -9,6 +9,10 @@ return array(
         'route' => '/user/settings',
         'handler' => 'user_settings',
       ),
+      array(
+        'route' => '/user/settings/:category',
+        'handler' => 'user_settings',
+      ),
       /*
       array(
         'route' => '/admin/users/add',
@@ -32,6 +36,12 @@ return array(
         'module'   => 'nav',
       ),
       */
+    ),
+    'pipelines' => array(
+      array(
+        // change the actual fields for settings
+        'name' => 'PIPELINE_MODULE_USER_SETTINGS_FIELDS',
+      ),
     ),
   ),
 );
