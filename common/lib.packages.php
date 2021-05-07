@@ -183,6 +183,7 @@ class package {
     $result = consume_beRsrc($rsrc, $params);
     return $result;
   }
+  // hotpath
   function buildBackendRoutes() {
     global $routers, $pipelines;
     // we install models...
@@ -274,6 +275,7 @@ class package {
       }
     }
   }
+  // hotpath
   function buildFrontendRoutes(&$router, $method) {
     // activate frontend hooks
     if (file_exists($this->dir . 'fe/data.php')) {
@@ -297,7 +299,11 @@ class package {
         }
         if (isset($pData['modules']) && is_array($pData['modules'])) {
           foreach($pData['modules'] as $m) {
-            $fePkg->addModule(constant($m['pipeline']), $m['module']);
+            if (!defined($m['pipeline'])) {
+              echo "Pipeline [", $m['pipeline'], "] is not defined, found in [", $this->dir, "]<br>\n";
+            } else {
+              $fePkg->addModule(constant($m['pipeline']), $m['module']);
+            }
           }
         }
         if (isset($pData['pipelines']) && is_array($pData['pipelines'])) {
