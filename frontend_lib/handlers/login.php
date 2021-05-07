@@ -30,7 +30,7 @@ function postLogin() {
   $user = $_POST['username'];
   $pass = $_POST['password'];
 
-  include 'lib/lib.sodium.php';
+  include '../frontend_lib/lib/lib.sodium.php';
   $resp = getVerifiedChallengedSignature($user, $pass);
   if ($resp === false) {
     wrapContent("Backend could not provide a challenge, please try again later");
