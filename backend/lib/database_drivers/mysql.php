@@ -104,8 +104,8 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $err = mysqli_error($this->conn);
     // do we need to create table?
     if ($err && strpos($err, 'doesn\'t exist') !== false) {
-      mysqli_free_result($res);
       // don't need to clean failed query in mysql
+      //mysqli_free_result($res);
       // create table
       //echo "creating table ", $tableName, "\n";
       $sql = 'create table `' . $tableName. '` (';
