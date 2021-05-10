@@ -273,7 +273,7 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
       // title, description?
       //'title' => htmlspecialchars($boardData['title']),
       //'description' => htmlspecialchars($boardData['description']),
-      'threads' => threads_html,
+      'threads' => $threads_html,
       'boardNav' => $boardnav_html,
       'pagenum' => $pagenum,
       // mixin
@@ -477,6 +477,7 @@ function getBoardCatalogHandler($boardUri) {
           $thread['no']. '.html#' . $thread['no'] .
           '"><img src="images/imagelessthread.png" width=209 height=64></a><br>';
         */
+        //echo "<pre>thread[", print_r($thread, 1), "]</pre>\n";
 
         // update thread number
         $tile_tags['no'] = $thread['no'];
@@ -498,7 +499,7 @@ function getBoardCatalogHandler($boardUri) {
           'human_created_at' => gmdate('n/j/Y H:i:s', $thread['created_at']),
           'replies' => $thread['reply_count'],
           'files' => $thread['file_count'],
-          'page' => $thread['page'],
+          'page' => $pageNum,
           'tile_image' => replace_tags($image_template, $tile_tags),
         );
         $tiles_html .= replace_tags($tile_template, $tags);
