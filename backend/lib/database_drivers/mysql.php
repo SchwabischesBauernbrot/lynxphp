@@ -221,9 +221,10 @@ class mysql_driver extends database_driver_base_class implements database_driver
       return false;
     }
     */
+    $id = mysqli_insert_id($this->conn);
     // how does this handle multiple?
     $this->markWriten($rootModel);
-    return mysqli_insert_id($this->conn);
+    return $id;
   }
 
   public function update($rootModel, $urow, $options) {
