@@ -114,18 +114,13 @@ function wrapContent($content, $options = '') {
     $doWork = false;
   }
 
-  $themes = array('yotsuba-b', 'yotsuba', 'amoled', 'army-green', 'cancer', 'chaos', 'choc', 'darkblue', 'gurochan', 'lain', 'miku', 'mushroom', 'navy', 'pink', 'rei-zero', 'solarized-dark', 'solarized-light', 'tempus-cozette', 'tomorrow', 'tomorrow2', 'vapor', 'win95', 'snerx');
-  if (empty($userSettings['current_theme']) || $userSettings['current_theme'] === 'default') $userSettings['current_theme'] = $themes[0];
-
-  $themesHtml = '';
-  foreach($themes as $theme) {
-    if ($userSettings['current_theme'] === $theme) {
-      $themesHtml .= '<link id="theme" rel="stylesheet" data-theme="' . $theme . '" href="css/themes/' . $theme . '.css">';
-    } else {
-      // these are always downloaded in chrome... ugh
-      //$themesHtml .= '<link rel="alternate stylesheet" type="text/css" data-theme="' . $theme . '" title="' . $theme . '" href="css/themes/' . $theme . '.css">';
-    }
-  }
+  $io = array(
+    'siteSettings' => $siteSettings,
+    'userSettings' => $userSettings,
+    'head_html' => '',
+  );
+  $pipelines[PIPELINE_SITE_HEAD]->execute($io);
+  $head_html = $io['head_html'];
 
   $templates = loadTemplates('header');
   // how and when does this change?
@@ -135,15 +130,28 @@ function wrapContent($content, $options = '') {
     'basehref' => BASE_HREF,
     'title' => empty($siteSettings['siteName']) ? '': $siteSettings['siteName'],
     // maybe head insertions is better?
-    'themes' => $themesHtml,
+    'head' => $head_html,
     'jsenable' => $enableJs ? '' : '<!-- ',
     'jsenable2' => $enableJs ? '' : ' -->',
   );
+
+
   echo replace_tags($templates['header'], $tags), $content;
   unset($templates);
+
+  $io = array(
+    'siteSettings' => $siteSettings,
+    'userSettings' => $userSettings,
+    'end_html' => '',
+  );
+  $pipelines[PIPELINE_SITE_END_HTML]->execute($io);
   $tags = array(
     'jsenable' => $enableJs ? '' : '<!-- ',
     'jsenable2' => $enableJs ? '' : ' -->',
+    'footer_header' => '',
+    'footer_nav' => '',
+    'footer_footer' => '',
+    'end' => $io['end_html'],
   );
   $footer = loadTemplates('footer');
   echo replace_tags($footer['header'], $tags);
