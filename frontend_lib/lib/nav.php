@@ -36,6 +36,7 @@ function renderPortalHeader($type, $options = false) {
     'headerPipeline' => false,
      // PIPELINE_type_NAV
     'navPipeline' => false,
+      'useNavFirstItem' => false,
     'navItems'  => array(),
     'prelabel'  => '[',
     'postlabel' => ']',
@@ -46,17 +47,23 @@ function renderPortalHeader($type, $options = false) {
   $p = array(
     'tags' => array()
   );
+  $selectedURL = false;
   if ($headerPipeline && isset($pipelines[$headerPipeline])) {
     $pipelines[$headerPipeline]->execute($p);
   }
   if ($navPipeline && isset($pipelines[$navPipeline])) {
     $pipelines[$navPipeline]->execute($navItems);
+    if ($useNavFirstItem) {
+      $keys = array_keys($navItems);
+      $selectedURL = $navItems[$keys[0]];
+    }
   }
-  $nav_html = getNav($navItems, array(
-    'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
+  $navOptions = array(
+    'selectedURL' => $selectedURL ?: substr($_SERVER['REQUEST_URI'], 1),
     'prelabel' => $prelabel,
     'postlabel' => $postlabel,
-  ));
+  );
+  $nav_html = getNav($navItems, $navOptions);
 
   return replace_tags($templates['header'], array_merge($p['tags'], array(
     'nav' => $nav_html,
