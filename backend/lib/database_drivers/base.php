@@ -258,6 +258,8 @@ class database_driver_base_class {
       $sql .= ' where ' . $this->build_where($options['criteria']);
     //} else {
       // a warning? or something to prevent total table loss if typo...
+      // options doesn't have a default for now
+      // that's a good enough warning
     }
     return $sql;
   }
