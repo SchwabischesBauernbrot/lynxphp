@@ -14,13 +14,16 @@ $themes = array_keys($allThemes);
 if (empty($userSettings['current_theme']) || $userSettings['current_theme'] === 'default') $userSettings['current_theme'] = $themes[0];
 
 // make sure theme is valid
+$themesHtml = '';
 if (!empty($allThemes[$userSettings['current_theme']])) {
   // load theme
   $themesHtml = '<link id="theme" rel="stylesheet" data-theme="' . $userSettings['current_theme'] . '" href="css/themes/' . $userSettings['current_theme'] . '.css">';
+} else {
+  echo "Invalid theme[", $userSettings['current_theme'], "]<br>\n";
+  echo "Valid themes: ", join(',', $themes), "<br>\n";
 }
 
 /*
-$themesHtml = '';
 foreach($themes as $theme) {
   //echo $userSettings['current_theme'], '===', $theme, "<br>\n";
   if ($userSettings['current_theme'] === $theme) {
