@@ -362,9 +362,13 @@ class database_driver_base_class {
           echo "Warning, string into groupby, fix this!<br>\n";
           //$useGroupBys = explode(',', $useGroupBys);
         }
+        // mysql only_full_group_by needs all fields used in the group by
         //echo "<pre>", print_r($useGroupBys, 1), "</pre>\n";
-        $useGroupBys = array_map(function($val) use ($tableName) {
-          return str_replace('MODEL.', $tableName . '.', $val);
+        $useGroupBys = array_map(function($val) use ($tableName, $joinAlias) {
+          // why ALIAS elsewhere but MODEL here?
+          // because it's the base table, not the joining
+          return str_replace(array('MODEL.', 'ALIAS.'),
+            array($tableName . '.', $joinAlias . '.'), $val);
         }, $useGroupBys);
         $data['groupbys'] = array_merge($data['groupbys'], $useGroupBys);
       }
