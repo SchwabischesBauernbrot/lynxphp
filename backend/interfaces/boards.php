@@ -394,12 +394,30 @@ function boardPage($boardUri, $posts_model, $page = 1) {
     array(
       'type' => 'left',
       'model' => $post_files_model,
-      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields),
+      //'groupby' => array_map(function ($f) { return 'ALIAS.' . $f; }, $filesFields),
     )
   );
 
   // for thread list
-  $threadModel = getBoardThreadsModel($boardUri);
+  $threadModel = getBoardThreadsModel($boardUri, $posts_model);
+  //echo "<pre>threadModel", print_r($threadModel['model']['children'][0]['groupby'], 1), "</pre>\n";
+
+  // add the file fields to the group by to make mysql happy
+  foreach($filesFields as $f) {
+    $threadModel['model']['children'][0]['groupby'][] = '`' . $filesTable . '`.' . $f;
+  }
+  //echo "<pre>threadModel", print_r($threadModel['model']['children'][0]['groupby'], 1), "</pre>\n";
+
+  // rebuild threadModel with the fixed group by
+  $threadModel = $db->makeSubselect($threadModel['model'], array('criteria'=>array(
+      array('threadid', '=', 0),
+      // we need the thread tombstones...
+      //array('deleted', '=', 0),
+    ),
+    // if you join, you'll lose this ordering..
+    //'order' =>'updated_at desc',
+  ), 'postid');
 
   $groupbyWrapper = $db->makeSubselect($threadModel, array(), 'postid');
   $groupbyWrapper['children'] = array(
@@ -407,8 +425,8 @@ function boardPage($boardUri, $posts_model, $page = 1) {
       'type' => 'left',
       'model' => $post_files_model,
       //'tableOverride' => 't2',
-      'alias' => 'theadfiles',
-      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
+      'alias' => 'threadfiles',
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields),
     ),
     array(
       'model' => $posts_extended_model2,
