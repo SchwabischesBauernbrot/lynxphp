@@ -26,6 +26,7 @@ if (
     !(
        ($req_path === '/signup' && $req_method === 'POST') ||
        ($req_path === '/forms/login' && $req_method === 'POST') ||
+       strpos($req_path, 'user/settings/themedemo/') !== false ||
        $req_path === '/logout'
     ) && strpos($req_path, '/.youtube') === false) {
   echo '<div style="height: 40px;"></div>', "\n"; flush();
@@ -153,6 +154,15 @@ $frontEndPipelines = array(
   // SETTINGS be included in the next 2?
   'PIPELINE_USER_NAV',
   'PIPELINE_USER_HEADER_TMPL',
+
+  'PIPELINE_SITE_HEAD',
+  // we can have one pipeline adjust all this data
+  // and likely would be less overhead
+  'PIPELINE_SITE_FOOTER_HEADER',
+  'PIPELINE_SITE_FOOTER_NAV',
+  'PIPELINE_SITE_FOOTER_FOOTER',
+  'PIPELINE_SITE_END_HTML',
+
   'PIPELINE_AFTER_WORK',
 );
 
