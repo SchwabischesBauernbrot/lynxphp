@@ -14,15 +14,20 @@ $fePkgs = array(
     ),
     'forms' => array(),
     'modules' => array(
-      // register form control
+      // add form control type
       array(
         'pipeline' => 'PIPELINE_FORM_WIDGET_THEMETHUMBNAILS',
         'module' => 'widget_themethumbnails',
       ),
-      // register settings
+      // add category/field to settings
       array(
         'pipeline' => 'PIPELINE_MODULE_USER_SETTINGS_FIELDS',
         'module' => 'user_settings_fields',
+      ),
+      // head tag
+      array(
+        'pipeline' => 'PIPELINE_SITE_HEAD',
+        'module' => 'site_head',
       ),
     ),
   ),
