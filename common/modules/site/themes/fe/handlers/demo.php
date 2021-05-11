@@ -13,6 +13,7 @@ if (file_exists('css/themes/' . $theme . '.css')) {
     exit();
   }
 }
+echo '<div style="height: 40px;"></div>', "\n";
 
 /*
 $templates = moduleLoadTemplates('demo', __DIR__);
