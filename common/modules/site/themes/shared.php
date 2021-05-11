@@ -1,6 +1,7 @@
 <?php
 
 return array(
+  // filename => Human readable name
   'themes' => array(
     'default' => 'Default',
     'yotsuba-b' => 'Yotsuba-B',
@@ -26,8 +27,8 @@ return array(
     'vapor' => 'Vapor',
     'win95' => 'Windows 95',
     'snerx' => 'SnerxWerx',
-    'seaform-dark' => 'Seaform Dark',
-    'seaform-light' => 'Seaform Light',
+    'seafoam-dark' => 'Seafoam Dark',
+    'seafoam-light' => 'Seafoam Light',
   ),
 );
 
