@@ -13,8 +13,10 @@ $themes = array_keys($allThemes);
 // translate default to first theme...
 if (empty($userSettings['current_theme']) || $userSettings['current_theme'] === 'default') $userSettings['current_theme'] = $themes[0];
 
+// make sure theme is valid
 if (!empty($allThemes[$userSettings['current_theme']])) {
-  $themesHtml = '<link id="theme" rel="stylesheet" data-theme="' . $theme . '" href="css/themes/' . $userSettings['current_theme'] . '.css">';
+  // load theme
+  $themesHtml = '<link id="theme" rel="stylesheet" data-theme="' . $userSettings['current_theme'] . '" href="css/themes/' . $userSettings['current_theme'] . '.css">';
 }
 
 /*
