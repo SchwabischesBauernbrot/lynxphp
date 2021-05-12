@@ -10,6 +10,12 @@ $fePkgs = array(
         'method'  => 'GET',
         'route'   => '/user/settings/themedemo/:theme/',
         'handler' => 'demo',
+        'cacheSettings' => array(
+          'files' => array(
+            //'common/modules/site/themes/fe/shared.php'
+            'css/themes/{{route.theme}}.css'
+          ),
+        ),
       ),
     ),
     'forms' => array(),
