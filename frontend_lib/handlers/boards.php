@@ -200,15 +200,8 @@ function preprocessPost(&$p) {
   $pipelines[PIPELINE_POST_PREPROCESS]->execute($p);
 }
 
-// /:uri/
-function getBoardThreadListing($boardUri, $pagenum = 1) {
-  //echo "pagenum[$pagenum]<br>\n";
-  $boardThreads = backendGetBoardThreadListing($boardUri, $pagenum);
-  if (!$boardThreads) {
-    wrapContent("There is a problem with the backend [$boardUri]");
-    return;
-  }
-  //echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
+// refactored out so theme demo can use this
+function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOptions = '') {
   $pageData = $boardThreads['page1'];
   $pages = $boardThreads['pageCount'];
   $boardData = $boardThreads['board'];
@@ -223,6 +216,11 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   $threadftr_template = $templates['loop4'];
   $thread_template = $templates['loop5'];
 
+  $noBoardHeaderTmpl = false;
+  if ($wrapOptions) {
+    if (!empty($wrapOptions['noBoardHeaderTmpl'])) $noBoardHeaderTmpl = true;
+  }
+
   //echo "test[", htmlspecialchars(print_r($templates, 1)),"]<br>\n";
 
   // FIXME: register/push a portal with wrapContent
@@ -230,7 +228,8 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   // also should wrapContent be split into header/footer for efficiency? yes
   // and we need keying too, something like ESI
   $boardData['pageCount'] = $boardThreads['pageCount'];
-  $boardPortal = getBoardPortal($boardUri, $boardData, array('pagenum' => $pagenum));
+  $boardPortal = getBoardPortal($boardUri, $boardData, array(
+    'pagenum' => $pagenum, 'noBoardHeaderTmpl' => $noBoardHeaderTmpl));
   $boardnav_html = '';
 
   // used to look at text, so we can queue up another backend query if needed
@@ -283,7 +282,20 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   );
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
   $tmpl = replace_tags($templates['header'], $p['tags']);
-  wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer']);
+  wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer'], $wrapOptions);
+}
+
+// /:uri/
+function getBoardThreadListing($boardUri, $pagenum = 1) {
+  //echo "pagenum[$pagenum]<br>\n";
+  $boardThreads = backendGetBoardThreadListing($boardUri, $pagenum);
+  if (!$boardThreads) {
+    wrapContent("There is a problem with the backend [$boardUri]");
+    return;
+  }
+  //echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
+
+  getBoardThreadListingRender($boardUri, $boardThreads, $pagenum);
 }
 
 function getThreadHandler($boardUri, $threadNum) {
