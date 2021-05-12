@@ -24,7 +24,7 @@ return array(
       'type'  => 'checkbox',
     ),
     'settings_notpublic' => array(
-      'label' => 'Hide board',
+      'label' => 'Not publicly indexed',
       'type'  => 'checkbox',
     ),
     /*
@@ -33,6 +33,26 @@ return array(
       'type'  => 'image',
     ),
     */
+    // disable thread-wise ids
+    // require file for new threads
+    // don't allow users to delete their post
+    // allow code tags
+    // force anon
+    // early404
+    // location flags
+    // unique files
+    // unique post
+    // hourly thread limit
+    // enable captcha after threads per hour hit
+    // tags
+    // file whitelist?
+    // filters
+    // custom css?
+    //
+    // language
+    // custom spoiler
+    // attachment deleted
+    // overboard icon
   ),
 );
 
