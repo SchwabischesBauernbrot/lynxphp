@@ -22,10 +22,11 @@ if (is_array($banner) && count($banner)) {
   }
   $ih = (int)$h;
   $iw = (int)$w;
-  $io['tags']['banner'] = '<img src="'. BASE_HREF . 'backend/' . $banner['image']. '" width="'.$w.'" height="'.$h.'">';
+  $io['tags']['board_header_top'] = '<img src="'. BASE_HREF . 'backend/' . $banner['image']. '" width="'.$w.'" height="'.$h.'">' . $io['tags']['board_header_top'];
 } else {
   // array() just means no banners
-  $io['tags']['banner'] = 'No banners, make a banners thread';
+  // maybe say nothing?
+  $io['tags']['board_header_top'] = 'No banners, make a banners thread' . $io['tags']['board_header_top'];
 }
 
 ?>
