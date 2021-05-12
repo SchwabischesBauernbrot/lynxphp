@@ -62,7 +62,10 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   }
 
   $p = array(
-    'tags' => array(),
+    'tags' => array(
+      'board_header_top' => '',
+      'board_header_bottom' => '',
+    ),
     'boardUri' => $boardUri,
   );
   //echo "noBoardHeaderTmpl[$noBoardHeaderTmpl]<Br>\n";
