@@ -114,9 +114,10 @@ class Router {
   // I'd like to standardize around a file
   // but func is just more flexible
   // context can be set up in a func before the include
-  function addMethodRoute($method, $cond, $func) {
+  function addMethodRoute($method, $cond, $func, $cacheSettings = false) {
     //echo "Installing [$method][$cond]<br>\n";
     $this->methods[$method][$cond] = $func;
+    $this->cacheSettings[$method . '_' . $cond] = $cacheSettings;
   }
   // anything use this? no, it's forward looking
   function getExternal($group, $name, $cond, $file) {
@@ -146,24 +147,48 @@ class Router {
       $method . '_routes' => array_keys($this->methods[$method]),
     );
   }
-  function isCached($key) {
+  function isCached($key, $routeParams) {
     if (!isset($this->cacheSettings[$key])) {
+      //echo "No cacheSettings for [$key]";
       return true; // render content
     }
     //echo "key[$key]<br>\n";
     //print_r($this->cacheSettings[$key]);
     $cacheSettings = $this->cacheSettings[$key];
-    if (!isset($cacheSettings['databaseTables'])) {
+    if (!isset($cacheSettings['databaseTables']) && !isset($cacheSettings['files'])) {
+      //echo "No cacheSettings keys", print_r($cacheSettings);
       return true; // render content
     }
-    global $db;
-    $mtime = $db->getLast($cacheSettings['databaseTables']);
+    $mtime = 0;
+    if (isset($cacheSettings['databaseTables'])) {
+      global $db;
+      $mtime = $db->getLast($cacheSettings['databaseTables']);
+    }
+    if (isset($cacheSettings['files'])) {
+      //echo "in[$mtime]<br>\n";
+      //print_r($routeParams);
+      foreach($cacheSettings['files'] as $file) {
+        foreach($routeParams as $param => $val) {
+          $file = str_replace('{{route.'. $param . '}}', $val, $file);
+        }
+        if (file_exists($file)) {
+          $mtime = max($mtime, filemtime($file));
+        } else {
+          if (DEV_MODE) {
+            echo "router:::isCached - file[$file] does not exist<br>\n";
+          }
+        }
+      }
+      //echo "out[$mtime]<br>\n";
+    }
     // backend hack
     if (getQueryField('prettyPrint')) {
       $cacheSettings['contentType'] = 'text/html';
     }
     $options = array(
-      'contentType' => isset($cacheSettings['contentType']) ? $cacheSettings['contentType'] : 'application/json',
+      // not sure application/json makes sense as a default
+      // since most endpoints aren't going to be json...
+      'contentType' => isset($cacheSettings['contentType']) ? $cacheSettings['contentType'] : 'text/html',
     );
     if (checkCacheHeaders($mtime, $options)) {
       // it's cached!
@@ -281,7 +306,7 @@ class Router {
         $func = $matches[0]['func'];
         $request['params'] = $matches[0]['params'];
         // if (not cache) && (not head)
-        if ($this->isCached($method . '_' . $matches[0]['cond']) && !$isHead) {
+        if ($this->isCached($method . '_' . $matches[0]['cond'], $matches[0]['params']) && !$isHead) {
           $func($request);
         }
         return true;
@@ -299,7 +324,7 @@ class Router {
         if ($use) {
           $func = $use['func'];
           $request['params'] = $use['params'];
-          if ($this->isCached($method . '_' . $matches[0]['cond']) && !$isHead) {
+          if ($this->isCached($method . '_' . $use['cond']) && !$isHead) {
             $func($request);
           }
         } else {
