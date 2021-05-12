@@ -135,7 +135,6 @@ function wrapContent($content, $options = '') {
     'jsenable2' => $enableJs ? '' : ' -->',
   );
 
-
   echo replace_tags($templates['header'], $tags), $content;
   unset($templates);
 
