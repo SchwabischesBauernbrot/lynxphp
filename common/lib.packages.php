@@ -277,23 +277,29 @@ class package {
   }
   // hotpath
   function buildFrontendRoutes(&$router, $method) {
+    //echo "buildFrontendRoutes<br>\n";
     // activate frontend hooks
     if (file_exists($this->dir . 'fe/data.php')) {
       $fePkgs = include $this->dir . 'fe/data.php';
+      //echo "Loading ", $this->dir, "\n";
       if (empty($fePkgs) || !is_array($fePkgs)) {
         return;
       }
+     // echo "Has pkg data\n";
       // package name is optinal
       foreach($fePkgs as $pName => $pData) {
         $fePkg = $this->makeFrontend();
         if (isset($pData['handlers']) && is_array($pData['handlers'])) {
           foreach($pData['handlers'] as $h) {
+            // FIXME: skip adding the methods we don't need...
             //$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
-            $fePkg->addHandler(empty($h['method']) ? 'GET' : $h['method'], $h['route'], $h['handler']);
+            $fePkg->addHandler(empty($h['method']) ? 'GET' : $h['method'], $h['route'], $h['handler'], array(
+            'cacheSettings' => empty($h['cacheSettings']) ? false : $h['cacheSettings']));
           }
         }
         if (isset($pData['forms']) && is_array($pData['forms'])) {
           foreach($pData['forms'] as $f) {
+            // FIXME: skip adding the methods we don't need...
             $fePkg->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
           }
         }
@@ -312,6 +318,8 @@ class package {
           }
         }
       }
+    //} else {
+      //echo "No fe/data.php in [", $this->dir, "]<br>\n";
     }
     /*
     else
@@ -390,6 +398,7 @@ class backend_package {
   function addPipeline($pipeline) {
     echo "lib.packages.php:::backend_package::addPipeline - Write me<br>\n";
   }
+  // FIXME: addScheduledTask
   function toString() {
     $content ='<ul>';
     if (is_array($this->models) && count($this->models)) {
@@ -415,7 +424,7 @@ class backend_package {
 
 class frontend_package {
   // attach
-  // - backend_resource
+  // - backend_resource via pkg
   // - frontend route/handler
   function __construct($meta_pkg) {
     $this->pkg = $meta_pkg;
@@ -524,6 +533,7 @@ class frontend_package {
   function buildRoutes(&$router, $method) {
     // do we have any routes in this method
     if (empty($this->handlers[$method])) {
+      //echo "no routes for [$method]<Br>\n";
       return;
     }
     $pkg = &$this->pkg;
@@ -566,7 +576,11 @@ class frontend_package {
           $intFunc = include $path;
         };
       }
-      $router->addMethodRoute($method, $cond, $func);
+      $cacheSettings = false;
+      if (!empty($row['options']['cacheSettings'])) {
+        $cacheSettings = $row['options']['cacheSettings'];
+      }
+      $router->addMethodRoute($method, $cond, $func, $cacheSettings);
     }
   }
   function toString() {
