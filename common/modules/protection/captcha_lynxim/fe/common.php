@@ -1,5 +1,7 @@
 <?php
 
+// why are these here?
+
 function getBaseDistorts($w, $h) {
   return array(
     array('origin'=>array('x'=>0,'y'=>0), 'destiny'=>array('x'=>0,'y'=>0)),
