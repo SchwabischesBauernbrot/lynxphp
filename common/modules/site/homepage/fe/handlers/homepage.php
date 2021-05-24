@@ -32,8 +32,7 @@ if (is_array($boards)) {
 
 $logo = 'images/default_logo.png';
 if (!empty($settings['site']['logo'])) {
-  // FIXME: BACKEND_BASE_URL
-  $logo = 'backend/' . $settings['site']['logo'];
+  $logo = BACKEND_BASE_URL . $settings['site']['logo'];
 }
 
 $tags = array(
