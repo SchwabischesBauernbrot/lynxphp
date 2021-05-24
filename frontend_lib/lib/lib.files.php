@@ -75,4 +75,129 @@ function processFiles($filter_fields = false) {
   );
 }
 
+function _getFileType($file) {
+  $type = $file['type'] ? $file['type'] : 'image';
+  if ($type === 'audio') {
+    $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg';
+    if (!$isPlayable) {
+      $type = 'file';
+    }
+  }
+  if ($type === 'video') {
+    $isPlayable = $file['mime_type'] === 'video/mp4' || $file['mime_type'] === 'video/webm' || $file['mime_type'] === 'video/ogg';
+    if (!$isPlayable) {
+      $type = 'image';
+    }
+  }
+  // normalized
+  if ($type === 'file' || $type === 'image') $type = 'img';
+  return $type;
+}
+
+function getThumbnail($file, $maxW = 0) {
+  $type = _getFileType($file);
+  //echo "type[$type]<br>\n";
+
+  // set default, no thumb
+  $thumb = $file['path'];
+
+  // thumbnailable?
+  if ($type === 'img' || $type === 'audio' || $type === 'video') {
+    if (isset($file['thumbnail_path'])) {
+      $thumb = $file['thumbnail_path'];
+      $type = 'img';
+    }
+  }
+
+  // figure out thumb size
+  if (empty($file['tn_w']) || empty($file['tn_h'])) {
+    $w = $file['w'];
+    $h = $file['h'];
+    while($h > 240) {
+      $w *= 0.9;
+      $h *= 0.9;
+    }
+  } else {
+    $w = $file['tn_w'];
+    $h = $file['tn_h'];
+  }
+
+  if ($maxW !== 0) {
+    $w = $file['w'];
+    $h = $file['h'];
+    // audio/video won't have these set yet... but thumbnail will be
+    if (empty($file['w']) || empty($file['h'])) {
+      $w = $file['tn_w'];
+      $h = $file['tn_h'];
+    }
+    while($w > $maxW) {
+      $w *= 0.9;
+      $h *= 0.9;
+    }
+  }
+  if (!$w || !$h) {
+    $w = 240;
+    $h = 240;
+  }
+  $w = (int)$w;
+  $h = (int)$h;
+
+  if (strpos($thumb, '://') === false) {
+    $thumb = 'backend/' . $thumb;
+  }
+  return '<' . $type . ' class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />';
+}
+
+function getAudioVideo($file, $maxW = 0) {
+  $type = _getFileType($file);
+  // no view if not viewable
+  if ($type === 'img') {
+    return '';
+  }
+  // maybe don't loop audio?
+  return getViewer($file, $maxW);
+}
+
+function getViewer($file, $maxW = 0) {
+  $type = _getFileType($file);
+  // set default, no thumb
+  $path = $file['path'];
+
+  // no view if not viewable
+  if (!($type === 'img' || $type === 'audio' || $type === 'video')) {
+    return false;
+  }
+
+  // figure out size
+  $w = $file['w'];
+  $h = $file['h'];
+
+  if ($maxW !== 0) {
+    $w = $file['w'];
+    $h = $file['h'];
+    // audio/video won't have these set yet... but thumbnail will be
+    if (empty($file['w']) || empty($file['h'])) {
+      $w = $file['tn_w'];
+      $h = $file['tn_h'];
+    }
+    while($w > $maxW) {
+      $w *= 0.9;
+      $h *= 0.9;
+    }
+  }
+  if (!$w || !$h) {
+    $w = 240;
+    $h = 240;
+  }
+  $w = (int)$w;
+  $h = (int)$h;
+
+  if (strpos($path, '://') === false) {
+    $path = 'backend/' . $path;
+  }
+  // loop
+  // can't loop because of how we collapse
+  return '<' . $type . ' class="" src="' . $path . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls  preload=none />';
+}
+
 ?>
