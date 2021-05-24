@@ -1,11 +1,12 @@
 <?php
 
 function getControlPanel() {
+  global $BASE_HREF;
   $account = backendLynxAccount();
   // you only get meta if error
   if (!$account || (!empty($account['meta']) && $account['meta']['code'] === 401)) {
     // FIXME get named route
-    redirectTo(BASE_HREF . 'forms/login');
+    redirectTo($BASE_HREF . 'forms/login');
     return;
   }
 
@@ -24,10 +25,10 @@ function getControlPanel() {
     $isGlobal = in_array('global', $account['groups']);
     // FIXME get named route
     if ($isAdmin) {
-      $admin_html = str_replace('{{admin}}', BASE_HREF . 'admin', $admin_tmpl);
+      $admin_html = str_replace('{{admin}}', $BASE_HREF . 'admin', $admin_tmpl);
     }
     if ($isGlobal) {
-      $global_html = str_replace('{{global}}', BASE_HREF . 'global', $global_tmpl);
+      $global_html = str_replace('{{global}}', $BASE_HREF . 'global', $global_tmpl);
     }
   }
 
@@ -42,9 +43,9 @@ function getControlPanel() {
   $tags = array(
     'login' => $account['login'],
     // FIXME get named route
-    'account' => BASE_HREF . 'account',
-    'create_board' => BASE_HREF . 'create_board',
-    'logout' => BASE_HREF . 'logout',
+    'account' => $BASE_HREF . 'account',
+    'create_board' => $BASE_HREF . 'create_board',
+    'logout' => $BASE_HREF . 'logout',
     'admin' => $isAdmin ? $admin_html : '',
     'global' => $isGlobal ? $global_html : '',
     'ownedBoards' => $boards_html,
@@ -60,7 +61,8 @@ function getCreateBoardForm() {
   );
   // FIXME: pipeline
   // FIXME get named route
-  return simpleForm(BASE_HREF . 'create_board', $formFields, 'Create board');
+  global $BASE_HREF;
+  return simpleForm($BASE_HREF . 'create_board', $formFields, 'Create board');
 }
 
 function getCreateBoard() {
@@ -73,7 +75,8 @@ function postCreateBoard() {
     // maybe not display this?
     //wrapContent('Board created!');
     // FIXME get named route
-    redirectTo(BASE_HREF . 'control_panel');
+    global $BASE_HREF;
+    redirectTo($BASE_HREF . 'control_panel');
     /*
     $uri = $_POST['uri'];
     redirectTo($uri . '/settings');
@@ -85,10 +88,11 @@ function postCreateBoard() {
 }
 
 function getAccountPortalNav() {
+  global $BASE_HREF;
   // FIXME get named route
   $navItems = array(
-    'Change username/password' => BASE_HREF . 'account/change_userpass',
-    'Change recovery email' => BASE_HREF . 'account/change_email',
+    'Change username/password' => $BASE_HREF . 'account/change_userpass',
+    'Change recovery email' => $BASE_HREF . 'account/change_email',
   );
   // FIXME: pipeline
   return getNav($navItems);
@@ -107,9 +111,10 @@ function getChangeUserPassForm() {
     'username' => array('type' => 'text', 'label' => 'New Username'),
     'password' => array('type' => 'password', 'label' => 'New Password (Minimum 16 chars, we recommend using a pass phrase)'),
   );
+  global $BASE_HREF;
   // FIXME: pipeline
   // FIXME get named route
-  return simpleForm(BASE_HREF . 'account/change_userpass', $formFields, 'Migrate account');
+  return simpleForm($BASE_HREF . 'account/change_userpass', $formFields, 'Migrate account');
 }
 
 function getChangeEmailForm() {
@@ -117,9 +122,10 @@ function getChangeEmailForm() {
   $formFields = array(
     'email' => array('type' => 'email', 'label' => 'Recovery Email (we suggest using a burner/temp one)'),
   );
+  global $BASE_HREF;
   // FIXME: pipeline
   // FIXME get named route
-  return simpleForm(BASE_HREF . 'account/change_email', $formFields, 'Change recovery email');
+  return simpleForm($BASE_HREF . 'account/change_email', $formFields, 'Change recovery email');
 }
 
 function getChangeUserPass() {
@@ -132,7 +138,8 @@ function postChangeUserPass() {
   $res = backendMigrateAccount($eKp['pk']);
   if (!empty($res['data'])) {
     // FIXME get named route
-    redirectTo(BASE_HREF . 'account?message=' . urlencode('Account migrated'));
+    global $BASE_HREF;
+    redirectTo($BASE_HREF . 'account?message=' . urlencode('Account migrated'));
   } else {
     wrapContent('Error: ' . print_r($res) . getChangeEmailForm());
   }
@@ -147,7 +154,8 @@ function postChangeEmail() {
   $res = backendChangeEmail($_POST['email']);
   if (!empty($res['data'])) {
     // FIXME get named route
-    redirectTo(BASE_HREF . 'account?message=' . urlencode('Recovery email changed'));
+    global $BASE_HREF;
+    redirectTo($BASE_HREF . 'account?message=' . urlencode('Recovery email changed'));
   } else {
     wrapContent('Error: ' . print_r($res) .  getChangeEmailForm());
   }
