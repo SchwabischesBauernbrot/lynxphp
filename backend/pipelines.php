@@ -1,6 +1,9 @@
 <?php
 
 // pipelines
+
+// separated out, so frontend can include if needed for dealing with modules...
+
 // - boardDB to API
 // - thread to API
 // - post to API
@@ -13,9 +16,14 @@
 
 // should this be wrapped in a function?
 // depends on how much memory/cputime this takes...
-definePipeline('PIPELINE_BOARD_DATA', 'boardData');
-definePipeline('PIPELINE_POST_DATA',  'postData');
-definePipeline('PIPELINE_USER_DATA',  'userData');
-definePipeline('PIPELINE_POST', 'post');
-definePipeline('PIPELINE_FILE', 'file');
+$backEndPipelines = array(
+  'PIPELINE_BOARD_DATA',
+  'PIPELINE_POST_DATA',
+  'PIPELINE_USER_DATA',
+  'PIPELINE_POST',
+  'PIPELINE_FILE',
+);
+// we don't need to necessarily call this here
+definePipelines($backEndPipelines);
+
 ?>
