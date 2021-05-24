@@ -164,7 +164,7 @@ $router->post('/files', function($request) {
 });
 
 $router->post('/newThread', function($request) {
-  global $db;
+  global $db, $models, $now;
   // require image with each thread
   if (!hasPostVars(array('boardUri', 'files'))) {
     // hasPostVars already outputs
@@ -189,12 +189,20 @@ $router->post('/newThread', function($request) {
     'deleted' => 0,
   )));
   processFiles($boardUri, $_POST['files'], $id, $id);
+
+  // bump board
+  $inow = (int)$now;
+  $urow = array('last_thread' => $inow, 'last_post' => $inow);
+  $db->update($models['board'], $urow, array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
+
   $data = (int)$id;
   sendResponse($data);
 });
 
 $router->post('/replyThread', function($request) {
-  global $db;
+  global $db, $models, $now;
   if (!hasPostVars(array('boardUri', 'threadId'))) {
     // hasPostVars already outputs
     return; //sendResponse(array(), 400, 'Requires boardUri and threadId');
@@ -221,6 +229,13 @@ $router->post('/replyThread', function($request) {
   )));
   $data = (int)$id;
   $issues = processFiles($boardUri, $_POST['files'], $threadid, $id);
+
+
+  // bump board
+  $urow = array('last_post' => (int)$now);
+  $db->update($models['board'], $urow, array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
 
   // bump thread
   $urow = array();
