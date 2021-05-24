@@ -115,7 +115,8 @@ function expectJson($json, $endpoint = '', $options = array()) {
         echo "<pre>Got a 401 [$json] for [", $endpoint, ']via[', isset($options['method']) ? $options['method'] : 'AUTO' ,"]</pre>\n";
       } else {
         // FIXME get named route
-        return redirectTo(BASE_HREF . 'forms/login');
+        global $BASE_HREF;
+        return redirectTo($BASE_HREF . 'forms/login');
       }
     }
   }
