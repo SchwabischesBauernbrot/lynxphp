@@ -19,7 +19,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   $tmpl = $templates['header'];
   $page_wrapper_tmpl = $templates['loop0'];
   $pageLink_tmpl     = $templates['loop1'];
-  $boardNaLink_tmpl  = $templates['loop2'];
+  //$boardNavLink_tmpl  = $templates['loop2'];
 
   $navItems = array(
     '[Index]' => '{{uri}}/',
@@ -44,13 +44,19 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     $pages_html = '';
     // FIXME: wire this up
     for($p = 1; $p <= $pageCount; $p++) {
+      $pgTags = array(
+        'uri'     => $boardUri,
+        'class'   => $pagenum == $p ? 'bold' : '',
+        'pagenum' => $p,
+      );
+      /*
       $tmp = $pageLink_tmpl;
-      // FIXME: use replace_tags
       $tmp = str_replace('{{uri}}', $boardUri, $tmp);
       // bold
       $tmp = str_replace('{{class}}', $pagenum == $p ? 'bold' : '', $tmp);
       $tmp = str_replace('{{pagenum}}', $p, $tmp);
-      $pages_html .= $tmp;
+      */
+      $pages_html .= replace_tags($pageLink_tmpl, $pgTags);
     }
 
     $boardNav = replace_tags($page_wrapper_tmpl, array(
@@ -80,6 +86,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'isCatalog' => $isCatalog,
     'threadNum' => $threadNum,
     'pagenum' => $pagenum,
+    // used in footer
     'boardNav' => $boardNav,
   );
 }
