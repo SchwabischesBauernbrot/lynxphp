@@ -1,33 +1,7 @@
 <?php
 
-// https://stackoverflow.com/a/22500394
-function convertPHPSizeToBytes($sSize) {
-  //
-  $sSuffix = strtoupper(substr($sSize, -1));
-  if (!in_array($sSuffix,array('P','T','G','M','K'))){
-    return (int)$sSize;
-  }
-  $iValue = substr($sSize, 0, -1);
-  switch ($sSuffix) {
-    case 'P':
-      $iValue *= 1024;
-      // Fallthrough intended
-    case 'T':
-      $iValue *= 1024;
-      // Fallthrough intended
-    case 'G':
-      $iValue *= 1024;
-      // Fallthrough intended
-    case 'M':
-      $iValue *= 1024;
-      // Fallthrough intended
-    case 'K':
-      $iValue *= 1024;
-      break;
-  }
-  return (int)$iValue;
-}
-
+// moved into set up.php
+/*
 function formatBytes($bytes, $precision = 2) {
   $units = array('B', 'KB', 'MB', 'GB', 'TB');
 
@@ -41,6 +15,7 @@ function formatBytes($bytes, $precision = 2) {
 
   return round($bytes, $precision) . ' ' . $units[$pow];
 }
+*/
 
 // https://stackoverflow.com/a/19570313
 function asBytes($ini_v) {
@@ -90,7 +65,8 @@ function renderPostForm($boardUri, $url, $options = false) {
 
   // FIXME: we need to be able to override webserver...
   $maxfiles = convertPHPSizeToBytes(ini_get('max_file_uploads'));
-  $maxfilesize = min(convertPHPSizeToBytes(ini_get('post_max_size')), convertPHPSizeToBytes(ini_get('upload_max_filesize')));
+  global $max_length;
+  $maxfilesize = $max_length;
 
   $formfields = array(
     'thread'   => array('type' => 'hidden'),
