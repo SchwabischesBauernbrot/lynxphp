@@ -71,6 +71,11 @@ $board_model = array(
     'owner_id'    => array('type' => 'int'),
     'title'       => array('type' => 'str'),
     'description' => array('type' => 'text'),
+    // denormalize some data to remove some N+1 query needs
+    // why not in JSON? because our queries will be doing sorting
+    // can be moved to a different store in the future
+    'last_thread' => array('type' => 'int'),
+    'last_post'   => array('type' => 'int'),
     //'sfw_board' => array('type' => 'bool'),
     // stats? stat summary?
     // super basic settings?
