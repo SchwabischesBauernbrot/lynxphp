@@ -15,6 +15,34 @@ function responseToText($response) {
   return $response['textResponse'];
 }
 
+// https://stackoverflow.com/a/22500394
+function convertPHPSizeToBytes($sSize) {
+  //
+  $sSuffix = strtoupper(substr($sSize, -1));
+  if (!in_array($sSuffix,array('P','T','G','M','K'))){
+    return (int)$sSize;
+  }
+  $iValue = substr($sSize, 0, -1);
+  switch ($sSuffix) {
+    case 'P':
+      $iValue *= 1024;
+      // Fallthrough intended
+    case 'T':
+      $iValue *= 1024;
+      // Fallthrough intended
+    case 'G':
+      $iValue *= 1024;
+      // Fallthrough intended
+    case 'M':
+      $iValue *= 1024;
+      // Fallthrough intended
+    case 'K':
+      $iValue *= 1024;
+      break;
+  }
+  return (int)$iValue;
+}
+
 class Router {
   function __construct() {
     $this->methods = array();
@@ -25,6 +53,10 @@ class Router {
     $this->methods['DELETE'] = array();
     $this->cacheSettings = array();
     $this->debug = array();
+    // save time on the backend or frontend?
+    // frontend gets more hits... backend may have mobile to deal with
+    $this->defaultContentType = 'text/html';
+    $this->max_length = 0;
   }
   // used for attaching routers
   // usually star(/*) routes
@@ -96,6 +128,11 @@ class Router {
       // we could global $db, $models here too
       $intFunc = include $res['handlerFile'];
     };
+
+    if (!empty($res['cacheSettings'])) {
+      $this->cacheSettings[$method . '_' . $cond] = $res['cacheSettings'];
+    }
+
     //echo "Installing [$method][$cond]<br>\n";
     switch($method) {
       case 'POST':
@@ -147,6 +184,10 @@ class Router {
       $method . '_routes' => array_keys($this->methods[$method]),
     );
   }
+  function isTooBig() {
+    $this->max_length = min(convertPHPSizeToBytes(ini_get('post_max_size')), convertPHPSizeToBytes(ini_get('upload_max_filesize')));
+    return $_SERVER['CONTENT_LENGTH'] > $this->max_length;
+  }
   function isCached($key, $routeParams) {
     if (!isset($this->cacheSettings[$key])) {
       //echo "No cacheSettings for [$key]";
@@ -188,7 +229,7 @@ class Router {
     $options = array(
       // not sure application/json makes sense as a default
       // since most endpoints aren't going to be json...
-      'contentType' => isset($cacheSettings['contentType']) ? $cacheSettings['contentType'] : 'text/html',
+      'contentType' => isset($cacheSettings['contentType']) ? $cacheSettings['contentType'] : $this->defaultContentType,
     );
     if (checkCacheHeaders($mtime, $options)) {
       // it's cached!
