@@ -541,7 +541,7 @@ class frontend_package {
     foreach($this->handlers[$method] as $cond => $row) {
       $file = $row['file'];
       $module_path = strtolower($this->pkg->dir);
-      $path = $module_path . 'fe/' . 'handlers/' . strtolower($file) . '.php';
+      $path = $module_path . 'fe/handlers/' . strtolower($file) . '.php';
       // FIXME: hide the ../commoon
       $func = function($request) use ($path) {
         // as configured by ...
