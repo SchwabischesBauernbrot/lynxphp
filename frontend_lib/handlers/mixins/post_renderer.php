@@ -90,8 +90,8 @@ function renderPost($boardUri, $p, $options = false) {
       //'viewer' => getViewer($file, array('type' => $majorMimeType)),
       'avmedia' => getAudioVideo($file, array('type' => $majorMimeType)),
       'path' => $path,
-      'tn_w' => $file['tn_w'],
-      'tn_h' => $file['tn_h'],
+      'tn_w' => empty($file['tn_w']) ? 0 : $file['tn_w'],
+      'tn_h' => empty($file['tn_h']) ? 0 : $file['tn_h'],
     );
 
     $ftmpl = replace_tags($file_template, $fTags);
