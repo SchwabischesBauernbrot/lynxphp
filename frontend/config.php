@@ -30,6 +30,7 @@ if (!defined('BASE_HREF')) {
   // maybe a different var would be better...
   // REQUEST_URI (but what does this look like in not /)
   // without protocol
+  // and when we run in CLI mode?
   define('BASE_HREF', rtrim(dirname(getServerField('SCRIPT_NAME', __FILE__)), '/') . '/');
 }
 
