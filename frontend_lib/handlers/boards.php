@@ -432,11 +432,12 @@ function getBoardCatalogHandler($boardUri) {
         // filename, size, w, h
         // thumb to be set
         if (isset($thread['files']) && count($thread['files'])) {
-          $tile_tags['thumb'] = getThumbnail($thread['files'][0], 209);
+          $tile_tags['thumb'] = getThumbnail($thread['files'][0], array('maxW' => 209));
         } else {
           $tile_tags['thumb'] = '<img src="images/imagelessthread.png" width=209 height=64>';
         }
-        // FIXME: need $BASE_HREF..
+        // need $BASE_HREF..
+        // do we? we have it in the base tag...
         $tags = array(
           'uri' => $boardUri,
           'subject' => htmlspecialchars($thread['sub']),
