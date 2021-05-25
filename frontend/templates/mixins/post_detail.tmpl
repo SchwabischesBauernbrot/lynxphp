@@ -40,9 +40,18 @@
     <span class="post-file-info">
     </span>
     <div class="post-file-src" data-type="image" data-attachment="false">
-      <a target="_blank" href="{{path}}">
-        {{thumb}}
-      </a>
+      <!-- I have no clue how to make this cleaner -->
+      <style>
+      details[open].img#{{fileid}} > summary::after {
+        content: url({{path}});
+      }
+      </style>
+      <details id="{{fileid}}" class="{{majorMimeType}}">
+        <summary>
+          {{thumb}}
+        </summary>
+        {{avmedia}}
+      </details>
     </div>
     <span class="post-file-info">
       <span>
