@@ -10,6 +10,9 @@ if (DEV_MODE) {
   error_reporting(E_ALL);
 }
 
+// to override BASE_HREF constant for static/ and pages/
+// it's strips out the auto detected base and fixes it towards the frontend webroot base
+// base tag takes care to it everywhere but the redirects...
 global $BASE_HREF;
 $BASE_HREF = BASE_HREF;
 
