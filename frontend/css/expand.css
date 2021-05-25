@@ -1,0 +1,30 @@
+details {
+  transition: all 1s ease;
+  overflow: hidden;
+}
+
+details summary {
+  cursor: zoom-in;
+}
+
+details video {
+  display: none;
+  visibility: hidden;
+}
+
+details[open] video {
+  display: block;
+  visibility: visible;
+}
+
+details[open] summary {
+  cursor: zoom-out;
+}
+
+details[open] > summary::after {
+  content: "close";
+}
+
+details[open] > summary img {
+  display: none;
+}
