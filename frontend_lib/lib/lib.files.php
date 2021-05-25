@@ -75,7 +75,7 @@ function processFiles($filter_fields = false) {
   );
 }
 
-function _getFileType($file) {
+function getFileType($file) {
   $type = $file['type'] ? $file['type'] : 'image';
   if ($type === 'audio') {
     $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg';
@@ -94,8 +94,13 @@ function _getFileType($file) {
   return $type;
 }
 
-function getThumbnail($file, $maxW = 0) {
-  $type = _getFileType($file);
+function getThumbnail($file, $options = false) {
+  extract(ensureOptions(array(
+     // only should be used when we know we're opening a ton of requests in parallel
+    'maxW' => 0,
+    'type' => false,
+  ), $options));
+  if (!$type) $type = getFileType($file);
   //echo "type[$type]<br>\n";
 
   // set default, no thumb
@@ -107,6 +112,13 @@ function getThumbnail($file, $maxW = 0) {
       $thumb = $file['thumbnail_path'];
       $type = 'img';
     }
+  }
+
+  if ($type !== 'img') {
+    // no thumbnail yet for video/audio
+    $thumb = 'images/imagelessthread.png';
+    $file['tn_w'] = 209;
+    $file['tn_h'] = 64;
   }
 
   // figure out thumb size
@@ -148,18 +160,29 @@ function getThumbnail($file, $maxW = 0) {
   return '<' . $type . ' class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />';
 }
 
-function getAudioVideo($file, $maxW = 0) {
-  $type = _getFileType($file);
+function getAudioVideo($file, $options = false) {
+  extract(ensureOptions(array(
+     // only should be used when we know we're opening a ton of requests in parallel
+    'maxW' => 0,
+    'type' => false,
+  ), $options));
+  if (!$type) $type = getFileType($file);
   // no view if not viewable
   if ($type === 'img') {
     return '';
   }
   // maybe don't loop audio?
-  return getViewer($file, $maxW);
+  return getViewer($file, $options);
 }
 
-function getViewer($file, $maxW = 0) {
-  $type = _getFileType($file);
+function getViewer($file, $options = false) {
+  extract(ensureOptions(array(
+     // only should be used when we know we're opening a ton of requests in parallel
+    'maxW' => 0,
+    'type' => false,
+  ), $options));
+  if (!$type) $type = getFileType($file);
+
   // set default, no thumb
   $path = $file['path'];
 
