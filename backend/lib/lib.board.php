@@ -77,11 +77,14 @@ $getPostsModel = array();
 function getPostsModel($boardUri) {
   global $db, $models, $getPostsModel;
 
+  // FIXME: just implement a cache here...
+  /*
   if (!empty($getPostsModel[$boardUri])) {
-    echo "getPostsModel called for [$boardUri] last call[$getPostsModel] trace[", gettrace(), "]<br>\n";
+    echo "getPostsModel called for [$boardUri] last call[", print_r($getPostsModel, 1), "] trace[", gettrace(), "]<br>\n";
   } else {
     $getPostsModel[$boardUri] = gettrace();
   }
+  */
 
   $cnt = $db->count($models['board'], array('criteria'=>array(
       array('uri', '=', $boardUri),
