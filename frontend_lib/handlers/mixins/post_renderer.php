@@ -65,6 +65,7 @@ function renderPost($boardUri, $p, $options = false) {
   // tn_w, tn_h aren't enabled yet
   $files_html = '';
   foreach($p['files'] as $file) {
+    //echo "<pre>file[", print_r($file, 1), "]</pre>\n";
     $ftmpl = $file_template;
     // disbale images until we can mod...
     //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
@@ -75,16 +76,25 @@ function renderPost($boardUri, $p, $options = false) {
     if (strpos($path, '://') === false) {
       $path = 'backend/' . $path;
     }
-    $ftmpl = str_replace('{{path}}', $path, $ftmpl);
-    $ftmpl = str_replace('{{filename}}', $file['filename'], $ftmpl);
-    if (isset($file['size'])) {
-      $ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
-    }
-    //$ftmpl = str_replace('{{size}}', $file['size'], $ftmpl);
-    $ftmpl = str_replace('{{width}}', $file['w'], $ftmpl);
-    $ftmpl = str_replace('{{height}}', $file['h'], $ftmpl);
-    $thumb = getThumbnail($file);
-    $ftmpl = str_replace('{{thumb}}', $thumb, $ftmpl);
+    $majorMimeType = getFileType($file);
+    $fTags = array(
+      'path' => $path,
+      // sha256
+      'fileid' => 'f' .  uniqid(),
+      'filename' => $file['filename'],
+      'size' => empty($file['size']) ? 'Unknown' : $file['size'],
+      'width' => $file['w'],
+      'height' => $file['h'],
+      'majorMimeType' => $majorMimeType,
+      'thumb' => getThumbnail($file, array('type' => $majorMimeType)),
+      //'viewer' => getViewer($file, array('type' => $majorMimeType)),
+      'avmedia' => getAudioVideo($file, array('type' => $majorMimeType)),
+      'path' => $path,
+      'tn_w' => $file['tn_w'],
+      'tn_h' => $file['tn_h'],
+    );
+
+    $ftmpl = replace_tags($file_template, $fTags);
     $files_html .= $ftmpl;
   }
 
