@@ -51,7 +51,7 @@ class Router {
     $this->methods['HEAD'] = array();
     $this->methods['PUT'] = array();
     $this->methods['DELETE'] = array();
-    $this->cacheSettings = array();
+    $this->routeOptions = array();
     $this->debug = array();
     // save time on the backend or frontend?
     // frontend gets more hits... backend may have mobile to deal with
@@ -130,7 +130,21 @@ class Router {
     };
 
     if (!empty($res['cacheSettings'])) {
-      $this->cacheSettings[$method . '_' . $cond] = $res['cacheSettings'];
+      $this->routeOptions[$method . '_' . $cond]['cacheSettings'] = $res['cacheSettings'];
+    }
+    // styleSheets, headScripts, title
+    // do we need scripts?
+    // maybe footer scripts?
+    // less sure about this because there's still could a temporal issue?
+    // not really atm...
+    if (!empty($res['styleSheets'])) {
+      $this->routeOptions[$method . '_' . $cond] = $res['styleSheets'];
+    }
+    if (!empty($res['headScripts'])) {
+      $this->routeOptions[$method . '_' . $cond] = $res['headScripts'];
+    }
+    if (!empty($res['title'])) {
+      $this->routeOptions[$method . '_' . $cond] = $res['title'];
     }
 
     //echo "Installing [$method][$cond]<br>\n";
@@ -151,19 +165,19 @@ class Router {
   // I'd like to standardize around a file
   // but func is just more flexible
   // context can be set up in a func before the include
-  function addMethodRoute($method, $cond, $func, $cacheSettings = false) {
+  function addMethodRoute($method, $cond, $func, $options = false) {
     //echo "Installing [$method][$cond]<br>\n";
     $this->methods[$method][$cond] = $func;
-    $this->cacheSettings[$method . '_' . $cond] = $cacheSettings;
+    $this->routeOptions['GET_' . $cond] = $options;
   }
   // anything use this? no, it's forward looking
   function getExternal($group, $name, $cond, $file) {
     $key = $group.'_'.$name;
     $this->methods['GET'][$cond] = is_array($key, $file);
   }
-  function get($cond, $func, $cacheSettings = false) {
+  function get($cond, $func, $options = false) {
     $this->methods['GET'][$cond] = $func;
-    $this->cacheSettings['GET_' . $cond] = $cacheSettings;
+    $this->routeOptions['GET_' . $cond] = $options;
   }
   function post($cond, $func) {
     $this->methods['POST'][$cond] = $func;
@@ -189,13 +203,13 @@ class Router {
     return $_SERVER['CONTENT_LENGTH'] > $this->max_length;
   }
   function isCached($key, $routeParams) {
-    if (!isset($this->cacheSettings[$key])) {
+    if (!isset($this->routeOptions['cacheSettings'][$key])) {
       //echo "No cacheSettings for [$key]";
       return true; // render content
     }
     //echo "key[$key]<br>\n";
-    //print_r($this->cacheSettings[$key]);
-    $cacheSettings = $this->cacheSettings[$key];
+    //print_r($this->routeOptions['cacheSettings'][$key]);
+    $cacheSettings = $this->routeOptions['cacheSettings'][$key];
     if (!isset($cacheSettings['databaseTables']) && !isset($cacheSettings['files'])) {
       //echo "No cacheSettings keys", print_r($cacheSettings);
       return true; // render content
