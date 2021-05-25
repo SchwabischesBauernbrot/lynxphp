@@ -416,7 +416,9 @@ function boardPage($boardUri, $posts_model, $page = 1) {
       //array('deleted', '=', 0),
     ),
     // if you join, you'll lose this ordering..
-    //'order' =>'updated_at desc',
+    // but we have to sort here because of the limiting
+    'order' =>'updated_at desc',
+    'limit' => ($limitPage ? ($limitPage * $tpp) . ',' : '') . $tpp,
   ), 'postid');
 
   $groupbyWrapper = $db->makeSubselect($threadModel, array(), 'postid');
@@ -436,7 +438,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
 
   $res = $db->find($groupbyWrapper, array(
     'orderNoAlias' =>'updated_at desc',
-    'limit' => ($limitPage ? ($limitPage * $tpp) . ',' : '') . $tpp,
+    // can't just limit 10 because the thread can have more than one file...
   ));
 
   $threads = array();
