@@ -200,6 +200,10 @@ class Router {
   }
   function isTooBig() {
     $this->max_length = min(convertPHPSizeToBytes(ini_get('post_max_size')), convertPHPSizeToBytes(ini_get('upload_max_filesize')));
+    // nginx always sets CONTENT_LENGTH, apache only passes when browser sets it
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+      return false; // not too big
+    }
     return $_SERVER['CONTENT_LENGTH'] > $this->max_length;
   }
   function isCached($key, $routeParams) {
