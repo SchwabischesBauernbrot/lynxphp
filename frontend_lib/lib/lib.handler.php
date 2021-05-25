@@ -2,7 +2,8 @@
 
 function redirectTo($url) {
   echo '<head>';
-  //echo '<base href="', BASE_HREF, '">';
+  //global $BASE_HREF;
+  //echo '<base href="', $BASE_HREF, '">';
   echo '<meta http-equiv="refresh" content="0; url=', $url,'">';
   echo '</head>';
   /*
@@ -88,18 +89,25 @@ function loadTemplatesFile2($path) {
   return $templates;
 }
 
-function wrapContent($content, $options = '') {
-  global $pipelines, $packages;
+function wrapContentData($options = '') {
+  global $packages;
   // how do we hook in our admin group?
   // the data is only there if we asked for it...
   // could be a: global, pipeline or ??
-  if (empty($options['settings'])) {
+
+  extract(ensureOptions(array(
+     // only should be used when we know we're opening a ton of requests in parallel
+    'noWork' => false,
+    'settings' => false,
+  ), $options));
+
+  $enableJs = true;
+  if (empty($settings)) {
     // this can cause an infinite loop if backend has an error...
+    // FIXME: caching
     $settings = $packages['base']->useResource('settings', false, array('inWrapContent'=>true));
-  } else {
-    $settings = $options['settings'];
-    //echo "<pre>", print_r($settings, 1), "</pre>\n";
   }
+  //echo "<pre>", print_r($settings, 1), "</pre>\n";
   if (empty($settings) || !is_array($settings)) {
     $siteSettings = array();
     $userSettings = array();
@@ -107,12 +115,21 @@ function wrapContent($content, $options = '') {
     $siteSettings = $settings['site'];
     $userSettings = $settings['user'];
   }
-  $enableJs = true;
-  $doWork = true;
-  // only should be used when we know we're opening a ton of requests in parallel
-  if (!empty($options['noWork'])) {
-    $doWork = false;
-  }
+
+  return array(
+    'siteSettings' => $siteSettings,
+    'userSettings' => $userSettings,
+    'enableJs' => $enableJs,
+    'doWork' => !$noWork,
+  );
+}
+
+function wrapContentHeader($row) {
+  global $pipelines;
+
+  $siteSettings = $row['siteSettings'];
+  $userSettings = $row['userSettings'];
+  $enableJs = $row['enableJs'];
 
   $io = array(
     'siteSettings' => $siteSettings,
@@ -125,9 +142,10 @@ function wrapContent($content, $options = '') {
   $templates = loadTemplates('header');
   // how and when does this change?
   // FIXME: cacheable...
+  global $BASE_HREF;
   $tags = array(
     'nav' => '',
-    'basehref' => BASE_HREF,
+    'basehref' => $BASE_HREF,
     'title' => empty($siteSettings['siteName']) ? '': $siteSettings['siteName'],
     // maybe head insertions is better?
     'head' => $head_html,
@@ -135,12 +153,17 @@ function wrapContent($content, $options = '') {
     'jsenable2' => $enableJs ? '' : ' -->',
   );
 
-  echo replace_tags($templates['header'], $tags), $content;
-  unset($templates);
+  echo replace_tags($templates['header'], $tags);
+}
+
+function wrapContentFooter($row) {
+  global $pipelines;
+  $enableJs = $row['enableJs'];
+  $doWork = $row['doWork'];
 
   $io = array(
-    'siteSettings' => $siteSettings,
-    'userSettings' => $userSettings,
+    'siteSettings' => $row['siteSettings'],
+    'userSettings' => $row['userSettings'],
     'end_html' => '',
   );
   $pipelines[PIPELINE_SITE_END_HTML]->execute($io);
@@ -167,8 +190,13 @@ function wrapContent($content, $options = '') {
   if ($doWork) {
     // FIXME: if DEV_MODE use JS to report how long it took to load
     // use an iframe...
-    echo '<iframe style="display: none" src="backend/opt/work"></iframe>', "\n";
+    if (DEV_MODE) {
+      echo '<iframe width=100% height=480 src="backend/opt/work"></iframe>', "\n";
+    } else {
+      echo '<iframe style="display: none" src="backend/opt/work"></iframe>', "\n";
+    }
     //$result = $packages['base']->useResource('work', false, array('inWrapContent' => true));
+    $result = '';
     //
     if (DEV_MODE) {
       $start = microtime(true);
@@ -191,8 +219,16 @@ function wrapContent($content, $options = '') {
     echo "<h4>input</h4>";
     if (count($_GET)) echo "GET", print_r($_GET, 1), "<br>\n";
     if (count($_POST)) echo "POST", print_r($_POST, 1), "<br>\n";
+    //if (count($_REQUEST)) echo "POST", print_r($_REQUEST, 1), "<br>\n";
     //echo "SERVER", print_r($_SERVER, 1), "<br>\n";
   }
+}
+
+function wrapContent($content, $options = '') {
+  $row = wrapContentData($options);
+  wrapContentHeader($row);
+  echo $content;
+  wrapContentFooter($row);
 }
 
 ?>
