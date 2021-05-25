@@ -56,10 +56,11 @@ $router->get('/boards/:uri/:page', function($request) {
     'pageCount' => ceil($threadCount/$tpp),
   ));
 }, array(
-  'contentType' => 'application/json',
-  'databaseTables' => array('user_sessions', 'board_{{uri}}_public_posts',
-    'board_{{uri}}_public_post_files', 'boards'
-  ),
+  'cacheSettings' => array(
+    'contentType' => 'application/json',
+    'databaseTables' => array('user_sessions', 'board_{{uri}}_public_posts',
+      'board_{{uri}}_public_post_files', 'boards'
+  )),
 ));
 
 // board data + thread data
