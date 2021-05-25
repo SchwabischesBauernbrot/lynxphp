@@ -4,7 +4,8 @@
 
 // local server config
 // has to be first if we use defines...
-$localConfig = 'config_' . getServerField('HTTP_HOST', getServerField('SERVER_NAME')) . '.php';
+$HTTP_HOST = getServerField('HTTP_HOST', getServerField('SERVER_NAME'));
+$localConfig = 'config_' . $HTTP_HOST . '.php';
 if (file_exists($localConfig)) {
   include($localConfig);
 } else {
@@ -22,6 +23,7 @@ if (file_exists($localConfig)) {
 // needs to be HTTPS if the backend is not on the same server
 // must have trailing slash
 if (!defined('BACKEND_BASE_URL')) define('BACKEND_BASE_URL', 'http://localhost/backend/');
+if (!defined('BACKEND_PUBLIC_URL')) define('BACKEND_PUBLIC_URL', 'https://' . $HTTP_HOST . '/backend/');
 
 // what request path is the site design to run under
 // cannot include protocol
