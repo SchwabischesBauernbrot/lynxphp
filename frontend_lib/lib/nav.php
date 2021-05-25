@@ -28,47 +28,21 @@ function getNav($navItems, $options = array()) {
   return $nav_html;
 }
 
-function renderPortalHeader($type, $options = false) {
-  global $pipelines;
-
-  extract(ensureOptions(array(
-     // PIPELINE_type_HEADER_TMPL
-    'headerPipeline' => false,
-     // PIPELINE_type_NAV
-    'navPipeline' => false,
-      'useNavFirstItem' => false,
-    'navItems'  => array(),
-    'prelabel'  => '[',
-    'postlabel' => ']',
-  ), $options));
-
-  $templates = loadTemplates('mixins/' . $type . '_header');
-
-  $p = array(
-    'tags' => array()
+/*
+  $portalOptions = array(
+    'headerPipeline' => PIPELINE_USER_HEADER_TMPL,
+    'footerPipeline' => PIPELINE_USER_FOOTER_TMPL,
+    'navPipeline'    => PIPELINE_USER_NAV,
+    'navItems' => array(
+      'general' => 'user/settings/general',
+      'theme' => 'user/settings/theme',
+    ),
+    // nav ideas: replaces? selected? displayOpts (list)
+    'useNavFirstItem' => true/false,
+    // do we want this? like header tags?
+    'replaces' => array()
   );
-  $selectedURL = false;
-  if ($headerPipeline && isset($pipelines[$headerPipeline])) {
-    $pipelines[$headerPipeline]->execute($p);
-  }
-  if ($navPipeline && isset($pipelines[$navPipeline])) {
-    $pipelines[$navPipeline]->execute($navItems);
-    if ($useNavFirstItem) {
-      $keys = array_keys($navItems);
-      $selectedURL = $navItems[$keys[0]];
-    }
-  }
-  $navOptions = array(
-    'selectedURL' => $selectedURL ?: substr($_SERVER['REQUEST_URI'], 1),
-    'prelabel' => $prelabel,
-    'postlabel' => $postlabel,
-  );
-  $nav_html = getNav($navItems, $navOptions);
-
-  return replace_tags($templates['header'], array_merge($p['tags'], array(
-    'nav' => $nav_html,
-  )));
-}
+*/
 
 
 /*
@@ -93,18 +67,77 @@ $portal = array(
 );
 */
 
-/*
-function renderPortal($portal) {
-  foreach($portal as $name => $section) {
-    renderSection($section);
+
+function renderPortalHeader($type, $options = false) {
+  global $pipelines;
+
+  extract(ensureOptions(array(
+     // PIPELINE_type_HEADER_TMPL
+    'headerPipeline' => false,
+     // PIPELINE_type_NAV
+    'navPipeline' => false,
+      'useNavFirstItem' => false,
+    'navItems'  => array(),
+    'prelabel'  => '[',
+    'postlabel' => ']',
+  ), $options));
+
+  $templates = loadTemplates('mixins/' . $type . '_header');
+  $selectedURL = false;
+
+  if ($navPipeline && isset($pipelines[$navPipeline])) {
+    $pipelines[$navPipeline]->execute($navItems);
+    if ($useNavFirstItem) {
+      $keys = array_keys($navItems);
+      $selectedURL = $navItems[$keys[0]];
+    }
   }
+  $navOptions = array(
+    'selectedURL' => $selectedURL ?: substr($_SERVER['REQUEST_URI'], 1),
+    'prelabel' => $prelabel,
+    'postlabel' => $postlabel,
+  );
+  $nav_html = getNav($navItems, $navOptions);
+
+  $p = array(
+    'tags' => array(
+      'nav' => $nav_html,
+    )
+  );
+  if ($headerPipeline && isset($pipelines[$headerPipeline])) {
+    $pipelines[$headerPipeline]->execute($p);
+  }
+  return replace_tags($templates['header'], $p['tags']);
 }
 
-function renderSection($section) {
-  $templates = loadTemplatesFile($section['file']);
+function renderPortalFooter($type, $options = false) {
+  global $pipelines;
+
+  extract(ensureOptions(array(
+     // PIPELINE_type_FOOTER_TMPL
+    'footerPipeline' => false,
+  ), $options));
+
+  $templates = loadTemplates('mixins/' . $type . '_footer');
+  $p = array(
+    'tags' => array()
+  );
+
+  if ($footerPipeline && isset($pipelines[$footerPipeline])) {
+    $pipelines[$footerPipeline]->execute($p);
+  }
+  return replace_tags($templates['header'], $p['tags']);
 }
+
+/*
+$unit = array(
+  'name' => 'unit name',
+  'cacheSettings' => array(),
+  'workFunction' => 'function name',
+)
 */
 
+/*
 // name is a lookup and part of what we're stored in (we store these objects in)
 class portal {
   // little touch
@@ -114,6 +147,8 @@ class portal {
     $this->headerTemplateFile = $header_template;
     $this->footerTemplateFile = $footer_template;
   }
+
+  // common data?
 
   // if we stay as a class
   // it's a safe assumption that a header's going to have a footer
@@ -136,5 +171,6 @@ class portal {
     echo $template;
   }
 }
+*/
 
 ?>
