@@ -38,6 +38,7 @@ switch($action) {
     $password = getOptionalPostField('password');
     global $db;
     foreach($posts as $r) {
+      // FIXME: call once per r['board']
       $posts_model = getPostsModel($r['board']);
       $post = $db->findById($posts_model, $r['postid']);
       if (!$post) {
