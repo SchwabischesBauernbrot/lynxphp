@@ -1,5 +1,6 @@
 <?php
-$now = microtime(true);
+//$now = microtime(true);
+$now = $_SERVER['REQUEST_TIME_FLOAT'];
 $board_settings = false;
 
 // load frontend config
