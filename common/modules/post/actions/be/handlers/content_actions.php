@@ -21,7 +21,7 @@ foreach($_POST as $k => $v) {
 }
 
 // are they logged in?
-$user_id = loggedIn();
+$user_id = getUserID();
 
 $hasDeleteAccess = array();
 foreach($boards as $uri => $t) {
