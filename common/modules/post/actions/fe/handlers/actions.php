@@ -30,18 +30,20 @@ switch($action) {
       }
       // how is multiple handled?
       $result = $pkg->useResource('content_actions',
-        array('action' => 'delete', 'password' => getOptionalPostField('password')),
+        array('action' => 'delete', 'password' => getOptionalPostField('postpassword')),
         array('addPostFields' => $postFields)
       );
-      if ($result['removedPosts'] + $result['removedThreads'] === count($postFields)) {
-        echo "Successful!<bR>\n"; flush();
-        if (!empty($_POST['page'])) {
-          return redirectTo('/' . $boardUri . '/page/' . $_POST['page']);
-        } else
-        if ($threadNum === 'ThreadNum') {
-          return redirectTo('/' . $boardUri . '/');
-        } else {
-          return redirectTo('/' . $boardUri . '/thread/' . $threadNum . '.html');
+      if (is_array($result)) {
+        if ($result['removedPosts'] + $result['removedThreads'] === count($postFields)) {
+          echo "Successful!<bR>\n"; flush();
+          if (!empty($_POST['page'])) {
+            return redirectTo('/' . $boardUri . '/page/' . $_POST['page']);
+          } else
+          if ($threadNum === 'ThreadNum') {
+            return redirectTo('/' . $boardUri . '/');
+          } else {
+            return redirectTo('/' . $boardUri . '/thread/' . $threadNum . '.html');
+          }
         }
       }
     } else {
@@ -92,17 +94,22 @@ if (getOptionalPostField('global_report')) {
 }
 */
 
-if (count($result['issues'])) {
+if (is_array($result) && count($result['issues'])) {
   wrapContent(print_r($result['issues'], 1)."<br>\n<pre>".print_r($result, 1)."</pre>\n");
 } else {
-  $boardUri = $result['request'][0]['board'];
+  $boardUri = false;
+  if (is_array($result)) {
+    $boardUri = $result['request'][0]['board'];
+  }
 
   // confirm the number matches...
   $ok = true;
   if (is_array($_POST['checkedposts'])) {
     $ok = false;
-    if (count($result['request']) === count($_POST['checkedposts'])) {
-      $ok = true;
+    if (is_array($result)) {
+      if (count($result['request']) === count($_POST['checkedposts'])) {
+        $ok = true;
+      }
     }
   }
 
@@ -114,7 +121,7 @@ if (count($result['issues'])) {
     }
   }
 
-  if ($ok) {
+  if ($ok && $boardUri) {
     if (!empty($_POST['page'])) {
       redirectTo('/' . $boardUri . '/page/' . $_POST['page']);
     } else
