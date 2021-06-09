@@ -35,7 +35,7 @@ $issues = array();
 
 switch($action) {
   case 'delete':
-    $password = getOptionalPostField('password');
+    $password = getQueryField('password');
     global $db;
     foreach($posts as $r) {
       // FIXME: call once per r['board']
