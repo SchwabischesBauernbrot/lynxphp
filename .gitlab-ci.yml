@@ -144,7 +144,7 @@ test:nginx:my:latest:
     - docker
   script:
     - *init-tests
-    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar && chmod u+x phpunit
+    - wget -O phpunit https://phar.phpunit.de/phpunit-9.phar && chmod u+x phpunit
     - ./phpunit tests/integration
 
 test:nginx:pg:latest:
@@ -162,7 +162,7 @@ test:nginx:pg:latest:
     - docker
   script:
     - *init-tests
-    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar && chmod u+x phpunit
+    - wget -O phpunit https://phar.phpunit.de/phpunit-9.phar && chmod u+x phpunit
     - ./phpunit tests/integration
 
 # debian
@@ -182,7 +182,7 @@ test:mod:my:latest:
     - docker
   script:
     - *init-tests
-    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar && chmod u+x phpunit
+    - wget -O phpunit https://phar.phpunit.de/phpunit-9.phar && chmod u+x phpunit
     - ./phpunit tests/integration
 
 test:mod:pg:latest:
@@ -200,5 +200,5 @@ test:mod:pg:latest:
     - docker
   script:
     - *init-tests
-    - wget -O phpunit https://phar.phpunit.de/phpunit-nightly.phar && chmod u+x phpunit
+    - wget -O phpunit https://phar.phpunit.de/phpunit-9.phar && chmod u+x phpunit
     - ./phpunit tests/integration
