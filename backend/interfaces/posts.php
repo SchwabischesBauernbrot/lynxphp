@@ -119,8 +119,9 @@ function getThread($boardUri, $threadNum, $posts_model) {
   return $posts;
 }
 
+// option.deleteReplies:bool
 function deletePost($boardUri, $postid, $options = false, $post = false) {
-  global $db;
+  global $db, $now, $models;
 
   // ensure post
   $posts_model = getPostsModel($boardUri);
@@ -128,12 +129,17 @@ function deletePost($boardUri, $postid, $options = false, $post = false) {
     $post = $db->findById($posts_model, $postid);
   }
 
+  $inow = (int)$now;
+  $urow = array('last_post' => $inow);
+
   // is this a thread...
   if (!$post['threadid']) {
-    if ($options['deleteReplies']) {
+    $urow['last_thread'] = $inow;
+    if ($options && $options['deleteReplies']) {
       // thread deletion request
       //$res = $db->find($posts_model, array('criteria' => array('threadid' => $postid)));
       // FIXME: write me!
+      echo "Write me";
     } else {
       // only disable OP
       $post['deleted'] = true;
@@ -149,6 +155,11 @@ function deletePost($boardUri, $postid, $options = false, $post = false) {
       return false;
     }
   }
+
+  // communicate it to the caches
+  $db->update($models['board'], $urow, array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
 
   // check files
   $files_model = getPostFilesModel($boardUri);
