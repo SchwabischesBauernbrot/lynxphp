@@ -1,4 +1,4 @@
- <?php
+<?php
 
 interface database_driver_base {
   public function connect_db($host, $user, $pass, $db, $port = 0);
