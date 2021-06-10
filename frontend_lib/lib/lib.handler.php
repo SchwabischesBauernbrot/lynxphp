@@ -191,18 +191,18 @@ function wrapContentFooter($row) {
     // FIXME: if DEV_MODE use JS to report how long it took to load
     // use an iframe...
     if (DEV_MODE) {
-      echo '<iframe width=100% height=480 src="backend/opt/work"></iframe>', "\n";
+      $start = microtime(true);
+      echo '<iframe width=100% onload="this.style.height = (this.contentWindow.document.body.scrollHeight)+\'px\'" src="backend/opt/work"></iframe>', "\n";
+      //global $packages;
+      // add 200ms to script time
+      //$result = $packages['base']->useResource('work', false, array('inWrapContent' => true));
     } else {
       echo '<iframe style="display: none" src="backend/opt/work"></iframe>', "\n";
-    }
-    //$result = $packages['base']->useResource('work', false, array('inWrapContent' => true));
-    $result = '';
-    //
-    if (DEV_MODE) {
-      $start = microtime(true);
+      $result = '';
     }
     // expirations happen here...
     $pipelines[PIPELINE_AFTER_WORK]->execute($result);
+
     if (DEV_MODE) {
       $diff = (microtime(true) - $start) * 1000;
       curl_log_report();
