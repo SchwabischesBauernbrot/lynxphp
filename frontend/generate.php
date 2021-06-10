@@ -7,6 +7,7 @@ include '../common/post_vars.php';
 global $BASE_HREF;
 
 define('DEV_MODE', false);
+define('IN_GENERATE', true);
 
 // without BACKEND_BASE_URL being correct, images aren't going to load
 // so we have to pass the right domain in...
@@ -45,52 +46,41 @@ function stripHTMLComments($html) {
 
 function routeToDisk($route, $path) {
   global $router;
+  // what should we set as REQUEST_URI?
+  $_SERVER['REQUEST_URI'] = $route;
   ob_start();
   $router->exec('GET', $route);
   // could we place this correctly?
   $routeHTML = '<div style="height: 40px;"></div>'. "\n" . ob_get_clean();
   $cleanHTML = stripHTMLComments($routeHTML);
-  echo "writing [$route] to [static/][$path][.html]\n";
-  file_put_contents('static/' . $path . '.html', $cleanHTML);
+  echo "writing [$route] to [static/][$path]\n";
+  file_put_contents('static/' . $path, $cleanHTML);
 }
 
-function flushRoute($route) {
+function routeToFile($route) {
   $parts = explode('/', $route);
   $file = $parts[count($parts) - 1];
-  if (!$route || $route[strlen($route) - 1] === '/') $file = 'index';
-  echo "route[$route] file[$file] [", count($parts), "]<br>\n";
-  if (count($parts) === 2) {
-    routeToDisk($route, $file);
-  } else {
+  if (!$route || $route[strlen($route) - 1] === '/') $file = 'index.html';
+  $dir = '';
+  //echo "parts[", count($parts), "] file[$file] route[$route]<br>\n";
+  if (count($parts) !== 2) {
     // dirname fails /BOARDURI/
-    if ($route[strlen($route) - 1] === '/') {
+    if (!$route || $route[strlen($route) - 1] === '/') {
+      $dir = trim($route, '/'); // just remove all the slashes
       if (count($parts) === 3) {
-        $dir = trim($route, '/'); // just remove all the slashes
-        $file = 'index'; // probably dont' need to do this
-      } else {
-        echo "generate::flushRoute - count[", count($parts), "] - write me\n";
-        return;
+        $file = 'index.html'; // probably dont' need to do this
       }
     } else {
       $dir = ltrim(dirname($route), '/'); // we don't want the first /
     }
-    echo "dir[$dir]\n";
+    //echo "dir[$dir]\n";
     if (!file_exists('static/'. $dir)) {
-      mkdir('static/'. $dir);
+      mkdir('static/'. $dir, 0777, true);
     }
-    routeToDisk($route, $dir . '/' . $file);
+    $dir .= '/';
   }
+  return $dir . $file;
 }
-
-// this is important for high scale...
-// we need to flush it out, so the core can support it
-
-// build index.html
-flushRoute('', 'index');
-
-// when do we expire the homepage?
-// - homepage backend route changes? (board listing order? site settings change)
-// - templates change
 
 // get a list all boards
 // requires web server and backend to be running
@@ -99,78 +89,115 @@ $boardURIs = array_map(function($bData) {
   return $bData['uri'];
 }, $boards['data']['boards']);
 
-// can access pkg data
-/*
-global $packages;
-foreach($packages as $n => $pkg) {
-  foreach($pkg->frontend_packages as $fe) {
-    if (!isset($fe->handlers['GET'])) continue;
-    foreach($fe->handlers['GET'] as $r => $hndlr) {
-      echo "r: $r\n";
-      if (strpos($r, '/:') !== false) {
-        foreach($boardURIs as $uri) {
-          flushRoute(str_replace(':uri', $uri, $r));
-        }
-      } else {
-        flushRoute($r);
-      }
-      print_r($hndlr);
-    }
-  }
-}
-*/
-
+// this only makes sense if we have 404 generation...
 function shouldPurgeRoute() {
 }
 
-function shouldGenerateRoute() {
-  return true;
+function shouldGenerateRoute($path, $cacheSettings, $params) {
+  global $router;
+  $fullpath = 'static/' . $path;
+  if (!file_exists($fullpath)) return true;
+  $ourtime = filemtime($fullpath);
+  $mtime = $router->getMaxMtime($cacheSettings, $params);
+  return $mtime > $ourtime;
 }
 
-// internal routes?
 // setup will set up frontend routes only
 // and that's what we want
-// can access options...
-foreach($router->methods['GET'] as $r => $f) {
-  if (isset($router->frontendData['GET_' . $r]['route'])) {
-    $rData = $router->frontendData['GET_' . $r]['route'];
-    if (!empty($rData['loggedIn'])) continue;
-    if (!empty($rData['dontGen'])) continue;
+$res = $router->getRouteData(array(
+  'method' => 'GET', 'skipLoggedIn' => true, 'skipDontGen' => true
+));
+foreach($res['GET'] as $r => $arr) {
+  if (strpos($r, 'settings') !== false && strpos($r, 'themedemo') === false) continue; // reduce noise
+  // FIXME: allow .json and .jpg...
+  // allow .html and directories that become index.html
+  if (strpos($r, '.jpg') === false && strpos($r, '.html') === false && $r[strlen($r) -1] !== '/') {
+    echo "Skipping [$r] because no html/jpg extension\n";
+    continue;
   }
-  if (strpos($r, 'settings') !== false) continue;
-  echo "r: $r\n";
-  if (strpos($r, '/:') !== false) {
-    if (strpos($r, '/:videoid') !== false) {
-      continue;
-    } else
-    if (strpos($r, '/:id') !== false) {
-      continue;
-    } else
-    if (strpos($r, '/:uri') !== false) {
-      foreach($boardURIs as $uri) {
-        if (strpos($r, '/:num') !== false) {
-          continue;
-        } else
-        if (strpos($r, '/:page') !== false) {
-          continue;
-        } else {
-          flushRoute(str_replace(':uri', $uri, $r));
+  $data = $router->extractParams($r);
+  $params = $data['params'];
+  $skip = array ('id', 'videoid');
+  if (count(array_intersect($params, $skip))) {
+    continue;
+  }
+  if (empty($arr['options']['cacheSettings'])) {
+    echo "r[$r] has no cacheSettings, skipping...\n";
+    continue;
+  }
+  $cacheSettings = $arr['options']['cacheSettings'];
+  //echo "r[$r] params[", print_r($params, 1), "]\n";
+  if (in_array('uri', $params)) {
+    foreach($boardURIs as $uri) {
+      $p = array('uri' => $uri);
+      if (in_array('num', $params)) {
+        // 4chan/test/threads.json
+        $catData = getBoardCatalog($uri);
+        foreach($catData['pages'] as $pageData) {
+          foreach($pageData['threads'] as $t) {
+            $no = $t['no'];
+            $p['num'] = $no;
+            $route = str_replace(':uri', $uri, $r);
+            $route = str_replace(':num', $no, $route);
+            $path = routeToFile($route);
+            if (shouldGenerateRoute($path, $cacheSettings, $p)) routeToDisk($route, $path);
+          }
         }
+        //print_r($catData);
+        //print_r($catData['pages']);
+        // get a list of thread numbers for the board
+        //echo "Skipping [$r] because :num\n";
+        continue;
+      } else
+      if (in_array('page', $params)) {
+        // get a list of pages for board
+        $catData = getBoardCatalog($uri);
+        //print_r($catData['pages']);
+        foreach($catData['pages'] as $pageData) {
+          //echo "page[", $p['page'], "]\n";
+          $pageNum = $pageData['page'];
+          $p['page'] = $pageNum;
+          $route = str_replace(':uri', $uri, $r);
+          $route = str_replace(':page', $pageNum, $route);
+          $path = routeToFile($route);
+          if (shouldGenerateRoute($path, $cacheSettings, $p)) routeToDisk($route, $path);
+        }
+        //echo "Skipping [$r] because :page\n";
+        continue;
       }
-    } else {
-      echo "unknown vars [$r]\n";
+      $route = str_replace(':uri', $uri, $r);
+      $path = routeToFile($route);
+      if (shouldGenerateRoute($path, $cacheSettings, $p)) routeToDisk($route, $path);
     }
+  } else
+  if (in_array('theme', $params)) {
+    // get a list of themes
+    //echo "Skipping [$r] because :theme\n";
+    $themeData = include '../common/modules/site/themes/shared.php';
+    foreach($themeData['themes'] as $theme => $label) {
+      $p = array('theme', $theme);
+      $route = str_replace(':theme', $theme, $r);
+      $path = routeToFile($route);
+      //echo "route[$route] r[$r]\n";
+      if (shouldGenerateRoute($path, $cacheSettings, $p)) routeToDisk($route, $path);
+    }
+    continue;
   } else {
-    flushRoute($r);
+    if (count($params)) {
+      echo "r[$r] Unknown param[", join(',', $params), "]<br>\n";
+      continue;
+    }
+    $path = routeToFile($r);
+    if (shouldGenerateRoute($path, $cacheSettings, array())) routeToDisk($r, $path);
   }
+  //echo "r[$r] [", join(',', $params), "]<br>\n";
 }
 
+// does it matter who owns these?
 $username = posix_getpwuid(posix_geteuid())['name'];
-//echo "username[$username]<br>\n";
 if ($username !== USER) {
   // we need to fix perms
   recurse_chown_chgrp('static/', USER, USER);
 }
-
 
 ?>
