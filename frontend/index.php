@@ -65,5 +65,16 @@ $res = $router->exec($req_method, $req_path);
 if (!$res) {
   http_response_code(404);
   echo "404 Page not found<br>\n";
+  if (DEV_MODE) {
+    echo "method[$req_method] path[$req_path]<br>\n";
+    //echo "<pre>method routes:", print_r($router->methods[$req_method], 1), "</pre>\n";
+    /*
+    foreach($router->methods[$req_method] as $r => $f) {
+      echo "$r<br>\n";
+    }
+    */
+    $debug = $router->debug($req_method);
+    echo "<pre>", print_r($debug, 1), "</pre>\n";
+  }
 }
 ?>
