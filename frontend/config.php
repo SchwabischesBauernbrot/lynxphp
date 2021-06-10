@@ -48,5 +48,7 @@ if (!defined('REDIS_PORT')) define('REDIS_PORT', '127.0.0.1');
 if (!defined('REDIS_SOCKET')) define('REDIS_SOCKET', '/tmp/redis.sock');
 if (!defined('REDIS_FORCE_HOST')) define('REDIS_FORCE_HOST', false);
 if (!defined('IN_TEST')) define('IN_TEST', false);
+if (!defined('IN_GENERATE')) define('IN_GENERATE', false);
+if (!defined('USER')) define('USER', 'www-data'); // debian
 
 ?>
