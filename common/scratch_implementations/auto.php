@@ -3,12 +3,14 @@
 // we may want to move sphinx over redis to reduce the number of requirements
 // iff we find sphinx to be an adequate replacement
 
+/*
 if (class_exists('Redis')) {
   include 'redis.php';
   class auto_scratch_driver extends redis_scratch_driver {
   }
   return;
 }
+*/
 /*
 // deprecated until further testing
 } elseif (class_exists('APCIterator')) {
