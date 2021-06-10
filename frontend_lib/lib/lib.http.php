@@ -6,6 +6,7 @@ $curlLog = array();
 // but we'd need to reset certain settings each time
 // but ultimately we should rather aim for one curl request per page total
 
+// router::getMaxMtime uses this
 function request($options = array()) {
   extract(ensureOptions(array(
     'url' => '',
@@ -19,6 +20,7 @@ function request($options = array()) {
   if (count($headers)) {
     $header = $headers;
   }
+  //echo "http::request - url[$url] method[$method]\n";
   return curlHelper($url, $fields, $header, $user, $pass, $method);
 }
 
@@ -53,7 +55,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   if (is_array($fields)) {
     curl_setopt($ch, CURLOPT_POST, count($fields));
   } else {
-    curl_setopt($ch, CURLOPT_POST, $fields?true:false);
+    curl_setopt($ch, CURLOPT_POST, $fields ? true : false);
   }
   curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
   //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
@@ -79,9 +81,13 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   } else
   if ($method==='GET') {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+  } else
+  if ($method === 'HEAD') {
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'HEAD');
+    curl_setopt($ch, CURLOPT_HEADER, true); // include response header in output
   }
   //curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false);
-  //curl_setopt($ch,CURLOPT_HEADER,true); // include response header in output
+
   //execute post
   $result = curl_exec($ch);
 
