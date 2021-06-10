@@ -11,11 +11,10 @@ include 'config.php';
 
 // message queue
 
-$router = include '../common/router.php';
-$router->defaultContentType = 'application/json';
+$router = include 'router.php';
 
-// one syscall to get the current time
-$now = microtime(true);
+// no syscalls needed to get the current time
+$now = $_SERVER['REQUEST_TIME_FLOAT'];
 
 // connect to db
 include 'lib/database_drivers/' . DB_DRIVER . '.php';
