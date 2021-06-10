@@ -30,5 +30,8 @@ if (!defined('DB_PWD')) define('DB_PWD', '');
 if (!defined('DB_NAME')) define('DB_NAME', 'lynxphp');
 if (!defined('DB_DRIVER')) define('DB_DRIVER', 'mysql');
 if (!defined('IN_TEST')) define('IN_TEST', false);
+// scratch file would need this
+if (!defined('USER')) define('USER', 'www-data'); // debian
+if (!defined('IN_GENERATE')) define('IN_GENERATE', false);
 
 ?>
