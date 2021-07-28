@@ -2,6 +2,16 @@
 
 $curlLog = array();
 
+// if you have count you need ?
+function paramsToQuerystringGroups($params) {
+  if (!$params) return array();
+  $qarr = array();
+  foreach($params as $k => $v) {
+    $qarr[] = $k . '=' . $v;
+  }
+  return $qarr;
+}
+
 // we could reuse the curl handle
 // but we'd need to reset certain settings each time
 // but ultimately we should rather aim for one curl request per page total
@@ -138,7 +148,7 @@ function curl_log_report() {
     echo $l['trace'];
     echo '<details>';
     echo '  <summary>Response</summary>', "\n";
-    echo '  <pre>', json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT), '</pre>', "\n";
+    echo '  <pre>', htmlspecialchars(json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT)), '</pre>', "\n";
     echo '</details>';
     $ttl += $l['took'];
   }
