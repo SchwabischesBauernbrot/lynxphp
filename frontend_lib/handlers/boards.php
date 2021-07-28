@@ -54,23 +54,32 @@ function relativeColor($relativeTo) {
 function getBoardsHandler() {
   global $now;
 
+  $pageNum = 1;
   $params = array(
     'search' => '',
     'sort' => 'activity',
+    'direction' => 'desc',
   );
   // popularity desc is the default
   // popularity desc should be highest post at the top
   // prettier if Latest activity is the default
-  if (!empty($_POST['search'])) {
-    $params['search'] = $_POST['search'];
+  if (!empty($_REQUEST['search'])) {
+    $params['search'] = $_REQUEST['search'];
   }
-  if (!empty($_POST['sort'])) {
-    $params['sort'] = $_POST['sort'];
+  if (!empty($_REQUEST['sort'])) {
+    $params['sort'] = $_REQUEST['sort'];
   }
   $reverse_list = true;
-  if (!empty($_POST['direction'])) {
+  if (!empty($_REQUEST['direction'])) {
     //$params['direction'] = $_GET['direction'];
-    $reverse_list = $_POST['direction'] !== 'asc';
+    $reverse_list = $_REQUEST['direction'] !== 'asc';
+  }
+  if (!empty($_GET['page'])) {
+    $pageNum = (int)$_GET['page'];
+  }
+  $params['page'] = $pageNum;
+  if (BACKEND_TYPE === 'lynxchan') {
+    $params['direction'] = $reverse_list ? 'desc' : 'asc';
   }
 
   //print_r($params);
@@ -78,14 +87,17 @@ function getBoardsHandler() {
   $boards = $res['data']['boards'];
   // FIXME: not very cacheable like this...
   $settings = $res['data']['settings'];
-  if ($reverse_list) {
-    $boards = array_reverse($boards);
+  if (BACKEND_TYPE === 'default') {
+    if ($reverse_list) {
+      $boards = array_reverse($boards);
+    }
   }
 
   $templates = loadTemplates('board_listing');
   $overboard_template = $templates['loop0'];
   $board_template     = $templates['loop1'];
-  $page_template      = $templates['loop2'];
+  $page_template     = $templates['loop2'];
+  //echo "<pre>pages_template", htmlspecialchars(print_r($page_template, 1)), "</pre>\n";
 
   $boards_html = '';
   foreach($boards as $c=>$b) {
@@ -163,9 +175,27 @@ function getBoardsHandler() {
 
 
   $page_html = '';
-  $tmp = $page_template;
-  $tmp = str_replace('{{page}}', 1, $tmp);
-  $page_html .= $tmp;
+  if (isset($res['data']['pageCount'])) {
+    //print_r($params);
+    $qParams = array();
+    if ($params['search']) $qParams['search'] = $params['search'];
+    if ($params['sort'] !== 'activity') $qParams['sort'] = $params['sort'];
+    if ($params['direction'] !== 'desc') $qParams['direction'] = 'asc';
+    $qs = paramsToQuerystringGroups($qParams);
+    for($i = 0; $i < $res['data']['pageCount']; $i++) {
+      $tmp = $page_template;
+      // we lose dir and sort
+      $tmp = str_replace('{{page}}', ($i + 1), $tmp);
+      $tmp = str_replace('{{qs}}', 'page=' . ($i + 1) . '&' . join('&', $qs), $tmp);
+      $tmp = str_replace('{{bold}}', $pageNum == $i + 1 ? 'bold' : '', $tmp);
+      $page_html .= $tmp;
+    }
+  } else {
+    $tmp = $page_template;
+    $tmp = str_replace('{{page}}', 1, $tmp);
+    $tmp = str_replace('{{bold}}', 'bold', $tmp);
+    $page_html .= $tmp;
+  }
 
   $content = str_replace('{{pages}}',  $page_html, $content);
   $content = str_replace('{{boards}}', $boards_html, $content);
