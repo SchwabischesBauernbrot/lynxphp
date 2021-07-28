@@ -76,7 +76,7 @@ function processFiles($filter_fields = false) {
 }
 
 function getFileType($file) {
-  $type = $file['type'] ? $file['type'] : 'image';
+  $type = isset($file['type']) ? $file['type'] : 'image';
   if ($type === 'audio') {
     $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg';
     if (!$isPlayable) {
@@ -101,7 +101,6 @@ function getThumbnail($file, $options = false) {
     'type' => false,
   ), $options));
   if (!$type) $type = getFileType($file);
-  //echo "type[$type]<br>\n";
 
   // set default, no thumb
   $thumb = $file['path'];
@@ -155,7 +154,7 @@ function getThumbnail($file, $options = false) {
   $h = (int)$h;
 
   if (strpos($thumb, '://') === false) {
-    $thumb = 'backend/' . $thumb;
+    $thumb = BACKEND_PUBLIC_URL . $thumb;
   }
   return '<' . $type . ' class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />';
 }
@@ -216,7 +215,7 @@ function getViewer($file, $options = false) {
   $h = (int)$h;
 
   if (strpos($path, '://') === false) {
-    $path = 'backend/' . $path;
+    $path = BACKEND_PUBLIC_URL . $path;
   }
   // loop
   // can't loop because of how we collapse
