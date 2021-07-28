@@ -74,7 +74,7 @@ function renderPost($boardUri, $p, $options = false) {
     $path = $file['path'];
     // if not an absolute URL
     if (strpos($path, '://') === false) {
-      $path = 'backend/' . $path;
+      $path = BACKEND_PUBLIC_URL . $path;
     }
     $majorMimeType = getFileType($file);
     $fTags = array(
