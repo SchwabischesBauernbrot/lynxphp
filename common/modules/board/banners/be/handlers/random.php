@@ -3,7 +3,7 @@ $params = $get();
 
 $boardData = boardMiddleware($request);
 if (!$boardData) {
-  return sendResponse(array());
+  return; // middleware sends response
 }
 
 global $db, $models;
