@@ -1,0 +1,47 @@
+<h1 class="board-title">{{siteName}}</h1>
+<img style="display: block; margin-left: auto; margin-right: auto;" src="{{logoURL}}" alt="">
+<div class="table-container flex-center mv-10 text-center">
+  <table>
+    <tr><th class="alt"><h2>Welcome to {{siteName}}</h2>
+    <tr><td><pre class="no-m-p">{{slogan}}</pre>
+  </table>
+</div>
+<div class="table-container flex-center mv-10 text-center">
+  <table class="boardtable">
+    <tr>
+      <th>Board
+      <th>Description
+      <!-- th>PPH
+      <th>Users
+      <th>Posts -->
+    {{boards}}
+<!-- loop -->
+    <tr>
+      <td><a href="{{uri}}/">/{{uri}}/ - {{title}}</a>
+      <td>{{description}}
+      <!-- td>{ {pph} }
+      <td>{ {users} }
+      <td>{{posts}} -->
+<!-- end -->
+<!-- loop -->
+    <tr>
+      <td colspan="5">
+        <a class="bold" href="/boards">More Boards</a>
+<!-- end -->
+  </table>
+</div>
+<!-- div class="table-container flex-center mv-10 text-center">
+  <table style="max-width:450px">
+    <tr><th>Overall Stats
+    <tr><td>
+      <pre class="no-m-p">
+        There are currently
+        <span class="bold">x</span> public boards,
+        <span class="bold">x</span> in total. Sitewide,
+        <span class="bold">x</span> posts have been made in the last hour,
+        <span class="bold">x</span> in total.
+        <span class="bold">x</span> files are being served, totaling
+        <span class="bold">xGB</span>.
+      </pre>
+  </table>
+</div -->
