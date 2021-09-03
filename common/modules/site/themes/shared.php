@@ -13,6 +13,7 @@ return array(
     'choc' => 'Choc',
     'darkblue' => 'Dark Blue',
     'gurochan' => 'Gurochan',
+    'kc' => 'KohlChan',
     'lain' => 'Lain',
     'miku' => 'Miku',
     'mushroom' => 'Mushroom',
