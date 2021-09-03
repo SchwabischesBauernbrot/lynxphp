@@ -32,7 +32,11 @@ if (is_array($boards)) {
 
 $logo = 'images/default_logo.png';
 if (!empty($settings['site']['logo'])) {
-  $logo = BACKEND_PUBLIC_URL . $settings['site']['logo'];
+  if (strpos($settings['site']['logo'], '://') === false) {
+    $logo = BACKEND_PUBLIC_URL . $settings['site']['logo'];
+  } else {
+    $logo = $settings['site']['logo'];
+  }
 }
 
 $tags = array(

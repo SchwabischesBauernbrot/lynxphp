@@ -56,17 +56,15 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     echo "PHP does not have the curl extension installed<br>\n";
     exit(1);
   }
+  // maybe only do this if AUTO or POST?
+  $hasFields = (is_array($fields) ? count($fields) : $fields) ? true : false;
 
   //open handle
   $ch = curl_init();
 
   //set the url, number of POST vars, POST data
   curl_setopt($ch, CURLOPT_URL, $url);
-  if (is_array($fields)) {
-    curl_setopt($ch, CURLOPT_POST, count($fields));
-  } else {
-    curl_setopt($ch, CURLOPT_POST, $fields ? true : false);
-  }
+  curl_setopt($ch, CURLOPT_POST, $hasFields);
   curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
   //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -82,8 +80,10 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
   }
   if ($method==='AUTO') {
-    if (!$fields) {
+    $method = 'POST'; // for logging
+    if (!$hasFields) {
       curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+      $method = 'GET'; // for logging
     }
   } else
   if ($method==='PUT') {

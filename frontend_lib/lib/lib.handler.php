@@ -190,14 +190,16 @@ function wrapContentFooter($row) {
   if ($doWork) {
     // FIXME: if DEV_MODE use JS to report how long it took to load
     // use an iframe...
+    // X-Frame-Options could block this...
+    $workUrl = BACKEND_PUBLIC_URL . 'opt/work';
     if (DEV_MODE) {
       $start = microtime(true);
-      echo '<iframe width=100% onload="this.style.height = (this.contentWindow.document.body.scrollHeight)+\'px\'" src="backend/opt/work"></iframe>', "\n";
+      echo '<iframe width=99% onload="this.style.height = (this.contentWindow.document.body.scrollHeight)+\'px\'" src="' . $workUrl . '"></iframe>', "\n";
       //global $packages;
       // add 200ms to script time
       //$result = $packages['base']->useResource('work', false, array('inWrapContent' => true));
     } else {
-      echo '<iframe style="display: none" src="backend/opt/work"></iframe>', "\n";
+      echo '<iframe style="display: none" src="' . $workUrl . '"></iframe>', "\n";
       $result = '';
     }
     // expirations happen here...
