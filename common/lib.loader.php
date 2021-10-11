@@ -67,7 +67,12 @@ function registerPackageGroup($group) {
     if (is_dir($path)) {
       // usually fe/be dir
       $loaded++;
-      $pkg = registerPackage($group . '/' . $file);
+      //echo "loading [$group/$file]<br>\n";
+      $groupfile = $group . '/' . $file;
+      if (in_array($groupfile, DISABLE_MODULES)) {
+        continue;
+      }
+      $pkg = registerPackage($groupfile);
       if ($pkg) {
         $packages[$pkg->name] = $pkg;
       }
