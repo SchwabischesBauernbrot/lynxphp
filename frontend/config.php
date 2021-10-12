@@ -56,6 +56,6 @@ if (!defined('IN_TEST')) define('IN_TEST', false);
 if (!defined('IN_GENERATE')) define('IN_GENERATE', false);
 if (!defined('USER')) define('USER', 'www-data'); // debian
 if (!defined('DISABLE_MODULES')) define('DISABLE_MODULES', array());
-if (!defined('DISABLE_WORK')) define('DISABLE_MODULES', false);
+if (!defined('DISABLE_WORK')) define('DISABLE_WORK', false);
 
 ?>
