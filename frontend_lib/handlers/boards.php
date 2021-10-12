@@ -78,20 +78,20 @@ function getBoardsHandler() {
     $pageNum = (int)$_GET['page'];
   }
   $params['page'] = $pageNum;
-  if (BACKEND_TYPE === 'lynxchan') {
-    $params['direction'] = $reverse_list ? 'desc' : 'asc';
-  }
+  $params['direction'] = $reverse_list ? 'desc' : 'asc';
 
   //print_r($params);
   $res = getBoards($params);
   $boards = $res['data']['boards'];
   // FIXME: not very cacheable like this...
   $settings = $res['data']['settings'];
+  /*
   if (BACKEND_TYPE === 'default') {
     if ($reverse_list) {
-      $boards = array_reverse($boards);
     }
   }
+  */
+  $boards = array_reverse($boards);
 
   $templates = loadTemplates('board_listing');
   $overboard_template = $templates['loop0'];
