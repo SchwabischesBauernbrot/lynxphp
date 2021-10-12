@@ -3,6 +3,7 @@
 function getControlPanel() {
   global $BASE_HREF;
   $account = backendLynxAccount();
+  //echo "<pre>", print_r($account, 1), "</pre>\n";
   // you only get meta if error
   if (!$account || (!empty($account['meta']) && $account['meta']['code'] === 401)) {
     // FIXME get named route
@@ -36,7 +37,8 @@ function getControlPanel() {
   if (isset($account['ownedBoards']) && is_array($account['ownedBoards'])) {
     foreach($account['ownedBoards'] as $board) {
       $tmp = $board_html;
-      $tmp = str_replace('{{uri}}', $board['uri'], $tmp);
+      // ['uri'] lynxchan just lists the names, if you need this use an /opt
+      $tmp = str_replace('{{uri}}', $board, $tmp);
       $boards_html .= $tmp;
     }
   }
