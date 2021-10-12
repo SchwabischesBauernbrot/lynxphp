@@ -1,12 +1,12 @@
 window.addEventListener('DOMContentLoaded', (event) => {
 
   const postForm = document.querySelector('#postform');
-  const newPostButton = document.querySelector('a[href="#postform"]');
+  const newPostButton = document.querySelector('input[type="submit"]');
   const openPostForm = (e) => {
     if (e) {
       e.preventDefault();
     }
-    history.replaceState({}, '', '#postform');
+    //history.replaceState({}, '', '#postform');
     postForm.style.display = 'flex';
     newPostButton.style.visibility = 'hidden';
     postForm.dispatchEvent(new Event('opened'));
@@ -25,7 +25,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     closeButton.addEventListener('click', closePostForm, false);
   }
 
-  const messageBox = document.getElementById('message');
+  //const messageBox = document.getElementById('message');
+  const messageBox = document.querySelector('#postform textarea[name="message"]');
 
   const addToMessageBox = (str) => {
     const index = messageBox.selectionStart;
