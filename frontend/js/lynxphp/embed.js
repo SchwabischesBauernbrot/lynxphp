@@ -49,7 +49,7 @@ function addToPostMedia(postScope, embedder) {
 class playlist {
 
   addtracks(track) {
-    console.log('adding', track)
+    //console.log('adding', track)
     if (this.tracks === undefined) this.tracks = []
     this.tracks.push(track)
   }
@@ -215,7 +215,7 @@ class playlist {
 
 const pl = new playlist
 
-isCatalog = false
+//isCatalog = false
 if (!isCatalog) { //dont show embed buttons in catalog
   window.addEventListener('DOMContentLoaded', (event) => {
 
