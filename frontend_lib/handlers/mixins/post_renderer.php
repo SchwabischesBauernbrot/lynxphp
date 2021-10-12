@@ -2,8 +2,16 @@
 
 // the 4chan format is p. shitty
 // missing threadid and boardUri...
+// would be handy to have this in JS for dynamic content
+// js can't hook into the pipeline system, so it can't render the same
+// well JS can use the ajax endpoints to pull it
 function renderPost($boardUri, $p, $options = false) {
   global $pipelines;
+
+  // unpack options
+  extract(ensureOptions(array(
+    'checkable' => false,
+  ), $options));
 
   $templates = loadTemplates('mixins/post_detail');
   $checkable_template = $templates['loop0'];
@@ -14,7 +22,7 @@ function renderPost($boardUri, $p, $options = false) {
   $reply_template     = $templates['loop5'];
 
   $postmeta = '';
-  if ($options && $options['checkable']) {
+  if ($checkable) {
     $postmeta .= replace_tags($checkable_template, array('no' => $p['no']));
   }
   // FIXME: pipeline...
@@ -49,7 +57,7 @@ function renderPost($boardUri, $p, $options = false) {
   }
   if (!empty($p['flag'])) {
     $flag = addslashes(htmlspecialchars($p['flag']));
-    $postmeta .= '<span class="flag flag-'.$p['flag_cc'].'" title="'.$flag.'" alt="'.$flag.'"></span>';
+    $postmeta .= '<span class="flag flag-'.$p['flag_cc'].'" title="'.$p['flagName'].'" alt="'.$p['flagName'].'"><img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '"></span>';
   }
   if (!empty($p['post-capcode'])) {
     $postmeta .= '<span class="post-capcode">' . htmlspecialchars($p['post-capcode']) . '</span>';
@@ -58,7 +66,7 @@ function renderPost($boardUri, $p, $options = false) {
     $postmeta .= '<span class="user-id">' . htmlspecialchars($p['user-id']) . '</span>';
   }
 
-  if ($postmeta !== '' && $options['checkable']) {
+  if ($postmeta !== '' && $checkable) {
     $postmeta = '      <label>' . "\n" . $postmeta . '      </label>';
   }
 
