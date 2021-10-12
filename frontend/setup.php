@@ -274,6 +274,7 @@ $router->post('/:uri/post', function($request) {
   global $BASE_HREF;
   $redir = $BASE_HREF . $boardUri . '/';
   $headers = array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session'));
+  //echo '<pre>headers: ', print_r($headers, 1), "</pre>\n";
   $row = array(
     // noFlag
     'name'     => getOptionalPostField('name'),
@@ -328,10 +329,10 @@ $router->post('/:uri/post', function($request) {
   if ($result === false) {
     wrapContent('Post Error: <pre>' . $json . '</pre>');
   } else {
-    //echo "<pre>", $endpoint, print_r($result, 1), "</pre>\n";
+    //echo "<pre>", $endpoint, "][", gettype($result), "][", print_r($result, 1), "</pre>\n";
     //echo "redir[$redir]<br>\n";
     //return;
-    if (is_numeric($result['data'])) {
+    if ($result && is_array($result) && isset($result['data']) && is_numeric($result['data'])) {
       // success
       redirectTo($redir);
     } else {
