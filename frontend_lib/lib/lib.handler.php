@@ -115,6 +115,9 @@ function wrapContentData($options = '') {
     $siteSettings = $settings['site'];
     $userSettings = $settings['user'];
   }
+  if (DISABLE_WORK) {
+    $noWork = true;
+  }
 
   return array(
     'siteSettings' => $siteSettings,
@@ -137,7 +140,9 @@ function wrapContentHeader($row) {
     'head_html' => '',
   );
   $pipelines[PIPELINE_SITE_HEAD]->execute($io);
-  $head_html = $io['head_html'];
+  $head_html = $io['head_html'] . "\n" . '<script>
+    const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
+  </script>';
 
   $templates = loadTemplates('header');
   // how and when does this change?
@@ -154,6 +159,11 @@ function wrapContentHeader($row) {
   );
 
   echo replace_tags($templates['header'], $tags);
+  global $sentBump;
+  if (!$sentBump) {
+    // make sure first lines of output are see-able
+    echo '<div style="height: 40px;"></div>', "\n"; flush();
+  }
 }
 
 function wrapContentFooter($row) {
@@ -192,6 +202,10 @@ function wrapContentFooter($row) {
     // use an iframe...
     // X-Frame-Options could block this...
     $workUrl = BACKEND_PUBLIC_URL . 'opt/work';
+    // https://stackoverflow.com/questions/57467159/how-to-make-allow-scripts-and-allow-same-origin-coexist-in-iframe
+    // https://www.w3schools.com/tags/att_iframe_sandbox.asp
+    // in a frame because it set 'X-Frame-Options' to 'SAMEORIGIN'.
+    // sandbox="allow-same-origin"
     if (DEV_MODE) {
       $start = microtime(true);
       echo '<iframe width=99% onload="this.style.height = (this.contentWindow.document.body.scrollHeight)+\'px\'" src="' . $workUrl . '"></iframe>', "\n";
