@@ -32,13 +32,18 @@ function postLogin() {
   $user = $_POST['username'];
   $pass = $_POST['password'];
 
-  include '../frontend_lib/lib/lib.sodium.php';
-  $resp = getVerifiedChallengedSignature($user, $pass);
-  if ($resp === false) {
-    wrapContent("Backend could not provide a challenge, please try again later");
-    return;
+  if (AUTH_DIRECT) {
+    //echo "user[$user]<br>\n";
+    $res = backendLogin($user, $pass);
+  } else {
+    include '../frontend_lib/lib/lib.sodium.php';
+    $resp = getVerifiedChallengedSignature($user, $pass);
+    if ($resp === false) {
+      wrapContent("Backend could not provide a challenge, please try again later");
+      return;
+    }
+    $res = backendVerify($resp['chal'], $resp['sig'], $user, $pass);
   }
-  $res = backendVerify($resp['chal'], $resp['sig'], $user, $pass);
   //echo "<pre>postLogin", print_r($res, 1), "</pre>\n";
   if ($res === true) {
     //echo "goto[", $_POST['goto'], "]<br>\n";

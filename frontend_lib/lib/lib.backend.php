@@ -62,6 +62,10 @@ function consume_beRsrc($options, $params = '') {
   }
   //echo "querystring[$querystring]<br>\n";
 
+  // while it should be in the dev report at the bottom, that's not always available
+  // this is very handy
+  //echo "URL[", BACKEND_BASE_URL . $options['endpoint'] . $querystring, "]<br>\n";
+
   // post login/IP
   $responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
     $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
@@ -158,6 +162,7 @@ function getBoards($params = false) {
       $qs[] = $k . '=' . urlencode($v);
     }
   }
+  //echo "qs[", join('&', $qs), "]<br>\n";
   $boards = consume_beRsrc(array(
     'endpoint'    => 'opt/boards.json',
     'querystring' => $qs,
@@ -265,6 +270,27 @@ function backendRegister($chal, $sig, $email = '') {
   }
   // session/ttl/upgradedAccount
   if (!empty($res['data']['session'])) {
+    setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
+    return true;
+  }
+  // error
+  return $res['meta'];
+}
+
+function backendLogin($user, $pass) {
+  $json = curlHelper(BACKEND_BASE_URL . 'opt/verifyAccount', array(
+    'u' => $user, 'p' => $pass,
+  ), array('HTTP_X_FORWARDED_FOR' => getip()));
+  $res = expectJson($json, 'opt/verifyAccount');
+  //echo "<pre>backendLogin", print_r($res, 1), "</pre>\n";
+  if ($res === false) {
+    // couldn't parse json
+    return;
+  }
+  // session
+  if (!empty($res['data']['session'])) {
+    // FIXME: ttl?
+    // looks like 1 hour, supposed to renew every minute...
     setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
     return true;
   }
