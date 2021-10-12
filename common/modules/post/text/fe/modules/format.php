@@ -92,7 +92,21 @@ if (count($btLookups)) {
 }
 */
 
+//echo "<pre>", print_r($io['safeCom'], 1), "</pre>\n";
+
 $replaces = array(
+  // >>>/malform/35@ThreadNum
+  '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/(\d+)@(\d+)(\s*)/m' => function ($matches) {
+    global $btLookups;
+    $btLookups[$matches[1]][$matches[2]] = $matches[3];
+    // obsecure output so it's not re-interpreted
+    $str = '<a class="quote"
+      href="' . $matches[1] . '/thread/' . $matches[3] . '.html#' . $matches[2] . '">&gt;&gt;&sol;' .
+      $matches[1] . '&sol;' . $matches[2] . '/</a>' . $matches[4];
+    //echo "<pre>matches[", htmlspecialchars($str), "]", print_r($matches, 1), "</pre>\n";
+
+    return $str;
+  },
   '/' . preg_quote('&gt;&gt;&gt;#') . '\/?(\w+)\/?(\s+)/m' => function ($matches) use ($io) {
     return '<a
       href="' . $io['boardUri'] . '/catalog#' . $io['boardUri'] . '-/' .
