@@ -150,4 +150,1748 @@ border: 1px solid black !important;
   background-color: #EEEEEE;
   border: 3px solid grey;
 }
-```
+
+/* ---- BALLS ---- */
+img[title="Afghanistan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJpJREFUOE+djkEOwzAIBP3/Y279SK59GmUJ66xtnEpZaRyMYZRmZgseHCXzLFgbOfwtaEctugsMCVtJisAgYXNmECifxOtSosGdAk3MqiQaggb3R0mKnF4EGtxfSRTN8EbBPwly+pcgw7JK8KbLBOHyVnL14/T6aijI45/cc3GWIi4yuFcC0CW9kQP6F4SCZWduRBMLG+ZZM2s/OUPYnv08BGYAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Albania"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIlJREFUOE+VjosRgDAIQzuJ5/5zuQdCSzjkY5W7aH0ksYOIknjkUSp6RRkwuo6zVVWEoMw0wIizD8d9LElmqGPgqUShzUfOLwcU2oB13OXWR/dHyE/MsJ43+aNUEgWjV+tbt0vXe3y/7WYeJX7pTbudleyKKiayLA4G1BCDVdgyEUyo5krRS0TjBlFZ023FxfzRAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Algeria"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKZJREFUOE+tUMERwzAMygjdpZ2oI3chxUhCJop6/ZQ7bIkA58thZjcu4BjZveBdgPn9vFAxFe0B4aGglwD0YvQ1NAmnAfw8XkXViZz9XHOWiAHAzgIF97zXtQZ9haK+DTrhnjL+rSQDxdS+/RMgtW1mwEOiAdAmeD7uXcQSLSKoE8j5FXM8cyrqJJjxEUdov4sILfCVQwmtDCR6mLwsJbJoYPea2XECRLkfnhWQX30AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="American Samoa"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAClSURBVDhPjY/bEYUwCEQtwRZuGTZkVbZyf2wMWRiQR4wyswF32JO4EFETF46h6i7UDVneJ8Jayfgg4TeAKb8qAPJC9rL/X38izAOImF4zP3RuvjheDjd64fvYVJqX4xkSuxW+G8T+0W41xYq+AYKPw16yJ2Crk70oLslrz6BPQC7kpOmszxyBTBVoGRlxqPcOunUDEsSNKSyHPVMNMR3UVXeJaLkAQLbuGfrb/qYAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Andorra"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAALBJREFUOE+tj7EVAjEMQzMCJdUtwAYsxzr0DHEtDTWbYFAS5RTbdxV+T0msZ/3nFDML+hWOVH4WigaGz3f7vEvQ83RNQdsD4Q44ghCksA3QwxyAFKC+wiKkmaPQE6CFfoLgoVtooT+CyNf+DYGaWbU+bkPqE7AP6ULwdVnqjW1wa3iCtO0iiBuoMkDND4gDIcQNuJEHTJAMRACFPgNMkGF0EEJeBISMN6oJ0I78rJmVLxEhEMVb1m5tAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Angola"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAA2klEQVQoz6VTMQ6CQBDcudj4AQKhuIaCwm/wX3u+QXGFjYXR8AEqGQu4k10QTZxqM9mbndnsgaRYAFiTM0jCcoctgVCVnzQEAK0QopM4fU8gor7clKuDnR4boqA/P0VE5Hh6KF65mp0wVCUn8Td+5MV928EeQlUKALpvjTHOHiAi9EWWiOu9T/XQ5ale7sT2r5z4IhNfZDJ0udTNOC27GRVv4UhiOV1lbl0S2sL13gtJOBsjtE49Dq1ToluxV8fmi0w1rw6tGZNAPDbYvwNALdrGihE2z/6fD/gCe7airqdZyBEAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Anguilla"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC8SURBVDhPlZDBDcIwDEVzQmKLzsAkFRsgcWMKBmAIJEAMwo0reyAQV2r07ThyXQfCk77qJP//Nk0V6IuaoHnqqV8c6Lk60vtGvFbhXGwxbED4tTtxeL0dRgWuaFJG127Gwqy6b5Ys5XHu8iRfl32FUmDBWku0QJ++pNwfswVrmCPc1cSIN0Yl+D/7yzBRWOI2WXY/KoCyd2z+V1oCQsMvISdxgTciY02aQdjSXKRehGpUy/QMphZswMuR0gfWYkiHWir4mAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Antarctica"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAYAAAC9+TVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADBSURBVDhPrZGBEYMwDAMZhvVYhjEYoOu5VowSxUl6tNfcPbFlS/ToZmYDfvCYknfBKLi0H7ZkFtQKL7+lC6F4eMeavb2CrLPuQjigiUa9Va/75fLiPK+fQuBD7fwphCKDSDaqnnbjL8WNwSdjntHnxJIIFT15lvb7wQw91NTn4FE/UGcGPKpxV3z4QmjIPGw0XyX81kIMpQ9aMeyijaGmc2EF90tged4hxINAGc/vFpRCotO3rGlhEhK9/ppnhNe2N8nsdlmFaKaKAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="Antigua and Barbuda"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAASCAYAAAA6yNxSAAAABGdBTUEAALGPC/xhBQAAAU9JREFUSEu9lk2OwjAMhdM1Ky7BGolFucfcgiUXYMGOm3CRUVdzhpHmErMzthtHL65TdaBMpKeK/L3PjpvSEVF6W+u6QfcmOjY9BOAtSmng0GoFXuubR8bY5yDWBfDmJ86AqZGR1tFIYbQ0WXM5JPrZcCzZZPhIZCoADMIFQSabGwFwSbRbBqvWGYBuzuZ060d99zTcAUb6+lEyVyBwI414SYPs6PqSATPO5gJQycYZIHsV/+Jrm0cgfsyyIQBf253KIp+YM8zvdV/mhQDameWzEY1FAAaSzp/kZWPyRIAqegOQp0GgOfbLQhnDDKAJZhH7/w1Aj4SbN28CWERRHeBriZHNZSAyLkc0FrwW4ZLCb86JABDWnzu+QfgdegoCixBNq0uivtCqoQrgr5nASKQInemin/5L/NJFtMjRp6bxV+Cpq3hNAC3MGU28XjmCB8MWSB120ZczAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 32px
+}
+img[title="Argentina"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAATCAYAAAB/TkaLAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAA5klEQVQ4y2NkwA/+45FjJFmCgYHhf7C0OgODqCBC5PV7OHPt05s49TPhNRAPgMr/J8VQigBNDGXEFiH3FikycMXdZ/i2SJGBgYEBL1sCi5mMOMMPOYKQAVJkYQNrn97E7lJKfY+eJP6XrrrNwMDAwNAdpgoXhInhEoeK4Uye/0tX3f7PwMDwHxkQI47TQGTF6JpvTbfEKo7MJjlJKWkIEB2oLDiczMCIFNx/9nvCaWRxiAOJNBRdw+0ZVgQNwleg/EeOaWIBeuwz4VBAqoEEi77/6GmTCAMZiS5PcRmOyzBiDCW75AcA7IOgoT1Rzr0AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 19px !important;
+    padding-right: 21px
+}
+img[title="Armenia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAAhklEQVR42pVSwRGAIAxLPKZxGVbqSi7DOvFRkVr1xBwfcknDlVBmCOD16kiaJRkE3E8aRJ/hrPAKxkB1dTTohXF9iZOkQ0ZST0xEAxoAdXTyzrS8g0mUmEYyJD8yYx/tT8xaZEZbtU3JWSGz5bzMGEYPjm+t3wZXltgoVgOQ3hnVl+786ugOdjBZO1QdOa4AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Aruba"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACdSURBVDhPlY6BEcMwCAM9TJfpeh2jA3SZDEMRtQhg0py5+9iRJdlDRBZ08GmpXrAKKj1f70u6onOj27sCQm8qqWFM/AcMRi/2lrdPOPgcqjyGrcXsQ7+XUAA2WuDo/CvhWSoBOy/h2VICMFWb5lQQ9LVkByv5vU6XYx/LIc8S0N10BTNeEou6GyuxIJW4MA13t6dMFUyc5o7qFZHxBV/2M/HprNWnAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Australia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC41ZYUyZQAAAOBJREFUOE+ljouRwyAMRN1/OkkBaYZiCFp9EJKIyVgzD6O95V2u3nvJGDpAtf+iDkfcPm+j2uMbDx+hVEni7vsRE2hRd09vOdN+hUm0hG8bN8GLfK79Ckj0Ed1Rdo93oBdkCs3ya/6RVowZn3Hx0qdALmb7T0+Bjw4VY5U/Wsmyl2UM7Zypw1w4pEQjJRvdq3wn5kMfoCh3Geyb/F4qj6rH/qtD+610Frg0OcsPpHtocl5IcQlimrN9FSK2C6Qs9uNFGX5DNc+6BHGWrL+wEhIpQOjkmb1MKUNiijOxu9KvL/z658uUfqPoAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 21px
+}
+img[title="Austria"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUCAYAAABroNZJAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABCElEQVQ4y5WTsW7CMBCGP6OIJUulLs2EMoIysSH1AfIWiDfJc3QB3oIHqNStU9SOqBMsSF26dHGH2iZ2znHyS4nu/px//2dfIA5tnjDuYRYTqLcL6u0CQO+alYuniDjsmlWqRBTRZlcPRZlH3Qw6Kcrcyw/HL7EuCw6Sl4T9K/B0d6PcS2qhKHPW1bPL39tXAC7nH8ed/p0pFTrpHuicB6qqom1bfvlm33yExjwnTuS23ADw+PnWa0X45rcjLbZcjDecM6Jvy40GdBdjeKtieFBKYeNuHuNtnJzYMci8UTW7dvMhXhSRClK8eDtTYG9nJl3hBAEGh22kQG9ik2LhYjGJ/UeRc3T4A7OEkR0X6iHGAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="Azerbaijan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAI9JREFUOE+VjNEVgCAIRV2nAfroq0VbpH36bQYCEgJFTc55aVfeTQBQBYc+YcpdSg1o+bzaCUTfhcojgSTvOokr5wXHWhzvteSFOj85Hni5l42ToY78R9x2MH1Jj4cSAzk0EQ/2PSwjE71RWILvLNqPdTrU475IZkXSUcmsyAqcRMFAZMvaKQFDxK2UuwCQHigDEjuVOuBHAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Bahamas"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAI9JREFUOE+1kNENgDAIRJ3NdZ3ELZzDH4S20IOWVD8kOaXXuxfjRkSDeOQxVcyKRkPCx5lrAuqLlFcAVcs6iAPorudQdD7vI6SaNsXrYZvg80sMEI6c72tPfb1j/QBBaRDCmd8vVRhaqXTq1wFE//wbcb70HWQWzNQ6BvkMAoCDmLECQdk60SimgBLFLBFtDyiMFS/D6NK6AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Bahrain"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJhJREFUOE+FjoENxDAMAjvEb/H7z9GR/OCUlLpOHokkRXDqEREvQzxa1y79DkbxofPzne5A9wPPCvCx27o3xMcqeOZD2mFQnniPgW5Jgz85Liv4m9J3l/vfwHvI7k9aCHWFacnKaQGWEJeXV04IulsQ1Y3pa5dnQjpQN5RtMyD5WICoHYCekBkYqI4FgJ6bGmSIeOXajYjjB73yTP1PUrG0AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Bangladesh"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIdJREFUOE+tjkEOgDAIBPsY3+PNT/j/OwKlFCgN0dhkTF13JzYAWMBDj5TYJdaAyve5JxHNC40rwUC6TuLGUnDZLsf7KumhHn4/rjR3Eg2+SGSD/C2ZIUOCgc2Tvg/tMGJ7Cu3739Ui+13BHe9VEkQlslHJa5EROIkGlciMdRMDDkm0IXYBoD31ZN/ksQ27eAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Barbados"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKBJREFUOE+tkFEOwzAIQ/vdg+SQ+9nxeiwWiCEesH1UjeQmdewnlENEiubST6ucVVVDw+Mtco0i9TvQPmgZgL8QgBi2ASlgIQaQz9kKWWYs+weAV8rPzY07EHSmnoZs0+Tv4aBQzScT4nKcm5z113QNCGXe+f4cr3Wn/YCkUBShMon7DulAWuJJviDIRtcPYQDkRZYDSicbZiroh3JWRI4P11/z0YdbEdAAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Belarus"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAAqklEQVR42pVSwQ3DIAy8i5glCzQTsEzW8BrtMEzABBmjC7gPg0MoFc0JIXG6s0/GVBE04PVp6DShM2QMQJHWRntY+aHBsLUNtapV1RW5no4xfcm2pkTSbSQzsDWFjDnxTqnUqPCcHWPkAuCIcU0JfyNYsCNGVSXp6e3umNPjfb7nNh69iti3PFT54iTWDhVZ2vFPDfAZlG8lpwZThnajuAsAPH+qL7tza0c/8KVlkKKn5CsAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Belgium"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsTAAALEwEAmpwYAAABNUlEQVQ4y7WVsU7DMBCGv4u6dIVuPEF3GPIKeYKKgbFTl0isSJG6IrFkYgfxBHmFDmHnCbq1MGZLGJrI59SuHSFOsmKdfJ/P99sXIc46NZfQYokBbSmZZ9BU8MQmGC8+UE7BFQsA5plZ0FTwzQGAFwonSzQs7xe5YGNrqtPXsYEI0OVqxxigDzzAxSEEAPesg9B3Xp0l9QnVfX6EM71ducWa+YR6W52EcpXBiFXoGHGpb9UW4CZb8FhtzqDPWcm+Oli+Xiix1NfK67vY1ueZJndmvqUc3wAZH9052toM7T8u0/Fa7yvqgE7bAHb5FdicxPO+J9lxmVrxCf9gM2+nUVd4EKutbX+fYTzUp35bw89DejEmmdInfXb9tbPi/1zTHujNdHK2CiiTOn/gRUV1/kv/pujYX2UAjRCeLxSnAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 21px
+}
+img[title="Belize"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAMFJREFUOE+FkrERwjAMRbNCNqDgOLbgjo6loGQBWpZhgLSwCtVHkm1ZUuSgux87z///uMgEYCUafqSKXtYaEFrmw1BZUd/QVnS6/1f1uhIXroZq0rHceuWonNeDAnX4/fgYFNoSBYMSu7aJGdJ2yeZN0pIORd/XGc83cN3Njid+D+VLt/JlvgU+5TY8jVu/5JllRZc9MQrZlcf6OMeolyRFcex5yzCWEtkkRUOZAleigFD2uzfZsGYiEEh4pOgFMP0AuQz+FgcaIpQAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Benin"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJtJREFUOE+tjtENgzAMRFmBH7boMJ2q87FFh6jk+kLsHs4RfhrphXDxPWUxswFf2CR1FowBhl9P++ybRIl+B5S7YCYBMXuScDkGgCpyjvMoOcJcUbjJ/eMHfgUv/M8kcef8W9JFwXt9JDe5byzp8OCM1j9eN4pUoYJe66ekiFSJiU5KlEgVAxacJBl0kSoDLmenBi2E6II6a2bLF/56CBXqesE3AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Bermuda"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAYAAAC9+TVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADPSURBVDhPrZKBDYMwDAQzDMswAGOwDGMwAMtkGNf/5NNATFFbrF7BT/6koiYfe4BkeUiGSWmycVy54wos+wdnLqCEXQQoLlYlGOwQR2WAHvv8QuhFgHth80RUEKFEohLW4e6SKC/Z3q037wd19uwLCZfgsC2rCnVaAdfD4muLfvv5nYBDr10YeNSWNbo/Cxh1QSn/JWFYBFWSJ5s3PsB2OAu6gOFJkv1fO4/9uxBdICQalv16JQBhCCSR6CcJkOiTAISheEQC7gQgDFvuJZZe68TmPA2afR8AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="Bhutan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKRJREFUOE+FkNENgzAMRBmnPx2hS7MOf12ACSJju7n0Ysdg6Yh52C8Sm4ikaNljmThryUDRub/LrET/RtsnAYLZScLLGGAW+ffz8lifJB2OuuOTxBq+jQvfVry1NkSae8lx/E4uey8lECEmQDHHPyklCAR2ssz6JFGeRKtFJAq0/OkSiOIyTl6GYJJ406EN8K1PgkkyQBdV4eWxE4FDxVXirIhsFxYyTDFqmA98AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Bolivia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAAyElEQVR42pVSvQ6CQAxuDSQ6ubByGhITH0KfycHNqROPwovgQ5CYXJTZxQkThzr0OMoBBr+pP9/XXntFJgIF7LuCgBMFgsrEQw0SaRmKI+VHBYJ9/ekacsvWAnGHEeFHuhIzu+6IlYmHEWcDQFMnALAyT81w06uIpy2mBoDCTmU6TVMn2AIKe9qdobA+Ik1Gdi2Jx+G1TbPlzb7T7G7izXUdrp6JkAguR5iDvGSihXfmCLp53E/9luWlZ2LvKMQO3qnYvdv560a/Ozpj1S3Q9AgAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Bonaire Saint Eustatius and Saba"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAClSURBVDhPrYzRDcJADEPLBHzyxQIsyoxILMJXiHPn1JcGCSEsub04ztvM7GAXPq1rFz4GHj0v1zSkcwfaH/7sAJTm7Lp2iB6zMEspzbUbq7EfixmmOHf5AmHwC4Q37j9BTrf7XI8CDb0e5/jXHMLdzAZEQRCOq1W8CYjPX4FUCnDFNyAdiMcKUcACiUcBKQzSXAFwQjIoMOjTMb0MGc5y59o1s+0N73Q6H19kZyAAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Bosnia and Herzegovina"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJ5JREFUOE+djgsSwjAIBZsLewVzP6/hOYqPUJBf1JGZDfSVbHsQUQHFR0veZWqA6DHGlk70HjB+Eyi6GyT+si74bJfzXCRXaPVjjnYF/0j0HfgsOZ+3Nt9KXLhgwZzTREqzz18ZBS9gpOrekmBqRSy4I2cBd6m4I/fQ1oGWRfoHKpKKgiBZg4VVJJJewJjEgiTK+MtKeLAQ8Y68S0THC50nIkffdv25AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Botswana"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAINJREFUOE+dkQ0OgCAIRr10l+pKHYaABPmRqbF9SW/wcqsBQAoWPaaJs5QMEF33U2YmGg22K4FEZp3ELsuAZRWnPkk61NrkeJgB21PJe8WpqMeMa1Js7fCeBP7Ef+W0WPKd/k/spl+Anyw5FcmOSk5FVuAkChYiu6w7ETBEXCXOAkB7AdsTSMt2vzwrAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Bouvet Island"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACiSURBVDhPhZALEsQgDEI9TK+09z9KFjCx2GrNDDE+kX5aRLyEYlvq6aXeoBujXT9JdYGlVkH3gFEGmgk2IRXkYb3VZTNIFuLcvSh1zBMcVfsl9xA3+Myq/Y6zOENo+f0r8yfPM8jADWfjmc9PqSrTqRTSVyz5xyVCD/EzU76AukKmIMJDyLhTIRo8iOAjxAMoNVcebkP8cmnaDAi809MbEe0PXA0kPa1Ng9UAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Brasil"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAYAAAC9+TVUAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4gwFECMdpP+10gAAAO5JREFUOMutlC0OwkAQhd9U4SFF4ftjuMBqJIIL9AS0R4GeAIVDINF7ADDAAVAk4NcNYmnTLZ0uoi/ZNJl2vrzOvCyhWwxZ5C0A4KveiYRUZT99AQYQ/WHfyyCffZ9SlQ3nxN1Iqfxta925GEap7LEwBsCLfcJG22ez3vq2BQG4KQBsNDrrTUjwLYjO56tc/i3bx96c3J8b74gciNEAEdUnCnPE0wLM7NSN7oGMzgpGW1gU5rWLeFogCvP63eishMQ25rKYvHGc3Zx5XA5bLB8JTq9xe9VEUkYqUCUB4A9bBeoDiFeBmFwhqTTEpfQBFJWGkdV+k/QAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="British Indian Ocean Territory"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADsSURBVDhPjVCxEcIwDEzNHGxCwaWkSEfBAqFlhrQZgYICjlCxATPQhAXgjooBFOkV2bHjHNHdW9L7/31JRkQjcMmRRKwVjAmIC8rzM1HJaJnFRdF3kUUeN8CcqblWc17LRQFIbQ9Xer4+0A3DXEC7VJgAopLNjPf3F/IwSbgGBSEmsMLOIUned2482PfbpZXsgxddGe9nI6Ze5P+T5NHVw/CEdpCA7rN4OYyY7o/dgk6bNd0v+4CHH/OMoKa5UVVVAS8+jDgQ8j/ouPKfYh6scmCYESQhcQCubHCEF3CPg0KzIVgc2YtTiLVElHUJpSrovbcxEgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="British Virgin Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADNSURBVDhPjZCxDQIxDEVdIbEFLS2TnNjgJDqmYAA6RuAYhYaWPZAQEhWY+77YcnIxype+Lnb83yWhQPzHTeIlddxtzvzsB/7cWWo19qexumQA4dfxIuHd4ZsBCtAMxrfVQoy1+rHfiseCqV+b39fptGnOZAAv1IAgRKexTga0hNj9sfZCjWGEJIze+NWTeJAU+GMNgveJTjKDFE0xaru/e5OsX4PU7EG+ll6CQNaMrMEIAElDNyNXABkEagLBOotQpBCmexhqkQ+ULkT0AwA9NBaIOaGUAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Brunei"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKBJREFUOE+FjtEVhTAIQ13BLzd4+2/iCm7hJ49QU9MW25wTgRTucTOzwS58Uve78Bh4dF/HpzPQ23i7AtDcbSBPEOICnB1qjj5Oyl2BsFI8WORevFGrMM8gfHO/i7AK87n/0jyFdGEYAFrzZL8NccCKN60QK1Qh3jcghcxgEOYopR9/kwAaM/fUFTIDZVZAA6nBAqTH9aYPIvT4y/2umW1/3roxT8RVdq8AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Bulgaria"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAXCAYAAADtNKTnAAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA50lEQVQ4y62Uvw6CQAzGv16QgUESEwZnEwcfDt8G38zBxNmBxAQHBhzqICF3vd4fot34rv3xtXAlpIPFMyElyML+cXcOmv3Bqys0gCxMBcUgdb11Dobhpboxv7rQIEvYLjZllQ1RXWiAOY+jTuQsUrqJ2Uy1ISGrB2q3ZHItx85J+7WnsffaeU8jAKCsGo+xQJh5Vih9mdxcKlwkLQn2c0i3B8voWtDlrN+LmN61AMAGfwj3FnetO5Pvm8J6cBWIhKRuf+Lrcbe6jdPtCQBkhLAW4C0lBoAcRxaAgpstBJPF2Ys6Z6V+ALmyW3obJ+IrAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 23px !important;
+    padding-right: 17px
+}
+img[title="Burkina Faso"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJFJREFUOE+tjoEJgDAMBDuFS4iDuKQ7OYkLCDFpmzRNE6pg4bWc/4cJAIbgoYcb26WMANG1bmE8UbvgdSbgcLeT6DEXNIs43QdJhXJecnxVEJXvc3G53mB+kqRjbykwhwQczZ2+gSqdxPmeQ/vyd76Ix6EEd3kvkkAUpm5E8lmkBJ1EwEykxrKxIEMSBbFdAEgPt+f7WBMOhW4AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Burundi"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKBJREFUOE+NUO0RhTAMcgUXeD8dwr1d460UAy2axvjBHTGlwKmTmV3owCiZveBVcOk/L7esis7F17cCUd6hpAuEDGAVBIW+c/reLqIB+Kj7w5fftpK6FHSu9JhxPpfoUyJyxnkKQSRRAOR/UvhH8QuinyWusShDbyHkM9BznCxREcxvBEKmlTStiVUoMxYMJYfwUJbDRyYLFLu5Yvaa2bQD4UUsJe+rjSQAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Cambodia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJBJREFUOE+tklEOgDAIQ5d4Fn+9szfzJghkRWBs+mGTbuSt9GuNiAaz5Cids+IRMNqOc+qq6Bl4fCuAkQ0lfhkBz2Zc5qGkQ9NHzhcPV9vVHZrwNuN4Y/9c4qAFRRVP+QhhLOc7W0v4rSyqlDOyx9JTS3zRSr4glOjQIf7Ayr4glBhYlOVl28lAYQ9Xzlkiaje8bQYFSg+hSQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Cameroon"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKRJREFUOE+dkOsJw0AMg7NC/3SEjtVBOmQh+xTc6GI5iu1LoQYdPiF9eSxmVrQNjlY5C1UD4dfT3rdH0We9t6BjQdkBVxCCFHYAvMwApAD1FVYhuxmDOwE6uJ8gWIb+gMinOWACkSfG0O8hDqIYlPDM3w6FuPhDEdQ9a/T3t6sgFlUdYPQDkkC/IOwEpANdQRRwgoThoBlEy9HJxjABmihnzWz5AtGKB2FF2jQGAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Canada"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAARCAYAAADdRIy+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNWWFMmUAAAC7SURBVDhP1Y/rDQIxDINvGJZhGBa7AVgv1Kld3LtUPMQfLH0liROL2yIiacLzEbp1+sOF2/V9VqEjsDp6xX8Eip8Fej0FfssyECWHQ+rLOfcz8PIMbXRTCy715Zyg9n/ZmE2X+nJOUC8DAYcJr/ljcwM9Ptn8eYHXEfe9c6zlEwVF7L1Om2YC6fgI5hB7DzsFppFmTtbQHzcW1p32ZDEWTOiFyXbzrgwUMGh26TObzFvd5HtCCxXH3ZnYHuABwUIkk74YAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 17px !important;
+    padding-right: 20px
+}
+img[title="Cape Verde"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJpJREFUOE+tj9ENgzAMRDNFv/ljhe7ZwRDT9NP4HNuNnaSpUE86HA7fAwoRdWbhMnTehfsAy8/X3APQ54DyCmDW3QAJZV0I2Szncw+poevHnIcFdyD6jP0nCPQ+HzI1FEOz3KRZoWPbb1sgFVb8jVmzHEJPRj3Xz0TB/5Wd74O145AWhIWvZbgBBIgHDWxV9k4OJDTQwHmXiMoFgLMLtxc3E9oAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Caymen Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADUSURBVDhPjZAxCgIxFESDhSC2Nnb2dt7CLngDwc5TiLV3sFAvY6GFp7ARxGZB/TJ/d8LfkLgZeCQ/OzO7WZeR/KFIMnBe/Owgz+VRPjfRGfTm484iNSD82p00vNp8WwWEXoSs5DzpK9iTx3qhXEZTqa4+gBnFjS8oFFhhRklKcUm4P/ZWmGEe+r1ew668JjxaggFvTJXg/6SULIkOFXue+grQeNvmFO/7Vld+AWfAEigcxjCAlXBGro7X0gMb7oIZhK2Ki+hFKKdsGZ/BVCIbiInk3A9i+koErv4IZgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Central African Republic"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKlJREFUOE+tksERhEAIBA3BMHzewwgvCbPyYUIcwy44i+h9pGpcmB26LMtJRC7SwqNUzkJXA9auC5+vHPMawmwqQGejrQMeIR3EsBOQAtAAIZ+zA6RN7fTC7ACulNeDAtyjMD9BUOhVL0GWbQl10+Tfw0GuIj+aLIZU95BB2hvVoH8Q7Nm+Q8zo/4iLIfkudhxyB7qDMGCAhEGwDMnLsZMNM3u4Us6KyPQDUy4MKiWCcVsAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Chad"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACzSURBVDhPnZAxDsMgDEU5QA/AyNS5AyMjA8dgYGDgHtwsS+9Ut3YCcoxCaZ/0JcexX6yoC2CSJUDdE7yeash2e3wV7QMfwUzCRIOsL1N9hAt4X8g6J4H3HmKMVKNAaw0pJbDW9hkpGa4opUCtlWqUGGPoOYTQZ+Q1gwSvyDlTjRLnHF23JmEiTPsfGN5vgmvJES5o4ctSgvwloT3G3vhB0ncEJ9FM0mcnTCX0fhH+NRmBUm9ui0GEyIFAeAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Chile"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAAmUlEQVR42p2S0RGEIAxEswx1XANUoJ3YDdXcdXId0ICN4MdiSPLhMO6HI7IvGzDotYoR/JIKnhyB7Tt8/2N+ByyWXfkbiDm9A9DAHMoH0UpMA5OrZ/oZjlsKiwi0JQWw/7gkY3m+zBxa+XyWvzcP2JY0cPTWykeWVdqZeq2lnevAvLcVTD1J/9Qzxl063VBwGsLxrHvYXszoBT6gW+Qv/gBSAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="China"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAATCAYAAAB2pebxAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABQ0lEQVQ4y52UPW7CQBCFv7WXCsnhCkh2g0SRIlXKFAnKBTgBdXID3yCpcwIuEBGKlKlSUFiiWSSu4CBRsdamsFnWfzFkpC1GM+/tm5mdFdTN0G2i1QHM6GWE3/eRgUQOJO8P3zx+3KBTjd5psn3G+nldwnouQRRH1llOV+hUA6BTzXK6srEiz1SVmCiO6F318Ps+ADKQJeD9/Bq9y0mzfcbh54CKFYBwyzHDp2FOMJB8xYq7t7ENfs4SbuPIqtu+bq0I8Y+m1vpZUjIubpaBtIqOZvtTlJTMkkYll6goibCNVWE9I1zAZtLOEG1yIlkFidOUUZNGUB6rXGpUiDHqdFSIKcqr+SosH8AIt5Qu+W0luS+2kSBcdBN5XQnnKPMA4TbsEhXH6Qj3jTSNuYOgvjvnErkETbvzJ1kV3PYpnbMCNcwvUiuEtJlhMbAAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 19px !important;
+    padding-right: 17px
+}
+img[title="Christmas Island"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAAZiS0dEAAAAAAAA+UO7fwAAAM5JREFUKM+tU7ERgkAQ3GVM6AGCtwscI0vQKmzAIhxTSzDEEowY7EID7YHwDB5v/o8HDbiE/x122f1fiPQIxoc/AQBSHDejCu/DbcCj/fqUgBFSPlXA1X713OnLoWBAVNy6ErhaAEg4fbRJHACyyEViXutuFO8dSYYZZhHtXA2SUfay8c8Ql7ZSNxyI+PDg8gq5nAB0KJvcR2orXZdNnuyJfMkq9tgC95XuLTG8HUYNnThgACj252RXBmWzjlJCtmyZiUaS/7SVYck4xw/4AX+nbwuZIb2JAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Cocos Island"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAP9o9TQQAAABCElEQVR42n1SoU4DURCcfcHyAScrK+AjmjTcJYDAERQCgSTtE3WLpSQ0qUSDIMEhCHwDim8g5xCoKqZi793tvVJG3N2bm9mdfVmhEg7hOpA9BkCm2dkwLE6HP4/VNw+PwujDeNFA/c09Vn68v3w7qXlwXD3tvo5egJBkNyZoGtqLRcGi6MJcnPHqHJi7EHM7UtlWgtQ1E+T+AQAQWwaIvRHHe3ecXAJwCgDLDaZpFQC8fxJc5Xc1+8IWSCpgiC79Vibz/AFyKnLriBio3XxlOSCnZTlo1QDMYN9ApFKoFG26pR/oF4bP2dx1Wo1YVc8A7OmzeUO3B3YQFZF8PKP8ykm2fynnfzu6BqM4m8UvDtmeAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Colombia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABGElEQVQ4y62UsW3DMBBFHwMvEBVuAlyZNkAKQ11mMDyBBsgGLr2BB/AEhmdwlyqAqwApCbhJkZRpDFwKiRJNH2UayK/Ew+nx8/glx4hERNOa997l+idjoJcHT9UIAN8bD8Ae0RzQ3QIK2h/FdHiXO46lqpF+A2sck+Aitf9bC8ePblG3gH6dgOZL2K1E+5kFIMBsMe5wtgC2be98mcws2IznlM7Kml/VCLvVcMsuF4WwowUMgDQqMUxPh2mbl6cvRCR7TO89ca+VCj0dpgporJL6WTRiV7eqe09j2L8onFWp10P17XV4Lq87+9uMG0vq1m1eazbVubqEAe/3j8Wc55/PM1NpPoqBKSj7CxqDWpBrMOIwlv4H/wAumZhg/mW+tQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 19px !important;
+    padding-right: 19px
+}
+img[title="Comoros"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACeSURBVDhPrZDNDYBQCINdwQU8uoA3E8dyDacyHl0JKXkgIv7ESFIfNO13sCKik3jwSRWz0NmAtTSXykD7wusTQGVZD4ExTJ1IAxJKit6XPUKKaaP3g88PLwA400bvKx+DnfUzJP4T3NBatwcft6p4OwSjRQ+4k0C4Z6AvAOkrJIL6cb6VdgwSQVnJywMOEDNK4E3ZOtEQs4QzxSwRVRtaxiKwzkycXgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Cook Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAWCAYAAAAmaHdCAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADoSURBVDhPrVKJDYNADLthWIYBGINlOkYHYJkOkxJfEpK7EFSplnxNXNs8ohFRyRN8BE6eSZgDE4b/cZ5zHaoguefgcbwnKkJJZvT0UE2yOFGkrKBlztvzOmCREn/lbPYFWMPyzxKGBsZfRlkCwRVlGAsg2XCOzHXtb/2Wy2ZzKGHhs3SqAaZ9A30Q5F20qUREA3YuSfRQwgM/Au328Rh4b60oue6wG++uSK+b8qlEhUsMRgsKsUf/Zc4YApnOeZ6rIjNner8rnL3khyLsksHIR9eeixS+AKsOJlRlQ9gyowBRixKOXiJqXzA2j/NaodOPAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 22px !important;
+    padding-right: 17px
+}
+img[title="Costa Rica"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAI9JREFUOE+tkt0NgDAIhLuCS/jikG7oSshPqUCptokkh+TjuPTBAgCdsKilil5SD8h8nGMlQc9Ax18Bqup1IRVwqcEyqozXmTvOsrAGqkmOHxyubWfpUkt3I6471M8hBjrjBPdwVRwir/PPna16x51DVoPMjYQIE5j+XFEmwIU08BYWjttNBAw1KFH0AkC5AXFVJsNdzh/jAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Croatia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAZCAYAAADe1WXtAAAABmJLR0QA+AASABJtHKa1AAAACXBIWXMAAAsTAAALEwEAmpwYAAABXElEQVRIx7VVMU7DQBCcjSwRIUFxprA7oOMJ/IImdT4RiZoSiUc4b6JANE6ZFMSFaeyGocmZ8+X27FhkJcu3693R3tzsWRA3Rr6J9mGmABEAG2NAEiTRGAPXd/N8gMQHbIwBAFzs9wCANk2D/gEYbZpiXlV0O/c7lXlV4RQ75MuYXDbGsDGG1kK+xvkMZ7BY2ySpchrb9lk6HeRV4zSm4SQgcpnSgF8f6uCkx90JAPrix1jxu36bpp0PEcys4EUEIjJdRn/1Ryj8D3kebb/MMgDA/W7XxVa3T/h5SfB4+Y7F4jOaGzzFMss68t3Dq4siGLf5sQnqkrViPx7SrfhjaUm3a9fX4nZt8RKl5Z4SSGKT58H44FT4VhcFSbLMst7bxn0qtJEkHt56gfr5BlfLJTZ5jrvtFt/rNa5fv/pVH6seVlinAWBrCmAUVAUOWgBw8JJWwRWwsdfcpP/+L3Mwab0DEclPAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 25px !important;
+    padding-right: 21px
+}
+img[title="Cuba"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUCAYAAABroNZJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC/SURBVDhPvZDRDcIwDEQzBCPwBfN0DGZB6hgMwBqMFGI7di6OCTQfPOmpNDmfTJMjHzAk3/aNA/vzUdxCMUdDHr6EQKjLDFhANom3+X8JvXt/LqEn2bZp6t20hPQDaHDXMQYu99F657KGBVAkuq8a+XW68iGi77PzIsMFKyUE/S5KiR4gHDjLf0f4vP9ObRMLVG1D+KisFvgSAp9dwcxaQnSD6jdoTsYFPlgo6EoIKwrXRj8UIBJYHEZwwOtI6Q1YiiSYU9zYzAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="Curacao"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAAZiS0dEAAAAKwB/DeF+0wAAALhJREFUKM+VkzsOAjEQQ+1oBT2i4A7LHTdcjFMsd6CgoURCMgVJtJl8CJbSRMobZ8ZDSbAiWV4GSaK9m6qAeWkxQFIWxOgkVe8Akm6XzNW0ra7Vg2fffbgtFF25zFYAaPUFQFI6GRCAsz2IgAJU07yApFzRuOCm+a2KpuoELOBbsehJF9Ky3hy7JJDU637Ev9qfHpDEBBnOSCUrLouyGd1o2Gh351fsQ2YIALvrG1XI6AKShJ4HAMAH+Plqe09u6MwAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Cyprus"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACYSURBVDhPrU/bDYQwDOuSjMEyDMMyDBPybJ0SVD6w5NY1tk/XiOhBhhwl56zwaVjwFdXQECxXAwHIjhEsRwA9QfIP++YZPVkns+OjzxcEUAv0zb9a+g7RzJ9HohDU/+5MPsC9bGJRuYCO2L0OV/CenjqCQ23fXGWgDx0bMS8PnZeV8A7ggD5DdGMaQ8zlYHp008MV5ywRtRuVNZWWzl4nTQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Czech Republic"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAWCAYAAAAmaHdCAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAA/0lEQVQ4y62UMW6EMBBF/6CVUhOxDTlBDuLcicZrpfElchP3aVOSA1ipIqVO9bewINjYYFBGQoaR5+H5M2PBtnHxLqVNzRbAAfDWwq2BVUZvLT0QHmvpAqQaRBjQLQDTCpMHXUokZQD/YDEOQ/j+HYp/laKQJrPbbMb+QUjS76xb2lQBciA5U7ojfVJtkooaTroTJBLFTyVmq3S6IQLm/CJCABL1yY97XQWSnNfUv9RkPsXh2Qgg/ouwUTqt0lHurdJ4fLlh7PrIP3Y9Pq9P5dlJU3v/eJsD90qc1WUClOz5+wsApFlW5gQg32yt0kcAUhpnljRIg/fuBFaOCgDgDsclr5P5RFA9AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 22px !important;
+    padding-right: 17px
+}
+img[title="Democratic Republic of the Congo"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKBJREFUOE+Vj0ESgzAMA3lCj73y0v6wx36lR2M5kWs7ZqCeWQiKJJJNRBZ08GipXrAKML90cUZT9FsgrHw/zz48sf3pTSUmFgM1J+jvx+7eVBJEH3yzIE7x64vGa7NPzShDODPj6J3elhTR4N35A2f1Z5GhVBD2F5Afpxt3Z/ifAsuzBMTwnYJUEosuwyAUpBIXpuFO2DNVMJFFDdUrItsBrYQiMEQJY78AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Denmark"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABGElEQVQ4y52TTWrDQAyFP5lSKKTH8LoBdz1r39OXyNrrGtJ1Vj5DA4Vu1EVGRnbmx8kDg+YhPUtvNHCDUsfunAbQy3QqFSmgwzAscS7PdF5qfx7HcTlYHEJQQHJFjQWuW00JzvO8FVc/SayH+De9TCf+eAPglV/arscL5hBCwIsBtF1PA0jb9Qtp4lv4TnOIOiKp293Tpe/WQVaeRiJrfqXTVa08uY8p0fvbN8HzoeN86NakKinecVoSBeB4nVDV5ZNo/ZY/XqfynlqXz2DbraynvPEigsX+nOMtNr3kM/Uj27nEl24tOf7HzxcA3++fRQuiv/d7mjO+Bi+YvP1HhVP5TcqOvcIuT2p7KnuscCNL8Xk9+GSztf/s9p4+bAbVuAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 21px
+}
+img[title="Djibouti"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKdJREFUOE+FjtERwzAIQzNDL19doZtlt/x0mY7QMQhgiygYn3X3bKwgXTYRGVDZUZJ3jdFQ6/j+p1RF96DjqgBg91HSDRcWjCrIvs0eablWghtCYOHrpUN/rJZD8PFNaQu//T1dnvlDiQlFAHqdn4dvb9C9+0/4hjhQ4SW6F0VZVYjpOT+9JBdVIYYyrcQHKqpCDBcYURKGWlUQcDgy2XBT7Rl5V0S2CxirNQfoldixAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Dominica"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAA5klEQVQoz5WTPwrCMBTGfynd3Zw8gKCgN6gXEM/gIkIdPIwexMFdRycVCh5AcejmXngOaWPSpFY/CAlfvvcveU8RhtAM1UoAQpoAUCxuxKMcEUGtJvp2e/Tsolp046AR+l5C2QppotdHIMW1K4CIiMPXtMSOq+0RrS9rVcrsHm9lHLWVkPXGv5Sm07ZTrwDIZn4K8rZNDBCPcq+EKotDGdHm6zYROoy3qjKW66lxGNLZ/x18l2z3MufhrOO/SdkzUY1w0N8/GT4uDO7nJgdOs6kmR0F8dIovcyOkidtsbiO2zs7fA/gGiremkp8VRqEAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Dominican Republic"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKdJREFUOE91j8EVwyAMQ/Ny6rVL9NTOk3s27QIdJEu4yMFGGFvvKc8I8QObiCxuwid17MJrgPLnVLN+z5c6A40BhwlQQQzEsAGww73QSy7O461myB26bJ3lEwQD34Jl6ywPTxuFrHx99zQ3YW5eC+bH+1AI/VHN6tm4WjTLnxwNCPYrEKsCYMshGYiVASaIDgmIVQFgh3hAIBYDsGRPCw9bXDl2RWT7A3AuKmkaqEaLAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="East Timor"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJdJREFUOE+Vj9ERgDAIQ93EH8/9t3AJd0GCBVOK9eQulsbknS4iMkgHj1I5C42GWue2vqoCPYuuXwCXZztImMceAagqso99gDQzBncKxyRfD11YPLjPIP5O9ZT99LF7+0Ue3KcQFgApbHJvgLBQZsBM1rk/oAdU4UqWR58hfwEdhEFVIYsBHSSMCSyXo5MNM1u4Us6KyHIBmuzzJi10+JIAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Ecuador"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACoSURBVDhPlZLhEYUgDIM7jMswgGOwjGM4AMs4TKUFaonlfI+7SPlMgj8kZn6pLnmEQq/oDQRda0VFz1DHr4Ih8/oSHx4Gz1ZcZyzp0Jac0xbzqWSAVQmVHnILM1Uz8GucQ44llM5HDapS3k2eB36AXXJLLjtvx6m73hr4NN++LjaUTHwdpHv0XnKatxIZ/5BlGoGf7Qf5gqnEwDAEwrBlECh0ARR6mZluO+gNORJ/yrkAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Egypt"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAVCAYAAACg/AXsAAAA1UlEQVQ4y61UwRHDIAyTuFz/GaIZoKtmi06RCTJAGaID9OE+goPhIKE0+pCTHSGDMUUEFiRTAoCIEAdgSCr+XIOIkCTUwGCdhKD4A4F7gXO1EhrcpCLWRYtAnucC8VHCnwj4WjkAbvgDrud2bEkk4WwP+EaBPI96yp03RJIYVGAdJwDA4/3ak5Sr8WHjvetkHSfZxCMaeXUVg3my+GeZN98OF2DIW5mMD3aZ42r5/OUjt6pY5q2UZC0AgLCn0fJrvuRMnB1OPS6Sjj0aj2fj0v06T0vxLy118kO+CX0mAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 17px
+}
+img[title="El Salvador"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJNJREFUOE+tkdERwyAMQ7NBxupq+coM2aAjupZBVBAntHfRncDo5PfDYmYnu3CkHrvwOfBofb0vnYG+g48zAM1uB9FlFjS7yjF3kPIqN/Vj7pcUdIbw3o8tzSnM7ochUA3DANCaq2rWh5QC6EwBKXcOmqnuxRkQWL90Zu40yL8gBXSQFtzAxuW2MwYR1nLmsWtmywexEkQnG5M0pQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Equatorial Guinea"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACfSURBVDhPrU7bEYMwDGOM/rIIS3WBzMFQLMEgruUXJjFNP6o7xY5O0nkhooEMPCV7LzgKLG37M6uia+F1VuB0761ExPehNANYBbOOfSxRMeD/ic6Dl3xFhv+fdEDy8vy1xIqCpiWzsLUmGmDaZa6YgXAuACSvsy6aATkZuuuZueBcX1/pmSjpi6pQZi64lYRghl/CkekFEc1csfcS0fIB87Ul6GhKOcsAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Eritrea"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACZSURBVDhPhZLRDYAgDERZz/UcxmUcptJyraWcSPKEPHoXPmwistCXfih1VlmFDl8bSNF70PBfgYPZqcQE8AGDBCffz0sJZKwI7H3f9AAgY/kd8/k1HZTcfFjvmP8s0R3SMA9+PARKlp1wnBJYyXgdBjTouAM5mAss7yVRlGBBJzJjev7ZWKCSC6aSEJuyGo5MFSYxzKizItIe/C8EJW6gjjwAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Estonia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUCAYAAABroNZJAAAABmJLR0QAOwA7ADu2h9G9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAyklEQVQ4y7WUMRqDIAxGX/oVr9LVydHZ2/Qs3qazo5OrV5GBDgULiIL9bDZi8vNMQoStGfImuwfADMOAUgqAqqrWD8uyAKC1pm3bIFdOEiSJnIip6zq4XSm1EjkCrXVANU0TgNy4wK4X8Qt5ZHHcPQ4YxzEr0jTNbr8NQNfPWZHX85Hujkv2AgLBlN/6VhDT9bMBjG8lfqcSDNknxrKKZP2XtVh+HPf/kNhfPg9ka/N9O3GxCgXSw1ZC5AlIaikdisXJe5utZEFtct6X+2U63VoIWwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="Ethiopia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACtSURBVDhPjU6BEQIxCPthXMkxXMZhXOaHQQIEgfZV7tJCSNIeIrJAC8cWUwusBMSPL9gEfRqYfwUQoW0hzRyCxl3x2q8hTmb9yeuF5nQEmYX5ePlda3oUnajF3RW/DSmkQ39hXPyG2OgHGUbied7bPPcW4r/T6+awV0OIAPQMyh218MHPEAbRVIMYkHwEtBBrgqwBNNfe9iXAvGySoGC+jnmYiTYkGeIdplZEjjd8ThMUX73lrAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Falkland Island"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUCAYAAABroNZJAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xMkMEa+wAAADVSURBVDhPzZDdEcIwDIM7ADvwyJYMxACdg42M5b/IOdoj8ILu1NSO/DXNJiJlFR4fuc21IgL7/qjwkdtcKyLwE4SHz0DY47k/gvDGCqTtB2k0Fm3zdCTfuN7L0PNys5X7DIAL4GEtd7LWBYnBkfWeLf7uJ/BBktYYiHAp8wWpxjeQABmktABJFQRB+09A2HEnCUpnj/pBjaFZCJ7JIFgTYPeisi/QOzTv5X1gawDiRBzKGpp7doKC+C9o7c0MH0HMBIDtwWYY1CDTcLoV1UzQG89ZEdleQHLnWQC83rMAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="Faroe Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABmJLR0QA/wD/AP+gvaeTAAAA0ElEQVQoz61TwQ3DIBCzUTboFIyAlFc7SzJFn52inSV5dR1mcB/kCKGkTaWexCPmztgmUBLqIvkOLiWJNeaaBMOE6AOiD8AwQVJerQNcOUxSLWWVktxrWGcENkwmtScgKVkP2RAVc+wqKyiVkAT6Nl5+O8uA44xfiuMMDFPOSNEHRR+UlK5le3u47W3sRB823i2TPTyrAiAM05vc+LymgPvbZ1+PCzpJrK+2zkf3czuXFDBd6woPBVv0u/JXPkpkfTbnyjexWPtKYL0Z+8cDfAHySZfbEtyFRgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Fiji"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACxSURBVDhPjY6BFYJADEMZwWFcwk2czSXcwR2cozbtpYSjCH0vcBeSTxcz28kHj1ZzFtobsFB4vPya83x/Sx1oPaDIcgbjDCmEIIWtgPFnBugRor7CopI9f42ADu4BavwNBAfdQoffOl+3cWXgKHwZEkEqzZTfMRIOEbCBqHmkz+1eUj8gud05CAMAhh56PvEMyBlo3oSdglwBYbiJAuLKQxl/YHO5OrMR5gh3mrNmtvwAoMZBH7hrtE0AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Finland"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAZCAYAAADaILXQAAAABmJLR0QA4wAAAACWNwZwAAAACXBIWXMAAAsTAAALEwEAmpwYAAABRElEQVRIx9WWO27DMAyGfxreW3Qrkm7u2r0H6JTZl+gNcoLeIIdwjpBbdO2oeA2SPQA7RLJpWpRlN0sFCIZE8uPDlGzgvw66A4MtJv0V6JTgRXApJ4IUcFPvAADf+08zcjYiCDocA1rQMMpg+P7xNRC4wzY4YaeACmxlSKRTXnsnT48PyaKfzhccfQCDoETmhUiJAFAwOJ0vJlTKnJqbetdVIdYtvBYlkhnEHB4PW7z5kgW5D5DKexwWBZ1scXYAX9u8J/qZd0hywdf2BnYzHPDcqbKwwWEMAFXDqJrRvtTVDswXSkS42fRrVE10X67lKCJRL7vJmFGugOe2O0g8ipxe9/PvbcPG7nNfArlO7gfgqveZPkTKcHI/42MxqrtMm39qswE0r0go5tfc0C+stHIdCD3KgXdX8JQDUQpa+vXnpX8Pv5W/3B8X0NVvAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 25px !important;
+    padding-right: 23px
+}
+img[title="France"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAYAAAC9+TVUAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xNkRpr/UAAACWSURBVDhPrY7RDYMwDESzS/npCF0TiSXYjRkoTmLrfDqgqXjSSfElfkphpqnslj4adlY5Z55XtXCVQF2ORJajkeVoKrl8Lbtie3/yu5ZEKw/BlYREiViu5x4Ee5IFIUB8Vj1L0i8Qn1XPv3lY0kUeBHsXnEt6FLjMEuMvSd0DWjEgiR0iiRR3AqQ+UPidPfoFXOAQpXwBS4jwcnJBbhQAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="French Guiana"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACWSURBVDhPnY5BCoAwDAS9iVePvsJv+kXBnwgxq92apmkFC2PDmh06iEiFHnxC/C6oA43GbW0Sid5Bxy8B4W4hQXAeU7EAoqLNMVeSFObDwkeulw4Q/JHwn9KX7PMS5k0JRQQCYnMKmhJiBcSWC8nzurbI3sAL7j4lkSiSgPwCK+mJIqygkOSgI/Pl3PHBHablCL8rIsMFcGUJeZQzdBcAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="French Polynesia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC9SURBVDhPhVKxEQIxDPuSOxqo6ShomYBjEHZgGu5o/idgBHZgJWMr9uM4TtCdYkWR9c1PRNSQIUfKmBW2Bluf/anLrOgnWP4rMFq2KlEDsAC8eUfvxxOz8hWqcbIuDz4gkLt92SPkebiA1wK5j0oEopnjkvvhmPoG0cw2YBRsLjNm9A3q1aZBlq3A6wiUlJkXba8L5vn2wozQPZwo6RX14HZKSfGK6X+qHn1BVbIag7K4vO5EA6aGM8YsEU1fXJVb9py8biUAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="French Southern Territories"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAYAAAC9+TVUAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xNkRpr/UAAACWSURBVDhPrY7RDYMwDESzS/npCF0TiSXYjRkoTmLrfDqgqXjSSfElfkphpqnslj4adlY5Z55XtXCVQF2ORJajkeVoKrl8Lbtie3/yu5ZEKw/BlYREiViu5x4Ee5IFIUB8Vj1L0i8Qn1XPv3lY0kUeBHsXnEt6FLjMEuMvSd0DWjEgiR0iiRR3AqQ+UPidPfoFXOAQpXwBS4jwcnJBbhQAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="Gabon"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIpJREFUOE+tjoENgDAIBDuFwziNS7iO07iA+5ggYMHSlrQkNnlLrvzFBABN8NCnm3qX0gJaPjY/HdE3UHkkkORdIzHlvGCYx3FuJS/UM8nxwuG+Fk6GeuTN4/KG+VlSQLM4wS2MhiXv3yVY9zMc6nFfJFGRdFQSFZUCI1EwEJVl7dSAIWIv9S4ApAdXzB59g92ThwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Gambia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJJJREFUOE+VjsERgCAMBCnAj3/fjjXYmE1Ymy3FJBJIgAjczEFcL6cBACqj6Gi6zJJrgOhZd9etojzg2CsQS9aU6GUJaOZxmquSCJMGOV4qoGeSPHucRDM6wLLd7Fb4j8s7dAYKmuAAt1+ZFZd8d4DzOqYdf4BPLpktkp1UMlukC0xJAp0ivZx2SsAQsecyCwDhBe1gDJmOsucuAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Georgia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJ5JREFUOE+NToENgDAI8wUP8f+X/AIpyOgYLjbpVrpSPURkoQJHy5oFV8ODhvu8BgNdUQqVXAB0JQBls4SXIwByCfuBV9up2h84AGCOAkbJ60UB1gDmXQkArczf7sI7P96UaZA5BX/481cYHP6ClfidRbzQlbB+9+y0ErAu7ebYUXiJCSoK8FKgFoCjZBj+aOhKeDk4DcNU+4s1KyLHA5CQWWn65A/cAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Germany"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAWCAYAAAAmaHdCAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4gMcFjkE23UUvwAAARlJREFUOMutlNGRgyAQhj+clKINXBfcO9dFrGFrwC7kHbu4BjS17D0oCSZGNHM7wwwsy8f+7CqUTUsBVQmg2hdBexCNsYcJYtwHVe8zUGwzL2wD0btD0rbeQnXsNc0/kWMK62NZAFrX5JnocQmL5XKidxq924QZFZknImqtA2AEBu9ghLqBaYRhCrRtWN8oYgAuCRB9D/W82XYBawPTFLheHV33OOyvj4uMiKqIuaTN7/Ynr+88mebDvnUMQ1jiwssb3CFJCoAx5wpxh6SbPjW9LSOvTKrOnj/tVfyDXfLF7ek9bgX/JmQroOS/N5sRUf09L8N8zQ1X5Y6zgNVXnNr3KCjFrdp+DRIF2JL3fPjt/yTP6nlsAQD+ANvXr5E5/bzPAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 22px !important;
+    padding-right: 17px
+}
+img[title="Ghana"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACESURBVDhPlY4BEoAgCAT9cC/2MQQKBAhUzFzSenfjAIBDOPRJFb2kEyCajbKiZ2FDFowSryuxYTFYVnHajxKGOh85HrTMLYY69C+yEzMoD+ywIeVliYGtEr+HVhJ69ezX4XIlEt7cr7yWVMZKnNGS30WmwJUo6MpCWDMRLChFiaIXAMYNUNLgOud4od4AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Gibraltar"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUCAYAAABroNZJAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xMkMEa+wAAADVSURBVDhPzZDdEcIwDIM7ADvwyJYMxACdg42M5b/IOdoj8ILu1NSO/DXNJiJlFR4fuc21IgL7/qjwkdtcKyLwE4SHz0DY47k/gvDGCqTtB2k0Fm3zdCTfuN7L0PNys5X7DIAL4GEtd7LWBYnBkfWeLf7uJ/BBktYYiHAp8wWpxjeQABmktABJFQRB+09A2HEnCUpnj/pBjaFZCJ7JIFgTYPeisi/QOzTv5X1gawDiRBzKGpp7doKC+C9o7c0MH0HMBIDtwWYY1CDTcLoV1UzQG89ZEdleQHLnWQC83rMAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="Greece"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAXCAYAAADk3wSdAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABvElEQVQ4y5WVPUsDQRCGnw3BSCCiRLBKZyWktrDyB8SPxkaJhWmCYjpBQUQEBasYIhaeoKJNmij5AaksrIVUdqkEgyGCJGnWIu65l9v7yMBxe7szz74zN3crCDZpmBN+ASII9PzSdC0uL6R8GcIEO3t4I5mcBGBmwr3jR2dwb7Xa7G+kXSwdKo9vXhmLxQFCQwH6vR+OtuZtntCByvzAJqAyBY6aCtrv/TAWi9NqtUkmJ1lK/NfwutM0AodrKg8u6wDExuMOtVapMhiPT9MoF5jbuaDf/QQgt7vmgPa6g/Hp9iIRfQe1YBVvbeC7deJQoZ6tUgWreOuIUxYZlq4clc3mDmmUCwA0ygVmc4e+/o5WOrisS0Cm0nmZSuflX3v5Xrqvine1FEAqnaf5dkUmkwn81Gq1mu2vt6ix+c/Xpwhre49fvs0PIBPZKgCduxUmNp/shc7dyiBA/IdIKfU5z/+B9LJEtiqH1/9EyOGfjjCp9FIqhLDVKYUmtdGwtdM3CJoPDQVIZKuOmuqZeaavpzaq6el7vv1R7Pt+1cGKeDiMCgw8TqTegyFSdnFE0IFnKoemToxy8PmdpIGxv2c65bgrcsgpAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 23px !important;
+    padding-right: 21px
+}
+img[title="Greenland"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACGSURBVDhPrUyBDcAgDPL/F3dMV6qtrNbMJSOhYwg0EVmowCmZs+Bq9OAW1dAUKt8GHJSdI1z2AHtA5Q9tV3V/4ABw6OuHAqwB/9/5ALTyp5FrkMwI+hv77pE/jQpcqGgjmtsOcbgiegq7NsJDJ/ROjHwd4oHHSBgjcFKOTjbMpEJmzopIuwFdbUCFsle3QgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Grenada"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJxJREFUOE99j9ENgDAIRF3BH0dwLAdxSBP3MUGoBU962OS0Po9nnURkiC670OSuZQSKjnktw0TvRrcouM5lCIpQFoJcsKAAOXYHSYex7NkFuFJfbx1Ukj/u7zS9uG+0XJ3E+lTC/t0YlJ/YB5nERTl/PCTP6WpRO11iKGjzLmEiE3iY4CNhIhR4mOAjCQAiFhyOmQwaVFwld0VkugGa1v3v/5P17wAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Guadeloupe"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACcSURBVDhPrZFBDkBADEXHjq2ltWM6gDNK3ERSbU1H2+mECMmneX6fSSQAqIIX3cL4LqUGiI59gDSvnGoORPeAIyda9HPuGoks64JhLY6zkWzjJLBcLzk+MvgikXeYnyUKmuILbmG/dGWmvyHRHR2WXKerRVrQEtEe74vEi54kslMkkSiS0AkpWmAkBSiZFvivmx0PGOZyFN8FgHQCNJn+BlvbPFMAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Guam"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADDSURBVDhPfY69FcIwDIRNRcsKKRmBmg1YhAFoaHhp6NKzhRmBMSAdI0B32LElFFmK3jv/nE+fFQA0SpUXUzqb1RrJenQ7Vxbof0hHAoTtyRWBJIwB8ieWBAhfZhtINbnynQCyVD5tZDjhJZ9AScuQ+C67rHz3IRVEiq8PNkOHOH5nPmV9iFCe4rpflWmMd4aU6WzQuh9xPF9wu/fNGwGmfoJ4IDwPjccTSIgGWTBq1oAZhA0Fk9LN3KONyaxhSzoLIPwAQKXpGV8JJKgAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Guatemala"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJZJREFUOE+tjNENgDAIRF3PCZ3KxAH8cBME2qOUUk2ML7mGHsctRDSIkSdVzIpGowSnZEVt4FG0bgd/58geWaaV4NgHasjwvs/qquzLopoG/pnflcD4UoIb1s8lzlR5vJ/ke1MEzms3gZjVEvaHIvBWIneMvlrii8BTCW6YUqKDK3oiFoisxIwWGIjHUPcxs4YzxSwRLTcrrHS3FNrnmwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Guernsey"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACqSURBVDhPfY7BEcQwCAPTQj7XxfVfzf3Twr0IgsiWbRzNyAGCdjjMbLELT+l5F14HuRi6zm8zVYF64aUCIIT/v88AgWS3QzTMBVghOqeeOl6v84cuQOgBqeby9Y8saA2hf4NAqN15Nk9Wod9BNOPuAwZo9PQ830Iqa6ByQPK68VwKS4RUenLxBqQCvUEkk5CcraAdRAHRsmgDASFMUxqmh6YNfbzzvGtmxw0752CPId7hxQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Guinea"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxElEQVQoz61Tuw7CMBCzo84d6NoJ+jmV+FYkdv6CqWLq2iU/YIZw4ZpUiEq1lOWUs+/hoySUIFkHP5DEMha2CJZ+gCKqd76NmwJNqb70A37BE1lVjVcHgG6e0u82qWeRFgDumcjyJLHxKt08wc+IJBQTQRk3IgAIvoq9sNYCDsCqnaUfQH43aDNRxCruW6lI/HZOz2ntjwhcHuNmJUES80Z24nW9QxKD38xegpVjzTT/EhmB5bG8nezGWCcnw9X3wyMO8A3lC2rrFbPbMQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Guinea-Bissau"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACeSURBVDhPlY7RDcIwDES7Aj+MwC5dkpGQug+S6wuxc3VOASK91r36nrKZ2YQfPCR1F8yBR6/bw97HXaJEY/AxBCsJiN2LhMuxAFSRc8yTpId5ovAl95cPfAs++F5J4p8zbgH44PsvCYuS5z5Y57Okzby4Ap3P7YYohapQ8V7rh6SKZInpnZQokSwGJLhIMugLv5SzU4MWhkhQd81sOwGXzfugkTS/eQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Guyana"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKxJREFUOE+dj8ENwzAMA7NCPx2hu3TJjFQg+wRQQzqSaVn+RAATiaYO9mZmk67Cp1TOQrOB8P5dqwD1BsstMNQKpLAA/F4fygPQebwRZKmvMB618wa5zSjMAFX+AEGjt9DCvILw35/2DOJPRX+pQxzkQtCVfQKqmyhIAVkBcAhmBdEsIFoKwBgQVbUciwKAcEQIm24ONS0nABSQMBCoFl2yHDvZoAnQQjlrZtsf7y4gcuHwa5UAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Haiti"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJFJREFUOE+VjOERQDAMhdnAsYAh7GIx/21jAAtFUk00TaL07mnv897XAYAJHvq4qbsUC6g873Ec0fOgcUvAyV0lUeNcUCzi+LaSG8r5yPFiEJTLm0+9wbxL+nV0uZGcwyLJUIrHNhnu9DXkeMfrJQn+C0Wt0C7tWfJXxBuR/BWVAiUR0BCVY9nUIEHEUeouAHQXrR/2TLfQVEQAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Heart Island and McDonald Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAP9o9TQQAAABCElEQVR42n1SoU4DURCcfcHyAScrK+AjmjTcJYDAERQCgSTtE3WLpSQ0qUSDIMEhCHwDim8g5xCoKqZi793tvVJG3N2bm9mdfVmhEg7hOpA9BkCm2dkwLE6HP4/VNw+PwujDeNFA/c09Vn68v3w7qXlwXD3tvo5egJBkNyZoGtqLRcGi6MJcnPHqHJi7EHM7UtlWgtQ1E+T+AQAQWwaIvRHHe3ecXAJwCgDLDaZpFQC8fxJc5Xc1+8IWSCpgiC79Vibz/AFyKnLriBio3XxlOSCnZTlo1QDMYN9ApFKoFG26pR/oF4bP2dx1Wo1YVc8A7OmzeUO3B3YQFZF8PKP8ykm2fynnfzu6BqM4m8UvDtmeAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Honduras"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAItJREFUOE+tkIEOgCAIRP3nPrRPIg7BALFs67YTvMGb1YhoMgtH6TwLzwGGj3PtAnQ3WH4DmHU2QMKyDoRslXMfIP3Wq2kz5+IGfA/ZfZVD6Nk/QyANu/m7JUv/xEuzGGYZaCWB9FqD/Esq6Z6cAhHj2bvWnQH5DHKAABnBEywtj50cSGigwnmWiNoF7Y5TtkzS9fIAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Hong Kong"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAA3ElEQVR42p1SwQ3CMAyMUXhWStmASDzSafruGCxAFugafXcaIoFIJ6iI1B88zMPUuIF+sKLq7N5ZydmA3isRsEwpMo7OBNEZTvfn+1CVVJcyLdtnAsbRGSK8lTizpQARx9YjopQRAb3/3M2GxCQAQET6ckU2FT3mUEo9bpeswrSNWomp79Z+6cVDAQiPrS/qZlSKK/JikOXk2DNep74r6mZrD2S3fPbCt+gMO5bhH77ZkKIzNJPd8US9h6qUU7IhEdjwiGxIQ1XSYR5jEhBTy4363gY12yB3B/7Y0Renkp1z6AEHMwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Hungary"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAZCAYAAADXPsWXAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAA+0lEQVQ4y82VOw6CQBCG/yFegM6WhtBqR8Ih0Nt4Aj2Ed5BDbGJHjTZ0xljoEdYCVoZlX0QLp5oH8+3sMJMljEUiXGiiAJDnXkmKolOEAJoCyARajZCz/Mh5VlPglj86kEMiX82r58V7Ly+EDlsvZOGMZgL3vidfVeIDhEEC5H8g9sYeAWCYjwRAa+nPCJKwoVoaEu586FicbHtTluUEUlWVcX+IA3iiIcEWJ3Jtbx2nH339unq3WdZxKgFILiF+Ren9ABFB6dy2+ZX++zlRp3Lb5bcOm/6Bzz/+xfvN/HvsTgBAkeaYC7BMbEhFA4B0iB+mJRuNwPdnkvMGbON9C8LjwHgAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 25px !important;
+    padding-right: 17px
+}
+img[title="Iceland"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAUCAYAAABvVQZ0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4gMcFw8qj33iMgAAAR9JREFUOMuVk8uNwjAQhv8fpRjTQTjSyR5JD0iZSPQQjtvJHjcdmG6GQ7CxHY8Jc0k0j2+eJtqiFR0tZ7YAqlsWSTOeJaQGMCt5g5nCtAaZpgkAMF4F003W/3G0oGQJCoAgAZQCoy0Bk8ThUysWyFpArCxUJfI5MPiE6kiiW7+MQBHZDQt+6cygIqCIAsDfz+5l4vz72p4IKYIus/Yzzg8AyxBV3jk478HTPdOjn4E+9+026ZYhuzWS6wFW9Ojn6guIMyO5hama+nRmsbLH8WjOxrKV+k2b3rns/Xnnmvpmm7XMzvs9b3RtU0VIUtOB6v8lDzjd66RliKdxKA1fSeEfYSrCr4AvvxhXLiAYKIMClyYohdhHm87wPWHUkpbyBBZClaVCPTVWAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 19px
+}
+img[title="India"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUCAYAAABroNZJAAABHUlEQVR42qWSMW7CQBBFP4ldRjQoNUUkfALukQLOQGGuEUVBAuNIhI4WQYu4CyVSjhF7YAyzeHdng6N86cvy7p+nmbGBgJIE5BpNJQWudrt1MxCHDgeqrAFYv3bFF8cjBTtw5YG0EIs74jsGaTIgGUEDSBfsNB2EQVoXDMgys8jKIZAKkWJ2+Z5QuWhTMQUVE9Db0B/NQGQcAZTzhOirQ0X+QJTj5mXb2hE/ez18Yzxep84PZVwH1M851++/VB6NXp/lA9HPx7WwJgGp56uuQC8A69IJAxsdYmXuQPZ7+hukdmgAYmtXfl7/W1lxvL2OswlmrL0gv7k1t9/FjxkoOjuegZ4msACQNqPPSC1WDR9iQP8BNIM1KPZBuj2dAJp9q/GMWYB1AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="Indonesia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAYAAAC9+TVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACYSURBVDhPrY4BEoAgCAT9ZF/tMz2GEDlColInZi5xhZ0KEb2Gi4/8DUkhIoJ9qw1f85maHDKGADGWzd9AWI7JRFfD7ZcAsVkvGV2OgcgE9ZyN7eFPDg0GPHvitZd9L1FoNcj5ULAiwRvnJ4kvhRJfH7yHsyWSdq6JdE++IpkVuZ0maWxc5AVyRWPgRRaXke5iUIezxFkiKifnhh/eDYAaigAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="Iran"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJxJREFUOE+NjoERgzAMA9mFRbpp96LDGCuxguLEbXUnYhT54TCzxS48ts5deA08Ot+v0jvQM/j4C0CzO0F0mQXNqhzzAolw6M/cDynoDPG9yiHM7u+Qq5ci6co77rVAQ4BAOacim0PVx+8AwVmpQfr5FPnl6l3P+IH2bBCC1ACo9Y47A5JBeZneASbICKKYYQpYdnLQwijvnLtmdtx5ZC6pPPBdpQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Iraq"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAINJREFUOE+tjYERgCAMA1nBJdzCxRzSlWoLFGJbDvXoXSQ8aUxE5MQjn1A2K/KA0bXtQ0VF3bCdFag0+yjBZQ0gG3HxrqTCNi85HxBAL6P3EZcRz1pcIlNh0XlUOuXQyo8qvEdeJ5eUE/7yUXl/WcnforarpgETjOR2LMjQLKFslojSDWug8+RN2EhzAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Ireland"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAZCAYAAADTyxWqAAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA6UlEQVQ4y+VUwRHDIAyzuc6TPfLJFs0OdIHukDH6aPbIQuojEAyYALn8qg+cD4SFZTPpgNhzQ5yIiB5UwsetkyAIMRVlspSgAYZuxJ+Qcc0a2MTh4fyuUfyTvzhUk4Ingys/Lqo77pvET9BIpdQkG0gfcsIeMHUYeT/Let+1uH7Ki8EnDd7tiDizZdx38xqCCPwshMC62Dvw5I0+rxkBgGON4rbkM59Vry9s7LPbkMtcxvhvnDQvNf2z+nB0kvH8xpIAohdXpwbLCnb5QlTTpJW8QKTOM+4hFETcNM+krxTjcutwrLWWeu8HRY5OVSnOHMYAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 25px !important;
+    padding-right: 19px
+}
+img[title="Isle of Man"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACRSURBVDhPnYyBEcMwCAMzRLfI/nNkJCJoRLCM01x1Jxu/kTYzmwz50Vp33TMAOj770l3RPWD8VUBzdyipYS5UtuI+TyUXTL3kuC7wTwn/4OeSelOagW9QYC66Oi77I3QzqHP3jhKwtsjNgN6056A4o0SLXE9vZqBvSQwviuha4M6SBFKkruHMKAgIvLLumtl2AtzOCVC3I260AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Israel"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADfSURBVDhPrZOBEYMgDEUdhpU6BsswhgO4HvVBvglUvdbrv/sKIXli0KXWengXl2eOkJxr87a5Sxkd1/AAYkBQEN2/gSCDGfGBUUoBlPOruZS1LUrMr0wdkAGkQEqreR5H97jq0AfIApYkUC/yeIcxlmzNGxbFnKafxfVqiENgvPsaND8ZMRdIp8l4959ByALN9CKekBxjQEKdg0hAarIOQdZngmLdJYhkh3VHCKKOfB5wCorJ6kFU3JF2fYB8++Mu7iwQ4AlEgvfj3n6adofT/7VfFHbBlEsHPbUgtdblDdf24mjFOxgHAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 18px
+}
+img[title="Italy"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAXCAYAAADgKtSgAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABa0lEQVRIx6WVvW7CMBSFPyO6wN6tG4qEWjGwtIolRp6BlygPw9uUsUOkLiAhdUFsbN3D0uF2SJzYJomd9EiWLf/cc318bCvuIVZb8Q+MvKACKbPVDEh9IrFKFExmUgSEy+ejNZyZOVKS+f1xwYsqbZiSYYgL8guxsqlmvVNmq5+mXXC1ep4CJJ7maWv2WmuuwMOpLldAa03bOYzcwCbDzMvaxfkQ7xapNa0OShkZICNJkmrBCUiWRW1QjkuXLJ3I85yN1swX8LuA+QI2WpPneec6gVQ6PD20MG4is2UAmEwmVXs6nTq7Mbjdbu65nM9i+1y1PAFDoVSnXLt10dru604Ra3W9/PD8CsDy+6vy/TjIv93fBRSRqrb7DUHILXXWPVESSC8rDkFYlt3a0dZIYaTxNe8XvCQAkPcPVzsRji9vUZ+F+1paDukD2y2jkFMGBI56W1QfAiuw6vsBi3+BGi6SCv1EQYLIHw2AP1Y/j7NQMVNCAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 23px !important;
+    padding-right: 23px
+}
+img[title="Ivory Coast"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAArUlEQVQoz62T4QlDIQyE78RdnKgdoytYV2jH6EJ901x/VMVoKBXegQjy8iX3klASZpFcH6skcX4LHkA5QdJy8Li4CeKcXTnhpwZQqyqO2QGA5fh+XIjRKkkD6nESo7FSjiVQUr8NsIIAIIxVbKtaCzhBxo5yMt6bhWZp/icuxHTn/p7nA3xe3UqCJPaO7Or2giSGsTO7ADOxbWj+BlVAj5t3Z5hGb6fc/eEZC/gBl/VyKx2QQGkAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Jamaica"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJJJREFUOE+Fj4sNgDAIRDuXqzqVC4k9hPYKNCV5fq7HizYRSfTBpSR2QQ5Qvq89hWg+YPkkcKy7SDx8HxM5xSLgXpJYOEYzE/CEfr9RAHg0O0iMNeDBu386D/eNFAwgcKpzogzncv+do+j/ujVkgbMT6T5LvBgFUaTnUcKiajlBgkUygpOIlsdODDSEaEPsikj7AFi91PYDfwg9AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Japan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAVCAYAAACt4nWrAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4gUdABMvN/Vs0AAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAALtSURBVDjLnZXPa11VEMc/M+e8HyQRzG+INSYx/ZHaiog7kYjVTaFu3AiCuNKFSCliUkGwq0IbpApmlfgP6EoEF5K4KWoVidCY1tZGQ6OUtElJkzbv+d69Z1y8e9PXvJfXkIHLnLnnzHe+M2fOOcIOxYNpRbMBshOfhy7KKkaA0ZER+vY8xuJffzL26edEAv9ZY3/fEBjsow/eJiqVGdq3lyMvDHN1tpWsvUXkHac/+cKKDQjqdhN5sDdeO0px9Sa93e3M/PITl+bm+OH8eXLqyZjy3jtvkgHbUVlEnJnFAtAM9uz+dnq6W2lv66YQWigUjeZsjqz3lCxivXCPb777nkKC41UtCkFqmHtVE4sBaFLsmQPtOCtxc2mZUhBQ4fdLl1kvRBTjDGvrZRYW/uWpoX3kE/YhBLQqkxTcJifGcYkRB/BxGS8xJTKslmClWOaVV48ROWWtcI9YPHv6BkEiSilBUb6cnKAlCeCdYmNnTnFnZRFJukMC4DxREGav3mLmyi3KCMY0GaAl2wTA8PDzrK2v4oFYMULg8uxvfHjiOB+f+8y8Bbhw4Wfu3plnbOxd3j85TgT8+sdtcsDrR4/RP3iIroEBUMOFAv8szDP/9zW++vpbYsALxMDZs6PM/TjD7dW7COBVPIWNIh2d3aCVvXjxpedYubHM3t5B8Dny+Sb6+55kaXmJzrYOri9eo6uni4MHHgd1BAlcvHIdU8O88kjbo8RVjWJ9va2WddjAQId5h1E5kZYFyyNWaT6xnDoTMJfMu+Tr7+80BRt8otOyddrTAHOKmZlBRacC2BSH6/43M9PUX2q7ZXMQxcZuJDZL9JYTqqrmnGOH99HDbyutsJeqkiAihBCqTuz9YFMc3hy/zOz9WprVXQ9ULOecxXFcsxhgWp7eluQRu/ggaRFEwUJqitQUuZr9dgHqAotszeRB8HRyawaNxDlXQyiteV0UVSUtVcP9E9n1S2TbZVEFKrt+5rZmloImARv6/w8AWFMJQfnvjAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 23px
+}
+img[title="Jersey"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACnSURBVDhPhY+7EcMwDENdp0uTLbJdZspaHiFlSoYQDQr6BnfPonAgbB9mNuDCY0qfBaMRwaLz/kyoWVEdfNQC6Pu+JSrJ1hIYfCMD4PN6JOprtimJW5wUF2a+nH5IQGeI95UPYXb2JbsvgTA7Y4Dw31lEVJfXmro4o1cpiTOKVgsr/9orz1IC+lAvLeKOK0rKUM2t+gKQJWn8KdJl0lzSdHtFnzWz4wdYcW0ZkOCZWAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Jordan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAARCAYAAAAyhueAAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADaSURBVDhPrZOBDQIhDEVZwSXcwsUc48ZwAMdwAYep/W2/lDsgHvEnD/p79AdiLCIyRIWly/5sptsEGHz7sOspjZ8FHxvaigHXLiz7dNZmSWvi0ApNzrfwD67J7Uwdn4NtsQLlQhj9ITQaJtRngRAeta1a+y+N/XW5yrY9rCb0oz7wtAjNDRwi8OTXPnOUanBLqDc8egEFz9cq7dNzMBn1szDP3UJpOJj3HDjTMBTkIFLutzkx230+WQkE6XLVcAdnAtM/ir1qcGNTHDJmYSrOcN6+uQ/zB0SkfACqGw2Mas7uYwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 17px !important;
+    padding-right: 21px
+}
+img[title="Kazakhstan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAZCAYAAAA14t7uAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABRklEQVRIx+1UvW6DMBD+bHXoEGXkMTqydIMHcJlQxaNEmao8CkKZKA9ANhZGHiNj1IHJlwHsmGDz16lSP8kyPs7fnb/zGfjHnwWb+EcL/azgDkIS4gwA6Gd6CrQaRA1IiLMiJ2qGtk2kikh9q7U5LyVnDk1/U5uBA1EDfBw7XYsiVtri+yvWdrVmb8sLOjquTYY1cjCDeJCReYLnzIsinuVkG/TtkNd2e+QDAOMACHkNWe3GG9UwkJYCyGuk+9NUQNINwt9/QER69JGByB/Yk7CA9IIuiIscwMvWTvp8LcGvl1UtvRiLMpbVDoyxcXHyemA3a5HcDvPEWRtCVvbjpaXQxzf90/3JSc5NzbI2HDlIL9Cb+fWCrA118OR20IW0XWZS18dVEOkFq+yI/IcUroxVprbMpm7Fo/NcnbQWfedtfTZn34o7Y17RZLX9awIAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 25px !important;
+    padding-right: 22px
+}
+img[title="Kenya"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACaSURBVDhPhU4BEoAgDOrDfa/vrbE5RVwXd+iGQF1mdtCBo6V6wVOQUMcjM4fd9DuPPbOprwfm4wRwd+9g5OPYxYnaO538fpGBZ6D2Lx3A7Mzfrl9m1N7pnHEugcRpBDpd/PtXADYCHFBESd4+3DvbEvGM0jizREwAlwD8XhnIURLDEKugzO1MBWAcTC47KOGZUSHEKmqoXjO7XhHP+eVlmPmSAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Kiribati"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACQSURBVDhPrY6LEYAwCEM7jNO7ksMglE8jpX7u5C4tPpNoI6JJPHKUyl7RDBgdN6qKxmIGDPARQu7eSwmG3YBsxWWfSgzGvOR8GViZ+UXJMcP6uQRgF4MQ8sKfvrLtIZwllxK9efkSdK4/0E8tUfAcNA4ZLVE2inxy0AcL+qMvAcyABaEUjkwGHXpRoewlonYCx7Mcdom8dAMAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Kosovo"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJpJREFUOE+djtsNgDAMAxmGafhiSZiHjUIccOuW8BCRTKsjPhjM7BIfPNL0u8gVOBqnJYLRE8lE9eJXCjAsaci561MlWuYCGaMcQxaVePghsMxH7scJ/kj4zvMs2dY55bcSgREIGOXJfgsRLWv6PSQkx9+1okzA6B560afki0jfs1MkbyJliAoaSQEie/p60+lBwHM5S79rZsMOukgQ0MGcy0MAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Kuwait"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAI5JREFUOE+NjNERwCAIQx2kX72O02U7WGegYAUjUG3unmIMKUQUYMmR4rNCNNjar/OTrKgPPCJZgaKZoURNT7aIvsxpCUreEDY5ny8eEJS8ZyX6x8xL8Fbhu+2NJQhq4fdPzx/V7HvHAmGllqknz7Hg3o4pmrMSX5QtIZqzXR3MmBT5ZdvxRjVbOMNniag8T2YL3rTV/zwAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Kyrgyzstan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAAqElEQVR42pVSuxHFMAgTviyQKq9O7x3Z0X3quPIIpJDjhz9N1KFDiBOIqcJB+pIYerZBcO9x1oiqlwkLjl8KiF9Jf0N7u72A5cywf/OTzKy6i9x7nBksZrxoew4MyYDv2LybiNRwC4BkQGP8Yp0P3a0gnxFAPqOVMR4AwVSZo8dxpXzG40pz4qYafPwNFNBtOFHdjSdqVHPwMn9T6Z5i9Q3dB/jf+fSjD++NggCNstllAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Latvia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAWCAYAAAArdgcFAAAABmJLR0QALwAeALhp0LZuAAAACXBIWXMAAAsTAAALEwEAmpwYAAABCUlEQVQ4y7WVPQ7CMAyFn1GP0JGBI0SVkOjCwC1YmZDgCkwcAQamDixscAPWrgw9AEKM3MEsiZTmr0kQT6oUu87XyLFdQprYsCkUTCmw43LRe7m93IOMIgQ2Yaka4Y8qUoI3h7NhA1SO2ZcaH5z587acouoAAKfJDgCwfu7zTi6qzoK47PqVXi3czqcWdHa92YByrDhWmVJKWiTIKVeZkqc5ogCmZN33Tp5UzwYgKs0c+zSitmzNNzw/VLCuGP9Qh3Ij6qxulPs4lCN5GICIoNa67fOrtc70NpEC6XbIH3O72WkBgNWj7THJc6E/g70jVwamguNni1YBsWDK+s25PhKCxsKH5k5w/xcsB6GcpDMi4AAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 22px !important;
+    padding-right: 23px
+}
+img[title="Laus"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIxJREFUOE+dkdENgCAMRFnBJYyjOa0r1aPachQQtckT8uydHyYRacDkR5e4m2kF1LGsQ3pF5YLrrMCw3aqEw7bAbuTzvSpJ227S56XHYeJPyf0OPJfwaRMzgESRCg/7zn6QAS3oeCfnr488Fw1BTvNeAviXzrCMl3wt4oKqxMWkiMOeiUIl9Ii4KyLpBAfD5b85/Jv2AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Lebanon"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAApUlEQVQoz61TuxXCMAy8ywq0dDAKC4SOPiuxQujYgx0o0zLDUWAHR5Gc5L1c42dJd/o8ifAhxOCiAYA+x3OocBjeMx5t9pqAERr5tNmLgImgZ89VjSKSQBLSfxz5X7MDYJMFwik+rqEv8dQs9d+dLlgDlUgDFgB1r7vQt7+3sNt4Ru14bej2nMeRfjWTTH0b+9JacOuOeLuy67JhjZgl125n8wF+ARx5m+eaomOvAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Lesotho"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACHSURBVDhPrYzZDcAwCEMzSnfpjP3uqBQIUCBnpVpyDst+BQAao+joOnfJbUDl4x67A3ofNF4B1NINkDCWQshGOb4DpP7qrdrM8XIF/ybRX+2VN+ifISQJrehvn6ski6GXjpadeo9LM8mOT4awr3PfsjHIZ5ADBIgFM1ga2yYHHCqo49wFgPIAOik0UBs4btoAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Liberia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIZJREFUOE+VjtENwCAIRPnuJP3sWN2yo7U5BIMIaF9yiQJ3QAlvoS1eOm/Wc1yTuF/AA0BDMnQWJstk8pfwjCi7athu3wB9i/7ZJ3STl91owd9fI62cKETpIZpaSYZZQX19SYWGgCF9V/A1e4MLf1APzBYuRhu9dBamDNkVg34bW2O3eTmIPqpztkADveIvAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Libya"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIVJREFUOE+VjIEVgCAIBd2hEdqlMVuvMQhU7CNYxHuXdMAvROTgkk/IvCt4weoq25Io6Gm4/QpQdNeE4LEuoFt56U2IgqX/kYd9fkAIWBnfsQIr4ztODPRA3xdCWUkcN9peMOhoRTOhjtq8if080riQv0EYYEKG+AjC43EziypZr5h3iajc6+/OpcxD1q8AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Liechtenstein"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIlJREFUOE+tjtENgDAIRF3BJfxxBmdzQ7/dBgELUkptMDY5rS93L04A0AQPPcL4LqUFVF73fgLRc6ExfZ5bPLaRrpXImAWlwAmGFcd7IylQjw7eOb4EjMt6/Abzk+SYF02BnASvYTYsuf/um4h2vBdJViQblWRFVlBJFAxEdqwbDxgi7sV3AWC6AIUN6VQw16joAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Lithuania"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAVCAYAAABLy77vAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABD0lEQVQ4y62TMW7CMBSGvxc7zJU4RKci9QQdiNqNkZ01R+AAXIO9W9lAYugV6NRDVGImMe7Q4DpxEkLIL1nR+2V/+t9zDP+yxeqlyEHmMGGDB7MtK5AAlteieoDJ+4YDM/arBbGOiJVipBWn3JAZQ5afmS7Xl7OlRMIO2AFHOMxnd7UmDnjsNyOpDLuv5AKy+9UCgFj/hYyVAmCkldt9yg0AmSm++RmA6XLtWrtbg4EGm5H2K7MdA6DefgKvyfc9l8hsxxawvrr45SeSJqiP59rcrX6aANjBhq0DJ00QkVLd6jeCajZd9avX//n4dHNLL99fABLVmLdCgkTup+ySzINIHegqsApoSkTHJxOc+wWxAXsJIt+a2wAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 18px
+}
+img[title="Luxembourg"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIVJREFUOE+tjoENgCAMBFnHERzXxdzAGWofKLYFxCZ+8lAv5WIioq4cHMP6XbQHjK5tn3YkegYeVwKp7BqJfiwLms045k5SYctHzpda0DMi3zOOYOb+LEEqNIvIglsYTZaUm4fjjLf8QD6LJCqqb5okLFICI2ngTeYetzceZCiiQf0uEaUbbstLDUk8qEwAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Macao"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAD1SURBVDhPY/j//z8GBgIQgRWjqwVhTAGQ4oo43BiLQQgGSDMhA2AYqhbFEBTNUAUoYrjEgWxMQyCCcECkOJCCCZBjCFQOiPEb8vuiGFZx3IYgBOEKw5dN+S9cF4EhjqYeTRCIwbYD6a8/f/z/9uvn/9qda1DEUTBIP8R1qAZlrl/wv3z7yv8///wGO79yx6r/D96/RlEDxkB9YP1gAmQIkkHfgbaDAMgQmEEgsPnaeRQDUAwBM5AMcp3T+X/nrUv/b75+/n/bjYv/7797/X/6ib1YDUAxBC4AVeACNAgZ281oxdAM14MuABaEKsaG0dX+//+fAQDpFAhmEGAJ5AAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Macedonia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAAz0lEQVR42n1Syw3DIAx9jjoDSOzQjMaZI0fOGY3uEIksQQ82xqFRLaTIzvPz84d6zjBGd5dtwWxLQgUq0E957C5EL0tf8WyaJgX5w6xqLaGfaMnIG4Ces2i7DlBAH+YLAPgyIxRwHffSrEoRXGqJVCteZViEKLmzcJD0NwAKk+VPRHJYayvwo28XZwMadxEUxtzqKK07aQl2V+ze5rYDLsoAAfgEF4WbIy5it3fApXiarawLbUU2MZH2lvQa3qPjTxB6C9t+b3Hn4QTQUwKAL578rpAeH8ZJAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Madagascar"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAqUlEQVQoz62TMQ7CMAxFv63egLUsUG4D6llBPQ7qxFqu8FnsyKSW2kh9U+TkfzuOIyRRIyLroEFS6liXGZDE93xLTWxfUhPPnlUWWfohnpVi4tlt/SdwTp/3Kl6qMjHNhREAXPphKw6NVbTiV1McQFc9X9oTy5j2CgDE71VzfT12VTGPE5SkxCwtzOMEkqJhTpoNHI1Ds9fIDYqu7odP4+V53xQXzREf8AfWWYgrEkI5EwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Malawi"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAB+SURBVDhPrY6BDYAgDARZwSVcwLiuI7lSpZU230IMJZIcmKd/Uoiooy7ehsRZpg+gcG+7gXnXsQ8YYlAwEjFOEi8zOIn+CddkXo8WrEj0rvKzBEI3OJH7MItI3tetibgnfZUwx3VOox2TZEUocBILPmSxbJ0YSNiGR8RZIioPdojfPAQDa9YAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Malaysia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAA5ElEQVR42n1Suw3CMBB9D2WPIGFGYIp00FAjBkBM4AWQMkBETZOSJehSYyQyASMcxcWfxJAnK/I59/zO745iLRJwHComOcWUsGlD6D7ncJ7SitH1CQHA6vkedACSUVBC9qaVDro0dKaMmqbUUKyNtUmz43HQqffX0+1gXC8iQyGkiID06V5EN/Wlkg71pQIgHqlUkbt0uh389/7jeWTk8NhKswt7vZi+GGfK13o5/M3tii98bPNDkhRraW1q0QyM66NvqUX/EOqk9kd7OqNmXB+ayXQolDkRHE0AAGCRzyLHyGf0C5zHd0q2AknRAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Maldives"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIxJREFUOE+tkNENgDAIRDuCw/jlcA7pQghNoUA5+yPJM/U8XtRGRAs8cinJXWENOHqOE1KJ5oGPO4Gi3SDxy1ro3NfE5b67SEZoo/dVHiQaIIm+hZ+8w/wtSd/eF4p/IvdQYqJBkDhCXyTS24lkkEAemeRLhARBgkQILwgSCzYiv2w7Oeghx4jcJaL2AnUy9rXYRCZXAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Mali"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAxElEQVQoz62TsQ7CMAxE76LOLKxMVSf+gr1Sv7VSP6d0YoUhP3AMwcVJKkSlnpTFkt/ZsU1JKEWyDn4kiWUsbAHasYciqve8dJsGTenejj1+yYOsqsa7A8AyTAmK5L6anABgXkGWJ4mNd1mGCf6PSEIxAcq4gQAg+Cr2yloLOEBZO+3Yg/xO0P5EEVnct1JB/HTutynfjwi8rt1mJUESbSJ7dX7MkMTgJ7MXkG2sLc2/IANYHsvbWbcx1slp4er74REH+Aaz1Gs+kYAnPgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Malta"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJdJREFUOE+tjNENxDAIQzvEbXH7bxHpRuKwU1NKSftTS06Ig99mZhe7cLSuu/A1mIuh3+d7cgc6Bh8FGGPwhipEoAwLgKQFZbUI54wVHvOhMKTCQ+5XWsgzhPcdRH/ulyHQHtJQWaaVLSFVudCZEN+7BXVFee/xJGQF6spw6kwIhwXoCQAHJIIC6gCuc6cGDD1eue6a2fYH/RZIhoVjByEAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Marshall Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACjSURBVDhPjZCLDYQwDEMZi8WY5OZjlhCHfHxpEER6tLi2VdhEZEEHj5HuBasA8/57ZiiqDcJvBcp5rLeqAjWY6obQEtJRFF5b7v2fmIP3KOBpfl3cSGJOnE26rXVDNz6Y4x/w9IxCQokGCvj7k9XfRIcLMJPHQB7nvehTGGgOlirxorx+D3Q8Y3k8bFPiHGKoAGRJCm74Es5MF0yMooHuFZHtAo9u+YOmxariAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Martinique"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACZSURBVDhPnY+BDQIxDAN/FVZhwF85JCZO3TQIgSW3zdW1/i8zO+yKZXTPhk/g6PG8YRXZVLQOftSCTyVhZl2rhI9BM5ChUucswxUW3wSWOE98KyH4p4Rv3CswhXWn+hv3GaBVX/gOfxVK3vv6R7Vqus8PwIqSBKUIqXRmwVaCQ0KGpxIyLcDIQ4FWRsXcH9PbUDDDk3vWzK4XEp5jscm9BSYAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Mauritania"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAI9JREFUOE+dj4sNgDAIRLuTGzmreyFQQH6txian5nn3ogMASvDQpU3uUiqg8nms04ieBxq/CTTSDZIwlkJgK47PVTKhnY8cbwr+SOQdZi+Bi0tC5skbjAMP5JBA43nTTzCFBQ230H5+XSyuhoXjjvcmcSL7BTcoTDYm2Yl8OkGQGEiykDS2TQYMVdQkdwFg3NXE1m6sViBxAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Mauritius"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAmUlEQVQoz62TsQ0CMRAE517UQEBEiEQFlEFMDZRFTBlUYIkaaGIJeL3uz39+g9hwdTs+2WtjWSKXrRqAXodTStg+H1XO4uktQABNeYunu4EZcMmPW2m3vwqQV48PMIwGv2jMaeAPMkAqzji6m+70N9X7lqQ4Zb04ag2l4c92ZrOG3s79hMt9YlVl6wI5QFr7FBbCrb/z9Qd8AxX/UNpIWYPLAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Mayotte"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAD8SURBVDhPrVA7EoIwFPQK2ngKvY3jHaxtbGAGGk9gR88wUHAAaGls/BSWdlbaieWa95KHCUQrd2bz9m02ywwjAAMq0OFlP0scGjr4Fb6ij1CSeF0tcdtucJ5P8Dzu8boc1bULyZLkVXtsMCRgewSfbzSfSusLO0CgfbFYe31rqmEFbE2gfTrdeX0BacU/lzRNIybzNBvzDz6oafuUExjP/UpVVWjbljUVCB/3O/t1XfOdgEv01EVlWfKMoognIQxDo4A4jnlKzrzjk0ukiBAEAfI8R5qmSJIERVEgyzKn3HqjS7TnFv2CXcCriM74UdZ/LHSWzjRhH/tZAKM38deG6DQFX54AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Mexico"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAVCAYAAAC6wOViAAABg0lEQVRIx7VULW/DMBB9nvoHWjI0UClqwcCk0UmlUUMr05KSFEzaT6lGUlJSaWRhA0n3DzbS8iXSwMjINGlw5A2kztfcuk2aJ0Wxz/Y9373zCVRAEEiqseP4Ak0jCCTJx/TLX6AxwiiSjAASYAQwimRzxIoQtyDui/9jiYVJs7rQad7SkQyH8oQZAsuXEEEgaSKJYx8AYFmyMNfZ1HwXwtBP0quI49iHZRX/Jsf79pT9haGfRFrWUUWtNlZF/nwY+gV9ha6I8ulWB45B+Xy5mIzV6zz9JIP5c7pOZrUhsmRh3e4BAD4frlCnYxGuzYQng5rr7Ot2jwD2PrkzA2ElPbcRswppY2gdtMu1C9opTUlqNTXh8EhdGyRBEr+vN5jZXTiX56ntUMKd1btLV3orLJZT3H10U9vs4h2TsYdNp5/arr/f9vo2R5p7KmnrG4zw1XuBNRj9W9sS1oo0q0LXBr0VAGCxnKaLk7EHANh0+nlCUZe0QJ5vDJoGIU6hqT7qmr7+AIxr+z6XkzqhAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 29px
+}
+img[title="Micronesia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACDSURBVDhPrY4JDoAwCAT7Yb/n95DFgi1HPSLJah2XSRsRhfDgkcZ3kQgYbTuVyUTXgY93Ao12J8m4rIWRVRznIOnQ5iHnVwdfJPqP87NkgFbEZNz1Z/g2IjlvF0V6g+obwR6PPEWSiVbRHZOsRBjPRgFiEgOFLFu2HQ8E9nIW3yWidgBobV8DdGkZLQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Moldova"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAXCAYAAADtNKTnAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABGUlEQVQ4y5WUMQ6CUAyG/xoXN27A7KKLk4txkAMwcANHRk5BXHBw8AYMHMAzuOgNuAGDieNzEB8U2sezyUugTb/X/m0eQTYz+Cc4TAqaJEmYoyxLZ44XRACyvLkGCMOQBeq6VsEz/GntJcYbEgSB/R5WpkFELfogrRqxEu1Wze+liVSNBHGOdUrgmW/JrjhJa55l2aiNpmkAAHmejxgdJKq+X7d4spX7Yg0A2LwfAEC8nVsMY4w9AGCe7S09f5vMhO2q+NPaiszkiM/XaRiHRBWIyJ4iBXaXJYoUzP/TRF+2qAKiymqx3RdWm/tiPQL8IOSayOt0UGPj6Qig9PjVJD2qANYOuUAOAKnPY38/2Gqu5GeVPF97Z84Hh0tjqL91EboAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 23px !important;
+    padding-right: 17px
+}
+img[title="Monaco"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIRJREFUOE+dj4ERwBAMRa3QJbr/CCboSmmETyJUcfeJJ3m9BiJy4ZW2YfreFA8YPdc9zUjUCi5XAgS9RgJ4EiPRX9BZ8TLffiHVMcbaiLcZxxvHS/TAFzcSvdC0yS3cXSLJ55mozMkukl2RmsmSzP6LtECuKCpYiPQwYi4VMp6l7yWi8ALxIT8a+2nADAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Mongolia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAXCAYAAADk3wSdAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH4gQKEiwIJS3CDwAAAStJREFUOMu1k6FuAzEMhn+fVjAwFUxqSGAHB/YKJeF7jrGq1CB0dI8wfHxkr3AP0JBJJa0GNjRQ4JLmerqL77K7zVKkyHY++48Twi/t/Q4S96stKJVDY4F9YJoC1MA0FZgC05R7bBeLsVz5oqlLgSkH9rK5OJ6eu/C2kj6oMLMa9N4nwastqBgDBIBzXHIHNQjs6xgArlKJix+PKUYDkx7FKXKku7Kq19DdqvIBQOSSR0RwZYW3x4eOf/CBM7Ocq0rTAIgrq6S/dS4p/0+trnY8zOXr9bbuInYZV9MfjJVgbKdbtdPjYY5gbGc4rqwQjEUwVu3wX+QX8Rl578HMmC2+8bm+xsf9TRZgud+heR6AFFpiLjBl2jul5X4nAOD6YZT6gaR8S8r4smrOCeQhsaOe/ZbYAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 23px !important;
+    padding-right: 21px
+}
+img[title="Montenegro"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKBJREFUOE99jtERwyAMQ3OXny7RSbJLduoinaIbdCDHpshVhIE7BUdIDzYzG+QrPqU0GxoNt77vY6oK9B98BOCzP6YCiGEJ4JsgLrPP2QHSzVzxDwAvyfvWjVl45QPkWkNWLywhAEEIVj7OuneHcCD0PF85V5kG+b1uDgKkOote6wOiIMy6Y0YnIQrSAs8KuEHSEBhLy9lRo5k9XEmzZrZd9jIGuz0dufsAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Montserrat"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADKSURBVDhPlZC9DcJADIWvQrAFM9CzQ8QGSHR0bMAAdBmBMAkdLQVbICFaMHn2+XCOMxxPesrZee/LT3BEX1wlmoSGmtmebsuOHmfiWY37EiuLAyjfdwcur7bPASADfcDoNB2xcVZf1wt22Bxlh2u0gSUlgBVmhkhY3Pb73jkkfT/OVpgRpssbwPsIsSAe9IlWmPF/uvlYQPEtXEi2ZNs9QGq7j9lh+F8rBCoGfhk9qYt4UQp61g7KVtUgzaLkyYXpPYRqZAu5M4XwAsJNJpg86uJIAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Morocco"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAVCAYAAACg/AXsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC/SURBVDhPrY5REgIxCEN7G7/88kb+e0hPhiUClix0VsfOZMumyWuHiCTNpZ8kzrA+AxV38k50Y7BDBB8bdRAU/wHxHarKLsto3qUrTMxVkVVBlp+6xOogukNViWXZgMRwFuBqIV8qQdR4Xq7QGnKv83U+QMyMddKfmxm/QPxsag8Z91vpt5DFjKBCKp/y2cSB3t7okFXI+3U9iOeUmT30HbIDdYAEqUBrmUErIEHCsADfDhCVo8MGTAcV4qyIjBeqIKuxfm3KxwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 17px
+}
+img[title="Mozambique"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACbSURBVDhPjZDRDYAgDEQdwWEcyl9XdQP3MKkU2nKUAjZ5Ui93J3Ejoo40/AjxXqYX2HydY4KiunB4VaCItylh4d6PjBoyQbDR096ViGij7ws9HWnBG+CoNtOFUvI+czMO6kL9H96AN1xQzXwbRkvBNKd8vAaR1XAuH2UvjVigtxqhGSvxRVEIwYKmxAQx/AlbxgtZFHOE9xLR9gEmN/+gYAqrLAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Myanmar"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJRJREFUOE+tjM0VgDAIgzuOd724tmu4iUOIgKUG+qMH815a+jUkEVFllhxNx6y4BozOve9W0TPw+FZgtqwrwWULIOtxmV3Jss0Giz5yvjLohfE2xR32zyUA1SjkjbyHIrtR+IfWEuZadEyrc1T8F8seS08twSJT7y22HdZdokMoGhkLXEkBg7K4XHYiUJjDLccsEaULGvovvdybtyMAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Namibia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACmSURBVDhPhY+BEYQwCARTjC19Y1+GLVkMnyNcvBD0mVkHkFvHZmYbvfAoybdgX+D4OJ8pRHeDMMbrjwTwViUMuyAOnCIIrgD9JonlLMwUaGFeJGj0a1qcqz0k7DvvEvniLM7t+/G+MySsWDr8d4omCJOxG1YNKFpLWCV4h+YpXAbJuPOnSyhilSElMjh1iTexLAMZESySuXiTpfDM5IUvKSrIt2bWfh3O/qD9kSaJAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Nauru"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACNSURBVDhPrY6LDcAgCEQ7TFfqqi7TYSiH+EEwGlOTU3PePbmIyIkXtlBjFvIGwvczVwBqF5RXgCLNGogpa8B4M5/vHpLNujZ9PopxAtE31t+QZtrg2udf3nMJJE/X6CnlkXGaHyNhAPRlA0RB/XKlXtpBTCByUXNrkg4AVUg1NLBTrp3RELOAAo1ZIro+H6bh4QlZH9UAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Nepal"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUCAYAAABroNZJAAAABGdBTUEAALGPC/xhBQAAAMNJREFUOE+ljwESwyAIBH1MX98v9TGpBxw5Cbad9GZWIuKOGTPHDJYEvdrveiQPOaB1942qWHM8no4PLBcI9/FhhdgBBK9z2NIMYm9pznoJYmebPgpBUkIRsX38pqKCRYLgUq1EZTMpACnhRUYFSidbJJfhb2DO+SBB/Y25NBIVxZNR271tMIzgYq2NCIsh/fMlGuxJFfGbeDNeUrMR7SUY1KiA6IuUlCAYrLWiIrvr+EF3YYeI7ktAeVE07oL7sfzBON4sd7KAFmdmwwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="Netherlands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAAWCAYAAAAxSueLAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH4gMcFRQKHqHdDgAAAQhJREFUSMe9VcsNgzAMfakYg0ulHJikA1QqW8CtU/QWtigSA3SSSiD10j3cQwlNaD5OkLBkiTjkvTjPcQC+kVJ3khKWAyAuwAE7mkjICkrVzslp4mHtmtmuZEmFMReD5SmFUmjAkIbj2GtdfHoFN6uxCy0+ALRtTYmFEyUxsYVnwlrVNJcoctf11ljKv8yFCO3GRRwyTbAmid2zRWyT+BerOfolSUFDWdFQVs4qdLnxb949O7+fIKLFAWAoq+9uVvHcdkUaQAhhgemxL66/Xdi7dpAiKtychTkOxTeRhYC4WnHKk46nW/JRvR5XL+6BsTCVKPvxJADgZGgQic0vtY+UQ5LTUmgrzge2qp47wcWMEgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 22px !important;
+    padding-right: 27px
+}
+img[title="New Caledonia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACVSURBVDhPrY7LEYAwCETTVApwrNEybMubDXjBEIEA+R5kZoVs2GcCAFRKhZ+m/C6qNnA5nn01QGXA8AzAol0DMWFaMF7PT7OB3FtkU2rRT00ZZEqx1/Ixo3I/Q56rhPRZ/4TPQwgH9axDXniP70y9fs0qIOcZknXsX9fnnmhHIBVoJgUwEDFGMBeWjDeyyaCG/C4AhBcG/On8ewqPEgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="New Zealand"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADuSURBVDhPrZKBEYMgDEUZxmUcoGO4TMdwAJfpMJQfE/ykAby23j2OfMgrWFPOeUp5MAh+LSIMGYi27VG5Iw5Dg4V+7vcyYQhY4qVW+x4jDMHfpWg4VIK5CXmOdcx9L/gIJCwxmhgTMUMpFj2vpQX7fRb1qa99V78i8t5Jv0V8GAyE0dVyOQFIy/VnCag1azxNUUoT8iO1Xo0f1EMpFtZ1L8173JwGUieW4Vw/G3snys/Oj02ltkE3VW7mc+kA3EY+fs4jqRQTMV4By6qchOJpCt3AoikzqQQ3xHxCLxSHD4yhvCMzwtCo4gC/9yKnN9RCuo8G71EsAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 21px
+}
+img[title="Nicaragua"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJRJREFUOE+tkdENgCAMRN3WAVzHMZzBTx2pckeLBato4iVP4NK+HwcRuZCCT0g7C64Fhsf1nkB0XrDcExg6W0lYTntGB0iwSNxsJcmvfFpe9ulwA/6O4L1sc9hbcE/8LEG0JBAYvvfRri4tXmBEoSSfsagX3eOXEuJ/aQ/dKZLPIieoJKV4kjXLZactWJoooJ0VkeEAi5hQCxNcJQwAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Niger"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJBJREFUOE+VjssRxDAIQ33KLZWkm1S6JaUTglggGH8Sa0Y21og3LkTUmIWj69yF24Cj69yG7oGegcc3gNm6FSQuWyFmoxxzA9HQ9THnKxTiDNl7lEOY2XPI6CcmzOy2YAbAHPMozeowC4CZBPK/C+2/Y9n6ATkFsgqyHYesgiKggngwgeVl38mBhFruOXeJqNy2vyl00HRw6QAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Nigeria"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAApUlEQVQoz61TQQ7DMAizo7wk+062vjVbv7N+xTusVDRB0yLVUoSEwIYAlIQeJEfnDknsfSkiKK1C0vBKq6FA7tVLq/gFT2RVZa8OANuyfklB+FZJnogsTxKzV9mWdUiUdFjv9xUnX8UsrLWEC5ADZj/Ow0Z/EpL4gPfj1e8Hbs97WEmSRJvILPZBMHnHLMFpY21p/iWyOMtjfztuG6ObCu+HVxzgBy9mdYtHJALQAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Niue"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACqSURBVDhPlY+BEcMgDAMZJsswQMbIMhmjKzGMahvs2uD0AnciIKQPFACLaPCUas6yVkPCJ2r9ABepkdvoaCgD/RZSLr0sBaDefHAGiII8rE/0aUeXBiR0EYDliuI7WIA404bsCZL6HsILff8wbfCen5P5/jakHnz8453DF4gazgzBF340dyWQfrv18I2kx32F7IKso5BdkAcEiBl/YHPZOrMh5ghnmrMAyheKozjWze6q/AAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Norfolk Island"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAAZiS0dEAAAAAAAA+UO7fwAAAJRJREFUKM+tU0EOgCAM64hP4nN8QB8nf6oHRGFskBibEGAZ7QpDYIPwIToQTIIUQXIYSNEUCEqdd6KPl4iWehlvAkkSKZa5iatcZefIXfkixb6I9LaOPNhZW1hYC/gBm2auFholP26SGAnL+H0noi8KALif0319CABPjVypOQRDB3c9UKHXqpdcdAdbtA02/UxfPuAFF3+N2wGbaHsAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="North Korea"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACNSURBVDhPlZJRFoAgCAQ7TFfq9B2GXARCQC3em9QVpj46iCjRCo+S2AtygObzmlOI3g2GdwJFegeJBL9LRSa5BZRfV5jEC7CP7O5k3w/Vm3GnufZFkkSrOs8YJEAH4rqCJa0vibR8cwXmWvGTJRJ8LjfTJT2TT6t+rogTDBILVrIwbDMx4FBFBbGXiI4HdDMMHQhGBh8AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Northern Mariana Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADxSURBVDhPhY5NDsFAAIXrEFauYGfnAI7gEizaLlmwlmFTiS4kFqQSLFhICCGRuICtdOEgzdOZdqbzpyZ5/fn63pc6AIykh16s0bs0JqBl7/o7FlHxQMf/BDx5V5Eo47xAM46WWMxOCLYHhctdU5JBceh7zdtZuSIR4IckjmMrlzdpyiXynR99k0YCBWRph08kSYLm6KZwS1+D7gWP4wr1/h6D2RpkROBOd2hNbvi8X+y70qf77O9UUcW74Dz34fWGTEKCEPcNsQrYXkg0EU2jG8AfElQ7kfGNb4SkTGSNJFAkApTJtLHY6IBBLrJE7wJwvmsSDTHF5iAIAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Norway"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAYCAYAAAD6S912AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABPElEQVQ4y51VoXLDMAx9LxdYFBrqst12N5bxjhR3Hzk+kvL2I1pqahSugjQ92bU8p0K2pHvW07Nsot5ErWklNZVAMgWPEcAU/MOHF0ym4GUYvCgQGQYvU/CrQWVUILmqx0yMhcoix6brc/kyBR/FmhowxL2LbLcvi5IF06Af728C4HNheD73GNUt4BpAg35Eu02TT12Pr+AjKse/2W+1Z7efq990vbSJqqvt1PU4Bv84sHnlciqB+K1YpT2s6p/Vx0UkGrNaa7RmWcQB4pKoO0BEnvwq1yxCxM1jpG3ZZ/0u/0DwnnxvALGs9d7yL2tNvQUAbn/sJhkxy9+mPaPWyR3KfkMl0XTSCuTyW5Y5Q5kkJVLykhywzb9yvD5fnSYJ1l/Aa/lP4RpQlcfSJ0UA/A9U0WTV6FSMIUsH3gCrLcIzNVf2/QAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 24px !important;
+    padding-right: 20px
+}
+img[title="Oman"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJJJREFUOE+VTtsRwCAIc4r+dNnu2WEoTwVEz+YuiiHJ2QBgIoKOktlLnAUxLlEVjQFH4nvd+NzDvDTyU7QRNoOaOipdZz5xloU3EA51vFSgn9hsoPdOtx0yCh62W+lliROD8UCP4l9yifwutT+4OCHmOG8lvqgMZGqml+SiMuTpCkJJF9RwEu6ZLLBoRQWzFwDaB9/0EDRnOzGOAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Pakistan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJ9JREFUOE+djdERwzAMQtM9ukz2H0oVxLhYkfMR7nBkjF6OiLg5haN17cL3IKPP+aVdyjrQf8ixA+juuboYeb0yBpQKsC97DinjCo/xoK+Eu5WnSp4fK/gM4f4E0Vv6HQRqIdAIaf3NyjOHthAVJEHcEmZCcl5AtbiTACmehAgkyA6m3HYuCIcROmBnByyQGTzA6vLcqQHDUe5cuxFx/ADMYRylZ7d2FgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Palau"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAItJREFUOE+tjtENhDAMQ5mPXVmHT1YJSaiDm7ZUICq9u57PfrCISIMe++iSu0YbaLRu+5Ce6L7odSYA6FYSHqPA2Si3eyMpYRz/fcRT46S+fpXgiwQb5WcJhY4JAOedfh3yMMM94JLr7eYi/h/YzveQZNEMbELyVsSCShLBgyyPY5MDD0u5R+6KyHICt4E8LfqLgjkAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Palestinian Territory"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIdJREFUOE+tjtENgDAIBbuCS7iFizmkKyFgIfQVLR+SXEtf4NJGRBNccqTgrDAHsJQx7XgDgxUGiQTXtitxqMIk6aGXDS5yvriJv4hl77dcSnrmZ4mJjFiLfJQY1VLJc8NvzqPG8ys9VWKidDij77gkitIFJAgGiQdfMlj2HQw0NFECzhJRuwFSb/fvR3cAEwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Panama"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACZSURBVDhPrZBREsQgCEO98J54D8MSNJhSan82MxGN8KZ1mNnNLiytay98D2Zj6utndQfam9UwPn4SVQhBCktAJA5gA7M6CGuGsStkVYoDL7kXadA9hPMJwjv3nyDxFvS+yIyDtGplu/nJJ8X8rGeQCr9AYS7K3M/P7AAwxXeQt0Ac6ytIVQFwQjJgUwOpw/TlkCFBjWuvmY0fyYs/lWaquOQAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Papua New Guinea"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKBJREFUOE+dj9ENgzAMRFmBn46Q/Sep1H0quT7DmXMSQNTSC/HJeTKLmQ144ZjSz4Ix8Oi9tlNmouPi1zvB9/MKOFskCFprAQeACjSHiNkg2cMs9DKchZ4bba1fdAst9FcS2fA/CfKphCLCTIYDbnEqIag+40NQfmfbrooo4FdREd55xRmSXnRFbqCSpyIVFEkGx8DtY1KaDPfhGf2smS0/ZJXehKklKikAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Paraguay"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJVJREFUOE+VjtENgCAMRJnEf+MCTuVcLuS3m1jbQkuBgnLJQblcXwgA0BhFh+u6S24DjK5t6doD5QHHL4BYugXELkvBZr2c5gaSQtXPHC9TsDNJ3r2cRDN6DAnH6uYi7ngFNQKeO4PEVikrw1oEGIkh8cZhP+cdP8BnhMyC0o5CpkEGUEA0+AKZZd2pAw4J1HHdBYDwAu2eJYFIBd0XAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Peru"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAAoUlEQVR42pVSMRIDIQhkHV9gOlPHd/JOU8cufoEUXAhymYzZwhlxFwQWwkwOWK+KwElB0EuVFb3UkCj79L1U+gaTHQXlzfYCK+JlShDmbNE2h5EAiIieFrGksC9tatocif5HXhoFrB89LeK7zWE+RHR7Pvww7pdrqJOEuc2x+as2hzAnu+wIPj7QFf2W6asy4b10LNutUqccLJfOXsSKs0dfclp5K32jQNAAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Philippines"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAA0klEQVR42p2SsRHCMAxFJeMFQmEyQejgjsqjZAv6VGqgZ4uMQhUulCwApGGBBFHI5zgmkAOd7mx/61mSbWQiCAyHS7EoRseALd8ZpDzE9OD4MUB0pLxPKENbG2YOg5xHCgATuTyz1R0RPYaIYEs45rHSt8jcXXcyEfN1xootAUA5rDnAT8bMbW3a2nhF2quSzCtVkokDAArzvO0lFZqtSgsAOM2Xowk2j4tmItd9WviNLwATKX8t3XkxCchE+SfS62YScJHhj0JEafdTtCvqjz/6Aq/lgmwlASk8AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Pitcairn"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADSSURBVDhPjVDBCQIxEMxLsAK/2oI2ctiB4E/wYwOxALtQW/Hh1wLsQBDBl+4xm0xYc4l3A8PuJjuz2bgK5A8HQcaukWZ+lOfqJJ+baP2+T2Sxm/UaaQPEr8NZxev9Vw0gRvTea2QvRBZynY6UyMnHZqkvcNuLspNnRsnAArWuEEXIaZSvlvZHboGaIkTA1ma18JF4esmE00uxY0LGQyVqTkQk7Xns/TXJyYm1nCZAuiyRU/MauiAP0APb2EdqILYYbMReiGqomvEOTUNgBTkzONcCdwo/auENI6MAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Poland"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAaCAYAAABctMd+AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABSUlEQVRIx7VWMW6FMAx9jjp1qDpwhFZi7swBOApH4ig+wF+7MzBwgN7BHQq/ibGd0K9aQgjiPNvPLwYgNnlkPUUbRSQCqK274MfGqkUBUlQmEYXAxrpENMjuIA1854Ci9tu0ZHRYabvvLBpTXk6NBmZupUkKOhQlFvALAGHmV2Ymjx6FZQYoEmLm9x1YAHwy84fXsxyDnC6TVsC2bViWBQAwjqPrV7CUazrj7B6UmdH3PQDcwQ/bgxQJ5ljp507wOt5gz1ppOx55ZVEtayN7vf+kc8JjRtaDiIip82maXKR5ns1Zc9BiymjtBlm7QY+CQ4rFlftqKT79Hi4qJuHb161ocF6Vfr92g/Y7cU7a8Yqt3XCiI+EfjaKPhKaCiKAbb/hTE/jlTCvgfw6ggV3Oa3O91Z+iX4aWCoxh13zc3SAR6JVZIhfUVtg3AhDxYfzNTTUAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 26px !important;
+    padding-right: 23px
+}
+img[title="Portugal"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAATCAYAAABhh3Y4AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH4gMcFwI0wNyhHAAAAOFJREFUSMe9VdsNwyAM9EUdhdnoTO0G/csA2aELsIv7AUkcxcbOQz3pRMLDJ3wYQHFwZwyRAIgGT8meWEosLiyRXnAPQhyW2GURT3QW44Np2iGwHrhDKCo4BNNwNG0qBvoDZBpVz0ohotx+3no9QKkTiHRap5IlU2rfubYSRMRM/X7BDR6auZtdWeUOdwi3ePb9nPPOFWMmArCQnf7Lp3GcVkNkVNMcbwMprVxi5Erm2o5T1WRurcKe9u4GmWtiWdQOCr/8twLOjMF9flqN4Vl5Vkitse6cbKYtZBuO+Ho1zg9CJ5wwgkSK6wAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 19px !important;
+    padding-right: 27px
+}
+img[title="Puerto Rico"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAVCAYAAABLy77vAAAABmJLR0QA+QD2AO5KnElOAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAz0lEQVQ4y61USQrDMAyUQiCQY36VPLj+VY+FnqaHeJMtR0rbAYMty8NosZjGQLVnMjBywPv1zIdl3cw3LqIakbR7N9GfMBm5cYO9RErOWCPCryJYS2xTJRdpp8ioluqzrJuQNwxPI297qyjaI08o3ACiV18TAMnORESzuA2cHyeCdG7tWh8VNTcRySEaEg+rHoq9usuh8SHiPrHj7I/Awq7pn2tFmeyo5Mfkw9mdap6G4cqks/y0gb8hGU5E0A6A6HJRWfbvx/UvZfeEvDuePzMXZ8JRyc7CAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 18px
+}
+img[title="Qatar"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJBJREFUOE+Vj4ERgDAIA93DWRzRCR0GGwpYaahn7tKjmLy6icjkJhzUOQvPi1RinjoxPIHQuR/UGRYAuf7bQTg7BLIHbtzx5mqvc+8bACLhap9+bQ1ZfQmHQC0QNjnI7YAaMmgMV1ZIyy5BECvD1tNTIQzEiu6h0yE6FCBoBYADEosB9lV2vy6xtDBzzorIdgOesybLvzVxrAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Republic of the Congo"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAAZiS0dEAAAAAAAA+UO7fwAAAJVJREFUKM+tk9ENxCAMQ+OIUW7/hXqz4P7gClwole78QxWS5wApSIYLwD3YRBIeKzPADGz7AwgqkPsToAMNXRV3V4IDZ3F1VdzBC0ku41Lu7uBJzYC5S/zmNmV8HbUuHe37AJZ3FRGRsxZJXoBPrRdIe64kid6lP4IAWv1o7YKR/oQOkBzUG/9l2OBFL8Y+lmP/yw94AhdKgH0SXG3GAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Reunion"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAB+SURBVDhPjY1RDsAgDEL7ufsfcFdxosGxhjpfQkwp1ChoGx3R7rhKYT9jnhFwxSxmUVJcoCnqp+ximQpn5+cjn8sKZkrJna79EX1J7nS9hphDLPClTP5rUgR74nI8AmxAcXv0Zn0yDBesxA7KyvEhZlGqsEUK+xn7R3/LSkQ8GeFjiCuBx24AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Romania"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAXCAYAAAAGAx/kAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABL0lEQVQ4y61UMarCQBCdDRaCLIhgoRB+ZWdpJdYRT2HhDTzIv4CVp/iYA6SyTPOxEiEWgggqpBubzf5Zd8Zk4T8Iu1n2PWb2zQxAc6D5WEQNyVgcUzjstyCJtT4IQHFM4Xk5Q6c/sKsETggP+61DpqsExQmxkcxW9sLwdPK4bGqU3DFnvZ/b34VxfURYxLH9oeT+emf393TqcT2hMtcs+XfzcNIdTZYO3xPSSSaS31cqppq6VSfWChExJNF+T2T4lbCXy1zDddGlJeCkhp96hD5+e3y3+8pdrqZQJxkCAFIYJ9nzIo5tI0ecWyEwkWEE/wSvRXSSgVLKe6My18457QCx16o0L99z0TVpsCnTP8GoXHPeKFSM1JIzalWIGFeQ4qilxcgUpaqbkI5Y08n6AupQ1bGNieAqAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 23px !important;
+    padding-right: 18px
+}
+img[title="Russia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUBAMAAACZjst6AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAGFBMVEUAAAAAAABAQEBgYGD/2AD/AAD///8AAP9I/x48AAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAHdElNRQfgCBgVAxRUV2O2AAAAfklEQVQI103OMQ7DIAwF0J8b4FRt5/YGyFygMjlA1JDMDGXvlOv3Y5Z+fYknJBsA8QRgeopanB+UWE72EuCSLCXNGqhcPptL89E2o0R1398aAybVpZjGPjtCNbmxlaqt9gL3b6vsGf51irdrhPuKZ+Xs1cV9EL/iT50D/h6PH0khI6JcugJyAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE2LTA4LTI0VDIxOjAzOjIxKzAyOjAwmLCm4wAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxNi0wOC0yNFQyMTowMzoyMCswMjowME+aFesAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="Rwanda"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJVJREFUOE+tjssNgCAQRKEDS7ARe7E1T3ZhERZgvNiEl3WXz8ouICGRZJC8zLxoACALHrqK0V1KDqi8HPUURO+Dxi1BTOgKiRiHgmCKX5tllks85PPFnchz/MRipyTdYP6WvFAW21zBSob1LHK3939n4N5td2jn9lHSK4oblqSicZ6aSQVCwqAhSse80cBBxLXoLgCYB4ZlG8EAYYwSAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Saint Barthelemy"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAD8SURBVDhPfU9BDgFBEPQHD9jg4g2ujo4e4ANcHSX+IPEBCWfxgCUhNuJEImJJCHFwcHMt0zPdO7O7QyU1U11TXckUAOSoQIeX2Swxb5jgT/iKrFBSCs6rBs7zAPd1Gc9NBXEY4Lrr6zeCk7UlskyQAPG2KiFWZZdFkPIFrPWptHlwAwSai82Z13dudTkBVxNoHpbrXl9AWvF/SVSteX0BacV8QNjqdtBo95IvCV2wlzZfp4gV9DJR8L5uWVnoEnOniz6POSuLzyNkZcF7+tQl2aJjNEE4HWC/HOGwHrNr4eyYEuPli37BLdCjiMT4U5ZdFqaGxOSwj9ksgMIX2t+Rdj4+DIEAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Saint Helena"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUCAYAAABroNZJAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xMkMEa+wAAADVSURBVDhPzZDdEcIwDIM7ADvwyJYMxACdg42M5b/IOdoj8ILu1NSO/DXNJiJlFR4fuc21IgL7/qjwkdtcKyLwE4SHz0DY47k/gvDGCqTtB2k0Fm3zdCTfuN7L0PNys5X7DIAL4GEtd7LWBYnBkfWeLf7uJ/BBktYYiHAp8wWpxjeQABmktABJFQRB+09A2HEnCUpnj/pBjaFZCJ7JIFgTYPeisi/QOzTv5X1gawDiRBzKGpp7doKC+C9o7c0MH0HMBIDtwWYY1CDTcLoV1UzQG89ZEdleQHLnWQC83rMAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="Saint Kitts and Nevis"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKBJREFUOE+Nj9ENgzAMRL0CPx2hu3REfjoSEvtUMr4Eu+ckQCIdhBffUxBV7WILj2HaWaQHGP5+ovTbXykj0X9zlliwLe9O4iIkSQq0Mg8gLGHOLEkIxprk9rIN/wIvfN9J/MySAS8/u+JDCcE0OMEzvIus9UaJQVJvNyeCBIlv65W+S55EImuT2gnJrMjDgiQJ8CDicnRaUKDhq7SzqioHwHMwOPKjYPIAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Saint Lucia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJZJREFUOE+tjVEOg0AIRD2FR/S0/fE+JsisDAK7tD8leRs6HZ6biEzo4FlSu2AONDo+0rISvYuuvwSE3SSJxyzErMuxTxILffh7lScJg05C4tQb5c+SEH5l0c8h4NcqmNod/z39LMLw8Dp33zGxZ9l4dX9KVQIBsYMksGy8kwgTBQRTBcAlHpioIx77TQ1GqHFH7YrIdgPcpUcVq5kYHQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Saint Martin"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAYAAAC9+TVUAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xNkRpr/UAAACWSURBVDhPrY7RDYMwDESzS/npCF0TiSXYjRkoTmLrfDqgqXjSSfElfkphpqnslj4adlY5Z55XtXCVQF2ORJajkeVoKrl8Lbtie3/yu5ZEKw/BlYREiViu5x4Ee5IFIUB8Vj1L0i8Qn1XPv3lY0kUeBHsXnEt6FLjMEuMvSd0DWjEgiR0iiRR3AqQ+UPidPfoFXOAQpXwBS4jwcnJBbhQAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="Saint Pierre and Miquelon"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACuSURBVDhPjY/RDcIwDESzCT9s0g0rsRPqDx2Af8YwPmM7juOiWLomvdy9tI2IJvHgUSpnodlAeH9eqwD1Dcqs9/02FenFEZZ7mh0gVhZXAxLSoqyFL/sIaY/NTB/xe9gn+byEQNxj8H4FiV/D+g+xX4njfgXBqOlBU+UPkCNJDlkRkmUZgfwu74eA7OdnSdJD3yAGWoV4xyARtAKJgAHihgZWyt7JhpgarpSzRNS+UX0/g8ff1scAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Saint Vincent and the Grenadines"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAMlJREFUOE+VjrENwjAQRb0NFaIApWEFdqBDaZgG2YU7ikgswQY0lCBlA3Y49O9y5ohsY570Fed8/yWuAFXSBL2WWw7Qswb3spaHF2zRnm10FyULucWJS3yeArTYny+ECYKzkSVYgqcF70kwDEmiIu5NiKAiwTSE8JGMIz/t3zRJvPdJAooSvpQhB2Dxuesoxkj3fkOPY0e3w5pnX5IaWFQRytf9KgmsBKThP0FP6gIPcoulaAdlS7NId1EqkS1qcC9rv7Ffm2eGc2/MlZVFxZlFOAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Samoa"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACQSURBVDhPrY5RDoAgDEO5gpfwx0N6Q680KWyjAzTBuKQKpX1ZEpFBefCZqs9Co4HwcQZd2+6agdoBZQVgniAGYlgDWEkD7HERYliA1Fv92+BuYB7cAwQH3oLH3yY+b5P1N0QLLvUoXGSAAGFzVQVSt/sGQq/0DbIKso5DVkEMCBA3XmB92Tu9UUwNz9RnRSTdLLbp1sVnEq8AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="San Marino"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACXSURBVDhPrY7REcAgCEPd/7PDdJkOQwmIpYDaj3IXxRDe2YgoiQtHqZiFsqHBaVWgp+F2B7By2Qfily3gPVTl915O7nXgA6iPPl8u4HuUvK/6V1boWT9B2sEPk5oaBIA9Aw3lfDBNZ4e4u8xhX3+0B5Vz3pP9AZmAJFX4toOxQKRZgJIc4AUZxgoWlsdONMQ0UKGYJaJ2Ax81U5Ggo3YPAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Sao Tome and Principe"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACdSURBVDhPnZFBDoUwCEQ9gvnXcOu1vcpfeCEEdHBKsSY2eUqn8GziJCIduuxRknuNPtDoty2PVKK70PJNANDbSCzY59VBg1ENcm51J7nCWL7/x1djpVxfWvAtePl+IMGZ8k3CZ8otgQjYnhpHtBImXbnce33erhdhYISLbB4SFvGvfQIzIWFRNZBhQSOJYCDLwzGTAw+v5orcKyLTAf4W81SQAjJ3AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Saudi Arabia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAARCAYAAAAyhueAAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC6SURBVDhPpY5hFoMwCIO9/0+PsSvtMIwAUUpbrS7vZUAKn9tEZGoVfoauu9nDEI7Dqa7AfaDRHZBKuy2jGWLpjRvO0fjDa2VwB0V9at6hWOtzAu5h9DSzWa497614X6AxU6t5VC0pqF+m8k7W6MayZriA7t/PMF+GHnOYIpi2eRWKZYr9KIPuoQn8yHGbOAUKx3L+R1UVCFvu/TmwmnlUjA/BNscu71jVbUjFYwetMIqzvXk9F/+1iGw/+OcigT6wpB4AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 17px !important;
+    padding-right: 21px
+}
+img[title="Senegal"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJxJREFUOE+F0NENgCAMBFD38NNBTNzNSR3ACUz1tC0HpUhyBhruRZ1EJORZeHTT3kXiAJf3Va5zCznmpQuVDcoKjBCDGCuAlu0CwgDPGYvIN/SFswG8cK4QbPgteOE8QujTxkg2zxEteJK5ATmi8R9Key5XyPd2EbIipwe8fUca6A+xjiM9aIQwUCE+UChDuOyddvAOASVp74rIdAOUmhh1vpTXQAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Serbia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAVCAYAAACg/AXsAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABKUlEQVQ4y52UTYrCQBCFX4m7ucEgRGLQK2QxZCeIBwhuBM8wh8jSS7gJHsDNXGCOMDOoKATxAlmXC9M9/Z/GB02T6npf/6S6AV3ctZCsnIGZMV+WPhgD4G5c09A1lUj8OuzZjLk0CK17vixx//kIAnohu+0N68937La31yAScNj3goa+AWFco5TAl7YjQQEAAJDjN8aKXBAGgGMy7XVn1z/NLyCsmqluwKuRzygn6mJknQnVjdaLZGaWTQWKg+WsqLBINgCANG/BqxHSvAUAGTe1SDbIigoAWFvJ5PKL03im9TGy6kQYVUBWVCAi7dsLOY1noLpBmrc4f789D7fbjml0vhFCx2Sq9SGJsiC1Rp7xyEr73x5ZxRYDUgGusg/CTLPv7sTcIcvzAB5mqFGOS3DqAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 17px
+}
+img[title="Seychelles"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACkSURBVDhPnZGBDYQwDAM7DCv9GL8YKzFMSJy4pG0e0EdyGyz7VIkmIot07Cg1Z02rYeFtFzk+i46tBl2LlR8AFLMDhGUoAgglQPYzbIW42YeFB18vXfIr8tj3HYS76j8IB30chASIMgCV/Tzh6RGA6k+Y7gZ9vx00A6ppX81S/iqcDlH9Kg/FBBggWC4TUxapBDB1SDci8KbcO7MBk6BCc1ZE2gnnqx+KCYz17QAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Sierra Leone"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIVJREFUOE+tjoENgDAIBJ3EQRzL3VzBtZBvC0JbUkn85Fu80IsbEQ3l4Ji230VHwGi/jrAz0TvwuBJIZddJ7GNZsCzimAdJg5qPnC+zYGdEviOOYOb+LEEadIvIgnuYTZHUm4fzzrf+QDmrJCtqb1SSFhmBkyhYicxjfdODAiEK2u8S0fYAdE48P0dwd+YAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Singapore"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAIAAAAym6IDAAAABnRSTlMA/wCAAICoT1i9AAAAmUlEQVR42rWS0Q3DMAhED6sTNFPUG8TTMV27QTtFvMLlwxayEkiUSuEDyYB5nLFQFZ6JapRKuG4pgiyvWe7lNAiACOVznt+3+fM7okqy5gKg5uKiQj0HqOQqaZAI5XBqLiNkjxJb9tjMaNPvY0GrfIwNSPb7IiSbt8h2tmjlG7X//4M+JUkbw477SKv39RxEAEiUCFUNj3HBVlCgX0D+YpzEAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="Sint Maarten"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACeSURBVDhPjYzBFcMwCEPdKXrKAhmry3ScLtRLJqGALQcTOS7viWBF+kVELtKxRZWzpquh1ve5TcVA56HnCgAhO0CaMQRMrBh9u73vqz5g9kFh4esnBOJtY+87CP6pauD1OabhmU8hAEEIhvDMHyGYx/7+Sw7RfAdhWJip9Xw7BCAWZgqdCvGjmayQFQEDpBs3sFzunWy42cJMOSsi5QcznP/v7xtXbQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Slovakia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAIAAABGj2DjAAAABnRSTlMA/wCAAICoT1i9AAAAxklEQVR42pVSsQ2EMAyMEV1onhpKGIdMwC6ehUzAOlBCDQ29v7gnMXmEhIsoPt2d7cQkzEYFXVNEwskTgYj8a4hIy3JtfysATkSxoJzsrWoCaasaEdEWIRXm2Fu5zoFERIJTI7oL2w0/jzNCnxqx3WC7wRiTmfeR6xkwKO4wDggqXDSF88cyWeeRfsa+cD6hxqcXZmKG8WeZCuePsd/r9rarcp3ju5XrvFXNXrfHMj0IcMnCFwF6FoB5WQpsg/7chB3nebujX3mtieaparFdAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Slovenia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAYAAAC9+TVUAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4gMdEjsLxkmkFQAAASZJREFUOMudk7FOwzAQhv+LWJGQWFkqsTCzUvURukYCd6MLG0vDdoxd+hDgSpGYysDOyguwICGhboVn+BmCYzuxSNKTTtbZuc/+L3cCAATqRQDBQDtAAAiM/+S0LsnC4OjmsAuQPM+chIEyIpBQtQ7OypJ9Ke957i/9g3Bfp2olh6o1lWSnBw8QXxNVksSuUMhsjeeXc8hsje+7e69bpHYHE1W2/g4AbPIVpuUtNvkqAoQvEZFEpY0ljOXi4powliSjuFLpLcwBwNZL+HAZrX0sgixHExTjOZ7evlCM51iOJtWBsVFNYGyrhdncXHy+ekCXPV5VzSaq/Dk5HTp3ON5+gKqShRtDAVFNXNP0BbnvXF40O67xACAlr5mcHMAmKDm+DQAA/AKnDL08JTyKQgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="Solomon Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACfSURBVDhPlY/BDYAwDAOZgj8zMAlvNmUL9kEKdUhKEtIClQ5Vxj7BQEQPysEjJXbBM0B52dokovuC8ZtAka6TSOAKTDIExz7StM585z0/8FKK9vRyJ8EFRX1pj77LckhUVJBio4xPz/K2RESK/rspM5q1JQWMraAH76+vu0VfxwA73ldJ4a/ASawoG0SswElq0JHFcd3EgEMpZ8QuEQ0nG5LnHt67aCUAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Somalia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIpJREFUOE+djAEOgCAMA/2e3/PDc51sjjKQ2KQKpb1DRAar8CnNXXgMNDov6Zwh8LCJQyvMAFXWQbzkj2x+y7AtSCqHKNdfC/5A0mYN8VEW7lMIg3CHqpz6fQivxF2DaL4N4g52Kvsa5AvEb75RPRA7EMjFZwbAAYngLcTIQTx2d5cIW7kyd0XkuAH8hDB3qmheawAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="South Africa"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAALBJREFUOE+NkN0RAiEMhK8GW3CGd99swobsw1Ysx1ZiNuTvIIiZ+Y6wbHbgDiKa4MKnZPSCWWDpc78tqYKi4VYN5XAmeSNExOejowZQDWYd/SmE3hcTvWxgo/PCTWtNUNHL9isdhZ75HWJPzOV6PD9CLMgxY5hXeoTIf8mGf0BIvx0vHDCG7ErmsPR+vqacXl9rdEbm8ZFmCJLTahikAOAhLoRhO2ycNi6quWL0EtHxBSGxAu9zKp0BAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="South Georgia and the South Sandwich Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADhSURBVDhPjZAxCsJAEEW3EryEeAEbe29gESztBCtTeQRbwUrwBJpLeAKx1dojCGKrY/6sf5lsNiEfPjOzO/+RjWuQtLiTpO8yycZHeS1O8rmJzjTu/VpauoDwe1doeLn5VgARqAaT67CnRk9v9we1y53IpTwz1cCCAsAKMyDaWxBmDwiQ8H70VpgBGcwLBdCY748qSD/tmc+SkNV0pD1BWkslIYmfpgAa4lOs/rtVCG0BtFtP1BT2CIFqEFrO/g6V5oycj3vpgQ1bM2hnZhC26gRqA1g1wniHpS6ygdiRnPsBvY1UMyAYuYEAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="South Korea"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACPSURBVDhPlYyBEYAwCAM7jCs5vcMgoGnTFE/NXQoF8s3MFrviKa234XVwHT6qAo3G2zcARLcD8jWsAmiCRGWrdHdXL/OgK/48q/6o7nn5R8gmpNLhc3WlCcKwCgBDnItuAWmwbXsaELnPNyFYhBBgAAxRJt8FpEF27gmQXzR9cB9UAA33jA5yCFBhvTWzdgIpxGYMjur2TQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="South Sudan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJdJREFUOE+VjtENgCAMRPkzfpn46RRu4WxO4z4mbmJSW0ixlDZAk7N43L0QAKASDn1M6SypNlTJUtXJBxXsUQEhYzmuItArEyKHgw0fFx4I4EHk5pH/dEYlyPvMZvheN9fnO9T/En4Ni4Mi7PklZHQiJO0Ems59SNSLfYaQrKAn7mTIKEgCCkg2GiBZzh1tRBNtTzoLAOEDN9vr61vwGlcAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Spain"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH4gMcFjsDdyfjngAAAWlJREFUOMudlbFOwzAQhv+LYOqIOnTpFPkVkFAfoRMI0YcoUnkSIvESZqhQpTxCVfUZrEwsPAETw8/gOL00NnGxZPlyOX8+351tQV6jkmXMWHJgzhHOvQMAlsvV6NziLyBJOOedbBqv9Avw3PssKAMstLLsG9S1TYKLHKD2NAdc5AABYLNZRfUxcJGTemMEzlEnKTv7bFeFMU8DoB7r2g7C0e5EAOAqFjtjPCxk2xjBYTLvgQGgqiyaZouyfEjWI+vaMsjOkSQJgIfJvOvhn7atqpOst92DOUdtNIBqJ/Tc9fqRACjnGQ9b8062gRcB94AshvpQASHGukq61bhvR9UA0Fob1Qd7vf1CVwH3+FdT8yRZp9vpDCLS9eMOuH5+8SFQ+pQTUejP2yu20xmOO79A0AWvQs+5UEQWp4/7j69Ovr0ZOUGL/kGS2P15mMyz43n3/TlgSepizgHHgGM3fxKegl30nFz6FP0C2pP6OioQ2OwAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 21px
+}
+img[title="Sri Lanka"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACkSURBVDhPfZGBDcQgDAM7TJfpAD/GL9Nhul4+pjFvQgDJQC37FJXDzCb5wlYqZ6HZgPWsVYH+F792wBWn6z5HEaSwd2NZApCW1dfsBAmzL3wToCvl/aBxfcrw813DCXLtIbsJa0iAKAbzP8F0W0h7mXgdBFHAXQV/gLzThVFAGFagAlqfEIIqSBYBA2QCiXIZUsAA6cYCVpV7JxvNjHClnDWz4wfqGwgWdjoGMgAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Sudan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJNJREFUOE+tjNENgDAIRB3BKWr88M/J3NAVXAgBC1KKtjGSHKWXuzcAQCUcWqF8llQbaB3j+qgIdB94tgAiyRYQNrcZ9mnRACkqWp/uCpJNHfk3fHzwYMAHCA33ef0KySCRnYaPy0KMeob71xuDUkqvoh73FeJAUclKOgrxoKhkZQEFRI0c6Clrxxts5nAknwWA4QRkfwKjbajmDwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Suriname"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJdJREFUOE+VkcENgCAMRT27gyN49uhmTuUQDuMOtS1+bIGKknyoj/aFxIGIqvCSrZmyV1IDRsu2hmmJnoLLngBBr5PYYTRYFnGpnSR9pRPrI+eDi32cNbjEwl3Eccd5l5zH1OShxECNCBDLG/0e/o1K0uv8c7+ue053lUjsL+0FM1nyV2QFTpJBR2SH80wJFDKOUvYS0XABdoEM2Quau6UAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Svalbard and Jan Mayen"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABmJLR0QA/wD/AP+gvaeTAAAAkElEQVQoz61TQQ6AIAxrjY+A/z9Of1EPBBhDEBN2YTRrKbAR7yGMg58AAIWJxp0oHIkIAMLURCNU+PSnm4JG0OKSEFldnf4EqRLJtM9rj6f98fUGo4gsTnVgQzTXCUjW/d097p13TiRBUim8VIkW9yK0Lx+JLr8Mz+b5d/jWI7kwcq1XtjYbVsQ8eTY7vwfwAVJKR5+k+S3/AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Swaziland"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACUSURBVDhPrZLRDYAgDEQdwJkcxR39dBSnqUfD1RaK8mGTg+b1eh+ERUQ6ocqRqvUW9QBo28+hsqCnQfsVQNEbQvwyDZ6NeOlDiFyWbjXJcaE51lVVoRVnI84Z9HOIg0FcpBJ/hG5g8pV6wXH3QTSwXuZ6aogCvPisbIchPsj/jZF8QAgx8BLWLttOCxRWc6bWKyLLDUfBAkz0925ZAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Sweden"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAYCAYAAAD6S912AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAABK0lEQVQ4y51VsXGEMBC8Yz57IqcEbsBjj12KaviUAlyBCyB1DTRC8DV8QEqEU9YBkpBAd0i/M8wwd8dqb9FJTDoQvDNloFKIME8jkelonkYfoyeAeRqBuycAEQH3NV5KCjIdBDXY5ZPgnTKqX5qUX7Btewh1sYfXRyNZcAgGviYJQaYj/oxUf328vyXJNFJW2lXJpNYv7sProyFLCldQ3/pNza+JLPl7HaN81HJ968WCU5guaruKVu9bJz+rXW3bIOVpLkIfOWOGi8RVwrQ4bzyWwfq1iwcxnI5fiJx4SiEOCp78255wGdYnpUSLu9xFWnAZiJg59lCJS6dwsuXlu1037c+JHX178JDt5i6HHYpKSZaSiXcKF5FudaxdUpzV/jb7XHI1IuMs8PgHCP/hhmYDffoAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 24px !important;
+    padding-right: 20px
+}
+img[title="Switzerland"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAbCAYAAACTHcTmAAAABmJLR0QAWQAwAADoK/NVAAAACXBIWXMAAAsTAAALEwEAmpwYAAABVElEQVRIx7WUO1LDMBCGV5pcIS2oJhSZXCCdawo1dKLnAtzDPepofAJ3uUCGglAL2hxiKYwUWd6VNjOwMx7Z8u7nffwWgMwwW7HlrCXAx+202t6B7R20wFqYKdjewbA+wLA+NMFi6PDswZ73YM97Ebha+jiVj+Oln2h7V+2tagBJ6xqxqgXcOZc2j96XYJKhCdkky4Hl87iUXGpJhGIIQaTDnXPQzTPFEALECwBQZUB4eTDJ8+mdzvboPbxu6Q++TTFK5V8zxsycRqanXQGLSQEAGGNmTcai6YthEYNSxDyUEuj0zyTFKkISWxX/aXPDvtycvtl4xWVXAxbgBUdx2WUBgIjZFC4hhW96seIyKEGImNZ8n6pIS3tYs984vPo8vcZIaCw1XrFkbr+0FasnJoDbF00/t7uPr3T/eX/b1KyuaE9klL+mMpeCpeIX/Vkc7F8PlB9Rc6ngqqHKqAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 27px !important;
+    padding-right: 21px
+}
+img[title="Syria"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAI5JREFUOE+tjoENgDAIBLuCS3QLF3NIV0IoUIFStYmfvNDL87EAwGAUfVLHLHkEiM6tTp0V3QuubwVqzboSe6wBy2acdlfCL56qjxyHCdidpO8ZJ9GO/rmEJJB97MxwWm4lzEOVFliljEp4Fqi1Llt+oH1byWqR3vSS1SJb4Eo6eCiLx/0mggYlnDlmAaBcFr8Ya24aRREAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Taiwan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAXCAYAAADpwXTaAAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsTAAALEwEAmpwYAAABBElEQVQ4y62V4YnDMAxGn8yNcAsUAt2lC9wOd9sUfDt0Ae9yNNAFMkO++5E2OK3sOKECY+JEL9InRYE2U8tDoQU0bADWI7ocxOWgYYJVgbYCAmD4us2HnxU/WwM9rAUYWkBkIICShh9VxV6jeYCaNdtSNSul6VZLf8vdebHyNOU5u55P9+y4zMZ4U0MCZju1crV7ao1ISuJ8FikJiEBkhOIqSpKSdL1K0rSnJEHUCPPKRM+vF9UURPoeum466Droe7/D86jGTKJFmjkgB+NAak2nSR9I6XsGnU6/d8hPyxyzF5hnW2HcBd1sodQaYR+o+KGLFZEdkK0PxwI0VCaO7fwjuX7/hX99HHj98HYAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 23px !important;
+    padding-right: 19px
+}
+img[title="Tajikistan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIxJREFUOE+djlEOwCAIQz3tLrrfHWh/jKowBDRzTarYlBcLEQWzcKT2XTgGHF0LZ6B36IVs0Vu6A8QuS8FmsxxzgPRQ9THnyxTsDMl7lkOY2WvIfeY/EWFmx4IYAgTyuahnY2gFgHimCmk3D8cPtw/Us0F2QX1HIdsgAxggGqxgbll3fFBDASX2XSIqDx/5Db/DxA95AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Tanzania"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACQSURBVDhPjY4BEoQgDAP5/4P4jI+phBJsS606s5zEZOeaiByMB0dK7IIzQLkXJKLnBeMvAVldJ3HjVXBZzA2nRMP9lPlCryy+lOXKc/ttMI5CQuwz7xD03cFFQ2OuwZhoVo8pnx07thL9d34IyiFBDz9R8msM2McrDifKBhEjcJIdVLIw3psYzJCihNgVkXYD7sT3XAy4GFkAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Thailand"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAI5JREFUOE+tkt0NgDAIhDuIvnUf9x/CGZCfokBp2iaSHJKP49IHCwB0wqKWKnpJPUB0H3WoLOgbcJwFqNTrQhrgUoNlVBlvM3ecZWENVIscPzjU82LpUkt3I6471M8hBjrjAvdwVxwir/PPXa12x51DdoPMjYQIE5j9XFE2wIW8YBJkj9+bCBgiHil6AaA8s/Mo7W9JhloAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Togo"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACZSURBVDhPlZABDsAgCAP95J6xF/sYBkwYFGYiSVUqvS0OIirikqUVzoqqwdYEjfv6xH3J+EGGV2gLWaAIc0AMSaV+viEPc2+e5nXhLYW4Yr+GvQzkEDnEMNYOYqAEQZB5HQTep0LiLoqPqTLAH6RTCqHknj+oIJ4+luYkb5BTkGcMEkHtL6MCIEHc2MEg7Bk01DRQI5wlovEAn2IJo872NjIAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Tokelau"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACCSURBVDhPrZBRDoAgDEN3Gu9/FS8ksuJg1E0x8SX9oLQlKgnlQUsU2UqulyEElKh87ALhfGW15MElBkZgGgn9du5007PiV4Fp2aNnfELg+07V3yPDhOxn2lDXPU9mlS+zOGsjSjejIisaUJphlyuyDgEzepllWS1ltMCH1zN8gUWInKXWeDqu4MywAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Tonga"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACPSURBVDhPrY4BDoAgDAP9/xd9zNwGHd1YoiQ2KcHSXrxEZLPKjta1a96DUUy6NYM70LrMAsoshpjRVS3IDFwosnhoZpjKT72vh+rRylD0A4JCHcMmdCD7xrvdAwLxGPoFQuUEoDwPOvGo2iHacVBXePP8AT8dcgrCJiCnIAYkSASz8GUcmxp4SIPq2hWR6wHy9iAhcCnz0wAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Trinidad and Tobago"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJBJREFUOE+djIsRgDAIQ7uCS7j/JK6E/NJSip6Wu1cxJGlEtMAjT0n2CqvA0nWcj1RFY+EVyFQFIPhGCYI4gioYddk1Zlk7uNjno84fF3ZKcGPeS+IXkzPMEII4gSAo/LMIclCm8undvHtFrunLu5miAZhrLQr/+v4uAiLrCUsXWKqKhBzumSyo6OaK7CWidgOgyPTLl111yQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Tunisia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAVCAYAAACg/AXsAAAABGdBTUEAALGPC/xhBQAAARhJREFUOE+Nk2tOw0AMhPMCBMqPCFS1PH4igcT9T9MDbG9hPO7O4uyLWpp6M/Z8StN0EJGdtPCxU76T6++QBXtiJmXTIQ7Rzx01IRhwiF4LU+M42p5XgrDfAslBFlyWxcz/ACYFzPNs+5QF3UU96NWDoEPVoFeErOtqOcumQ77ckkLOPcgtwkOt3gmGYXgx+QA97wMS5oOEpw+7LiDRTNXycSc7CBdbEN9Z0zRJeHyXy9uPzVR9SM23rwTI8buEMED5omeAUXcfXuVy+KK/h0CovLNsB5D7k4TnzytE/QLEZV/eN8jdUbZtg6XpCPEgFq8LTyH4v/FdMYgdGiBfnOG54BfSumZ5SEYG8+KsyOSGmXG5pnxXRIZfpNf4AGZBNh4AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 21px !important;
+    padding-right: 17px
+}
+img[title="Turkey"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAUCAYAAABvVQZ0AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC41ZYUyZQAAAMJJREFUOE+djYERxSAMQjtM91+ow/hNFKWRWO9zh1VIXq9SytZVdrhjFy1D2AHkL6AO++LOcce8Bm2wPM+0kgLOS70CFJWBaWfCFCQDQNwD6CAulE564ziMtVsyZb2EmXqxNaAA93wWY/D+NmZNtNsC+8ZBdBDnPDu69p0DKCG8Vc4/9qjl658gdFlOnZ/1/h/MtIWhhE/zAYtAFi9xhzdAZj/8Uq8ZMIpBEuaPA2AGMo/LKwxQtoLASwBjSTnONpfrByWL3hxt/F/+AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 19px
+}
+img[title="Turkmenistan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKVJREFUOE+tkdENgzAMRBmHj/4zAauwU5dgEEZgGeMLucRx3JJKtXTIXO6eIphEpJMOHqF8FuoNtY5llXnfkjDcoQhUF10JIATDst2Z1akQGDhEmQF6vmh97B0km2X4HvkNhMYnyDefZ6o/Q379JsZvIRj+nRElyH27G4Qy5cOR0Et9QiCUz/drCMJOgXjQE8QCGkgxciAqQ7ZcOt5IZgZF8lkRmS7Eyg57iOQLqwAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Turks and Caicos Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADRSURBVDhPjZC9DcIwEIWvArEEoqShoWeHiJIOiY4hEAPQMEAqfmagpqRlASaIhGjDwTvrrItjW37SJ/l+3nMcSogzFIlHVHE1P/F7feb2yVIrmLu1uGQB5s/hIubN/tsJCIJ6YfyYDASclWa7FLheMB933N6Jb6uxYMK8fIAVah9Sv7Ih/v04W6HGMsygGc78OXiaa+DGWIj8n7+JrlNPMiRoCp2+Cen0YyE57BcoGgL1hiXA5+xO0ogtplAPzFbFQboLU0rJMJ1hqUTWEBKI6AcoFi7Sfxug9wAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Tuvalu"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACcSURBVDhPnY/RDYAgEEOZzxUczBX8dRFHEuldeqnIGeJLmsDRFigJ9UNT1AvmZa9k3Y4Qzt02xg0tjBKANaQlUvQqi5ttTUmJzruywL/QpGBvRYN5PaPUeLxC4dlo3r/GDxLzdIkZKR+62h6I2YQ9vvMoYesfsQQMDSrerGvkPO7YgKZMWsQMwkpapGGIXoQy0jKewTSDBnp1lHIDaiaM+TN5eYkAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="U.S. Virgin Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAK9JREFUOE+NT4ENwzAIyzF9aY/tmD7TYxgmGEhD1Vly4rjGY0NENipwtLxnwd2YwUd0RSlUvhUQJZsldZiB6gGd79pO1fNDDQB/+nqVQNUA308+AK18Kbn6v0ZAK/cAadASYPMd7ulxueG3DWKD4xOkR8QM5uedRQEdOP1X7S4FAPKYg8wSHxjfDC8ljmWD6dtp3Iq4fmFXYE+KMDwQG6FAwfXrMLk8wmRRw3tWRMYPAhh+giw6pj4AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Uganda"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAmUlEQVQoz62TsQ7DIAxEeYg5S1dG/v+LOnZl4QeuQ0AFEodG7UlezuZ8sg2S3AzgSFZIYub8HQErT3OyenzlKjQBlaq6dUWl63bCA5JEGGxtzvUzApyKzQ+uckzKMWl3+EHLWXzLefcnyIqG1tGKsOoA7PMAu0bSsJ07qAPHn63wWwHz2HJMS4HH6zkcG/PfuRKbHx+c/PIB3yczjPKqLS9uAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Ukraine"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAXCAYAAADpwXTaAAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsTAAALEwEAmpwYAAABSUlEQVQ4y62VvU7DMBSFP0dBMLSCCYlnQH2IDJU6slesTOwsHVnY+waIGUakPgWqEBtL1wxQ2qhNolyG/NRxYuJIHMmDz/U9PravbUUTYvQVjlCmyEojvoBRd16DlFWR7IKRRcfXXYQtiUEL9/Z8Q5JmAHx8hlzfvQigfNNV0JKoI0kzkjRjG8WsN/tarHIWFkKPD1ecDY65OB9WyQBHvleJAKw3e+IiVsKz7cs2iqtmwnQ0n00AxCv3KziQxGnWSHCB1VmXoLlEq1i0S5wEy3F6fchSq535bMLp8MR5ad8/O27vX6tak2Ve/aLdhL6tfgNKl0wXOfM0PkxfcjY+51Tzkk8XAogOF948AKk56IM8Tzz+EbUnSN61wKUWcOR92yz6QBe+7QTkr8FWkdyt8iyBvkLW51e6ltMipLo+C6uoKeL68wju+80vl3W+XGU8mT0AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 23px !important;
+    padding-right: 19px
+}
+img[title="United Arab Emirates"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAARCAYAAAAyhueAAAAABGdBTUEAALGPC/xhBQAAAK9JREFUOE+1jusNAjEMg28QfiHGYVkGY4YQt/XVuT6glbD0nfNorDvMbIgLny7Xt0p3CMrhULPgduCjb4GUvI0ZoSmPdgg5Z5EX29LgJhS+Cu9gqcx9XbxvjwRqcn89T3pz1LxPlusYyp7Sveo6L+4mA/1Llb5Raa9vnNr8NZTBRDWb051+KFjRMBTshPJW6hgKGKqzX5Cc2tDBSijv6E4cUmU5RcU+7bK3B7uY2fEB0HRBJpRu5tsAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 17px !important;
+    padding-right: 21px
+}
+img[title="United Kingdom"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAUCAYAAABroNZJAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xMkMEa+wAAADVSURBVDhPzZDdEcIwDIM7ADvwyJYMxACdg42M5b/IOdoj8ILu1NSO/DXNJiJlFR4fuc21IgL7/qjwkdtcKyLwE4SHz0DY47k/gvDGCqTtB2k0Fm3zdCTfuN7L0PNys5X7DIAL4GEtd7LWBYnBkfWeLf7uJ/BBktYYiHAp8wWpxjeQABmktABJFQRB+09A2HEnCUpnj/pBjaFZCJ7JIFgTYPeisi/QOzTv5X1gawDiRBzKGpp7doKC+C9o7c0MH0HMBIDtwWYY1CDTcLoV1UzQG89ZEdleQHLnWQC83rMAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 20px !important;
+    padding-right: 17px
+}
+img[title="United States Minor Outlying Islands"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAWCAYAAADafVyIAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABBklEQVRIx7VUMRLCIBDcc1LF1kdYRl9gCn2LT/ItWsTSSlNaW9ua9iwiDFwghwZ3JjPAhV3uWI4wDkYa6OsAAD4msu9GuEgj33KfxInImxuY9ZgITTl5SiaFtsk9cSgLsxaDKkAhAmdNy7ZQ0sVTIVgoQhSzpiS+ivk6IiQ5pQA/4xuDiPxPUQHkgeWdDULLff+5qh/XMLMdp8TkJbMkljjPV2qsKSvUXcsmC9WmzGytunndPJsGY8LG5NVeZnA/eKVrHhc7rbvWjpuy8rY5MSvFofpNuuWemggAyxPkQt21ARdlBv2jPG6ZCs1+uV4ch9wwpfZDwzpt4teSidZOo900Rx8CgDdNpWKFhAATpQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 22px !important;
+    padding-right: 24px
+}
+img[title="United States of 'Murica"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAWCAYAAADafVyIAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABBklEQVRIx7VUMRLCIBDcc1LF1kdYRl9gCn2LT/ItWsTSSlNaW9ua9iwiDFwghwZ3JjPAhV3uWI4wDkYa6OsAAD4msu9GuEgj33KfxInImxuY9ZgITTl5SiaFtsk9cSgLsxaDKkAhAmdNy7ZQ0sVTIVgoQhSzpiS+ivk6IiQ5pQA/4xuDiPxPUQHkgeWdDULLff+5qh/XMLMdp8TkJbMkljjPV2qsKSvUXcsmC9WmzGytunndPJsGY8LG5NVeZnA/eKVrHhc7rbvWjpuy8rY5MSvFofpNuuWemggAyxPkQt21ARdlBv2jPG6ZCs1+uV4ch9wwpfZDwzpt4teSidZOo900Rx8CgDdNpWKFhAATpQAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 22px !important;
+    padding-right: 24px
+}
+img[title="Uruguay"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJ1JREFUOE+djt0NwzAIhD1CnjpLB80Qfe4m2acSMTkdBoylpCedf87wmSYik7t0KZ1r1XOAQlN7f6IL0Dj0Ywas5GoHRIPvvmk47X4Cc5rKICpt/B0vA1B8p3g3CAMC6DBJAUkTjoKnk6gChI15Tz/CzKpJ/tEFwZ7od40BrhUQBLflegBBhrD8MdsBAsQCPC7lm+lwsbDHK+daEWkn9HFvn5PHkWgAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Uzbekistan"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAJhJREFUOE+djtENgCAMRFnBBfx0CDd1ENdwpdoWr5QCUWzyoDnuLiQiauCRo0v0Cq0g5uPkNY/sFZ2iskjYFTRhz+MVm1AKggGaOjs6NM3rgYcs2nzU+eLlWjblEW3wNtLxxhRDz+xvTMwwrQH4edHL1/6gJbks0Xru00hO8yiZLULGSmaLfEFVYsJLkQ9bJgoqsjwieoko3c92G30UC9cIAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Vanuatu"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACTSURBVDhPlY4BDoAwCAP9pM/wM35vj0E6KWOMzEhyyrq22SEiCzr4lGQvWAWV2oaqaCxmqIIZeqcSF9swgCoYdexLiYk+OAezT9L1x4O9Ig7OuxLeKW/BddVmEifqxihhEYFOPvT5Ip65f/K+bha94D73wIt8LvlT0P0syUVlKGI+z3JxYVeUwp7JQhdZVJC9InI8ZxjZQUcYrb4AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Vatican"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAATCAYAAACk9eypAAAABGdBTUEAALGPC/xhBQAAAMFJREFUOE+NUsERwjAMy7w8WIHOwDCdpQ92MZYiO05KAd0plmOpzaVtZjbRYU8R+jSfGm93bB2d0GtoCJd4apiD65v6Us1ABKRr6GwGagAoIQamIbAGAO9HQBt2KzoC2JPOwLZtHPBoQAlwz2fwzIGK+gYhA64ZStMF6anX+g+nQDxFA6L2qlxdXxuB0nuBGGckoNc+qrMHfh0JUD8CSWBXbS9e6fdrFfir6+vTg4Kl916WAPBo9zSDXLLx9hOHx9obgGI1NPcWwOgAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 19px !important;
+    padding-right: 12px
+}
+img[title="Venezuela"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATCAYAAACdkl3yAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADKSURBVDhPnZDRDcMwCEQzREfoXyfpUF2ic1XqAB2GAuYQxtSxa+kRcnCnOAcRTeEjZWDYywKA4VNwZzAXdD+aVbBhFSBwUaR/GupZDRC4DH0XdBYAuAy9B0mRFyxU4AoCC0rUuiAhG23hFL1V/D//IH4PQhi9Gt2iab907asgG/hZ1LVyz8L10SgMU91mS0HxiZM9Q5AvASzDYOhe1JsvDTZQH4Jaf9D7ctvGPkKrB+2GwdMF7YbFEPWiicwCc4B7sgBgqMi7RHR8Ae3br6Vvf9WkAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 19px !important;
+    padding-right: 18px
+}
+img[title="Vietnam"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAASCAYAAAC9+TVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAClSURBVDhPtY/rDYMwDIQZhpW6apdhGNfnco57MQV+UOlTkntVLGb2F//50XukFUkMvF+4+LPPgF50mQMktS4/CVJWuqFx8evZAMlsHblaVjiUAzjvUnpfYVvvw25+zmQU7cjDmZ+jYQaqp2/RZ6Pif9Tq5NkRFI/QbIzAuTqkGfRghBtrJ0PqsRN9pnSolutdB8BIUMjAKHFIy+TnkeIe7tCsmS0fW9ukHrM+1q4AAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 18px !important;
+    padding-right: 17px
+}
+img[title="Wallis and Futuna"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKpJREFUOE+tkL0RwlAMgzMIJXukZTkKJqBgnaxBSUtrLCcyyvtLE93pPUWxv8tlMrPKLhxNl7NwXayDoc/lGv7eH5lboH/wqACoBSFIYQmYb0uYA7BCWj1yBdnKFBcOer886Feo8DyC8J37JMjz9U5vZRj/gtaegB1Ey55V2gfEu0MQF8sbe644AzICUZq5ExHH2vVBkN4KgBOSxQAE6TK9e8jS657LWTObfgCfK/k8abL0AAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Western Sahara"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAIxJREFUOE+Vj1ESgCAIRL1C352li3W+7kWAYoCQujOruLO8qQIAg1F0hPZd8hi4pcjDTh9cccUGQsFznKaw6hCiJcVJjhcOBMggWS6iGf0P0bdIv2lGfxABiekt0rlWyyzEK8tFDKl3+/f72nP9Kj4Zwo6KmdtOh2yDFMBAejADqeW+4wMOCZTYdwGgvFnT8hmVySPrAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Yemen"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAHxJREFUOE+tjFEOgDAIQ3cQP73/zXYGpDiQwZbpYpO6+lJaiCiZhc/QsQtnwKge59SjoSdwXA2otduN+GMteDbjyGmkQdNLzo8r+Azp/4xDyOyfR6AGuyK04D38Khm5372hdidfGdm1jewO2a0GA6E4crqJQGA48o5dIioX8SE1mOvJq7EAAAAASUVORK5CYII=)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Zambia"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACGSURBVDhPrY+BDYAgDAQZxvVchvUcpraUllCeBhNNTsjn/6KFiBb4kRckdoU1kHJNAKJxkXEioHtg3UkyjXthynY531eJhv4c5nxY8FESfq0Xf5P0gbPLmVyy4bkUKNGv02IGkrRT9i4RwNiIEsMlJyIk8a1dPLASkMSxb2LQQhMBYpeIyguk4cvl2eRMgAAAAABJRU5ErkJggg==)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
+img[title="Zimbabwe"]{
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAYAAADJ7fe0AAAABGdBTUEAALGPC/xhBQAAAKdJREFUOE+NUsERwzAIyzPPjtAVsmpH6wBZhYKMMOdAUt3JxkLoyF02EblQYUfJ1Wu8Ciodn71lFTQLLWH4PjO8OcQFgAZoxWDWUa8hvAl7n+/Xk64XDTM5YO+7EPaUQ+hCyIysO+cmDCIN+X3DYcY26TZYj2t3RMjw+jYJ/wbAOvxjLQK1f17HNIMTpIhGMZQZPs6yCMEN3S+fh2NmFSC6ueLqFZHtB2n8GvkMRVfYAAAAAElFTkSuQmCC)!important;
+    background-repeat: no-repeat !important;
+    width: 0px !important;
+    height: 14px !important;
+    padding-right: 17px
+}
