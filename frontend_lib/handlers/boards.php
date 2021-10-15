@@ -201,7 +201,7 @@ function getBoardsHandler() {
   $content = str_replace('{{boards}}', $boards_html, $content);
   // FIXME get named route
   global $BASE_HREF;
-  $content = str_replace('{{action}}', $BASE_HREF . 'boards', $content);
+  $content = str_replace('{{action}}', $BASE_HREF . 'boards.php', $content);
 
   wrapContent($content, array('settings' => $settings));
 }
@@ -316,6 +316,129 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer'], $wrapOptions);
 }
 
+// /:uri
+function getBoardFileRedirect($request) {
+  $boardUri = $request['params']['uri'];
+  if ($boardUri) {
+    $boardUri .= '/';
+  }
+  // FIXME: only redir if the board exists...
+  global $BASE_HREF;
+  redirectTo($BASE_HREF . $boardUri);
+  //echo "Would redirect to [$boardUri]\n";
+}
+
+function getBoardThreadListingHandler($request) {
+  $boardUri = $request['params']['uri'];
+  getBoardThreadListing($boardUri);
+}
+
+function getBoardThreadListingPageHandler($request) {
+  $boardUri = $request['params']['uri'];
+  $page = $request['params']['page'] ? $request['params']['page'] : 1;
+  getBoardThreadListing($boardUri, $page);
+}
+
+function getBoardCatalogHandler($request) {
+  $boardUri = $request['params']['uri'];
+  renderBoardCatalog($boardUri);
+}
+
+function getBoardSettingsHandler($request) {
+  $boardUri = $request['params']['uri'];
+  getBoardSettings($boardUri);
+}
+
+function getThreadHandler($request) {
+  $boardUri = $request['params']['uri'];
+  $threadNum = str_replace('.html', '', $request['params']['num']);
+  getThread($boardUri, $threadNum);
+}
+
+function makePostHandler($request) {
+  global $pipelines, $max_length;
+  $boardUri = $request['params']['uri'];
+
+  //echo '<pre>_POST: ', print_r($_POST, 1), "</pre>\n";
+  //echo "max_length[$max_length]<br>\n";
+  //echo '<pre>_SERVER: ', print_r($_SERVER, 1), "</pre>\n";
+  //echo '<pre>_FILES: ', print_r($_FILES, 1), "</pre>\n";
+
+  $res = processFiles();
+  //echo '<pre>res: ', print_r($res, 1), "</pre>\n";
+  $files = isset($res['handles']['files']) ? $res['handles']['files'] : array();
+  //echo '<pre>files: ', print_r($files, 1), "</pre>\n";
+
+  $endpoint = 'lynx/newThread';
+  global $BASE_HREF;
+  $redir = $BASE_HREF . $boardUri . '/';
+  $headers = array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session'));
+  $row = array(
+    // noFlag
+    'name'     => getOptionalPostField('name'),
+    'email'    => getOptionalPostField('email'),
+    'message'  => getOptionalPostField('message'),
+    'subject'  => getOptionalPostField('subject'),
+    'boardUri' => $boardUri,
+    'password' => getOptionalPostField('postpassword'),
+    // captcha
+    'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
+    'files'    => json_encode($files),
+    // flag
+  );
+  if (!empty($_POST['thread'])) {
+    $row['threadId'] = $_POST['thread'];
+    $endpoint = 'lynx/replyThread';
+    $redir .= 'thread/' . $_POST['thread'];
+  }
+  $io = array(
+    'boardUri' => $boardUri,
+    'endpoint' => $endpoint,
+    'headers'  => $headers,
+    'values'   => $row,
+    'redir'    => $redir,
+    'error'    => false,
+    'redirNow' => false,
+  );
+  // validate results
+  $pipelines[PIPELINE_POST_VALIDATION]->execute($io);
+  //print_r($io);
+  $row     = $io['values'];
+  $headers = $io['headers'];
+  $redir   = $io['redir'];
+  if (!empty($io['error'])) {
+    echo "error";
+    //print_r($io);
+    wrapContent($io['error']);
+    return;
+  }
+  if (!empty($io['redirNow'])) {
+    echo "redirNow";
+    redirectTo($io['redirNow']);
+    return;
+  }
+
+  // make post...
+  $json = curlHelper(BACKEND_BASE_URL . $endpoint, $row, $headers);
+  // can't use this because we need better handling of results...
+  //$result = expectJson($json, $endpoint)
+  //echo "json[$json]<br>\n";
+  $result = json_decode($json, true);
+  if ($result === false) {
+    wrapContent('Post Error: <pre>' . $json . '</pre>');
+  } else {
+    //echo "<pre>", $endpoint, print_r($result, 1), "</pre>\n";
+    //echo "redir[$redir]<br>\n";
+    //return;
+    if ($result && is_array($result) && isset($result['data']) && is_numeric($result['data'])) {
+      // success
+      redirectTo($redir);
+    } else {
+      wrapContent('Post Error: ' . print_r($result, 1));
+    }
+  }
+}
+
 // /:uri/
 function getBoardThreadListing($boardUri, $pagenum = 1) {
   //echo "pagenum[$pagenum]<br>\n";
@@ -329,7 +452,7 @@ function getBoardThreadListing($boardUri, $pagenum = 1) {
   getBoardThreadListingRender($boardUri, $boardThreads, $pagenum);
 }
 
-function getThreadHandler($boardUri, $threadNum) {
+function getThread($boardUri, $threadNum) {
   $threadNum = (int)$threadNum;
   $templates = loadTemplates('thread_details');
   $tmpl = $templates['header'];
@@ -395,7 +518,7 @@ function getThreadHandler($boardUri, $threadNum) {
   wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer']);
 }
 
-function getBoardCatalogHandler($boardUri) {
+function renderBoardCatalog($boardUri) {
   $data = getBoardCatalog($boardUri);
   $catalog = $data['pages'];
   $boardData = $data['board'];
@@ -510,7 +633,7 @@ function getBoardCatalogHandler($boardUri) {
   wrapContent($boardHeader . $tmpl);
 }
 
-function getBoardSettingsHandler($boardUri) {
+function getBoardSettings($boardUri) {
   global $pipelines;
   $templates = loadTemplates('board_settings');
   $tmpl = $templates['header'];
