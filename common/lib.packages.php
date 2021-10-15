@@ -29,6 +29,7 @@ class backend_resource {
 class package {
   var $ver;
   var $resources;
+
   function __construct($name, $ver, $dir) {
     $this->ver = $ver;
     $this->name = $name;
@@ -40,6 +41,7 @@ class package {
     $this->backend_packages = array();
     $this->common = array(); // optional common data
   }
+
   // should we make a frontend_package/backend_package
   // no because they're optional and could have more than one
   // FIXME: rename this... they'll be in a fe/be context and we need to emphasize the pkg part
@@ -73,10 +75,13 @@ class package {
     $label = strtolower($label); // must be lowercase since it's a filename
     if (!isset($rsrcArr['handlerFile'])) {
       $rsrcArr['handlerFile'] = $this->dir . 'be/handlers/'. $label . '.php';
-      // is this only an issue if used (fe/be)?
-      if (!file_exists($rsrcArr['handlerFile'])) {
-        echo "Failed to setup [", $rsrcArr['handlerFile'], "]<br>\n";
-      }
+    }
+    // is this only an issue if used (fe/be)?
+    if (!file_exists($rsrcArr['handlerFile'])) {
+      echo "Failed to setup resource[$label] file[", $rsrcArr['handlerFile'], "] is missing or unaccessible<br>\n";
+    }
+    if ($rsrcArr['endpoint'][0] === '/') {
+      echo "Resource[$label]'s endpoint should NOT start with a slash<br>\n";
     }
     //echo "Adding [$label] to [", $this->name, "]<br>\n";
     $this->resources[$label] = $rsrcArr;
@@ -250,6 +255,7 @@ class package {
 
     // install routes
     foreach($this->resources as $label => $rsrc) {
+      // will always be missed the first /
       $endpoint = $rsrc['endpoint'];
       // figure out which router
       $router = 'opt';
@@ -276,7 +282,8 @@ class package {
     }
   }
   // hotpath
-  function buildFrontendRoutes(&$router, $method) {
+  // if router is omitted, we only set up modules/pipelines
+  function frontendPrepare($router = false, $method = 'GET') {
     //echo "buildFrontendRoutes<br>\n";
     // activate frontend hooks
     if (file_exists($this->dir . 'fe/data.php')) {
@@ -285,22 +292,31 @@ class package {
       if (empty($fePkgs) || !is_array($fePkgs)) {
         return;
       }
-     // echo "Has pkg data\n";
-      // package name is optinal
+      // echo "Has pkg data\n";
+      // package name is optional?
       foreach($fePkgs as $pName => $pData) {
         $fePkg = $this->makeFrontend();
-        if (isset($pData['handlers']) && is_array($pData['handlers'])) {
-          foreach($pData['handlers'] as $h) {
-            // FIXME: skip adding the methods we don't need...
-            //$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
-            $fePkg->addHandler(empty($h['method']) ? 'GET' : $h['method'], $h['route'], $h['handler'], array(
-            'cacheSettings' => empty($h['cacheSettings']) ? false : $h['cacheSettings']));
+        $fePkg->name = $pName;
+        if ($router) {
+          if (isset($pData['handlers']) && is_array($pData['handlers'])) {
+            foreach($pData['handlers'] as $h) {
+              // FIXME: skip adding the methods we don't need...
+              //$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
+              $m = empty($h['method']) ? 'GET' : $h['method'];
+              //echo $m, '_', $h['route'], ' ', print_r($h, 1), "\n";
+              $options = array(
+                'cacheSettings' => empty($h['cacheSettings']) ? false : $h['cacheSettings'],
+                'loggedIn' => empty($h['loggedIn']) ? false : $h['loggedIn'],
+              );
+              //echo $m, '_', $h['route'], ' ', print_r($options, 1), "\n";
+              $fePkg->addHandler($m, $h['route'], $h['handler'], $options);
+            }
           }
-        }
-        if (isset($pData['forms']) && is_array($pData['forms'])) {
-          foreach($pData['forms'] as $f) {
-            // FIXME: skip adding the methods we don't need...
-            $fePkg->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
+          if (isset($pData['forms']) && is_array($pData['forms'])) {
+            foreach($pData['forms'] as $f) {
+              // FIXME: skip adding the methods we don't need...
+              $fePkg->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
+            }
           }
         }
         if (isset($pData['modules']) && is_array($pData['modules'])) {
@@ -335,9 +351,11 @@ class package {
     }
     */
 
-    // build all frontend routes
-    foreach($this->frontend_packages as $fe_pkg) {
-      $fe_pkg->buildRoutes($router, $method);
+    if ($router) {
+      // build all frontend routes
+      foreach($this->frontend_packages as $fe_pkg) {
+        $fe_pkg->buildRoutes($router, $method);
+      }
     }
   }
   function registerFrontendPackage($fe_pkg) {
@@ -445,6 +463,7 @@ class frontend_package {
     if (!isset($this->handlers[$method])) {
       $this->handlers[$method] = array();
     }
+    //echo "[$method][$cond]=>opts[", print_r($options, 1), "]\n";
     $this->handlers[$method][$cond] = array(
       'file' => $file,
       'options' => $options,
@@ -452,10 +471,11 @@ class frontend_package {
   }
   function addForm($cond, $file, $options = false) {
     if (!isset($options['get_options'])) $options['get_options'] = array();
+    //else echo "addForm - [", print_r($options['get_options'], 1), "]\n";
     $options['get_options']['form'] = true;
     if (!isset($options['post_options'])) $options['post_options'] = false;
-    $this->addHandler('GET', $cond, 'form_'.$file.'_get', $options['get_options']);
-    $this->addHandler('POST', $cond, 'form_'.$file.'_post', $options['post_options']);
+    $this->addHandler('GET', $cond . '.html', 'form_'.$file.'_get', $options['get_options']);
+    $this->addHandler('POST', $cond . '.php', 'form_'.$file.'_post', $options['post_options']);
   }
   function addModule($pipeline_name, $file = false) {
     $bsn = new pipeline_module($this->pkg->name. '_' . $pipeline_name);
@@ -485,7 +505,7 @@ class frontend_package {
           $ref->shared = include $module_path . 'shared.php';
         } else {
           if (file_exists($module_path . 'shared.php')) {
-            echo "lulwat [$module_path]shared.php<br>\n";
+            echo "perms? [$module_path]shared.php<br>\n";
           }
         }
         if (is_readable($module_path . 'fe/common.php')) {
@@ -493,7 +513,7 @@ class frontend_package {
           $ref->common = include $module_path . 'fe/common.php';
         } else {
           if (file_exists($module_path . 'fe/common.php')) {
-            echo "lulwat [$module_path]fe/common.php<br>\n";
+            echo "perms? [$module_path]fe/common.php<br>\n";
           }
         }
         $ref->ranOnce = true;
@@ -530,7 +550,7 @@ class frontend_package {
   function addPipeline($pipeline) {
     definePipeline($pipeline['name']);
   }
-  function buildRoutes(&$router, $method) {
+  function buildRoutes($router, $method) {
     // do we have any routes in this method
     if (empty($this->handlers[$method])) {
       //echo "no routes for [$method]<Br>\n";
@@ -568,7 +588,11 @@ class frontend_package {
             );
             if (!empty($row['options'])) {
               if (!empty($row['options']['form'])) {
-                $res['action'] = $request['originalPath'];
+                if (strpos($request['originalPath'], '.html') !== false) {
+                  $res['action'] = str_replace('.html', '.php', $request['originalPath']);
+                } else {
+                  $res['action'] = $request['originalPath'];
+                }
               }
             }
             return $res;
@@ -576,11 +600,18 @@ class frontend_package {
           $intFunc = include $path;
         };
       }
+      /*
       $cacheSettings = false;
       if (!empty($row['options']['cacheSettings'])) {
         $cacheSettings = $row['options']['cacheSettings'];
       }
-      $router->addMethodRoute($method, $cond, $func, $cacheSettings);
+      */
+      // module, name?
+      if (!is_array($row['options'])) $row['options'] = array();
+      $row['options']['module'] = $this->pkg->name;
+      //$row['options']['name'] = $this->name;
+      $row['options']['address'] = $row['file'];
+      $router->addMethodRoute($method, $cond, $func, $row['options']);
     }
   }
   function toString() {
