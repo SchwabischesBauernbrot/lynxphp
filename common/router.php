@@ -1,5 +1,8 @@
 <?php
 
+ldr_require('lib.units.php');
+ldr_require('lib.http.response.php');
+
 // route names - they're named by cond tbh (exec can locate it)
 // route lastMod options - can be done in func
 // decode security options into meaningful easy settings
@@ -13,34 +16,6 @@ function make_text_response($text) {
 }
 function responseToText($response) {
   return $response['textResponse'];
-}
-
-// https://stackoverflow.com/a/22500394
-function convertPHPSizeToBytes($sSize) {
-  //
-  $sSuffix = strtoupper(substr($sSize, -1));
-  if (!in_array($sSuffix,array('P','T','G','M','K'))){
-    return (int)$sSize;
-  }
-  $iValue = substr($sSize, 0, -1);
-  switch ($sSuffix) {
-    case 'P':
-      $iValue *= 1024;
-      // Fallthrough intended
-    case 'T':
-      $iValue *= 1024;
-      // Fallthrough intended
-    case 'G':
-      $iValue *= 1024;
-      // Fallthrough intended
-    case 'M':
-      $iValue *= 1024;
-      // Fallthrough intended
-    case 'K':
-      $iValue *= 1024;
-      break;
-  }
-  return (int)$iValue;
 }
 
 class Router {
@@ -58,130 +33,124 @@ class Router {
     $this->defaultContentType = 'text/html';
     $this->max_length = 0;
   }
-  // used for attaching routers
+
+  // FIXME: we need a file version for all
+  // that only import the routes we need on demand
+
+  // used for attaching subrouters
   // usually star(/*) routes
   function all($cond, $func) {
+    //echo "INSTALLING [$cond] in ALL<br>\n";
+    //print_r($this->methods);
     foreach(array_keys($this->methods) as $method) {
+      //echo "INSTALLING [$cond] in [$method]<br>\n";
       $this->methods[$method][$cond] = $func;
     }
   }
-  // only done on the backend...
-  function fromResource($name, $res, $moduleDir) {
-    if (!isset($res['handlerFile'])) {
-      return 'handlerFile is not set';
-    }
-    // endpoint could detect router...
-    $cond = $res['endpoint'];
-    $method = empty($res['method']) ? 'GET' : $res['method'];
-    if ($method === 'AUTO') {
-      if ($res['formData']) {
-        $method = 'POST';
-      } else {
-        $method = 'GET';
-      }
-    }
 
-    $func = function($request) use ($res, $moduleDir) {
-      // get session
-      $user_id = null;
-      if (!empty($res['sendSession'])) {
-        $user_id = getUserID();
-      }
-      if (!empty($res['requireSession'])) {
-        $user_id = loggedIn();
-        if (!$user_id) {
-          return;
-        }
-      }
-      // get ip
-      $ip = null;
-      if (!empty($res['sendIP'])) {
-        $ip = getip();
-      }
 
-      if (is_readable($moduleDir . 'shared.php')) {
-        $shared = include $moduleDir . 'shared.php';
-      }
-      if (is_readable($moduleDir . 'be/common.php')) {
-        $common = include $moduleDir . 'be/common.php';
-      }
-
-      // make pass a callback to handle response
-      $sendResponse = function($request, $response, $next) use ($res) {
-        $respText = responseToText($response);
-        if ($res['unwrapData']) {
-          sendResponse($respText);
-        } else
-        if ($res['expectJson']) {
-          echo json_encode($respText);
-        }
-      };
-      // create a single closure this file API can depend on
-      $get = function() use ($user_id, $ip, $sendResponse) {
-        // request?
-        return array(
-          'sendResponse' => $sendResponse,
-          'userid' => $user_id,
-          'ip' => $ip,
-        );
-      };
-      // we could global $db, $models here too
-      $intFunc = include $res['handlerFile'];
-    };
-
-    if (!empty($res['cacheSettings'])) {
-      $this->routeOptions[$method . '_' . $cond]['cacheSettings'] = $res['cacheSettings'];
-    }
-    // styleSheets, headScripts, title
-    // do we need scripts?
-    // maybe footer scripts?
-    // less sure about this because there's still could a temporal issue?
-    // not really atm...
-    if (!empty($res['styleSheets'])) {
-      $this->routeOptions[$method . '_' . $cond] = $res['styleSheets'];
-    }
-    if (!empty($res['headScripts'])) {
-      $this->routeOptions[$method . '_' . $cond] = $res['headScripts'];
-    }
-    if (!empty($res['title'])) {
-      $this->routeOptions[$method . '_' . $cond] = $res['title'];
-    }
-
-    //echo "Installing [$method][$cond]<br>\n";
-    switch($method) {
-      case 'POST':
-        $this->methods['POST'][$cond] = $func;
-      break;
-      case 'GET':
-      default:
-        $this->methods['GET'][$cond] = $func;
-      break;
-    }
-    return true;
-  }
   // we should know the method if we're using this route
   // and the method should be in the correct case
   // no need for defaults
   // I'd like to standardize around a file
   // but func is just more flexible
   // context can be set up in a func before the include
+  // used by frontend packages
   function addMethodRoute($method, $cond, $func, $options = false) {
     //echo "Installing [$method][$cond]<br>\n";
     $this->methods[$method][$cond] = $func;
-    $this->routeOptions['GET_' . $cond] = $options;
+    //echo "options[", print_r($options, 1), "]\n";
+    $this->routeOptions[$method . '_' . $cond] = $options;
   }
-  // anything use this? no, it's forward looking
-  function getExternal($group, $name, $cond, $file) {
-    $key = $group.'_'.$name;
-    $this->methods['GET'][$cond] = is_array($key, $file);
-  }
+  /*
   function get($cond, $func, $options = false) {
     $this->methods['GET'][$cond] = $func;
+    //echo "Installing GET_[$cond] options[", print_r($options, 1), "]<br>\n";
     $this->routeOptions['GET_' . $cond] = $options;
   }
   function post($cond, $func) {
     $this->methods['POST'][$cond] = $func;
   }
+  */
+
+  // FIXME: routes need unique names...
+
+  // dynamic vs static (captcha/banners)
+  // expiration: backend routes, files
+  //
+  // could be a factory
+  // we could gather all _GET, _POST, params for us...
+  //   no _POST without method being POST
+  //   params are include
+  //   we'd just need to define the querystring
+  // also cleaning off .html or .json can be useful
+  // providing db, models, tpp
+  function import($routes, $module = 'unknown', $dir = 'handlers') {
+    foreach($routes as $group => $groupData) {
+      $adjDir = $dir; // reset
+      if (isset($groupData['dir'])) {
+        $adjDir = $dir . '/' . $groupData['dir'];
+      }
+      // groupData: file, routes
+      foreach($groupData['routes'] as $routeData) {
+        // routeData: func, options, loggedin(, method, route)
+        $method = empty($routeData['method']) ? 'GET' : $routeData['method'];
+        //echo "method[$method][", $routeData['route'], "]<br>\n";
+        if (isset($this->methods[$method][$routeData['route']])) {
+          echo "router::import - Warning, route already defined<br>\n";
+        }
+        $route = $routeData['route'];
+        $this->methods[$method][$route] = function($request) use ($routeData, $groupData, $adjDir) {
+          if (isset($routeData['file'])) {
+            include $adjDir . '/' . $routeData['file'] . '.php';
+            return;
+          }
+          $file = empty($groupData['file']) ? false : $groupData['file'];
+          if ($file && empty($this->included[$file])) {
+            include $adjDir . '/' . $file . '.php';
+            $this->included[$file] = true;
+          }
+          if ($routeData['func']) {
+            $func = $routeData['func'];
+            $func($request);
+          } else {
+            echo "router::import - No function defined<br>\n";
+          }
+        };
+        // promote options from routeData into the router internal structure
+        if (isset($routeData['options'])) {
+          $this->routeOptions[$method . '_' . $routeData['route']] = $routeData['options'];
+        }
+        // trade some cpu for memory
+        if (isset($routeData['route'])) unset($routeData['route']);
+        if (isset($routeData['method'])) unset($routeData['method']);
+        // normalize some options
+        //if (!isset($routeData['options'])) $routeData['options'] = array();
+        //if (!isset($routeData['loggedIn'])) $routeData['loggedIn'] = false;
+
+        $methodRoute = $method . '_' . $route;
+
+        // move loggedIn and cacheSettings into routeOptions?
+        // allow these outside of the options sub
+        if (isset($routeData['cacheSettings'])) {
+          $this->routeOptions[$methodRoute]['cacheSettings'] = $routeData['cacheSettings'];
+          unset($routeData['cacheSettings']);
+        }
+        if (isset($routeData['loggedIn'])) {
+          $this->routeOptions[$methodRoute]['loggedin'] = $routeData['loggedIn'];
+          unset($routeData['loggedIn']);
+        }
+        $this->routeOptions[$methodRoute]['module'] = $module;
+        $this->routeOptions[$methodRoute]['name'] = $group;
+        if (isset($routeData['file'])) {
+          $this->routeOptions[$methodRoute]['address'] = $routeData['file'];
+        } else {
+          $this->routeOptions[$methodRoute]['address'] = $routeData['func'] . '@' . $groupData['file'];
+        }
+      }
+    }
+  }
+
   function debug($method = false) {
     if (!$method) {
       return print_r($this->methods, 1);
@@ -201,44 +170,93 @@ class Router {
   function isTooBig() {
     $this->max_length = min(convertPHPSizeToBytes(ini_get('post_max_size')), convertPHPSizeToBytes(ini_get('upload_max_filesize')));
     // nginx always sets CONTENT_LENGTH, apache only passes when browser sets it
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    $method = getServerField('REQUEST_METHOD', 'GET');
+    if ($method !== 'POST') {
       return false; // not too big
     }
     return $_SERVER['CONTENT_LENGTH'] > $this->max_length;
   }
-  function isCached($key, $routeParams) {
-    if (!isset($this->routeOptions['cacheSettings'][$key])) {
-      //echo "No cacheSettings for [$key]";
-      return true; // render content
-    }
-    //echo "key[$key]<br>\n";
-    //print_r($this->routeOptions['cacheSettings'][$key]);
-    $cacheSettings = $this->routeOptions['cacheSettings'][$key];
-    if (!isset($cacheSettings['databaseTables']) && !isset($cacheSettings['files'])) {
-      //echo "No cacheSettings keys", print_r($cacheSettings);
-      return true; // render content
-    }
+  function getMaxMtime($cacheSettings, $routeParams) {
     $mtime = 0;
     if (isset($cacheSettings['databaseTables'])) {
       global $db;
       $mtime = $db->getLast($cacheSettings['databaseTables']);
+    }
+    if (isset($cacheSettings['backend'])) {
+      $params = array();
+      foreach($routeParams as $k => $v) {
+        $params[':' . $k] = $v;
+      }
+      if (empty($params[':page'])) $params[':page'] = 1;
+      foreach($cacheSettings['backend'] as $be) {
+        //echo "checking[", print_r($be, 1), "] [", print_r($params, 1), "]\n";
+        // interpolate
+        $endpoint = str_replace(array_keys($params), array_values($params), $be['route']);
+        $result = request(array(
+          //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
+          'url' => BACKEND_BASE_URL . $endpoint,
+          'method' => 'HEAD',
+        ));
+        $lines = explode("\r\n", $result);
+        array_shift($lines);
+        $headers = array();
+        foreach($lines as $h) {
+          if (!$h) continue;
+          if (strpos($h, ': ') !== false) {
+            list($k, $v) = explode(': ', $h);
+            $headers[$k] = $v;
+          } else {
+            echo "h[$h] has no :\n";
+          }
+        }
+        if (!isset($headers['last-modified'])) {
+          // if we don't have an anchor no way...
+          echo "No way to cache backend[", $be['route'], "], no cacheSettings\n";
+          return PHP_INT_MAX;
+          continue;
+        }
+        $ts = strtotime($headers['last-modified']);
+        $mtime = max($mtime, $ts);
+      }
     }
     if (isset($cacheSettings['files'])) {
       //echo "in[$mtime]<br>\n";
       //print_r($routeParams);
       foreach($cacheSettings['files'] as $file) {
         foreach($routeParams as $param => $val) {
+          if (is_array($val)) {
+            echo "router::getMaxMitme error - params[$param] val[", print_r($val, 1), "] file[$file]\n";
+          } else {
+           $val = str_replace('.html', '', $val);
+          }
           $file = str_replace('{{route.'. $param . '}}', $val, $file);
         }
         if (file_exists($file)) {
           $mtime = max($mtime, filemtime($file));
         } else {
           if (DEV_MODE) {
-            echo "router:::isCached - file[$file] does not exist<br>\n";
+            echo "router:::getMaxMtime - file[$file] does not exist<br>\n";
           }
         }
       }
       //echo "out[$mtime]<br>\n";
+    }
+    return $mtime;
+  }
+
+  // do we have a cached copy
+  function isUncached($key, $routeParams) {
+    if (!isset($this->routeOptions[$key]['cacheSettings'])) {
+      //echo "No cacheSettings for [$key]";
+      //print_r($this->routeOptions);
+      return true; // render content
+    }
+    //echo "key[$key]<br>\n";
+    //print_r($this->routeOptions['cacheSettings'][$key]);
+    $cacheSettings = $this->routeOptions[$key]['cacheSettings'];
+    if (!isset($cacheSettings['databaseTables']) && !isset($cacheSettings['files'])) {
+      //echo "No cacheSettings keys", print_r($cacheSettings);
+      return true; // render content
     }
     // backend hack
     if (getQueryField('prettyPrint')) {
@@ -249,6 +267,7 @@ class Router {
       // since most endpoints aren't going to be json...
       'contentType' => isset($cacheSettings['contentType']) ? $cacheSettings['contentType'] : $this->defaultContentType,
     );
+    $mtime = $this->getMaxMtime($cacheSettings, $routeParams);
     if (checkCacheHeaders($mtime, $options)) {
       // it's cached!
       // roughly 120ms rn
@@ -257,6 +276,25 @@ class Router {
     }
     return true; // render content
   }
+
+  // call handler func
+  function callHandler($match, $request, $isHead) {
+    $params = $match['params'];
+    // if (not cache) && (not head)
+    // could just pass route
+    if ($this->isUncached($request['method'] . '_' . $match['cond'], $params)) {
+      if ($isHead) {
+        //header('connection: close');
+        return;
+      }
+      // move match into request
+      $request['params'] = $params;
+      $func = $match['func'];
+      $func($request);
+    }
+  }
+
+  // is path supposed to start with /? seems to be yes
   function exec($method, $path, $level = 0) {
     $isHead = false;
     if ($method === 'HEAD') {
@@ -266,10 +304,11 @@ class Router {
     $methods = $this->methods[$method];
     // could strip & but that's non-standard
     $segments = explode('/', $path);
-    //echo "router::exec[$level] - path[$path] segments[", count($segments), "]<br>\n";
+    //echo "router::exec[$level] - method[$method] path[$path] segments[", count($segments), "]<br>\n";
 
     $params = array();
     $request = array(
+      // could pass isHead here and clear it later
       'method' => $method,
       'originalPath' => $path,
       'path' => $path, // * route will truncate off previous router...
@@ -289,7 +328,9 @@ class Router {
     foreach($methods as $cond => $func) {
       //echo "rule[$cond]<br>\n";
       if ($path === $cond) {
-        $func($request);
+        $this->callHandler(array(
+          'cond' => $cond, 'params' => array(), 'func' => $func,
+        ), $request, $isHead);
         return true;
       }
       $csegs = explode('/', $cond);
@@ -297,6 +338,7 @@ class Router {
       //echo "router::exec[$level] - Rule[$cond] condCnt[", count($csegs), "] vs reqeustCnt[", count($segments), "]<br>\n";
       // optimization?
       // no * in route and the depth doesn't match
+      //echo "cond[$cond] slashes[", count($csegs), "] request[", count($segments), "]<br>\n";
       if (strpos($cond, '*') === false && count($csegs) !== count($segments)) {
         //echo "[$level] Skipping rule[$cond]<br>\n";
         continue;
@@ -312,7 +354,7 @@ class Router {
           // auto match the rest
           // could treat $func as a router and exec it here
           if (is_object($func)) {
-            $request['params'] = $params;
+            //$request['params'] = $params;
             $tsegs = array();
             for($j = 0; $j < $i; $j++) {
               $tsegs[] = $segments[$j];
@@ -322,7 +364,8 @@ class Router {
             // even tho we just stripped it
             // since we can't remove / from /*
             $newPath = '/' . substr($path, strlen($usedPath));
-            $request['path'] = $newPath;
+            //$request['path'] = $newPath;
+            //echo "newPath[$newPath]<br>\n";
             $res = $func->exec($request['method'], $newPath, $level + 1);
             return $res;
           }
@@ -330,6 +373,14 @@ class Router {
         } else
         if (strlen($c) && $c[0] === ':') {
           $paramName = substr($c, 1);
+          // ignore extensions
+          $pos = strpos($paramName, '.');
+          if ($pos !== false) {
+            $ext = substr($paramName, $pos);
+            $paramName = substr($paramName, 0, $pos);
+            // remove extension from value too
+            $segments[$i] = str_replace($ext, '', $segments[$i]);
+          }
           //print_r($segments);
           //echo "[$i] Building[$paramName] c[$c] seg[", $segments[$i], "]<br>\n";
           $params[$paramName] = $segments[$i];
@@ -361,13 +412,15 @@ class Router {
     }
     if (count($matches)) {
       //echo "<pre>", print_r($matches, 1), "</pre>\n";
-      if (count($matches) === 1) {
-        $func = $matches[0]['func'];
-        $request['params'] = $matches[0]['params'];
-        // if (not cache) && (not head)
-        if ($this->isCached($method . '_' . $matches[0]['cond'], $matches[0]['params']) && !$isHead) {
-          $func($request);
+      if (0) {
+        echo '<ul>', "\n";
+        foreach($matches as $m) {
+          echo '<li>', $m['cond'], '<pre>', print_r($m['params'], 1), '</pre>', "\n";
         }
+        echo '</ul>', "\n";
+      }
+      if (count($matches) === 1) {
+        $this->callHandler($matches[0], $request, $isHead);
         return true;
       } else {
         $use = false;
@@ -381,18 +434,10 @@ class Router {
           //echo "[$c][", print_r($row, 1), "]=[$score]<br>\n";
         }
         if ($use) {
-          $func = $use['func'];
-          $request['params'] = $use['params'];
-          if ($this->isCached($method . '_' . $use['cond']) && !$isHead) {
-            $func($request);
-          }
+          $this->callHandler($use, $request, $isHead);
         } else {
           // not sure, just use first
-          $func = $matches[0]['func'];
-          $request['params'] = $matches[0]['params'];
-          if ($this->isCached($method . '_' . $matches[0]['cond']) && !$isHead) {
-            $func($request);
-          }
+          $this->callHandler($matches[0], $request, $isHead);
         }
         return true;
       }
@@ -401,7 +446,5 @@ class Router {
     return false;
   }
 }
-
-return new Router;
 
 ?>
