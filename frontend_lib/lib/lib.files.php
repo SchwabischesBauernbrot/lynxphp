@@ -115,9 +115,10 @@ function getThumbnail($file, $options = false) {
 
   if ($type !== 'img') {
     // no thumbnail yet for video/audio
-    $thumb = 'images/imagelessthread.png';
+    $thumb = 'images/awaiting_thumbnail.png';
     $file['tn_w'] = 209;
     $file['tn_h'] = 64;
+    $type = 'img';
   }
 
   // figure out thumb size
