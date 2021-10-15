@@ -8,6 +8,10 @@
 // new name suggestion: boardExistsMiddleware ?
 function boardMiddleware($request) {
   $boardUri = getQueryField('boardUri');
+  if (!$boardUri) {
+    sendResponse(array(), 400, 'No boardUri passed');
+    return;
+  }
   $boardData = getBoardByUri($boardUri);
   if (!$boardData) {
     sendResponse(array(), 404, 'Board does not exist');
