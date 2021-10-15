@@ -27,24 +27,29 @@ function sqlToType($sqlType) {
 class pgsql_driver extends database_driver_base_class implements database_driver_base {
   function __construct() {
     parent::__construct();
+    // datetime would have been nice to have to make database easier to work with
     $this->modelToSQL = array(
       'str'     => 'VARCHAR NOT NULL DEFAULT \'\',',
       'string'  => 'VARCHAR NOT NULL DEFAULT \'\,',
-      'int'     => 'BIGINT NOT NULL DEFAULT 0,',
-      'integer' => 'BIGINT NOT NULL DEFAULT 0,',
+      'int'     => 'BIGINT DEFAULT 0 NOT NULL,',
+      'integer' => 'BIGINT DEFAULT 0 NOT NULL,',
       'boolean' => 'Boolean DEFAULT false,',
       'bool'    => 'Boolean DEFAULT false,',
       'text'    => 'TEXT NOT NULL,', // maybe it should be null
+      // take more processing power but easier for humans to read in the tables
+      //'datetime' => 'timestamp NOT NULL DEFAULT \'0001-01-01\',',  // NOW() is also available
       //'bigtext' => 'TEXT NOT NULL,',
     );
     $this->changeModelToSQL = array(
       'str'     => array('TYPE VARCHAR', 'SET NOT NULL DEFAULT \'\''),
       'string'  => array('TYPE VARCHAR', 'SET NOT NULL DEFAULT \'\''),
-      'int'     => array('TYPE BIGINT', 'SET NOT NULL DEFAULT 0'),
-      'integer' => array('TYPE BIGINT', 'SET NOT NULL DEFAULT 0'),
+      // Using EXTRACT(EPOCH FROM {{field}})
+      'int'     => array('DROP DEFAULT', 'TYPE BIGINT', 'SET NOT NULL', 'SET DEFAULT 0'),
+      'integer' => array('DROP DEFAULT', 'TYPE BIGINT', 'SET NOT NULL', 'SET DEFAULT 0'),
       'boolean' => array('TYPE Boolean DEFAULT false'),
       'bool'    => array('TYPE Boolean DEFAULT false'),
       'text'    => array('TYPE TEXT', 'SET NOT NULL'), // maybe it should be null
+      //'datetime' => array('TYPE timestamp', 'SET NOT NULL DEFAULT \'0001-01-01\''),
       //'bigtext' => 'TEXT NOT NULL,',
     );
     $this->sqlToModel = array(
@@ -53,6 +58,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       'character varying' => 'str',
       'text' => 'text',
       'boolean' => 'bool',
+      //'timestamp without time zone' => 'datetime',
     );
     $this->joinCount = 0;
     $this->btTables = false;
@@ -212,6 +218,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
           //echo "field[$fieldName] wantType[", $f['type'], "]<br>\n";
           if (is_array($this->changeModelToSQL[$f['type']])) {
             foreach($this->changeModelToSQL[$f['type']] as $f) {
+              //$f = str_replace('{{field}}', $fieldName, $f);
               $sql .= 'ALTER COLUMN ' . $fieldName . ' ' . $f . ', ';
             }
           } else {
@@ -409,11 +416,20 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     return 'string_agg(' . $field . ', \',\')';
   }
   public function unixtime($val = '') {
-    if ($val) {
-      // attempt to see if this works...
-      return 'cast(extract(epoch from ' . $val . ') as integer)';
-    }
-    return 'cast(extract(epoch from CURRENT_TIMESTAMP) as integer)';
+    if ($val === '') $val = 'CURRENT_TIMESTAMP';
+    return 'cast(extract(epoch from ' . $val . ') as integer)';
+  }
+  /*
+  public function unixtimeTs($val = '') {
+    if ($val === '') $val = 'CURRENT_TIMESTAMP';
+    return '(\'epoch\'::timestamptz + ' . $val . ' * \'1 second\'::interval)';
+  }
+  */
+  public function isTrue($val) {
+    return $val === 't';
+  }
+  public function isFalse($val) {
+    return $val === 'f';
   }
 }
 
