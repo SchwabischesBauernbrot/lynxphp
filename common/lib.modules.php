@@ -3,6 +3,9 @@
 // modulization classes and functions
 // provides support for the various modules
 
+// requires config to be loaded...
+// maybe it shouldn't...
+
 // the singleton could hold all the pipelines
 // but what's the advantage of a singleton vs a global
 
@@ -287,7 +290,7 @@ class pipeline_module extends orderable_module {
   }
 }
 
-include 'lib.loader.php';
-include 'lib.packages.php';
+//include 'lib.loader.php';
+ldr_require('lib.packages.php');
 
 ?>
