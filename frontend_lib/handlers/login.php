@@ -6,11 +6,13 @@ function getLoginForm($goto = false) {
   if ($goto === false) $goto = '';
   $tags = array(
     // force TLS
-    'action' => 'https://' . BASE_HOST . $BASE_HREF . 'forms/login',
+    // FIXME: NO_TLS support
+    'action' => 'https://' . BASE_HOST . $BASE_HREF . 'forms/login.php',
     'goto' => $goto,
     // FIXME get named route
-    'forgot_account' => $BASE_HREF . 'forgot_account',
-    'signup' => $BASE_HREF . 'signup',
+    // we need a pipeline if forgot isn't base
+    'forgot_account' => $BASE_HREF . 'forgot_account.html',
+    'signup' => $BASE_HREF . 'signup.html',
   );
   return replace_tags($templates['header'], $tags);
 }
@@ -25,7 +27,8 @@ function getLogout() {
   setcookie('session', '', 1, '/');
   //wrapContent('You are now logged out');
   global $BASE_HREF;
-  redirectTo($BASE_HREF . 'forms/login');
+  //echo "base[$BASE_HREF]<br>\n";
+  redirectTo($BASE_HREF . 'forms/login.html');
 }
 
 function postLogin() {
@@ -39,6 +42,11 @@ function postLogin() {
     include '../frontend_lib/lib/lib.sodium.php';
     $resp = getVerifiedChallengedSignature($user, $pass);
     if ($resp === false) {
+      /*
+      // make sure first lines of output are see-able
+      global $sentBump;
+      echo '<div style="height: 40px;"></div>', "\n"; $sentBump = true;
+      */
       wrapContent("Backend could not provide a challenge, please try again later");
       return;
     }
@@ -56,10 +64,11 @@ function postLogin() {
       // FIXME get named route
       redirectTo($BASE_HREF . $_POST['goto']);
     } else {
-      redirectTo($BASE_HREF . 'control_panel');
+      redirectTo($BASE_HREF . 'control_panel.php');
     }
   } else {
     $tmpl = "Error: Log In incorrect or other error: " . print_r($res, 1) . "<br>\n";
+    echo '<div style="height: 40px;"></div>', "\n";
     wrapContent($tmpl . getLoginForm());
   }
 }
