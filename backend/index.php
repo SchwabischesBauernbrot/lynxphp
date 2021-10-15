@@ -2,7 +2,9 @@
 
 // REST API
 
-include '../common/post_vars.php';
+require '../common/lib.loader.php';
+ldr_require('../common/common.php');
+ldr_require('../common/lib.http.server.php');
 
 // read backend config
 include 'config.php';
@@ -65,10 +67,30 @@ logRequest(getip());
 include '../common/lib.pipeline.php';
 include 'pipelines.php';
 
-$routers = array();
-$routers['4chan'] = include 'routes/4chan.php';
-$routers['lynx']  = include 'routes/lynxchan_minimal.php';
-$routers['opt']   = include 'routes/opt.php';
+// we map where the code for each route is
+// maybe we should inline all those routes here... (avoid 3 file reads)
+// or just load one on demand...
+$routeConfig = array(
+  // name => file
+  '4chan' => '4chan',
+  'lynx'  => 'lynxchan_minimal',
+  'opt'   => 'opt',
+);
+
+function buildRouters($routeConfig) {
+  $routers = array();
+  foreach($routeConfig as $n => &$f) {
+    $router = &$routers[$n];
+    $router = new BackendRouter;
+    // we could put them all in one group
+    $router->import(include 'routes/' . $f . '.php');
+    unset($router);
+  }
+  unset($f); // break link
+  return $routers;
+}
+
+$routers = buildRouters($routeConfig);
 
 include 'lib/lib.board.php';
 include 'lib/middlewares.php';
@@ -115,15 +137,16 @@ $response_template = array(
 
 function sendResponse2($data, $options = array()) {
   global $response_template, $now;
-  $code  = 200;
-  $err   = '';
-  $mtime = $now;
-  $meta = array();
-  if (isset($options['err']))     $err   = $options['err'];
-  if (isset($options['code']))    $code  = $options['code'];
-  if (isset($options['lastMod'])) $mtime = $options['lastMod'];
-  if (isset($options['meta']))    $meta  = $options['meta'];
 
+  // unpack options
+  extract(ensureOptions(array(
+    'code'  => 200,
+    'err'   => '',
+    'mtime' => $now,
+    'meta'  => array(),
+  ), $options));
+
+  // array is copied here?
   $resp = $response_template;
   $resp['meta']['code'] = $code;
   foreach($meta as $k => $v) {
@@ -141,8 +164,17 @@ function sendResponse2($data, $options = array()) {
   // you'd have to be able to calculate the output size
   // on a 304 check
   //$filesize = strlen($output);
-  _doHeaders($mtime);
+  _doHeaders($mtime, array('contentType' => 'application/json'));
   echo $output;
+  return true;
+}
+
+function sendRawResponse($mixed, $code = 200, $err = '') {
+  if (getQueryField('prettyPrint')) {
+    echo '<pre>', json_encode($mixed, JSON_PRETTY_PRINT), "</pre>\n";
+  } else {
+    echo json_encode($mixed);
+  }
   return true;
 }
 
@@ -159,12 +191,7 @@ function sendResponse($data, $code = 200, $err = '', $meta = false) {
   if ($err) {
     $resp['meta']['err'] = $err;
   }
-  if (getQueryField('prettyPrint')) {
-    echo '<pre>', json_encode($resp, JSON_PRETTY_PRINT), "</pre>\n";
-  } else {
-    echo json_encode($resp);
-  }
-  return true;
+  return sendRawResponse($resp, $code, $err);
 }
 
 // wrapper for now
