@@ -1,30 +1,30 @@
-details {
+details.postFile {
   transition: all 1s ease;
   overflow: hidden;
 }
 
-details summary {
+details.postFile summary {
   cursor: zoom-in;
 }
 
-details video {
+details.postFile video {
   display: none;
   visibility: hidden;
 }
 
-details[open] video {
+details[open].postFile video {
   display: block;
   visibility: visible;
 }
 
-details[open] summary {
+details[open].postFile summary {
   cursor: zoom-out;
 }
 
-details[open] > summary::after {
+details[open].postFile > summary::after {
   content: "close";
 }
 
-details[open] > summary img {
+details[open].postFile > summary img {
   display: none;
 }
