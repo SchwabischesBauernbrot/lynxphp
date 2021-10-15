@@ -99,7 +99,7 @@ function getPostsModel($boardUri) {
     'fields' => array(
       // can just be postid...
       //'no' => array('type'=>'integer'),
-      'threadid' => array('type'=>'int'),
+      'threadid' => array('type'=>'int'), // thread has threaid = postid
       'resto' => array('type'=>'int'),
       'sticky' => array('type'=>'bool'),
       'closed' => array('type'=>'bool'),
