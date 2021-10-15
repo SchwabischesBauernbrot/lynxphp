@@ -7,16 +7,18 @@ function userBoards($user_id) {
   global $db, $models;
   $user_id = (int)$user_id;
   $res = $db->find($models['board'], array('criteria'=>array(
-//    array('owner_id', '=', $user_id),
+    //array('owner_id', '=', $user_id),
     'owner_id' => $user_id
   )));
   $boards = $db->toArray($res);
   $db->free($res);
+  $boardList = array();
   foreach($boards as &$row) {
     boardDBtoAPI($row);
+    $boardList[] = $row['uri'];
   }
   unset($row);
-  return $boards;
+  return $boardList;
 }
 
 function getAccount($user_id) {
@@ -85,6 +87,58 @@ function isUserPermitted($user_id, $permission, $target = false) {
   }
 
   return $access;
+}
+
+// I guess we moved these out?
+function verifyChallengedSignatureHandler() {
+  if (!hasPostVars(array('chal', 'sig'))) {
+    // hasPostVars already outputs
+    return;
+  }
+  $chal = $_POST['chal'];
+  $sig  = $_POST['sig'];
+  include '../common/sodium/autoload.php';
+  // validate chal is one we issued? why?
+  // so we can't reuse an old chal
+  // well at least
+  // FIXME: make sure it's not expired
+  global $db, $models;
+  $res = $db->find($models['auth_challenge'], array('criteria' =>
+    array('challenge' => $chal)
+  ));
+  if (!$db->num_rows($res)) {
+    $db->free($res);
+    return sendResponse(array(), 401, 'challenge not found');
+  }
+  $row = $db->get_row($res);
+  $db->free($res);
+  // make sure no one can replay
+  $db->deleteById($models['auth_challenge'], $row['challengeid']);
+  $edPkBin = base64_decode($row['publickey']); // it's ed signing key in b64
+
+  // prove payload was from user and not just a guessed challenge
+  if (!\Sodium\crypto_sign_verify_detached($sig, $chal, $edPkBin)) {
+    return sendResponse(array(), 401, 'signature verification failed');
+  }
+  return $edPkBin;
+}
+
+function loginResponseMaker($user_id, $upgradedAccount = false) {
+  if (!$user_id) {
+    return sendResponse(array(), 500, 'logging in as no user');
+  }
+  $sesrow = ensureSession($user_id);
+  if (!isset($sesrow['created']) && $sesrow['userid'] != $user_id) {
+    // there's already a session
+    return sendResponse(array(), 400, 'You passed an active session');
+  }
+  // and return it
+  $data = array(
+    'session' => $sesrow['session'],
+    'ttl'     => $sesrow['expires'],
+    'upgradedAccount' => $upgradedAccount,
+  );
+  sendResponse($data);
 }
 
 ?>
