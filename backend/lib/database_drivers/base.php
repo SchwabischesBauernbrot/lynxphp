@@ -8,6 +8,7 @@ interface database_driver_base {
   public function make_constant($value);
   public function make_direct($value);
   public function insert($rootModel, $recs);
+  // options.criteria
   public function update($rootModel, $urow, $options);
   public function delete($rootModel, $options);
   // options
@@ -16,8 +17,11 @@ interface database_driver_base {
   //              array(field, comparison, field/constant)
   public function find($rootModel, $options = false);
   public function count($rootModel, $options = false);
+  // options doesn't look to be used...
   public function findById($rootModel, $id, $options = false);
+  // options doesn't look to be used...
   public function updateById($rootModel, $id, $row, $options = false);
+  // options.criteria
   public function deleteById($rootModel, $id, $options = false);
   // result functions
   public function num_rows($res);
@@ -504,6 +508,7 @@ class database_driver_base_class {
     );
   }
 
+  // options doesn't look to be used...
   public function findById($rootModel, $id, $options = false) {
     $tableName = modelToTableName($rootModel);
     $id = (int)$id;
@@ -515,6 +520,7 @@ class database_driver_base_class {
     );
     return $this->find($rootModel, $options);
   }
+  // options doesn't look to be used...
   public function updateById($rootModel, $id, $row, $options = false) {
     $tableName = modelToTableName($rootModel);
     $id = (int)$id;
@@ -542,6 +548,13 @@ class database_driver_base_class {
       $arr[] = $row;
     }
     return $arr;
+  }
+
+  public function isTrue($val) {
+    return $val;
+  }
+  public function isFalse($val) {
+    return !$val;
   }
 }
 
