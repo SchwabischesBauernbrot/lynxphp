@@ -1,12 +1,18 @@
 <?php
 chdir('..');
-include '../common/post_vars.php';
+
+include '../common/lib.loader.php';
+ldr_require('../common/common.php'); // ensureOptions
+ldr_require('../common/lib.http.server.php');
 // we don't need routes...
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 
 //define('BASE_HREF', '/pages');
 
 include 'setup.php';
+foreach($packages as $pkg) {
+  $pkg->frontendPrepare();
+}
 
 global $BASE_HREF;
 // it's always auto-detected correctly
@@ -22,7 +28,8 @@ $BASE_HREF = preg_replace('~pages/$~', '', $BASE_HREF);
 global $_HeaderData;
 if (!$_HeaderData) $_HeaderData = wrapContentData(array());
 wrapContentHeader($_HeaderData);
-chdir(__DIR__);
 // make sure first lines of output are see-able
-echo '<div style="height: 40px;"></div>', "\n";
+sendBump('GET', 'pages/'); // deal with template's static nav
+
+chdir(__DIR__);
 ?>
