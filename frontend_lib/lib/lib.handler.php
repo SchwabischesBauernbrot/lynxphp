@@ -13,83 +13,29 @@ function redirectTo($url) {
   */
 }
 
-function tagify($tag) {
-  return '{{' . $tag . '}}';
-}
+// or maybe don't have a static div...
+// use js to change it if X condition are met?
 
-function replace_tags($template, $tags) {
-  if (!is_string($template)) {
-    echo "replace_tags - Template isn't an string\n";
-    return $template;
+// not POSTING to this page or this page or ANY this page
+// and reqpath does not have .youtube
+$sentBump = false;
+function sendBump($req_method, $req_path) {
+  global $sentBump;
+  if (
+      !(
+         ($req_path === '/signup' && $req_method === 'POST') ||
+         ($req_path === '/forms/login' && $req_method === 'POST') ||
+         strpos($req_path, 'user/settings/themedemo/') !== false ||
+         strpos($req_path, '/preview/') !== false ||
+         $req_path === '/logout'
+      ) && strpos($req_path, '/.youtube') === false) {
+    // make sure first lines of output are see-able
+    echo '<div style="height: 40px;"></div>', "\n"; flush();
+    $sentBump = true;
   }
-  if (!is_array($tags)) {
-    echo "replace_tags - Tags isn't an array\n";
-    return $template;
-  }
-  return str_replace(array_map('tagify', array_keys($tags)), array_values($tags), $template);
 }
 
-function loadTemplates($template) {
-  return loadTemplatesFile('templates/' . $template . '.tmpl');
-}
-
-function moduleLoadTemplates($template, $dir) {
-  // this will be called from the frontend_handlers dir
-  return loadTemplatesFile($dir . '/../views/' . $template . '.tmpl');
-}
-
-function loadTemplatesFile($path) {
-  $lines = @file($path);
-  if (!is_array($lines)) {
-    echo "lib.handler::loadTemplatesFile - Can't read [$path]<br>\n";
-    return array();
-  }
-  $section = 'header';
-  $loop = -1;
-  $templates = array('header' => '');
-  foreach($lines as $line) {
-    $tline = trim($line);
-    if ($tline === '<!-- loop -->') {
-      $loop++;
-      $section = 'loop' . $loop;
-      $templates[$section] = '';
-      continue;
-    } else if ($tline === '<!-- end -->') {
-      $section = 'header';
-      continue;
-    }
-    $templates[$section] .= $line;
-  }
-  return $templates;
-}
-
-function loadTemplatesFile2($path) {
-  $section = 'header';
-  $templates = array($section => '');
-  $lines = file($path);
-  foreach($lines as $line) {
-    $tline = trim($line);
-    // starts with <!-- section[
-    if (substr(0, 13, $tline) === '<!-- section[') {
-      //echo "Found new layout format<Br>\n";
-      // ends with ] -->
-      $end = strpos($tline, '] -->', 12);
-      $section = substr($tline, 12, $end);
-      if (empty($templates[$section])) $templates[$section]='';
-      continue; // don't include line
-    }
-    if (strtoupper($tline) === '<!-- END -->') {
-      // only count loops, so that loop0 is the first loop
-      $section = 'footer';
-      if (empty($templates[$section])) $templates[$section]='';
-      continue; // don't include line
-    }
-    $templates[$section] .= $line;
-  }
-  return $templates;
-}
-
-function wrapContentData($options = '') {
+function wrapContentData($options = false) {
   global $packages;
   // how do we hook in our admin group?
   // the data is only there if we asked for it...
