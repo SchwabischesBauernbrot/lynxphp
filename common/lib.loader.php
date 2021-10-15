@@ -6,6 +6,48 @@
 
 $module_base = 'common/modules/';
 
+$_loader_data = array();
+function ldr_require($file) {
+  global $_loader_data;
+  // normalize file path / name?
+  if (empty($_loader_data[$file])) {
+    include $file;
+    $_loader_data[$file] = true;
+  }
+}
+
+function ldr_done() {
+  global $_loader_data;
+  $_loader_data = false;
+}
+
+// uid and gid can be string (doesn't have be numeric)
+function recurse_chown_chgrp($basepath, $uid, $gid) {
+  if (is_dir($basepath)) {
+    $d = opendir($basepath);
+    if (!$d) {
+      echo "file::recurse_chown_chgrp [$basepath] error<br>\n";
+      return;
+    }
+    while(($file = readdir($d)) !== false) {
+      if ($file !== '.' && $file !== '..') {
+        $path = $basepath . '/' . $file ;
+
+        //print $typepath. " : " . filetype ($typepath). "<BR>" ;
+        if (filetype($path) === 'dir') {
+          recurse_chown_chgrp($path, $uid, $gid);
+        }
+        // if we can't change it, then we're probably not root and nothing we can do
+        // likely the webserver that will have the correct perms in the first place
+        @chown($path, $uid);
+        @chgrp($path, $gid);
+      }
+    }
+  }
+  @chown($basepath, $uid);
+  @chgrp($basepath, $gid);
+}
+
 function registerPackage($pkg_path) {
   global $module_base;
   $full_pkg_path = '../' . $module_base . $pkg_path . '/';
@@ -93,7 +135,7 @@ function registerPackages() {
   $packages['base'] = registerPackage('base');
 
   // data
-  $groups = array('board', 'post', 'user', 'admin', 'global', 'site', 'protection');
+  $groups = array('board', 'thread', 'post', 'user', 'admin', 'global', 'site', 'protection');
   foreach($groups as $group) {
     registerPackageGroup($group);
   }
