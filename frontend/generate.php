@@ -1,5 +1,7 @@
 <?php
-include '../common/post_vars.php';
+require '../common/lib.loader.php';
+ldr_require('../common/common.php'); // ensureOptions
+ldr_require('../common/lib.http.server.php');
 // if executed from CLI, how do we know which config to use?
 
 // TEMP: change change defines here...
@@ -27,7 +29,8 @@ if ($host) {
 }
 
 $req_method = 'GET';
-include 'setup.php';
+require 'setup.php';
+require 'setup.router.php';
 // it's always auto-detected correctly
 // only if it's manually hardcoded when it's wrong...
 // well we should normalize
