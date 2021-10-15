@@ -1,0 +1,7 @@
+.lpPostForm textarea {
+  width: 100%;
+}
+
+.lpPostForm input[name="captcha"] {
+  width: 100px;
+}
