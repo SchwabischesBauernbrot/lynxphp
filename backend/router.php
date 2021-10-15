@@ -7,9 +7,17 @@ class BackendRouter extends Router {
     parent::__construct();
     $this->defaultContentType = 'application/json';
   }
+  // override defaults
+  function import($routes, $module = 'backend', $dir = 'handlers') {
+    return parent::import($routes, $module);
+  }
   function fromResource($name, $res, $moduleDir) {
+    // DEV_MODE is not availabel on backend...
     if (!isset($res['handlerFile'])) {
       return 'handlerFile is not set';
+    }
+    if (!file_exists($res['handlerFile']) || !is_readable($res['handlerFile'])) {
+      echo "BackendRouter::fromResource - handlerFile[", $res['handlerFile'], "] is not found or accessible<br>\n";
     }
     // router is stripped by this point
     // has no / in front
@@ -59,9 +67,11 @@ class BackendRouter extends Router {
         }
       };
       // create a single closure this file API can depend on
-      $get = function() use ($user_id, $ip, $sendResponse) {
+      $get = function() use ($user_id, $ip, $sendResponse, $request) {
         // request?
+        // yea we need to get at params
         return array(
+          'params' => $request['params'],
           'sendResponse' => $sendResponse,
           'userid' => $user_id,
           'ip' => $ip,
@@ -72,6 +82,7 @@ class BackendRouter extends Router {
     };
 
     if (!empty($res['cacheSettings'])) {
+      //echo "Setting cacheSettings for $method_$cond<br>\n";
       $this->routeOptions[$method . '_' . $cond]['cacheSettings'] = $res['cacheSettings'];
     }
 
