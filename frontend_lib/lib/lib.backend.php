@@ -80,6 +80,10 @@ function consume_beRsrc($options, $params = '') {
   return $responseText;
 }
 
+// returns
+// - false = error
+// - array = decoded data
+// - string = decoded data
 function expectJson($json, $endpoint = '', $options = array()) {
   $obj = json_decode($json, true);
   if ($obj === NULL) {
@@ -108,6 +112,12 @@ function expectJson($json, $endpoint = '', $options = array()) {
     if (isset($obj['meta']['board']['settings'])) {
       global $board_settings;
       $board_settings = $obj['meta']['board']['settings'];
+    }
+    if (DEV_MODE) {
+      if ($obj['meta']['code'] === 404) {
+        echo "<pre>BE gave 404 [", print_r($obj['data'], 1), "]</pre>\n";
+        return false;
+      }
     }
     // let's just handle 401s globally here
     if ($obj['meta']['code'] === 401) {
@@ -231,7 +241,7 @@ function sendFile($tmpfile, $type, $filename) {
 
 function backendAuthedGet($endpoint) {
   //echo "<pre>", print_r($_COOKIE, 1), "</pre>\n";
-  if (!isset($_COOKIE['session'])) {
+  if (!isLoggedIn()) {
     return json_encode(array('meta'=>array('code'=>401)));
   }
   $json = curlHelper(BACKEND_BASE_URL . $endpoint, '',
@@ -326,54 +336,6 @@ function backendVerify($chal, $sig, $user = '', $pass = '') {
   return $res['meta'];
 }
 
-function backendMigrateAccount($edPkBin) {
-  $json = curlHelper(BACKEND_BASE_URL . 'opt/migrateAccount', array(
-    'pk' => bin2hex($edPkBin),
-  ), array('sid' => $_COOKIE['session']));
-  $res = expectJson($json, 'opt/migrateAccount');
-  //echo "<pre>backendVerify", print_r($res, 1), "</pre>\n";
-  if ($res === false) {
-    // couldn't parse json
-    return;
-  }
-  return $res;
-}
-
-function backendChangeEmail($em) {
-  $json = curlHelper(BACKEND_BASE_URL . 'opt/changeEmail', array(
-    'em' => $em,
-  ), array('sid' => $_COOKIE['session']));
-  $res = expectJson($json, 'opt/changeEmail');
-  //echo "<pre>backendVerify", print_r($res, 1), "</pre>\n";
-  if ($res === false) {
-    // couldn't parse json
-    return;
-  }
-  return $res;
-}
-
-
-/*
-function backendLogin($user, $pass) {
-  // login, password, email
-  $json = curlHelper(BACKEND_BASE_URL . 'lynx/login', array(
-    'login'    => $user,
-    'password' => $pass,
-  ), array('HTTP_X_FORWARDED_FOR' => getip()));
-  $res = expectJson($json, 'lynx/login');
-  if ($res === false) {
-    // couldn't parse json
-    return;
-  }
-  if (!empty($res['data']['session'])) {
-    setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
-    //redirectTo('control_panel.php');
-    return true;
-  }
-  return $res['meta'];
-}
-*/
-
 function backendCreateBoard() {
   $json = curlHelper(BACKEND_BASE_URL . 'lynx/createBoard', array(
     'boardUri'         => $_POST['uri'],
@@ -389,6 +351,13 @@ function backendLynxAccount() {
   // means not logged in...
   if (!$json) return false;
   return expectJson($json, 'lynx/account');
+}
+
+function backendOptMyBoards() {
+  $json = backendAuthedGet('opt/myBoards');
+  // means not logged in...
+  if (!$json) return false;
+  return expectJson($json, 'opt/myBoards');
 }
 
 function backendGetPerm($perm, $target = false) {
