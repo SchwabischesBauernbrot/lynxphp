@@ -10,6 +10,7 @@ if (file_exists($localConfig)) {
   include($localConfig);
 } else {
   echo "Local frontend config file [$localConfig] not found in ", getcwd(), "<br>\n";
+  echo "BACKEND_PUBLIC_URL won't be configured correctly<br>\n";
 }
 
 // site wide config
@@ -57,5 +58,6 @@ if (!defined('IN_GENERATE')) define('IN_GENERATE', false);
 if (!defined('USER')) define('USER', 'www-data'); // debian
 if (!defined('DISABLE_MODULES')) define('DISABLE_MODULES', array());
 if (!defined('DISABLE_WORK')) define('DISABLE_WORK', false);
+if (!defined('AUTH_DIRECT')) define('AUTH_DIRECT', false);
 
 ?>
