@@ -11,11 +11,15 @@
         <a class="no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#postform">{{no}}</a>
       </span>
       <span class="replies mt-5 ml-5">{{replies}}</span>
-      <select class="jsonly postmenu">
-        <option value="single">Hide</option>
-        <option value="fid">Filter ID</option>
-        <option value="fname">Filter Name</option>
-      </select>
+      <details style="display: inline">
+        <summary>Actions</summary>
+        {{actions}}
+        <!-- select class="jsonly postmenu">
+          <option value="single">Hide</option>
+          <option value="fid">Filter ID</option>
+          <option value="fname">Filter Name</option>
+        </select -->
+      </details>
       {{links}}
     </span>
   </div>
@@ -34,7 +38,7 @@
         </span>
 <!-- end -->
 <!-- loop -->
-          <img src="/file/{{file}}.png" height="14" width="14" title="{{title}}">
+          <img src="images/img/{{icon}}.png" height="14" width="14" title="{{title}}">
 <!-- end -->
 <!-- loop -->
   <div class="post-file">
@@ -47,7 +51,7 @@
         content: url({{path}});
       }
       </style>
-      <details id="{{fileid}}" class="{{majorMimeType}}">
+      <details id="{{fileid}}" class="postFile {{majorMimeType}}">
         <summary>
           {{thumb}}
         </summary>
