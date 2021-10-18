@@ -13,6 +13,52 @@ function renderPost($boardUri, $p, $options = false) {
     'checkable' => false,
   ), $options));
 
+  //$isBO = perms_isBO($boardUri);
+  $threadId = $p['threadid'] ? $p['threadid'] : $p['no'];
+  $isOP = $threadId === $p['no'];
+
+  $post_actions = array(
+    'all'    => array(),
+    'user'   => array(),
+    'bo'     => array(),
+    'global' => array(),
+    'admin'  => array(),
+  );
+
+  global $pipelines;
+  // pretext processing...
+  $action_io = array(
+    'boardUri' => $boardUri,
+    'p' => $p,
+    'actions'  => $post_actions,
+  );
+  if ($isOP) {
+    $pipelines[PIPELINE_THREAD_ACTIONS]->execute($action_io);
+  }
+  $pipelines[PIPELINE_POST_ACTIONS]->execute($action_io);
+  // remap output over the top of the input
+  $post_actions = $action_io['actions'];
+
+  //
+
+  $post_actions_html_parts = array();
+  if (count($post_actions['all'])) {
+    foreach($post_actions['all'] as &$a) {
+      /*
+      $post_actions_html_parts[] = '<a href="dynamic.php?boardUri=' . urlencode($boardUri) .
+        '&action=' . urlencode($a). '&id=' . $p['no']. '">' . $l . '</a>';
+      */
+      $post_actions_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
+    }
+  }
+  if (count($post_actions['bo']) && perms_isBO($boardUri)) {
+    foreach($post_actions['bo'] as &$a) {
+      $post_actions_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
+    }
+  }
+  unset($a);
+  $post_actions_html = join('<br>' . "\n", $post_actions_html_parts);
+
   $templates = loadTemplates('mixins/post_detail');
   $checkable_template = $templates['loop0'];
   $posticons_template = $templates['loop1'];
@@ -25,27 +71,28 @@ function renderPost($boardUri, $p, $options = false) {
   if ($checkable) {
     $postmeta .= replace_tags($checkable_template, array('no' => $p['no']));
   }
-  // FIXME: pipeline...
-  $icons = array();
-  if (!empty($p['sticky']) && $p['sticky'] !== 'f') {
-    $icons[] = 'sticky';
+
+  // add icons to postmeta
+  $icon_io = array(
+    'boardUri' => $boardUri,
+    'p' => $p,
+    'icons' => array(),
+  );
+  if ($isOP) {
+    $pipelines[PIPELINE_THREAD_ICONS]->execute($icon_io);
   }
-  if (!empty($p['cyclic']) && $p['sticky'] !== 'f') {
-    $icons[] = 'cyclic';
-  }
+  $pipelines[PIPELINE_POST_ICONS]->execute($icon_io);
+  $icons = $icon_io['icons'];
   if (count($icons)) {
     $icons_html = '';
-    foreach($icons as $file) {
-      $tags = array(
-        'file' => $file,
-        'title' => $file,
-      );
-      $icons_html .= replace_tags($icon_template, $tags);
+    foreach($icons as $i) {
+      $icons_html .= replace_tags($icon_template, $i);
     }
     $tmp = $posticons_template;
     $tmp = str_replace('{{icons}}', $icons_html, $tmp);
     $postmeta .= $tmp;
   }
+
   // FIXME: this wrappers need to be controlled...
   // why was this subject? the field is sub...
   if (!empty($p['sub'])) {
@@ -108,21 +155,18 @@ function renderPost($boardUri, $p, $options = false) {
 
   $replies_html = '';
 
-  global $pipelines;
   // pass in p and get it back modified
   $p['safeCom'] = htmlspecialchars($p['com']);
   $p['boardUri'] = $boardUri; // communicate what board we're on
   $pipelines[PIPELINE_POST_TEXT_FORMATTING]->execute($p);
 
-  $threadid = $p['threadid'] ? $p['threadid'] : $p['no'];
-
   $links_html = '';
   // are we a BO? is this our post?
 
   $tags = array(
-    'op'        => $threadid === $p['no'] ? 'op': '',
+    'op'        => $isOP ? 'op': '',
     'uri'       => $boardUri,
-    'threadNum' => $threadid,
+    'threadNum' => $threadId,
     'no'        => $p['no'],
     'subject'   => htmlspecialchars($p['sub']),
     'message'   => $p['safeCom'],
@@ -133,6 +177,7 @@ function renderPost($boardUri, $p, $options = false) {
     'jstime'    => gmdate('Y-m-d', $p['created_at']) . 'T' . gmdate('H:i:s.v', $p['created_at']) . 'Z',
     'human_created_at' => gmdate('n/j/Y H:i:s', $p['created_at']),
     'links'     => $links_html,
+    'actions'   => $post_actions_html,
   );
   $tmp = replace_tags($templates['header'], $tags);
 
