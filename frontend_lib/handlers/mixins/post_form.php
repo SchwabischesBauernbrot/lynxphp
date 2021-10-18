@@ -1,6 +1,6 @@
 <?php
 
-// moved into set up.php
+// moved into setup.php
 /*
 function formatBytes($bytes, $precision = 2) {
   $units = array('B', 'KB', 'MB', 'GB', 'TB');
@@ -40,28 +40,28 @@ function number_abbr($number) {
   return $number;
 }
 
-function renderPostForm($boardUri, $url, $options = false) {
-  global $pipelines;
-
-  $templates = loadTemplates('mixins/post_form');
-
-  $values = array();
+function renderPostFormHTML($boardUri, $options = false) {
   $type = 'Thread';
+  $values = array();
   $tagThread = '';
-  if ($options) {
-    if (!empty($options['reply'])) {
-      $type = 'Reply';
-      $tagThread = '<input type="hidden" name="thread" value="' . $options['reply'] . '">';
-      $values['thread'] = $options['reply'];
-    }
-    // this is for posting...
-    // moved into board_portal
-    /*
-    if ($options['page']) {
-      $tagThread = '<input type="hidden" name="page" value="' . $options['page'] . '">';
-    }
-    */
+
+  extract(ensureOptions(array(
+    'reply' => 'false',
+    'showClose' => true,
+  ), $options));
+
+  if ($reply) {
+    $type = 'Reply';
+    $tagThread = '<input type="hidden" name="thread" value="' . $reply . '">';
+    $values['thread'] = $reply;
   }
+  // this is for posting...
+  // moved into board_portal
+  /*
+  if ($options['page']) {
+    $tagThread = '<input type="hidden" name="page" value="' . $options['page'] . '">';
+  }
+  */
 
   // FIXME: we need to be able to override webserver...
   $maxfiles = convertPHPSizeToBytes(ini_get('max_file_uploads'));
@@ -80,32 +80,54 @@ function renderPostForm($boardUri, $url, $options = false) {
     'message'  => array('type' => 'textarea',      'label' => 'Message', 'autocomplete' => 'off'),
     'files'    => array('type' => 'multidropfile', 'label' => 'Files',
       'postlabel' => 'Max ' . $maxfiles . ' files</small><small>' . number_abbr($maxfilesize) . ' total'),
-    // FIXME: remove if logged in (not needed)
-    'postpassword' => array('type' => 'password',      'label' => 'Passwords', 'maxlength' => 50),
   );
+  if (!isLoggedIn()) {
+    $formfields['postpassword'] = array('type' => 'password',      'label' => 'Passwords', 'maxlength' => 50);
+  }
+
+  $postFormHTML = '<div class="noselect" id="dragHandle">New ' . $type . '</div>';
+  if ($showClose) {
+    $postFormHTML .= '<a class="close postform-style" href="' . $_SERVER['REQUEST_URI'] . '#!">X</a>';
+  }
+  // wrap in section
+  $postFormHTML = '<section class="row jsonly">' . $postFormHTML . '</section>';
+
   $formOptions = array_merge(jsChanStyle(), array(
     'buttonLabel' => 'New ' . $type,
     'formId'      => 'postform',
-    'postFormTag' => '
-    <section class="row jsonly">
-      <div class="noselect" id="dragHandle">New ' . $type . '</div>
-      <a class="close postform-style" href="' . $_SERVER['REQUEST_URI'] . '#!">X</a>
-    </section>',
+    'postFormTag' => $postFormHTML,
   ));
+
+  global $pipelines;
   $io = array(
     'boardUri'   => $boardUri,
     'type'       => $type,
     'formfields' => $formfields,
   );
   $pipelines[PIPELINE_POST_FORM_FIELDS]->execute($io);
-  $formfields = $io['formfields'];
+  $formfields = $io['formfields']; // map ouptut
   $pipelines[PIPELINE_POST_FORM_OPTIONS]->execute($formOptions);
   $pipelines[PIPELINE_POST_FORM_VALUES]->execute($values);
 
+  // get html for these parameters
+  return generateForm($boardUri . '/post.php', $formfields, $values, $formOptions);
+}
+
+function renderPostForm($boardUri, $url, $options = false) {
+  global $pipelines;
+
+  $type = 'Thread';
+  if ($options) {
+    if (!empty($options['reply'])) {
+      $type = 'Reply';
+    }
+  }
+
+  $templates = loadTemplates('mixins/post_form');
   $tags = array(
-    'form' => generateForm($boardUri . '/post', $formfields, $values, $formOptions),
-    'type' => $type,
-    'action'      => $url,
+    'form'   => renderPostFormHTML($boardUri, $options),
+    'type'   => $type,
+    'action' => $url,
     /*
     'uri'  => $boardUri,
     'tagThread'   => $tagThread,
