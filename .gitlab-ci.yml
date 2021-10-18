@@ -132,6 +132,8 @@ variables:
 buildzip:
   tags:
     - docker
+  script:
+    - exit
   artifacts:
     paths:
       - .
