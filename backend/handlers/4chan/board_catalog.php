@@ -6,8 +6,7 @@ global $tpp;
 $boardUri = $request['params']['board'];
 $page = boardCatalog($boardUri);
 if (!is_array($page)) {
-  // boardCatalog handles this
-  return;
+  return sendRawResponse(array(), 404, 'Board not found');
 }
 $pages = count($page);
 $res = array();
@@ -17,8 +16,4 @@ for($i = 1; $i <= $pages; $i++) {
     'threads' => $page[$i],
   );
 }
-if (getQueryField('prettyPrint')) {
-  echo '<pre>', json_encode($res, JSON_PRETTY_PRINT), "</pre>\n";
-} else {
-  echo json_encode($res);
-}
+sendRawResponse($res);

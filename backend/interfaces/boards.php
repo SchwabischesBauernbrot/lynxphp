@@ -382,6 +382,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
       );
     }
     $threads = array_values($threads);
+    //echo "<pre>[", print_r($threads, 1), "]</pre>\n";
     return $threads;
   }
 
@@ -510,8 +511,9 @@ function boardCatalog($boardUri) {
   $posts_model = getPostsModel($boardUri);
   if ($posts_model === false) {
     // this board does not exist
-    sendResponse(array(), 404, 'Board not found');
-    return;
+    // we shouldn't handle the response here because
+    // 4chan and opt has different response formats
+    return false;
   }
   $post_files_model = getPostFilesModel($boardUri);
   $fileTable = modelToTableName($post_files_model);

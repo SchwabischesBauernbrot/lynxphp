@@ -6,14 +6,9 @@
 $boardUri = $request['params']['board'];
 $threadNum = (int)str_replace('.json', '', $request['params']['thread']);
 $posts_model = getPostsModel($boardUri);
+// board doesn't not exist
 if (!$posts_model) {
-  echo '[]';
-  return;
+  return sendRawResponse(array(), 404, 'Board not found');
 }
 $posts = getThread($boardUri, $threadNum, false);
-// board doesn't not exist
-if (getQueryField('prettyPrint')) {
-  echo '<pre>', json_encode($posts, JSON_PRETTY_PRINT), "</pre>\n";
-} else {
-  echo json_encode($posts);
-}
+sendRawResponse($posts);
