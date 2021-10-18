@@ -129,6 +129,14 @@ variables:
 
 # alpine
 
+buildzip:
+  tags:
+    - docker
+  artifacts:
+    paths:
+      - .
+  
+
 test:nginx:my:latest:
   before_script:
     - *alpine
