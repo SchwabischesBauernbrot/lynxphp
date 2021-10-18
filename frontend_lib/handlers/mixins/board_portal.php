@@ -1,5 +1,7 @@
 <?php
 
+// refactored out so we can share data between header/footer
+// without having to recalculate it
 function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   global $pipelines;
   $pagenum   = 0;
@@ -23,7 +25,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
 
   $navItems = array(
     '[Index]' => '{{uri}}/',
-    '[Catalog]' => '{{uri}}/catalog',
+    '[Catalog]' => '{{uri}}/catalog.html',
   );
   $pipelines[PIPELINE_BOARD_NAV]->execute($navItems);
 
@@ -80,6 +82,9 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     $pipelines[PIPELINE_BOARD_HEADER_TMPL]->execute($p);
   }
 
+  // FIXME: are we in a thread? (if so set reply option)
+  $form_html = renderPostFormHTML($boardUri, array('showClose' => false));
+
   return array(
     'tmpl' => $tmpl,
     'tags' => $p['tags'],
@@ -88,6 +93,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'pagenum' => $pagenum,
     // used in footer
     'boardNav' => $boardNav,
+    'postForm' => $form_html,
   );
 }
 
@@ -159,6 +165,7 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
     'boardNav' => $row['boardNav'],
     'threadstats' => $threadstats_html,
     'postactions' => renderPostActions($boardUri),
+    'postForm' => $row['postForm'],
   )));
 }
 
