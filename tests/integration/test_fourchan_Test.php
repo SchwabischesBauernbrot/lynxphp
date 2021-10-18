@@ -9,22 +9,22 @@ final class test_fourchan_Test extends TestCase
     }
 
     public function testBoardCatalogJson(): void {
-      $threads = getExpectJson('4chan/test/catalog.json');
+      $threads = getExpectJson('4chan/X/catalog.json');
       $this->assertIsArray($threads);
     }
 
     public function testBoardThreadsJson(): void {
-      $pages = getExpectJson('4chan/test/threads.json');
+      $pages = getExpectJson('4chan/X/threads.json');
       $this->assertIsArray($pages);
     }
 
     public function testBoardPage1Json(): void {
-      $threads = getExpectJson('4chan/test/1.json');
+      $threads = getExpectJson('4chan/X/1.json');
       $this->assertIsArray($threads);
     }
 
     public function testBoardThreadXJson(): void {
-      $threads = getExpectJson('4chan/test/thread/1.json');
+      $threads = getExpectJson('4chan/X/thread/Y.json');
       $this->assertIsArray($threads);
     }
 
