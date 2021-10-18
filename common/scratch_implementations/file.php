@@ -18,6 +18,16 @@ class file_scratch_driver extends scratch_implementation_base_class {
     }
   }
 
+  // FIXME: file permissions
+  function checkPerms() {
+    $username = posix_getpwuid(posix_geteuid())['name'];
+    //echo "username[$username]<br>\n";
+    if ($username !== USER) {
+      // we need to fix perms
+      recurse_chown_chgrp($this->file, USER, USER);
+    }
+  }
+
   function getlock() {
     $lock = $this->lock;
     if (file_exists($lock)) {
@@ -38,6 +48,7 @@ class file_scratch_driver extends scratch_implementation_base_class {
     }
     global $ts;
     file_put_contents($lock, $ts . '_' . posix_getpid());
+    $this->checkPerms();
     if (!file_exists($lock)) {
       echo "cant create lock[$lock]<br>\n";
       return false;
@@ -50,8 +61,8 @@ class file_scratch_driver extends scratch_implementation_base_class {
     if (!$this->getlock()) {
       return false;
     }
-    $fp = fopen($this->file,'r');
-    $tmpfname = tempnam('/tmp', 'futabilly');
+    $fp = fopen($this->file, 'r');
+    $tmpfname = tempnam('/tmp', 'lynxphp');
     $wfp = fopen($tmpfname, 'w');
     if (!$fp || !$wfp) {
       unlink($this->lock);
@@ -68,6 +79,7 @@ class file_scratch_driver extends scratch_implementation_base_class {
     fclose($wfp);
     unlink($this->file);
     rename($tmpfname, $this->file);
+    $this->checkPerms();
     // unlock
     unlink($this->lock);
     return true;
@@ -76,7 +88,7 @@ class file_scratch_driver extends scratch_implementation_base_class {
   function get($key) {
     //$lines=file($this->file);
     //foreach($lines as $line) {
-    $fp=fopen($this->file,'r');
+    $fp = fopen($this->file, 'r');
     if (!$fp) return false;
     while(($line = fgets($fp)) !== false) {
       $data = unserialize(trim($line));
@@ -94,13 +106,15 @@ class file_scratch_driver extends scratch_implementation_base_class {
       return false;
     }
     $fp = fopen($this->file,'r');
-    $tmpfname = tempnam('/tmp', 'futabilly');
+    $tmpfname = tempnam('/tmp', 'lynxphp');
     $wfp = fopen($tmpfname, 'w');
     if (!$fp || !$wfp) {
       unlink($this->lock);
       return true;
     }
     $found=0;
+    // FIXME: change format so don't need to unserailize to get the k
+    // or just serialize the whole thing...
     while(($line = fgets($fp)) !== false) {
       $data = unserialize(trim($line));
       if ($data['k'] !== $key) {
@@ -120,6 +134,7 @@ class file_scratch_driver extends scratch_implementation_base_class {
     unlink($this->file);
     // Not NFS safe
     rename($tmpfname, $this->file);
+    $this->checkPerms();
     // unlock
     unlink($this->lock);
     return true;
