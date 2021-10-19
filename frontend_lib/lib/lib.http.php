@@ -12,6 +12,22 @@ function paramsToQuerystringGroups($params) {
   return $qarr;
 }
 
+function parseHeaders($response) {
+  $lines = explode("\r\n", $response);
+  array_shift($lines);
+  $headers = array();
+  foreach($lines as $h) {
+    if (!$h) continue;
+    if (strpos($h, ': ') !== false) {
+      list($k, $v) = explode(': ', $h);
+      $headers[$k] = $v;
+    } else {
+      echo "h[$h] has no :\n";
+    }
+  }
+  return $headers;
+}
+
 // we could reuse the curl handle
 // but we'd need to reset certain settings each time
 // but ultimately we should rather aim for one curl request per page total
@@ -79,18 +95,21 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     curl_setopt($ch, CURLOPT_USERPWD, $user . ':' . $pass);
     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
   }
-  if ($method==='AUTO') {
+  if ($method === 'AUTO') {
     $method = 'POST'; // for logging
     if (!$hasFields) {
       curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
       $method = 'GET'; // for logging
     }
   } else
-  if ($method==='PUT') {
+  if ($method ===' PUT') {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
   } else
-  if ($method==='GET') {
+  if ($method === 'GET') {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+  } else
+  if ($method === 'DELETE') {
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
   } else
   if ($method === 'HEAD') {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'HEAD');
@@ -148,7 +167,33 @@ function curl_log_report() {
     echo $l['trace'];
     echo '<details>';
     echo '  <summary>Response</summary>', "\n";
-    echo '  <pre>', htmlspecialchars(json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT)), '</pre>', "\n";
+    if ($l['result'][0] === '[' || $l['result'][0] === '{') {
+      echo '  <pre>', htmlspecialchars(json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT)), '</pre>', "\n";
+    } else {
+      if ($l['method'] === 'HEAD') {
+        $headers = parseHeaders($l['result']);
+        unset($headers['report-to']);
+        unset($headers['expect-ct']);
+        unset($headers['nel']);
+        unset($headers['alt-svc']);
+        unset($headers['cf-ray']);
+        unset($headers['strict-transport-security']);
+        unset($headers['x-frame-options']);
+        unset($headers['x-content-type-options']);
+        unset($headers['x-xss-protection']);
+        //unset($headers['cf-cache-status']);
+        unset($headers['server']);
+        // a table format maybe better here...
+        echo '<table>';
+        foreach($headers as $k => $v) {
+          echo '<tr><th>', $k, '<td>', $v, "\n";
+        }
+        echo '</table>';
+        //echo '  <pre>', htmlspecialchars(print_r($headers, 1)), '</pre>', "\n";
+      } else {
+        echo '  <pre>', htmlspecialchars($l['result']), '</pre>', "\n";
+      }
+    }
     echo '</details>';
     $ttl += $l['took'];
   }
