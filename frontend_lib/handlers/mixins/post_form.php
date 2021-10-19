@@ -46,9 +46,11 @@ function renderPostFormHTML($boardUri, $options = false) {
   $tagThread = '';
 
   extract(ensureOptions(array(
-    'reply' => 'false',
+    'reply'     => false,
     'showClose' => true,
+    'formId'    => 'postform',
   ), $options));
+
 
   if ($reply) {
     $type = 'Reply';
@@ -94,7 +96,7 @@ function renderPostFormHTML($boardUri, $options = false) {
 
   $formOptions = array_merge(jsChanStyle(), array(
     'buttonLabel' => 'New ' . $type,
-    'formId'      => 'postform',
+    'formId'      => $formId,
     'postFormTag' => $postFormHTML,
   ));
 
@@ -110,7 +112,7 @@ function renderPostFormHTML($boardUri, $options = false) {
   $pipelines[PIPELINE_POST_FORM_VALUES]->execute($values);
 
   // get html for these parameters
-  return generateForm($boardUri . '/post.php', $formfields, $values, $formOptions);
+  return generateForm($boardUri . '/post', $formfields, $values, $formOptions);
 }
 
 function renderPostForm($boardUri, $url, $options = false) {
@@ -122,6 +124,8 @@ function renderPostForm($boardUri, $url, $options = false) {
       $type = 'Reply';
     }
   }
+
+  //echo "type[$type]<br>\n";
 
   $templates = loadTemplates('mixins/post_form');
   $tags = array(
