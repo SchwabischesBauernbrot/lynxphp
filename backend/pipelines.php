@@ -22,6 +22,7 @@ $backEndPipelines = array(
   'PIPELINE_USER_DATA',
   'PIPELINE_POST',
   'PIPELINE_FILE',
+  'PIPELINE_REPLY_ALLOWED',
 );
 // we don't need to necessarily call this here
 definePipelines($backEndPipelines);
