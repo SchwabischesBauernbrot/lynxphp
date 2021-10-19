@@ -24,6 +24,11 @@ function modelToSQL($type) {
     case 'bigtext':
       $sql = ' LONGTEXT NOT NULL, '; // 4GB
     break;
+    /*
+    case 'datetime':
+      $sql = ' DATETIME NOT NULL DEFAULT \'0001-01-01\', ';
+    break;
+    */
   }
   return $sql;
 }
@@ -44,6 +49,9 @@ function sqlToType($sqlType) {
     break;
     case 'mediumtext':
       $type = 'text';
+    break;
+    case 'datetime':
+      $type = 'datetime';
     break;
   }
   return $type;
@@ -356,6 +364,8 @@ class mysql_driver extends database_driver_base_class implements database_driver
     return mysqli_free_result($res);
   }
   public function make_constant($value) {
+    if ($value === true) return '1';
+    if ($value === false) return '0';
     return '"'. addslashes($value) . '"';
   }
   public function groupAgg($field) {
@@ -364,6 +374,11 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function unixtime($val = '') {
     return 'UNIX_TIMESTAMP(' . $val . ')';
   }
+  /*
+  public function unixtimeTs($val = '') {
+    return 'FROM_TIMESTAMP(' . $val . ')';
+  }
+  */
 }
 
 ?>
