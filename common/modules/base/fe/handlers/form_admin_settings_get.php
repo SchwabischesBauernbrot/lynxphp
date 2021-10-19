@@ -13,6 +13,6 @@ $pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
 
 $html = generateForm($params['action'], $fields, $values);
 
-wrapContent('Settings'. $html);
+wrapContent(renderAdminPortal() . 'Settings'. $html);
 
 ?>
