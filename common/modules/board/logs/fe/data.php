@@ -5,8 +5,16 @@ $fePkgs = array(
     'handlers' => array(
       array(
         'method'  => 'GET',
-        'route'   => '/:uri/logs',
+        'route'   => '/:uri/logs.html',
         'handler' => 'public_list',
+        'cacheSettings' => array(
+          'files' => array(
+            // theme is also would affect this caching
+            'templates/header.tmpl', // wrapContent
+            '../common/modules/board/logs/fe/views/log_listing.tmpl', // homepage
+            'templates/footer.tmpl', // wrapContent
+          ),
+        ),
       ),
       /*
       array(
