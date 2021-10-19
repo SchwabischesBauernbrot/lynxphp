@@ -4,6 +4,6 @@
 $params = $getModule();
 
 // io is navItems
-$io['[Logs]'] = '{{uri}}/logs';
+$io['[Logs]'] = '{{uri}}/logs.html';
 
 ?>
