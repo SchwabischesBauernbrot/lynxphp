@@ -1,7 +1,10 @@
 window.addEventListener('DOMContentLoaded', (event) => {
 
   const postForm = document.querySelector('#postform');
-  const newPostButton = document.querySelector('input[type="submit"]');
+  //const newPostButton = document.querySelector('input[type="submit"]');
+  const newPostButton = document.querySelector('.openPostForm');
+  console.log('newPostButton', newPostButton)
+
   const openPostForm = (e) => {
     if (e) {
       e.preventDefault();
@@ -11,17 +14,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
     newPostButton.style.visibility = 'hidden';
     postForm.dispatchEvent(new Event('opened'));
   };
+
+
   const closePostForm = (e) => {
     e.preventDefault();
     history.replaceState({}, '', location.pathname);
     postForm.style.display = 'none';
     newPostButton.style.visibility = 'visible';
   };
+
+  // if we have a postform
   if (postForm) {
-    const closeButton = postForm ? postForm.querySelector('.close') : null;
     if (newPostButton) {
       newPostButton.addEventListener('click', openPostForm, false);
     }
+    const closeButton = postForm ? postForm.querySelector('.close') : null;
     closeButton.addEventListener('click', closePostForm, false);
   }
 
