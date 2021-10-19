@@ -108,7 +108,13 @@ $router->all('/opt/*', $routers['opt']);
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 $req_path   = getServerField('PATH_INFO');
 
-// we could check
+registerPackages();
+// build routes (and activate backend_handlers.php/models.php)
+foreach($packages as $pkg) {
+  $pkg->buildBackendRoutes();
+}
+
+// we could validate request before bothering the db
 if (0) {
   // saves about 40ms
   // but all the pipelines aren't set up
@@ -117,12 +123,6 @@ if (0) {
   if ($res) {
     exit();
   }
-}
-
-registerPackages();
-// build routes (and activate backend_handlers.php/models.php)
-foreach($packages as $pkg) {
-  $pkg->buildBackendRoutes();
 }
 
 $db->ensureTables();
@@ -170,6 +170,7 @@ function sendResponse2($data, $options = array()) {
 }
 
 function sendRawResponse($mixed, $code = 200, $err = '') {
+  if ($code !== 200) http_response_code($code);
   if (getQueryField('prettyPrint')) {
     echo '<pre>', json_encode($mixed, JSON_PRETTY_PRINT), "</pre>\n";
   } else {
@@ -198,6 +199,8 @@ function sendResponse($data, $code = 200, $err = '', $meta = false) {
 function wrapContent($error) {
   sendResponse(array(), 400, $error);
 }
+
+//echo "method[$req_method]<br>\n";
 
 $res = $router->exec($req_method, $req_path);
 if (!$res) {
