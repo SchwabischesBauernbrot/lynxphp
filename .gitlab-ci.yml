@@ -137,7 +137,7 @@ buildzip:
     - exit
   artifacts:
     paths:
-      - .
+      - /builds/odilitime/lynxphp/
   
 
 test:nginx:my:latest:
