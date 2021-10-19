@@ -106,12 +106,23 @@ class BackendRouter extends Router {
 
     //echo "Installing [$method][$cond]<br>\n";
     switch($method) {
+      case 'GET':
+        $this->methods['GET'][$cond] = $func;
+      break;
       case 'POST':
         $this->methods['POST'][$cond] = $func;
       break;
-      case 'GET':
+      case 'HEAD':
+        $this->methods['HEAD'][$cond] = $func;
+      break;
+      case 'PUT':
+        $this->methods['PUT'][$cond] = $func;
+      break;
+      case 'DELETE':
+        $this->methods['DELETE'][$cond] = $func;
+      break;
       default:
-        $this->methods['GET'][$cond] = $func;
+        echo "Unknown method [$method]<br>\n";
       break;
     }
     return true;
