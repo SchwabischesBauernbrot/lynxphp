@@ -129,6 +129,17 @@ variables:
 
 # alpine
 
+buildzip:
+  tags:
+    - docker
+  image: hello-world
+  script:
+    - exit
+  artifacts:
+    paths:
+      - .
+  
+
 test:nginx:my:latest:
   before_script:
     - *alpine
