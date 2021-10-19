@@ -228,7 +228,7 @@ $frontendRouterData = array(
       ),
       'newPost' => array(
         'method' => 'POST',
-        'route'  => '/post.php',
+        'route'  => '/:uri/post',
         'func'   => 'makePostHandler',
       ),
       'catalog' => array(
