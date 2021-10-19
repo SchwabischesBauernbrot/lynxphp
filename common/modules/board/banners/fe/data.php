@@ -5,8 +5,16 @@ $fePkgs = array(
     'handlers' => array(
       array(
         'method'  => 'GET',
-        'route'   => '/:uri/banners',
+        'route'   => '/:uri/banners.html',
         'handler' => 'public_list',
+        'cacheSettings' => array(
+          'files' => array(
+            // theme is also would affect this caching
+            'templates/header.tmpl', // wrapContent
+            '../common/modules/board/banners/fe/views/banner_listing.tmpl', // homepage
+            'templates/footer.tmpl', // wrapContent
+          ),
+        ),
       ),
       array(
         'method'  => 'GET',
