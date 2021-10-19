@@ -83,7 +83,9 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   }
 
   // FIXME: are we in a thread? (if so set reply option)
-  $form_html = renderPostFormHTML($boardUri, array('showClose' => false));
+  $form_html = renderPostFormHTML($boardUri, array(
+    'showClose' => false, 'formId' => 'bottom_postform',
+  ));
 
   return array(
     'tmpl' => $tmpl,
