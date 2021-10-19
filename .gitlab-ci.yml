@@ -132,6 +132,7 @@ variables:
 buildzip:
   tags:
     - docker
+  image: hello-world
   script:
     - exit
   artifacts:
