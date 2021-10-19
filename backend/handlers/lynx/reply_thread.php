@@ -9,8 +9,8 @@ $user_id = (int)getUserID();
 $boardUri = $_POST['boardUri'];
 $posts_model = getPostsModel($boardUri);
 $threadid = (int)$_POST['threadId'];
-// make sure threadId exists...
-$id = $db->insert($posts_model, array(array(
+
+$post = array(
   // noFlag, email, password, captcha, spoiler, flag
   'threadid' => $threadid,
   'resto' => 0,
@@ -24,7 +24,22 @@ $id = $db->insert($posts_model, array(array(
   'capcode' => '',
   'country' => '',
   'deleted' => 0,
-)));
+);
+
+// is board locked?
+global $pipelines;
+$reply_allowed_io = array(
+  'p'       => $post,
+  'allowed' => true,
+);
+$pipelines[PIPELINE_REPLY_ALLOWED]->execute($reply_allowed_io);
+
+if (!$reply_allowed_io['allowed']) {
+  return sendResponse(array(), 200, 'Reply is not allowed');
+}
+
+// make sure threadId exists...
+$id = $db->insert($posts_model, array($post));
 $data = (int)$id;
 $issues = processFiles($boardUri, $_POST['files'], $threadid, $id);
 
