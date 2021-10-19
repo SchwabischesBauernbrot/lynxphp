@@ -242,6 +242,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   function query($sqls) {
     if (!is_array($sqls)) $sqls = array($sqls);
     if (count($sqls) === 1) {
+      //echo "SQL[", $sqls[0], "]<br>\n";
       $res = pg_query($this->conn, $sqls[0]);
       $err = pg_last_error($this->conn);
       if ($err) {
@@ -410,6 +411,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     return pg_free_result($res);
   }
   public function make_constant($value) {
+    if ($value === true) return 'true';
+    if ($value === false) return 'false';
     return '\''. pg_escape_string($value) . '\'';
   }
   public function groupAgg($field) {
