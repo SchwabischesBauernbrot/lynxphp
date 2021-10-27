@@ -5,15 +5,28 @@
     </div>
     {{threadstats}}
   </div>
-  <!-- div class="jsonly" id="livetext">
-    <div class="dot" id="livecolor"></div>
-    Connecting...
-    <input class="postform-style ml-5 di" type="button" value="Update">
-  </div -->
+  <div id="livetext" class="jsonly">
+    <!-- div class="dot" id="livecolor"></div>
+    Connecting... -->
+    <!-- input class="postform-style ml-5 di" type="button" value="Update" -->
+    <a id="updatePage" href="{{url}}">Refresh</a>
+  </div>
   {{postactions}}
 </form>
+  {{postForm}}
 <!-- loop -->
   <div id="threadstats">
     <span>{{replies}} replies</span> | <span>{{files}} file</span>
   </div>
+<!-- end -->
+<!-- loop -->
+  <center>
+    <details>
+      <!-- new thread / new reply ? -->
+      <summary>Post Form</summary>
+      <div class="lpPostForm" style="max-width: 650px">
+        {{postForm}}
+      </div>
+    </details>
+  </center>
 <!-- end -->
