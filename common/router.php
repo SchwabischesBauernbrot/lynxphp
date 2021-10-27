@@ -182,6 +182,7 @@ class Router {
       global $db;
       $mtime = $db->getLast($cacheSettings['databaseTables']);
     }
+    // could be promoted in the frontend router...
     if (isset($cacheSettings['backend'])) {
       $params = array();
       foreach($routeParams as $k => $v) {
@@ -197,18 +198,7 @@ class Router {
           'url' => BACKEND_BASE_URL . $endpoint,
           'method' => 'HEAD',
         ));
-        $lines = explode("\r\n", $result);
-        array_shift($lines);
-        $headers = array();
-        foreach($lines as $h) {
-          if (!$h) continue;
-          if (strpos($h, ': ') !== false) {
-            list($k, $v) = explode(': ', $h);
-            $headers[$k] = $v;
-          } else {
-            echo "h[$h] has no :\n";
-          }
-        }
+        $headers = parseHeaders($result);
         if (!isset($headers['last-modified'])) {
           // if we don't have an anchor no way...
           echo "No way to cache backend[", $be['route'], "], no cacheSettings\n";
@@ -246,6 +236,7 @@ class Router {
 
   // do we have a cached copy
   function isUncached($key, $routeParams) {
+    // no caching
     if (!isset($this->routeOptions[$key]['cacheSettings'])) {
       //echo "No cacheSettings for [$key]";
       //print_r($this->routeOptions);
@@ -254,6 +245,7 @@ class Router {
     //echo "key[$key]<br>\n";
     //print_r($this->routeOptions['cacheSettings'][$key]);
     $cacheSettings = $this->routeOptions[$key]['cacheSettings'];
+    // need dbtables or files
     if (!isset($cacheSettings['databaseTables']) && !isset($cacheSettings['files'])) {
       //echo "No cacheSettings keys", print_r($cacheSettings);
       return true; // render content
@@ -268,6 +260,9 @@ class Router {
       'contentType' => isset($cacheSettings['contentType']) ? $cacheSettings['contentType'] : $this->defaultContentType,
     );
     $mtime = $this->getMaxMtime($cacheSettings, $routeParams);
+    global $now;
+    $diff = $now - $mtime;
+    //echo "last change[$diff]<br>\n";
     if (checkCacheHeaders($mtime, $options)) {
       // it's cached!
       // roughly 120ms rn
