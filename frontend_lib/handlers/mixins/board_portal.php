@@ -4,18 +4,15 @@
 // without having to recalculate it
 function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   global $pipelines;
-  $pagenum   = 0;
-  $isCatalog = 0;
-  $isThread  = 0;
-  $threadNum = 0;
-  $noBoardHeaderTmpl = false;
-  if (is_array($options)) {
-    if (isset($options['pagenum']))   $pagenum   = $options['pagenum'];
-    if (isset($options['isCatalog'])) $isCatalog = $options['isCatalog'];
-    if (isset($options['isThread']))  $isThread  = $options['isThread'];
-    if (isset($options['threadNum'])) $threadNum = $options['threadNum'];
-    if (isset($options['noBoardHeaderTmpl'])) $noBoardHeaderTmpl = $options['noBoardHeaderTmpl'];
-  }
+
+  extract(ensureOptions(array(
+    'pagenum'   => 0,
+    'isCatalog' => false,
+    'isThread'  => false,
+    'threadNum' => 0,
+    'noBoardHeaderTmpl' => false,
+    'threadClosed' => false,
+  ), $options));
 
   $templates = loadTemplates('mixins/board_header');
   $tmpl = $templates['header'];
@@ -82,9 +79,10 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     $pipelines[PIPELINE_BOARD_HEADER_TMPL]->execute($p);
   }
 
-  // FIXME: are we in a thread? (if so set reply option)
-  $form_html = renderPostFormHTML($boardUri, array(
+  // if threadNum, is it locked?
+  $form_html = $threadClosed ? '' : renderPostFormHTML($boardUri, array(
     'showClose' => false, 'formId' => 'bottom_postform',
+    'reply' => $threadNum,
   ));
 
   return array(
@@ -126,7 +124,8 @@ function renderBoardPortalHeaderEngine($row, $boardUri, $boardData) {
     'url' => $_SERVER['REQUEST_URI'],
     'title' => $isCatalog ? '' : ' - ' . htmlspecialchars($boardData['title']),
     'description' => htmlspecialchars($boardData['description']),
-    'postform' => renderPostForm($boardUri, $renderPostFormUrl, $renderPostFormOptions),
+    // if postForm is set, the thread is not closed
+    'postform' => $row['postForm'] ? renderPostForm($boardUri, $renderPostFormUrl, $renderPostFormOptions) : '',
     'sticknav' => $stickNav_html,
     'boardNav' => $row['boardNav'],
     'pretitle' => $isCatalog ? 'Catalog(' : '',
@@ -141,6 +140,7 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
   $templates = loadTemplates('mixins/board_footer');
   $tmpl = $templates['header'];
   $threadstats_tmpl = $templates['loop0'];
+  $postForm_tmpl = $templates['loop1'];
 
   $threadstats_html = '';
 
@@ -167,7 +167,7 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
     'boardNav' => $row['boardNav'],
     'threadstats' => $threadstats_html,
     'postactions' => renderPostActions($boardUri),
-    'postForm' => $row['postForm'],
+    'postForm' => $row['postForm'] ? str_replace('{{postForm}}', $row['postForm'], $postForm_tmpl) : '',
   )));
 }
 
