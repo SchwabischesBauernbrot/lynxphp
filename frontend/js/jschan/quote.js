@@ -3,24 +3,35 @@ window.addEventListener('DOMContentLoaded', (event) => {
   const postForm = document.querySelector('#postform');
   //const newPostButton = document.querySelector('input[type="submit"]');
   const newPostButton = document.querySelector('.openPostForm');
-  console.log('newPostButton', newPostButton)
+  //console.log('newPostButton', newPostButton)
 
   const openPostForm = (e) => {
     if (e) {
       e.preventDefault();
     }
     //history.replaceState({}, '', '#postform');
-    postForm.style.display = 'flex';
-    newPostButton.style.visibility = 'hidden';
-    postForm.dispatchEvent(new Event('opened'));
+    // disabled on locked/closed threads
+    if (postForm) {
+      postForm.style.display = 'flex';
+    }
+    if (newPostButton) {
+      newPostButton.style.visibility = 'hidden';
+    }
+    if (postForm) {
+      postForm.dispatchEvent(new Event('opened'));
+    }
   };
 
 
   const closePostForm = (e) => {
     e.preventDefault();
     history.replaceState({}, '', location.pathname);
-    postForm.style.display = 'none';
-    newPostButton.style.visibility = 'visible';
+    if (postForm) {
+      postForm.style.display = 'none';
+    }
+    if (newPostButton) {
+      newPostButton.style.visibility = 'visible';
+    }
   };
 
   // if we have a postform
