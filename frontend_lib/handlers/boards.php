@@ -247,10 +247,9 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   $threadftr_template = $templates['loop4'];
   $thread_template = $templates['loop5'];
 
-  $noBoardHeaderTmpl = false;
-  if ($wrapOptions) {
-    if (!empty($wrapOptions['noBoardHeaderTmpl'])) $noBoardHeaderTmpl = true;
-  }
+  extract(ensureOptions(array(
+    'noBoardHeaderTmpl' => false,
+  ), $wrapOptions));
 
   //echo "test[", htmlspecialchars(print_r($templates, 1)),"]<br>\n";
 
@@ -511,9 +510,17 @@ function getThread($boardUri, $threadNum) {
   global $pipelines;
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
   $tmpl = replace_tags($tmpl, $p['tags']);
+
+  // FIXME: move into a pipeline
+  $closed = false;
+  if (count($boardData['posts'])) {
+    $closed = empty($boardData['posts'][0]['closed']) ? false : true;
+  }
+
   $boardPortal = getBoardPortal($boardUri, $boardData, array(
     'isThread' => true,
     'threadNum' => $threadNum,
+    'threadClosed' => $closed,
   ));
   wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer']);
 }
