@@ -1,6 +1,7 @@
 <?php
 
 function renderPostActions($boardUri, $options = false) {
+  global $pipelines;
   $templates = loadTemplates('mixins/post_actions');
   $tabs = array(
     array('name'=>'Delete', 'content' => $templates['loop0']),
@@ -17,8 +18,17 @@ function renderPostActions($boardUri, $options = false) {
     // BO, Global or Admin only actions:
     'Ban' => $templates['loop3'],
   );
-  $bottomHtml = $templates['loop4'];
-  $bottomHtml = str_replace('{{captcha}}', '', $bottomHtml);
+  $bottomHtml = $templates['loop4']; // captcha
+
+  $captcha_html = '';
+  $io = array('field'   => 'captcha', 'details' => false);
+  // generate/store/send captcha challange, image, and possibly an ID
+  $pipelines[PIPELINE_FORM_CAPTCHA]->execute($io);
+  if (isset($io['html'])) {
+    //$captcha_html = $io['html'];
+  }
+
+  $bottomHtml = str_replace('{{captcha}}', $captcha_html, $bottomHtml);
   $tags = array(
     'actions' => renderTabs($tabs, array(
       'name' => 'action',
