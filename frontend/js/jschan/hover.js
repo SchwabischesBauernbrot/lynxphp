@@ -171,6 +171,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
           // we need the lock to prevent multiple inflight
           if (!hoverHTMLLoading[htmlPath]) {
             //console.log('htmlPath', htmlPath, 'hash', hash)
+            //console.log('asking for', htmlPath.substr(1))
             hoverHTMLLoading[htmlPath] = fetch(htmlPath.substr(1)).then(res => res.text());
           }
           hoverHTMLLoading[htmlPath].then(html => {
