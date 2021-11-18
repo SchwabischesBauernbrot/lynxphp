@@ -43,6 +43,7 @@ $fePkgs = array(
         'method'  => 'GET',
         'route'   => '/globals/reports',
         'handler' => 'global_report_list',
+        'loggedIn' => true,
       ),
     ),
     'forms' => array(),
