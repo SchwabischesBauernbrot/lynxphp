@@ -48,6 +48,7 @@ function gettrace() {
 }
 
 // ensure all values are set in res
+// what if the option name needs to be stored in a different variable
 function ensureOptions($rules, $data) {
   $res = array();
   if (!$data || !is_array($data)) $data = array();
