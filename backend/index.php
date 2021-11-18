@@ -58,7 +58,7 @@ include '../common/lib.modules.php'; // module functions and classes
 // routers, db options, cache options, pipelines...
 
 // build modules...
-enableModulesType('models'); // bring models online
+enableModulesType('models'); // online models from common/modules/base/models.php
 
 include 'interfaces/requests.php';
 // we have database connections
@@ -96,6 +96,7 @@ include 'lib/lib.board.php';
 include 'lib/middlewares.php';
 include 'interfaces/boards.php';
 include 'interfaces/posts.php';
+include 'interfaces/threads.php';
 include 'interfaces/users.php';
 include 'interfaces/files.php';
 include 'interfaces/sessions.php';
@@ -135,6 +136,11 @@ $response_template = array(
   ),
 );
 
+// options
+// - code
+// - err
+// - mtime
+// - meta
 function sendResponse2($data, $options = array()) {
   global $response_template, $now;
 
@@ -152,19 +158,25 @@ function sendResponse2($data, $options = array()) {
   foreach($meta as $k => $v) {
     $resp['meta'][$k] = $v;
   }
+  // should we only set this if there's actually data?
+  // how to tell an array()/false versus no data?
   $resp['data'] = $data;
   if ($err) {
     $resp['meta']['err'] = $err;
   }
   if (getQueryField('prettyPrint')) {
-    $output = '<pre>' . json_encode($resp, JSON_PRETTY_PRINT) . "</pre>\n";
+    // we need the HTML for the htmlspecialchars
+    // and we need that to stop executing user generate js
+    // but isn't it the default?
+    _doHeaders($mtime, array('contentType' => 'text/html'));
+    $output = '<code>' . htmlspecialchars(json_encode($resp, JSON_PRETTY_PRINT)) . "</code>\n";
   } else {
+    _doHeaders($mtime, array('contentType' => 'application/json'));
     $output = json_encode($resp);
   }
   // you'd have to be able to calculate the output size
   // on a 304 check
   //$filesize = strlen($output);
-  _doHeaders($mtime, array('contentType' => 'application/json'));
   echo $output;
   return true;
 }
@@ -172,8 +184,12 @@ function sendResponse2($data, $options = array()) {
 function sendRawResponse($mixed, $code = 200, $err = '') {
   if ($code !== 200) http_response_code($code);
   if (getQueryField('prettyPrint')) {
-    echo '<pre>', json_encode($mixed, JSON_PRETTY_PRINT), "</pre>\n";
+    // we need the HTML for the htmlspecialchars
+    // and we need that to stop executing user generate js
+    //header('Content-Type: text/html'); // should be the default
+    echo '<pre>', htmlspecialchars(json_encode($mixed, JSON_PRETTY_PRINT)), "</pre>\n";
   } else {
+    header('Content-Type: application/json');
     echo json_encode($mixed);
   }
   return true;
