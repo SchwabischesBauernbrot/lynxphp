@@ -109,7 +109,7 @@ $replaces = array(
   },
   '/' . preg_quote('&gt;&gt;&gt;#') . '\/?(\w+)\/?(\s+)/m' => function ($matches) use ($io) {
     return '<a
-      href="' . $io['boardUri'] . '/catalog#' . $io['boardUri'] . '-/' .
+      href="' . $io['boardUri'] . '/catalog.html#' . $io['boardUri'] . '-/' .
       $matches[1] . '/">&gt;&gt;&gt;#/' . $matches[1].'/</a>' . $matches[2];
   },
 // we need the thread number for that post on that board
