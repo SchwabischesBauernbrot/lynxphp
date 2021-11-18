@@ -8,6 +8,16 @@ return array(
       array(
         'route' => '/signup',
         'handler' => 'signup',
+        'options' => array(
+          'get_options'=> array(
+            'cacheSettings' => array(
+              'files' => array(
+                'templates/header.tmpl', // wrapContent
+                'templates/footer.tmpl', // wrapContent
+              ),
+            ),
+          ),
+        ),
       ),
     ),
     'modules' => array(
