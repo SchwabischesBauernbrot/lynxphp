@@ -8,12 +8,19 @@ $fePkgs = array(
     'handlers' => array(
       array(
         'method'  => 'GET',
-        'route'   => '/user/settings/themedemo/:theme/',
+        'route'   => '/user/settings/themedemo/:theme.html',
         'handler' => 'demo',
         'cacheSettings' => array(
           'files' => array(
-            //'common/modules/site/themes/fe/shared.php'
-            'css/themes/{{route.theme}}.css'
+            //'../common/modules/site/themes/fe/shared.php',
+            'css/themes/{{route.theme}}.css', // wrapContent
+            'templates/thread_listing.tmpl', // demo/boards
+            'templates/header.tmpl', // wrapContent
+            'templates/footer.tmpl', // wrapContent
+            'templates/mixins/board_header.tmpl',
+            'templates/mixins/board_footer.tmpl',
+            'templates/mixins/post_detail.tmpl', // renderPost
+            'templates/mixins/post_actions.tmpl', // renderPostActions
           ),
         ),
       ),
