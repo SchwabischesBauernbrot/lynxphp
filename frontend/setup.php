@@ -90,4 +90,17 @@ require '../frontend_lib/handlers/mixins/tabs.php'; // maybe more of a lib...
 
 registerPackages();
 
+function js_add_script($pkg, $script, $options = false) {
+  extract(ensureOptions(array(
+    'orderConstraints' => false,
+  ), $options));
+
+  $bsn = new pipeline_module(PIPELINE_SITE_END_SCRIPTS . '_' . $pkg->name . '_' . $script);
+  $bsn->attach(PIPELINE_SITE_END_SCRIPTS,
+    function(&$io, $options = false) use ($pkg, $script) {
+      $io['scripts'][] = array('module' => $pkg->name, 'script' => $script);
+  });
+
+}
+
 ?>
