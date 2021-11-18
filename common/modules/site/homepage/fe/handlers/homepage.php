@@ -15,7 +15,7 @@ if (!$homepage || !is_array($homepage)) {
   $settings = $homepage['settings'];
 }
 
-$templates = loadTemplates('index');
+$templates = moduleLoadTemplates('index', __DIR__);
 $board_template = $templates['loop0'];
 $moreBoards = $templates['loop1'];
 
