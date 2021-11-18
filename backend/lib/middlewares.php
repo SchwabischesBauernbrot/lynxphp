@@ -35,7 +35,7 @@ function boardOwnerMiddleware($request) {
   $ok = false;
   // this will not have boardid
   foreach($ownedBoards as $board) {
-    if ($board['uri'] === $boardUri) {
+    if ($board === $boardUri) {
       $ok = true;
       break;
     }
