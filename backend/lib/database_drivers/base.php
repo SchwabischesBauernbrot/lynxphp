@@ -232,9 +232,11 @@ class database_driver_base_class {
         $urow['json'] = json_encode($urow['json']);
       }
     }
+    //echo "<pre>", print_r($urow, 1), "</pre>\n";
     foreach($urow as $f=>$v) {
       // updates are always assignments (=, never </>=)
       $val = is_array($v) ? $v[0] : $this->make_constant($v);
+      //echo "val[$val]<br>\n";
       $sets[$f] = $f . '=' . $val;
     }
     // postgres doesn't allow you to set the AI PK
