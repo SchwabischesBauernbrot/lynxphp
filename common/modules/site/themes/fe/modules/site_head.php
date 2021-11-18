@@ -9,6 +9,14 @@ $allThemes = $shared['themes'];
 unset($allThemes['default']); // erase default as a possible final option
 $themes = array_keys($allThemes);
 
+if (IN_GENERATE) {
+  // reduce permutations and yet keep it reasonable
+  // we can 304 to reduce bandwidth
+  // but will still eat php workers...
+  $io['head_html'] .= '<link id="theme" rel="stylesheet" href="dynamic.php?action=css_theme">';
+  return;
+}
+
 // FIXME: set default theme in siteSettings
 // translate default to first theme...
 if (empty($userSettings['current_theme']) || $userSettings['current_theme'] === 'default') $userSettings['current_theme'] = $themes[0];
