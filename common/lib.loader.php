@@ -69,6 +69,9 @@ function registerPackage($pkg_path) {
     // not all module.php will have resources
     if (!empty($data['resources'])) {
       foreach($data['resources'] as $rsrcHdr) {
+        if (!isset($rsrcHdr['name'])) {
+          echo "<pre>Weird name not set", print_r($rsrcHdr, 1), "in [$full_pkg_path]</pre>\n";
+        }
         $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params']);
       }
     }
@@ -132,10 +135,12 @@ function registerPackageGroup($group) {
 function registerPackages() {
   global $packages;
   $packages = array();
-  $packages['base'] = registerPackage('base');
+  //$packages['base'] = registerPackage('base');
 
   // data
-  $groups = array('board', 'thread', 'post', 'user', 'admin', 'global', 'site', 'protection');
+  $groups = array(
+    'base/base', 'base/user', 'base/site', 'base/thread',
+    'board', 'thread', 'post', 'user', 'admin', 'global', 'site', 'protection');
   foreach($groups as $group) {
     registerPackageGroup($group);
   }
