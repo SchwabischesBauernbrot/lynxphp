@@ -208,6 +208,7 @@ class module_registry {
     return $expMod;
   }
 
+  // we could hash all the names in the pipeline to make a cacheable key
   function resolve_all() {
     $list = array();
     foreach($this->registry as $name => $obj) {
