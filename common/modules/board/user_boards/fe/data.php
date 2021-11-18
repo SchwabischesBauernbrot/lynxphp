@@ -9,6 +9,16 @@ return array(
         //'portal' => 'user',
         'route' => '/create_board',
         'handler' => 'create_board',
+        'options' => array(
+          'get_options'=> array(
+            'cacheSettings' => array(
+              'files' => array(
+                'templates/header.tmpl', // wrapContent
+                'templates/footer.tmpl', // wrapContent
+              ),
+            ),
+          ),
+        ),
       ),
     ),
     'modules' => array(
