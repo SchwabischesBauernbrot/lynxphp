@@ -17,7 +17,10 @@ $pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
 // or filter the params through the pipeline
 
 // FIXME: get from formdata...
-wrapContent('Please wait...');
+// this is a problem is something goes wrong...
+$row = wrapContentData();
+wrapContentHeader($row);
+echo "Please wait...";
 
 $res = $pkg->useResource('save_settings', array('boardUri' => $boardUri),
   array('addPostFields' => $_POST)
@@ -29,9 +32,13 @@ $boardUri = $_POST['uri'];
 if ($res['success']) {
   // maybe a js alert?
   echo "Success<br>\n";
-  redirectTo('/' . $boardUri . '/settings/board');
+  //wrapContentFooter($row);
+  // redirect dev mode does it's own weird header thing...
+  redirectTo('/' . $boardUri . '/settings/board.html', array('header' => false));
 } else {
-  wrapContent('Something went wrong...' . print_r($res, 1));
+  //wrapContent();
+  echo 'Something went wrong...' , print_r($res, 1);
+  wrapContentFooter($row);
 }
 
 ?>
