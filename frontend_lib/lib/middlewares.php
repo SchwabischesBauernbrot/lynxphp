@@ -10,7 +10,7 @@ function boardOwnerMiddleware($request) {
   $ok = false;
   if (isset($account['ownedBoards']) && is_array($account['ownedBoards'])) {
     foreach($account['ownedBoards'] as $board) {
-      if ($board['uri'] === $boardUri) {
+      if ($board === $boardUri) {
         $ok = true;
         break;
       }
