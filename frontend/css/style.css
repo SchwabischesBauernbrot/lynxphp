@@ -487,7 +487,8 @@ table {
   background: var(--background-rest);
   border: 1px solid var(--box-border-color);
   border-spacing: 0;
-  width: 700px;
+  /* disable 11/5/21 so admin screens are wider */
+  /* width: 700px; */
 }
 
 .w900 {
@@ -1086,7 +1087,7 @@ input[type="button"], input[type="range"], input[type="number"], input[type="tex
 
 textarea {
   max-height: 100%;
-  max-width: 100%;
+  max-width: 650px;
 }
 
 input[type=number]::-webkit-outer-spin-button,
