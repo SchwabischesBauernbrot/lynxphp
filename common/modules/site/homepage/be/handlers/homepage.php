@@ -10,6 +10,7 @@ $res = array();
 foreach($boards as $b) {
   $posts_model = getPostsModel($b['uri']);
   $b['threads'] = getBoardThreadCount($b['uri'], $posts_model); // 1 query
+  // if we bump the updated_at on boards we wouldn't need to do this query...
   if ($b['threads']) {
     $newestThreadRes = $db->find($posts_model, array('criteria'=>array(
       array('threadid', '=', 0), // 1 query
