@@ -70,12 +70,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
   const toggleHighlightPost = function (e) {
     hovering = e.type === 'mouseover';
+
+    const loc = whereAmI()
+
     //console.log('jsonParts - pathname', this.pathname)
     let jsonParts = this.pathname.replace(/\.html$/, '.json').split('/');
     //console.log('jsonParts - pathname to json', jsonParts)
     let jsonPath;
     if ((isManage || isModView) && jsonParts.length === 5) {
-      jsonParts.splice(2,1); //remove manage from json url
+      jsonParts.splice(2, 1); //remove manage from json url
     }
     jsonPath = '/opt' + jsonParts.join('/');
     //console.log('jsonPath - add opt', jsonPath)
@@ -172,6 +175,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
           if (!hoverHTMLLoading[htmlPath]) {
             //console.log('htmlPath', htmlPath, 'hash', hash)
             //console.log('asking for', htmlPath.substr(1))
+            // does this already have BACKEND_PUBLIC_URL ?
+            // no because it's talking to the frontend to render the html
             hoverHTMLLoading[htmlPath] = fetch(htmlPath.substr(1)).then(res => res.text());
           }
           hoverHTMLLoading[htmlPath].then(html => {
