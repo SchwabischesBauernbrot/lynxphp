@@ -9,7 +9,7 @@ function getCreateBoardForm() {
   // FIXME: pipeline
   // FIXME get named route
   global $BASE_HREF;
-  return simpleForm($BASE_HREF . 'create_board', $formFields, 'Create board');
+  return simpleForm($BASE_HREF . 'create_board.php', $formFields, 'Create board');
 }
 
 return array();
