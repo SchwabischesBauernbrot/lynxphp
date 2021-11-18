@@ -1,0 +1,159 @@
+var limitRefreshWait = 10 * 60
+var refreshTimer = false
+var autoRefresh = false
+var unreadPosts = 0
+var originalTitle = document.title
+
+function refreshPosts(manual) {
+
+  // prevent more clicks...
+  var refreshElem = document.getElementById('refresh')
+  var refreshingElem = document.getElementById('refreshing')
+  refreshElem.style.display = 'none'
+  refreshingElem.style.display = 'block'
+
+  // we have to ask the backend, is there anything new...
+  const loc = whereAmI()
+  fetch(getRefreshUrl(loc)).then(res => res.text()).then(html => {
+    var result = refreshCallback(null, html)
+
+    // refreshButton.style.display = 'inline'
+    //console.log('refreshPosts - autoRefresh', autoRefresh)
+    if (autoRefresh) {
+      startTimer((manual || result.foundNewReplies) ? 20 : lastRefresh * 2)
+    }
+    refreshElem.style.display = 'block'
+    refreshingElem.style.display = 'none'
+  })
+}
+
+function stopTimer() {
+  if (refreshTimer) {
+    if (typeof(labelRefresh) !== 'undefined') {
+      labelRefresh.innerHTML = ''
+    }
+    // clear old timer and allow a new one to be set
+    clearInterval(refreshTimer)
+    refreshTimer = false
+  }
+}
+
+function startTimer(time) {
+  if (time > limitRefreshWait) {
+    time = limitRefreshWait
+  }
+
+  currentRefresh = time
+  lastRefresh = time
+
+  // don't set a timer unless there's a reason
+  if (typeof(refreshCallback) !== 'undefined') {
+    if (typeof(labelRefresh) !== 'undefined') {
+      labelRefresh.innerHTML = currentRefresh
+    }
+    // since we're above to stomp previous refreshTimer make sure it doesn't fire
+    stopTimer()
+    refreshTimer = setInterval(function checkTimer() {
+      currentRefresh--
+
+      if (!currentRefresh) {
+        refreshPosts(false)
+        if (typeof(labelRefresh) !== 'undefined') {
+          labelRefresh.innerHTML = ''
+        }
+      } else {
+        if (typeof(labelRefresh) !== 'undefined') {
+          labelRefresh.innerHTML = currentRefresh
+        }
+      }
+
+    }, 1000)
+  } else {
+    console.log('refreshCallback is not defined')
+  }
+}
+
+// change the autoRefresh timer variable
+function changeRefresh(dontSave) {
+  //console.log('changeRefresh - start', autoRefresh)
+  // if autorefresh is enabled
+  if (autoRefresh) {
+    // turn it off
+    stopTimer()
+  } else {
+    // start it (turn it on)
+    startTimer(5)
+  }
+
+  // toggle autoRefresh
+  autoRefresh = !autoRefresh
+  //console.log('changeRefresh - set', autoRefresh)
+
+  //console.log('changeRefresh', dontSave, 'auto', autoRefresh)
+  // FIXME: lynxphp communicates with backend for settings like this...
+  /*
+  if (!dontSave) {
+    var days = 365*10 // remember this setting for 10 years
+    //console.log('writing', autoRefresh?'true':'false')
+    setCookie('myAutoRefresh', autoRefresh?'true':'false', days)
+  }
+  */
+}
+
+if (!DISABLE_JS) {
+  // wire up checkbox
+  var autoCheckbox = document.getElementById('autoRefreshEnable')
+  if (autoCheckbox) {
+    autoCheckbox.onclick = function() {
+      changeRefresh(false)
+    }
+    // bring online
+    if (autoCheckbox.checked) {
+      changeRefresh(true)
+    }
+  }
+
+  // wire up button
+  var updateButton = document.getElementById('updatePage')
+  if (updateButton) {
+    updateButton.onclick = function() {
+      // make sure we can make it do something
+      if (typeof(refreshCallback) !== 'undefined') {
+        stopTimer()
+        refreshPosts(true)
+        return false
+      }
+    }
+  }
+
+  document.onscroll = function() {
+
+    if (!unreadPosts) {
+      return;
+    }
+
+    var threadElem = document.getElementById('threadsContainer')
+    var rect = threadElem.children[threadElem.children.length - 1].getBoundingClientRect()
+
+    if (rect.bottom < window.innerHeight) {
+      // refresh post would set this...
+      unreadPosts = 0
+
+      document.title = originalTitle
+    }
+
+  }
+
+  var isActive = true
+
+  window.onfocus = function () {
+    isActive = true
+    document.onscroll()
+  }
+
+  window.onblur = function () {
+    isActive = false
+  }
+} else {
+  delete originalTitle
+}
