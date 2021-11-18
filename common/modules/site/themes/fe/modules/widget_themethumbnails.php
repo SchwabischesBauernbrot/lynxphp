@@ -69,15 +69,23 @@ $io['html'] = '
 $first = array_shift($details['options']);
 asort($details['options']);
 array_unshift($details['options'], $first);
+//global $now;
 foreach($details['options'] as $v => $l) {
   $sel = $v === $value ? 'checked ' : '';
+  /*
+  $mtime = $now;
+  if (file_exists('css/themes/' . $v . '.css')) {
+    $mtime = filemtime('css/themes/' . $v . '.css');
+  }
+  // ?v=' . $mtime . '
+  */
   $io['html'] .= '
 <li class="dummie-themes-li">
   <div class="thumbnail-container" title="' . $l . '">
     <label>
       <h5><input type="radio" name="' . $fieldName . '" value="' . $v. '"' . $sel . '>' . $l . '</h5>
       <div class="thumbnail">
-        <iframe src="/user/settings/themedemo/' . $v . '/" frameborder="0" scroll="no"></iframe>
+        <iframe src="/user/settings/themedemo/' . $v . '.html" frameborder="0" scroll="no"></iframe>
       </div>
     </label>
   </div>
