@@ -4,6 +4,6 @@
 $params = $getModule();
 
 // io is navItems
-$io['navItems']['Board settings'] = '{{uri}}/settings/board';
+$io['navItems']['Board settings'] = '{{uri}}/settings/board.html';
 
 ?>
