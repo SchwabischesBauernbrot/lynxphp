@@ -9,6 +9,16 @@ return array(
         'portal' => 'account',
         'route' => '/account/change_userpass',
         'handler' => 'change_userpass',
+        'options' => array(
+          'get_options'=> array(
+            'cacheSettings' => array(
+              'files' => array(
+                'templates/header.tmpl', // wrapContent
+                'templates/footer.tmpl', // wrapContent
+              ),
+            ),
+          ),
+        ),
       ),
     ),
     'modules' => array(
