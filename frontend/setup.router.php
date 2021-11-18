@@ -123,6 +123,11 @@ $frontendRouterData = array(
         'func'   => 'getAdminFERoutesPage',
         'loggedIn' => true,
       ),
+      'be_routes' => array(
+        'route'  => '/admin/be_routes.php',
+        'func'   => 'getAdminBERoutesPage',
+        'loggedIn' => true,
+      ),
 
     ),
   ),
@@ -209,6 +214,7 @@ $frontendRouterData = array(
           ),
         ),
       ),
+      /*
       'thread' => array(
         'route'  => '/:uri/thread/:num.html',
         'func'   => 'getThreadHandler',
@@ -226,6 +232,7 @@ $frontendRouterData = array(
           ),
         ),
       ),
+      */
       'newPost' => array(
         'method' => 'POST',
         'route'  => '/:uri/post',
