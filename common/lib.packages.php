@@ -44,6 +44,8 @@ class package {
 
   // should we make a frontend_package/backend_package
   // no because they're optional and could have more than one
+  // only one fe/ directory but that array can have multiple for on/off
+  // it's not ib/mb support
   // FIXME: rename this... they'll be in a fe/be context and we need to emphasize the pkg part
   function makeFrontend() {
     return new frontend_package($this);
@@ -283,8 +285,20 @@ class package {
   }
   // hotpath
   // if router is omitted, we only set up modules/pipelines
-  function frontendPrepare($router = false, $method = 'GET') {
+  // FIXME: an option to only load a list of these resources...
+  // like js only needs the js only
+  function frontendPrepare($router = false, $method = 'GET', $options = false) {
     //echo "buildFrontendRoutes<br>\n";
+    $ensuredOptions = ensureOptions(array(
+      'loadHandlers'  => true,
+      'loadForms'     => true,
+      'loadJs'        => false,
+      'loadModules'   => true,
+      'loadPipelines' => true,
+      'router' => $router, // false
+      'method' => $method, // GET
+    ), $options);
+
     // activate frontend hooks
     if (file_exists($this->dir . 'fe/data.php')) {
       $fePkgs = include $this->dir . 'fe/data.php';
@@ -297,51 +311,11 @@ class package {
       foreach($fePkgs as $pName => $pData) {
         $fePkg = $this->makeFrontend();
         $fePkg->name = $pName;
-        if ($router) {
-          if (isset($pData['handlers']) && is_array($pData['handlers'])) {
-            foreach($pData['handlers'] as $h) {
-              // FIXME: skip adding the methods we don't need...
-              //$fePkg->addHandler('GET', '/:uri/banners', 'public_list');
-              $m = empty($h['method']) ? 'GET' : $h['method'];
-              //echo $m, '_', $h['route'], ' ', print_r($h, 1), "\n";
-              $options = array(
-                'cacheSettings' => empty($h['cacheSettings']) ? false : $h['cacheSettings'],
-                'loggedIn' => empty($h['loggedIn']) ? false : $h['loggedIn'],
-              );
-              //echo $m, '_', $h['route'], ' ', print_r($options, 1), "\n";
-              $fePkg->addHandler($m, $h['route'], $h['handler'], $options);
-            }
-          }
-          if (isset($pData['forms']) && is_array($pData['forms'])) {
-            foreach($pData['forms'] as $f) {
-              // FIXME: skip adding the methods we don't need...
-              $fePkg->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
-            }
-          }
-        }
-        if (isset($pData['modules']) && is_array($pData['modules'])) {
-          foreach($pData['modules'] as $m) {
-            if (!defined($m['pipeline'])) {
-              echo "Pipeline [", $m['pipeline'], "] is not defined, found in [", $this->dir, "]<br>\n";
-            } else {
-              $fePkg->addModule(constant($m['pipeline']), $m['module']);
-            }
-          }
-        }
-        if (isset($pData['pipelines']) && is_array($pData['pipelines'])) {
-          foreach($pData['pipelines'] as $m) {
-            $fePkg->addPipeline($m);
-          }
-        }
+        $fePkg->unpack($pData, $ensuredOptions);
       }
     //} else {
       //echo "No fe/data.php in [", $this->dir, "]<br>\n";
     }
-    /*
-    else
-    if (file_exists($this->dir . 'fe/index.php')) {
-      include $this->dir . 'fe/index.php';
-    }*/
 
     // optional common functions and data
     // load here so they couldn't be called to calculate data for the module/data
@@ -449,8 +423,60 @@ class frontend_package {
     $this->pkg->registerFrontendPackage($this);
     $this->handlers = array();
     $this->modules = array();
+    $this->js = array();
     $this->ranOnce = false;
   }
+
+  function unpack($pData, $ensuredOptions) {
+    // unpacks load*, router, method
+    extract($ensuredOptions);
+    // we could split this into multiple functions...
+    // maybe all this should be moved into fe_pkg
+    if ($router) {
+      if ($loadHandlers && isset($pData['handlers']) && is_array($pData['handlers'])) {
+        foreach($pData['handlers'] as $h) {
+          // FIXME: skip adding the methods we don't need...
+          //$this->addHandler('GET', '/:uri/banners', 'public_list');
+          $m = empty($h['method']) ? 'GET' : $h['method'];
+          //echo $m, '_', $h['route'], ' ', print_r($h, 1), "\n";
+          $options = array(
+            'cacheSettings' => empty($h['cacheSettings']) ? false : $h['cacheSettings'],
+            'loggedIn' => empty($h['loggedIn']) ? false : $h['loggedIn'],
+          );
+          //echo $m, '_', $h['route'], ' ', print_r($options, 1), "\n";
+          // file maybe more descriptive and consistent than handler
+          $this->addHandler($m, $h['route'], $h['handler'], $options);
+        }
+      }
+      if ($loadForms && isset($pData['forms']) && is_array($pData['forms'])) {
+        foreach($pData['forms'] as $f) {
+          // FIXME: skip adding the methods we don't need...
+          $this->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
+        }
+      }
+    }
+    if ($loadJs && isset($pData['js']) && is_array($pData['js'])) {
+      // no need to unpack, we just need to transfer the data
+      // maybe some rules to determine if to load it or not?
+      $this->js = $pData['js'];
+      // unpack it into pipelines if we're on this page?
+    }
+    if ($loadModules && isset($pData['modules']) && is_array($pData['modules'])) {
+      foreach($pData['modules'] as $m) {
+        if (!defined($m['pipeline'])) {
+          echo "Pipeline [", $m['pipeline'], "] is not defined, found in [", $this->dir, "]<br>\n";
+        } else {
+          $this->addModule(constant($m['pipeline']), $m['module']);
+        }
+      }
+    }
+    if ($loadPipelines && isset($pData['pipelines']) && is_array($pData['pipelines'])) {
+      foreach($pData['pipelines'] as $m) {
+        $this->addPipeline($m);
+      }
+    }
+  }
+
   // could make a addCRUD (optional update)
   // could make an addForm that has a get/post
   // maybe a list of overrides options (defaults to change behavior)
@@ -469,6 +495,7 @@ class frontend_package {
       'options' => $options,
     );
   }
+
   function addForm($cond, $file, $options = false) {
     if (!isset($options['get_options'])) $options['get_options'] = array();
     //else echo "addForm - [", print_r($options['get_options'], 1), "]\n";
@@ -477,6 +504,7 @@ class frontend_package {
     $this->addHandler('GET', $cond . '.html', 'form_'.$file.'_get', $options['get_options']);
     $this->addHandler('POST', $cond . '.php', 'form_'.$file.'_post', $options['post_options']);
   }
+
   function addModule($pipeline_name, $file = false) {
     $bsn = new pipeline_module($this->pkg->name. '_' . $pipeline_name);
     if ($file === false) $file = $pipeline_name;
@@ -547,9 +575,11 @@ class frontend_package {
     });
     return $bsn;
   }
+
   function addPipeline($pipeline) {
     definePipeline($pipeline['name']);
   }
+
   function buildRoutes($router, $method) {
     // do we have any routes in this method
     if (empty($this->handlers[$method])) {
