@@ -5,7 +5,7 @@
 //
 
 return array(
-  'opt' => array(
+  'lynxchan_minimal' => array(
     'dir'  => 'lynx',
     'routes' => array(
       'createBoard' => array(
