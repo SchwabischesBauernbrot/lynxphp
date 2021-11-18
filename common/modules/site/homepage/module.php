@@ -9,6 +9,11 @@ return array(
         'endpoint' => 'opt/homepage.json',
         'unwrapData' => true,
         'sendSession' => true,
+        'cacheSettings' => array(
+          // FIXME: all public posts...
+          'databaseTables' => array('boards', 'site_settings'),
+          //'files' => array(),
+        ),
       ),
     ),
   ),
