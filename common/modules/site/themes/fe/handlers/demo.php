@@ -5,6 +5,7 @@ $params = $getHandler();
 //echo "<pre>", print_r($params, 1), "</pre>\n";
 
 $theme = $params['request']['params']['theme'];
+$theme = str_replace('.html', '', $theme);
 
 /*
 if (file_exists('css/themes/' . $theme . '.css')) {
@@ -154,6 +155,14 @@ $boardThreads = array(
     'description' => 'this is an imaginary board for purposes of demostration',
   )
 );
+
+if (!function_exists('secondsToTime')) {
+  // this smells bad...
+  include '../frontend_lib/handlers/boards.php';
+  // prevent generation's fe router from including this group again
+  global $router;
+  $router->included['boards'] = true;
+}
 
 getBoardThreadListingRender($boardUri, $boardThreads, 1, array(
   'noBoardHeaderTmpl' => true,
