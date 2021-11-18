@@ -1,11 +1,15 @@
 <?php
 
-function redirectTo($url) {
-  echo '<head>';
-  //global $BASE_HREF;
-  //echo '<base href="', $BASE_HREF, '">';
-  echo '<meta http-equiv="refresh" content="0; url=', $url,'">';
-  echo '</head>';
+function redirectTo($url, $options = false) {
+  if (DEV_MODE) {
+    wrapContent('DEV_MODE is enabled, <a href="' . $url . '">click here to continue</a>', $options);
+  } else {
+    echo '<head>';
+    //global $BASE_HREF;
+    //echo '<base href="', $BASE_HREF, '">';
+    echo '<meta http-equiv="refresh" content="0; url=', $url,'">';
+    echo '</head>';
+  }
   /*
   echo '<script>';
   echo 'window.location = "', $url, '"';
@@ -27,9 +31,12 @@ function sendBump($req_method, $req_path) {
          ($req_path === '/forms/login' && $req_method === 'POST') ||
          strpos($req_path, 'user/settings/themedemo/') !== false ||
          strpos($req_path, '/preview/') !== false ||
+         strpos($req_path, '/refresh') !== false ||
          $req_path === '/logout'
       ) && strpos($req_path, '/.youtube') === false) {
     // make sure first lines of output are see-able
+    //if (DEV_MODE)
+    echo '<!-- lib.handler::sendBump -->';
     echo '<div style="height: 40px;"></div>', "\n"; flush();
     $sentBump = true;
   }
@@ -51,7 +58,8 @@ function wrapContentData($options = false) {
   if (empty($settings)) {
     // this can cause an infinite loop if backend has an error...
     // FIXME: caching
-    $settings = $packages['base']->useResource('settings', false, array('inWrapContent'=>true));
+    //echo "packages[", print_r(array_keys($packages), 1), "]<br>\n";
+    $settings = $packages['base_settings']->useResource('settings', false, array('inWrapContent'=>true));
   }
   //echo "<pre>", print_r($settings, 1), "</pre>\n";
   if (empty($settings) || !is_array($settings)) {
@@ -88,6 +96,7 @@ function wrapContentHeader($row) {
   $pipelines[PIPELINE_SITE_HEAD]->execute($io);
   $head_html = $io['head_html'] . "\n" . '<script>
     const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
+    const DISABLE_JS = false
   </script>';
 
   $templates = loadTemplates('header');
@@ -117,6 +126,54 @@ function wrapContentFooter($row) {
   $enableJs = $row['enableJs'];
   $doWork = $row['doWork'];
 
+  // a script could be
+  // - a relative url
+  // - a file in a module
+  // ordering of the script can be important too
+  // so a single list is preferred
+  // however that doesn't let us group load a module...
+  // so we have scenarios where we want to combine
+  // and others we don't
+  // we'd have to compile it...
+  // well for now, we'll add an option
+  // and deal with it when we have a need for ordering...
+  $io = array(
+    'scripts' => array(
+      // lynxphp and jschan both use this
+      'js/url.js',
+      // jschan
+      // quote requires localstorage
+      'js/localstorage.js',
+      // click to reply
+      'js/jschan/quote.js',
+      'js/jschan/hover.js',
+      // lynxphp
+      'js/lynxphp/embed.js',
+      'js/lynxphp/refresh.js',
+    ),
+  );
+  // THINK: how do we let JS live in module directories
+  // but be efficently servered by web server?
+  // so that we don't have to fire up php each time
+  // make the static generation engine can copy them
+  // and then we have PHP fallback
+  $pipelines[PIPELINE_SITE_END_SCRIPTS]->execute($io);
+  $scripts = $io['scripts'];
+
+  // THINK: how to use a pipeline to override this behavior?
+  // maybe fallback if pipeline has no hooks
+  $scripts_html = '';
+  foreach($scripts as $p) {
+    if (is_array($p)) {
+      // can add a type/version key later
+      // FIXME: support multiple scripts on one module
+      // FIXME: generate support to drop the need for php call
+      // make all the scripts local to webroot
+      $p = 'js.php?module=' .$p['module'] . '&scripts=' . $p['script'];
+    }
+    $scripts_html .= '<script src="' . $p . '"></script>' . "\n";
+  }
+
   $io = array(
     'siteSettings' => $row['siteSettings'],
     'userSettings' => $row['userSettings'],
@@ -129,7 +186,7 @@ function wrapContentFooter($row) {
     'footer_header' => '',
     'footer_nav' => '',
     'footer_footer' => '',
-    'end' => $io['end_html'],
+    'end' => $scripts_html . $io['end_html'],
   );
   $footer = loadTemplates('footer');
   echo replace_tags($footer['header'], $tags);
@@ -186,9 +243,14 @@ function wrapContentFooter($row) {
   }
 }
 
-function wrapContent($content, $options = '') {
+function wrapContent($content, $options = false) {
+  extract(ensureOptions(array(
+    'header' => true
+  ), $options));
   $row = wrapContentData($options);
-  wrapContentHeader($row);
+  if ($header) {
+    wrapContentHeader($row);
+  }
   echo $content;
   wrapContentFooter($row);
 }
