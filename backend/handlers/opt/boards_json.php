@@ -20,7 +20,10 @@ foreach($boards as $b) {
   // include posts, threads, last_activity
   $posts_model = getPostsModel($b['uri']);
   if (!$posts_model) {
-    return sendResponse(array(), 500, 'Board database integrity error ' . $b['uri']);
+    return sendResponse2(array(), array(
+      'code' => 500,
+      'err'  => 'Board database integrity error ' . $b['uri'],
+    ));
   }
   $b['threads'] = getBoardThreadCount($b['uri'], $posts_model); // 1 query
   $b['posts'] = getBoardPostCount($b['uri'], $posts_model); // 1 query
@@ -47,4 +50,4 @@ foreach($boards as $b) {
 ksort($res);
 $res = array_merge($noLast, $res);
 // FIXME: not very cacheable like this...
-sendResponse(array('settings' => getSettings(), 'boards' => array_values($res)));
+sendResponse2(array('settings' => getSettings(), 'boards' => array_values($res)));
