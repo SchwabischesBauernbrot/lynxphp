@@ -28,6 +28,9 @@ permission modules (vols vs jannies)
 board reports
 banners
 filters
+- ID
+- Name
+- board string replaces
 rules
 location detection
 r9k
