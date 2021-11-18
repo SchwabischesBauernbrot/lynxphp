@@ -280,11 +280,11 @@ function boardPage($boardUri, $posts_model, $page = 1) {
     $sql = 'select '.join(',', array_map(function ($f) { return 'f.' . $f . ' as file_' . $f; }, $filesFields)).', ranked_post.*
               from
               (
-                select t1.*, tf.*, t1.created_at as thread_created_at, p.postid as replyid, t.postid as thread_postid, rank() OVER (PARTITION BY p.threadid ORDER BY p.created_at DESC) AS "rank",
+                select t1.*, t1.json as thread_json, tf.*, t1.created_at as thread_created_at, p.postid as replyid, t.postid as thread_postid, rank() OVER (PARTITION BY p.threadid ORDER BY p.created_at DESC) AS "rank",
                   '.join(',', array_map(function ($f) { return 'p.' . $f . ' as post_' . $f; }, $postFields)).',
                   '.join(',', array_map(function ($f) { return 'tf.' . $f . ' as threadfile_' . $f; }, $filesFields)).'
                 from (
-                  select p1.*,count(jt1.postid) as cnt
+                  select p1.*, count(jt1.postid) as cnt
                       from '.$postTable.' as p1
                         left join '.$postTable.' as jt1 on (jt1.postid=p1.threadid and jt1.deleted = \'0\')
                       where p1.threadid = \'0\'
@@ -295,12 +295,13 @@ function boardPage($boardUri, $posts_model, $page = 1) {
                   left join '.$postTable.' as t on (t1.postid = t.postid)
                   left join '.$filesTable.' tf on (tf.postid = t.postid)
                   left join '.$postTable.' as p on (t1.postid = p.threadid)
-                order by t.updated_at desc, p.created_at desc
+                order by sticky desc, t.updated_at desc, p.created_at desc
               ) as ranked_post
               left join '.$filesTable.' f on f.postid = ranked_post.replyid
             where rank <= ' . $lastXreplies . '
             order by ranked_post.thread_postid desc, ranked_post.replyid asc
             limit ' . $tpp . ($limitPage ? ' OFFSET ' . ($limitPage * $tpp) : '');
+    //echo "sql[$sql]<br>\n";
     $res = pg_query($db->conn, $sql);
     $err = pg_last_error($db->conn);
     if ($err) {
@@ -319,6 +320,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
         }, ARRAY_FILTER_USE_BOTH);
         // process op
         $threads[$row['thread_postid']]['postid'] = $row['thread_postid'];
+        $threads[$row['thread_postid']]['json']   = $row['thread_json'];
         $threads[$row['thread_postid']]['created_at'] = $row['thread_created_at'];
         postDBtoAPI($threads[$row['thread_postid']]);
         $threads[$row['thread_postid']]['posts'] = array();
@@ -438,7 +440,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
   );
 
   $res = $db->find($groupbyWrapper, array(
-    'orderNoAlias' =>'updated_at desc',
+    'orderNoAlias' =>'sticky desc, updated_at desc',
     // can't just limit 10 because the thread can have more than one file...
   ));
 
