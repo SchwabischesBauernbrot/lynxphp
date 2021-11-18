@@ -290,6 +290,8 @@ class Router {
   }
 
   // is path supposed to start with /? seems to be yes
+  // exec is a weird name for a router...
+  // determineRoute? run
   function exec($method, $path, $level = 0) {
     $isHead = false;
     if ($method === 'HEAD') {
