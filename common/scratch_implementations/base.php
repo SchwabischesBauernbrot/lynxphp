@@ -28,6 +28,7 @@ class scratch_implementation_base_class implements scratch_implementation_interf
     $this->set($key, $count);
     return $count;
   }
+  // isset?
   // can val be an array?
   function set($key, $val) { }
   function get($key) { }
