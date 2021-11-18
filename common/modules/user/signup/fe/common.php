@@ -34,8 +34,8 @@ function getSignupForm($goto = false) {
     'form' => generateForm($secure_signup_link, $formFields, $values, $formOptions),
     'goto' => $goto,
     // FIXME get named route
-    'forgot_account' => BASE_HREF . 'forgot_account',
-    'login' => BASE_HREF . 'forms/login',
+    'forgot_account' => BASE_HREF . 'forgot_account.html',
+    'login' => BASE_HREF . 'forms/login.html',
   );
   // FIXME: pipeline
   return replace_tags($templates['header'], $tags);
