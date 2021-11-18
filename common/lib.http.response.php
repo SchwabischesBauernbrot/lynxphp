@@ -4,6 +4,8 @@
 
 // requires config (frontend?)
 
+// 304 just decreases bandwidth (for slow link/cost)
+
 // private
 function _doHeaders($mtime, $options = false) {
   // no need for headers when generating pages
