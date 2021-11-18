@@ -9,7 +9,7 @@ Make API requests using the same protocol as the app. Only use SSL when a user i
 */
 
 return array(
-  'opt' => array(
+  '4chan' => array(
     'dir'  => '4chan',
     'routes' => array(
       // https://a.4cdn.org/boards.json
