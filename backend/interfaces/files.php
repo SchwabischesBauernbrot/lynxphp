@@ -6,6 +6,7 @@ function fileDBtoAPI(&$row, $boardUri) {
     $f5 = substr($k, 0, 5);
     return $f5 ==='file_';
   }, ARRAY_FILTER_USE_BOTH));
+  //echo "<pre>[", print_r($row, 1), "]</pre>\n";
 
   // if file exists
   if (file_exists($row['path']) && filesize($row['path'])) {
@@ -73,6 +74,7 @@ function fileDBtoAPI(&$row, $boardUri) {
     }
   } else {
     // request generation
+    //echo "Requesting generation of [", $row['path'], "]<br>\n";
     global $workqueue;
     $row['boardUri'] = $boardUri;
     $workqueue->addWork(PIPELINE_FILE, $row);
@@ -457,14 +459,6 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
 
     // farm out thumbnailing
     global $workqueue;
-    /*
-    $extFileData = array_merge(array(
-      'boardUri' => $boardUri,
-      'fileid' => $id,
-    ), $fileData);
-    print_r($extFileData);
-    //$workqueue->addWork(PIPELINE_FILE, $extFileData);
-    */
     $fileData['fileid'] = $id; // set fileid
     $fileData['boardUri'] = $boardUri;
     $workqueue->addWork(PIPELINE_FILE, $fileData);
