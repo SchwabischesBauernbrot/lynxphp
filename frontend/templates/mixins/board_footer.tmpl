@@ -5,15 +5,23 @@
     </div>
     {{threadstats}}
   </div>
-  <div id="livetext" class="jsonly">
-    <!-- div class="dot" id="livecolor"></div>
-    Connecting... -->
-    <!-- input class="postform-style ml-5 di" type="button" value="Update" -->
-    <a id="updatePage" href="{{url}}">Refresh</a>
-  </div>
   {{postactions}}
 </form>
   {{postForm}}
+  <div id="livetext">
+    <!-- div class="dot" id="livecolor"></div>
+    Connecting... -->
+    <!-- input class="postform-style ml-5 di" type="button" value="Update" -->
+    <!-- this should be style like it's own button -->
+    <div id="refresh">
+      <input type=checkbox {{enableAutoRefresh}} id="autoRefreshEnable" class="jsonly">
+      <a id="updatePage" href="{{url}}">Refresh</a>
+      <span id="labelRefresh"></span>
+    </div>
+    <div id="refreshing" style="display: none">
+      Refreshing...
+    </div>
+  </div>
 <!-- loop -->
   <div id="threadstats">
     <span>{{replies}} replies</span> | <span>{{files}} file</span>
