@@ -10,5 +10,5 @@ $posts_model = getPostsModel($boardUri);
 if (!$posts_model) {
   return sendRawResponse(array(), 404, 'Board not found');
 }
-$posts = getThread($boardUri, $threadNum, false);
+$posts = getThread($boardUri, $threadNum, array('posts_model' => $posts_model));
 sendRawResponse($posts);
