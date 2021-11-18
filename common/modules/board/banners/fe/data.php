@@ -4,7 +4,6 @@ $fePkgs = array(
   array(
     'handlers' => array(
       array(
-        'method'  => 'GET',
         'route'   => '/:uri/banners.html',
         'handler' => 'public_list',
         'cacheSettings' => array(
@@ -17,7 +16,6 @@ $fePkgs = array(
         ),
       ),
       array(
-        'method'  => 'GET',
         'route'   => '/:uri/settings/banners',
         'handler' => 'settings_list',
       ),
