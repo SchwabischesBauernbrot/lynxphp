@@ -2,7 +2,7 @@ LynxPHP aims to be the Wordpress of imageboards that's easily installable on sha
 with the features of LynxChan. While designed for small communities it can be used for larger ones.
 
 Goals
-- 3 distinct pieces
+- 2-3 distinct pieces
 - all similar functionality grouped into modules
 - Works on shared hosting and is easy to install as any PHP/MySQL web app
 - Raw php/js, in hopes to require less frameworks to learn
