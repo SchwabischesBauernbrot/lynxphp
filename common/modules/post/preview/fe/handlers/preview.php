@@ -19,8 +19,21 @@ $result = $pkg->useResource('preview', array('board' => $boardUri, 'id' => $id .
 $res = json_decode($result, true);
 //echo "<pre>", htmlspecialchars(print_r($res, 1)), "</pre>\n";
 
-echo renderPost($boardUri, $res['final'], array(
-  'checkable' => false,
-));
+// has final
+if (!empty($res['final'])) {
+  // without the wrap it's not very SEO friendly...
+  // maybe js could make it smart...
+  echo renderPost($boardUri, $res['final'], array(
+    'checkable' => false,
+  ));
+} else {
+  /*
+  echo "boardUri[$boardUri] id[$id]<br>\n";
+  echo "<pre>be", htmlspecialchars(print_r($result, 1)), "</pre>\n";
+  echo "<pre>decode", htmlspecialchars(print_r($res, 1)), "</pre>\n";
+  */
+  // no wrap since we're embedded
+  echo "Error rendering post[$id] on board[$boardUri]<br>\n";
+}
 
 ?>
