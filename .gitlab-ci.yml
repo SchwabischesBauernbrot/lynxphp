@@ -132,12 +132,12 @@ variables:
 buildzip:
   tags:
     - docker
-  image: hello-world
+  image: php:8.0.0
   script:
     - exit
   artifacts:
     paths:
-      - .
+      - /builds/odilitime/lynxphp/
   
 
 test:nginx:my:latest:
