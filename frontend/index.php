@@ -15,15 +15,18 @@ if (isPostTooBig()) {
   return;
 }
 */
+require 'setup.php';
+require 'setup.router.php';
+ldr_done(); // free memory
+
+if ($router->sendHeaders($req_method, $req_path)) {
+  return;
+}
 
 sendBump($req_method, $req_path); // deal with template's static nav
 
 // work around nginx weirdness with PHP and querystrings
 ensureQuerystring();
-
-require 'setup.php';
-require 'setup.router.php';
-ldr_done(); // free memory
 
 $res = $router->exec($req_method, $req_path);
 // work is called in wrapContent
