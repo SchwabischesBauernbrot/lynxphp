@@ -27,6 +27,7 @@ function modelToString($model) {
   return $s;
 }
 
+// remap keys of a hash
 function key_map($func, $arr) {
   $nArr = array();
   foreach($arr as $k => $v) {
