@@ -290,9 +290,8 @@ class Router {
   }
 
   // is path supposed to start with /? seems to be yes
-  // exec is a weird name for a router...
   // determineRoute? run
-  function exec($method, $path, $level = 0) {
+  function findRoute($method, $path, $level = 0) {
     $isHead = false;
     if ($method === 'HEAD') {
       $method = 'GET';
@@ -325,10 +324,13 @@ class Router {
     foreach($methods as $cond => $func) {
       //echo "rule[$cond]<br>\n";
       if ($path === $cond) {
-        $this->callHandler(array(
-          'cond' => $cond, 'params' => array(), 'func' => $func,
-        ), $request, $isHead);
-        return true;
+        return array(
+          'match' => array(
+            'cond' => $cond, 'params' => array(), 'func' => $func,
+           ),
+          'isHead' => $isHead,
+          'request' => $request
+        );
       }
       $csegs = explode('/', $cond);
       //echo "router::exec[$level] - Rule has router[", strpos($cond, '*') !== false, "]<br>\n";
@@ -363,7 +365,7 @@ class Router {
             $newPath = '/' . substr($path, strlen($usedPath));
             //$request['path'] = $newPath;
             //echo "newPath[$newPath]<br>\n";
-            $res = $func->exec($request['method'], $newPath, $level + 1);
+            $res = $func->findRoute($request['method'], $newPath, $level + 1);
             return $res;
           }
           break;
@@ -417,8 +419,11 @@ class Router {
         echo '</ul>', "\n";
       }
       if (count($matches) === 1) {
-        $this->callHandler($matches[0], $request, $isHead);
-        return true;
+        return array(
+          'match' => $matches[0],
+          'isHead' => $isHead,
+          'request' => $request
+        );
       } else {
         $use = false;
         $minScore = 99;
@@ -431,17 +436,55 @@ class Router {
           //echo "[$c][", print_r($row, 1), "]=[$score]<br>\n";
         }
         if ($use) {
-          $this->callHandler($use, $request, $isHead);
+          return array(
+            'match' => $use,
+            'isHead' => $isHead,
+            'request' => $request
+          );
+
         } else {
           // not sure, just use first
-          $this->callHandler($matches[0], $request, $isHead);
+          return array(
+            'match' => $matches[0],
+            'isHead' => $isHead,
+            'request' => $request
+          );
         }
-        return true;
       }
     }
     // can't handle 404 here because sometimes we return to another router
     return false;
   }
+
+  function sendHeaders($method, $path) {
+    $res = $this->findRoute($method, $path);
+    if ($res === false) return false; // 404 passthru
+    $key = $res['request']['method'] . '_' . $res['match']['cond'];
+    $uncached = $this->isUncached($key, $res['match']['params']);
+    if ($res['isHead']) {
+      //header('connection: close');
+      return true;
+    }
+    $this->headersSent = true;
+    return !$uncached;
+  }
+
+  // primary function of the router
+  function exec($method, $path) {
+    $res = $this->findRoute($method, $path);
+    if ($res === false) return false; // 404 passthru
+    if ($this->headersSent) {
+      $request = $res['request'];
+      // move match into request
+      $request['params'] = $res['match']['params'];
+      $func = $res['match']['func'];
+      $func($request);
+    } else {
+      $this->callHandler($res['match'], $res['request'], $res['isHead']);
+    }
+    return true;
+  }
+
 }
 
 ?>
