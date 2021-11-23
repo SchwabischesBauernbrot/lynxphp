@@ -32,6 +32,7 @@ class Router {
     // frontend gets more hits... backend may have mobile to deal with
     $this->defaultContentType = 'text/html';
     $this->max_length = 0;
+    $this->headersSent = false;
   }
 
   // FIXME: we need a file version for all
