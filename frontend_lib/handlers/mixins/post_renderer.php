@@ -8,6 +8,8 @@
 function renderPost($boardUri, $p, $options = false) {
   global $pipelines;
 
+  //echo "<pre>", print_r($p['files'], 1), "</pre>\n";
+
   // unpack options
   extract(ensureOptions(array(
     'checkable' => false,
