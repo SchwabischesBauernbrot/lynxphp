@@ -869,7 +869,8 @@ input:invalid, textarea:invalid {
 
 .post-message {
   text-align: left;
-  max-width: 400px;
+/* or do we limit to 400px for 2 column? */
+  max-width: 600px;
 }
 
 /* aceofdiamonds edit */
