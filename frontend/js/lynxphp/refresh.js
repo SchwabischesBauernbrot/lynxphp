@@ -17,6 +17,24 @@ function refreshPosts(manual) {
   fetch(getRefreshUrl(loc)).then(res => res.text()).then(html => {
     var result = refreshCallback(null, html)
 
+    if (result.foundNewReplies) {
+      console.log('new replies', result.posts.length)
+      for(var i in result.posts) {
+        var post = result.posts[i]
+        //console.log('firing event')
+        const newPostEvent = new CustomEvent('addPost', {
+           detail: post
+        })
+        //dispatch the event so quote click handlers, image expand, etc can be added in separate scripts by listening to the event
+        setTimeout(() => {
+          //console.log('dispatching event')
+          window.dispatchEvent(newPostEvent)
+        }, 50);
+      }
+    //} else {
+      //console.log('result foundNewReplies is falsish', result)
+    }
+
     // refreshButton.style.display = 'inline'
     //console.log('refreshPosts - autoRefresh', autoRefresh)
     if (autoRefresh) {
