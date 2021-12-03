@@ -23,9 +23,10 @@ $res = json_decode($result, true);
 if (!empty($res['final'])) {
   // without the wrap it's not very SEO friendly...
   // maybe js could make it smart...
-  echo renderPost($boardUri, $res['final'], array(
+  // could include direct replies...
+  wrapContent(renderPost($boardUri, $res['final'], array(
     'checkable' => false,
-  ));
+  )));
 } else {
   /*
   echo "boardUri[$boardUri] id[$id]<br>\n";
