@@ -332,11 +332,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
   }
   console.log('backlinks added')
 
+  // FIXME: probably should make a batch version
+
   window.addEventListener('addPost', function(e) {
+    //console.log('addPost - detail', e.detail)
     if (e.detail.hover) {
       return; //dont need to handle hovered posts for this
     }
-    const post = e.detail.post;
+    //const post = e.detail.post;
     const newquotes = document.getElementsByClassName('quote'); //to get backlinks from replying posts. just an easy way. could make more efficient and only do necessary ones later.
     for (let i = 0; i < newquotes.length; i++) {
       newquotes[i].removeEventListener('mouseover', toggleHighlightPost);
@@ -344,6 +347,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       newquotes[i].addEventListener('mouseover', toggleHighlightPost, false);
       newquotes[i].addEventListener('mouseout', toggleHighlightPost, false);
     }
+    console.log('quotes (re)processed for', e.detail.postId)
   });
 
   window.addEventListener('updatePostMessage', function(e) {
