@@ -20,7 +20,13 @@ function renderPost($boardUri, $p, $options = false) {
   $isOP = $threadId === $p['no'];
 
   $post_actions = array(
-    'all'    => array(),
+    'all'    => array(
+      // FIXME: post/actions should provide this
+      array('link' => '/' . $boardUri . '/report/' . $p['no'], 'label' => 'report'),
+      // hide
+      // filter ID/name
+      // moderate
+    ),
     'user'   => array(),
     'bo'     => array(),
     'global' => array(),
