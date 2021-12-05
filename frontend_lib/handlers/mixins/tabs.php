@@ -44,7 +44,7 @@ function renderTabs($tabs, $options = array()) {
       if ($selectFirst) {
         $sel = $c === 0 ? ' checked' : '';
       }
-      $html .= '<input type="radio" class="tab" id="tab_' . $stb . '"' .
+      $html .= '<input type="radio" class="tab" id="tab_' . $stb . '" ' .
         'name="' . $name . '" value="'.$stb.'" role="button"' . $sel .
         '>';
       $html .= '<label for="tab_' . $stb . '">' . $tb . '</label>
@@ -94,7 +94,7 @@ function renderTabs($tabs, $options = array()) {
     }
     if (!empty($options['closeAll'])) {
       $stb = 'CLOSEALL';
-      $html .= '<input type="radio" class="tab" id="tab_'.$stb.'"' .
+      $html .= '<input type="radio" class="tab" id="tab_'.$stb.'" ' .
         'name="' . $name . '" role="button">';
       $html .= '<label id="tabLabel_'.$stb.'" for="tab_' . $stb . '">X</label>
       <style>
