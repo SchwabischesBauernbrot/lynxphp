@@ -8,39 +8,44 @@ $fePkgs = array(
         'route'   => '/forms/board/:uri/actions',
         'handler' => 'actions',
       ),
+      array(
+        'route'   => '/:uri/report/:id',
+        'handler' => 'report_post',
+        'loggedIn' => true,
+      ),
       // maybe this should be a form...
       array(
-        'method'  => 'GET',
         'route'   => '/:uri/settings/reports',
         'handler' => 'report_list',
+        'loggedIn' => true,
       ),
       array(
         'method'  => 'POST',
         'route'   => '/:uri/settings/reports',
         'handler' => 'report_multiaction',
+        'loggedIn' => true,
       ),
       array(
-        'method'  => 'GET',
         'route'   => '/:uri/settings/reports/:id/close',
         'handler' => 'close_report',
+        'loggedIn' => true,
       ),
       array(
-        'method'  => 'GET',
         'route'   => '/:uri/settings/reports/:id/delete',
         'handler' => 'delete_report',
+        'loggedIn' => true,
       ),
       array(
-        'method'  => 'GET',
         'route'   => '/:uri/settings/reports/:id/banPoster',
         'handler' => 'ban_report',
+        'loggedIn' => true,
       ),
       array(
-        'method'  => 'GET',
         'route'   => '/:uri/settings/reports/:id/banReport',
         'handler' => 'ban_reporter',
+        'loggedIn' => true,
       ),
       array(
-        'method'  => 'GET',
         'route'   => '/globals/reports',
         'handler' => 'global_report_list',
         'loggedIn' => true,
