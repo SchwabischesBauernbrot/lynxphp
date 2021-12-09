@@ -28,15 +28,18 @@ function sendBump($req_method, $req_path) {
   if (
       !(
          ($req_path === '/signup' && $req_method === 'POST') ||
+         ($req_path === '/signup.php' && $req_method === 'POST') ||
          ($req_path === '/forms/login' && $req_method === 'POST') ||
+         ($req_path === '/forms/login.php' && $req_method === 'POST') ||
          strpos($req_path, 'user/settings/themedemo/') !== false ||
          strpos($req_path, '/preview/') !== false ||
          strpos($req_path, '/refresh') !== false ||
-         $req_path === '/logout'
+         $req_path === '/logout' ||
+         $req_path === '/logout.php'
       ) && strpos($req_path, '/.youtube') === false) {
     // make sure first lines of output are see-able
     //if (DEV_MODE)
-    echo '<!-- lib.handler::sendBump -->';
+    echo '<!-- lib.handler::sendBump [', $req_method, '][', $req_path, '] -->';
     echo '<div style="height: 40px;"></div>', "\n"; flush();
     $sentBump = true;
   }
