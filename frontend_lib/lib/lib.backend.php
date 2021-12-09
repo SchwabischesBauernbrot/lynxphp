@@ -65,10 +65,18 @@ function consume_beRsrc($options, $params = '') {
   // while it should be in the dev report at the bottom, that's not always available
   // this is very handy
   //echo "URL[", BACKEND_BASE_URL . $options['endpoint'] . $querystring, "]<br>\n";
+  //if ($postData) echo "POST[", print_r($postData, 1), "]<br>\n";
+  //if (isset($options['method'])) echo "method[", $options['method'], "]<br>\n";
 
   // post login/IP
-  $responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
-    $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
+  $responseText = request(array(
+    'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
+    'method' => empty($options['method']) ? 'AUTO' : $options['method'],
+    'headers' => $headers,
+    'body' => $postData,
+  ));
+  //$responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
+  //  $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
   //echo "<pre>responseText[$responseText]</pre>\n";
   if (!empty($options['expectJson']) || !empty($options['unwrapData'])) {
     $obj = expectJson($responseText, $options['endpoint'], $options);
@@ -143,7 +151,8 @@ function expectJson($json, $endpoint = '', $options = array()) {
 }
 
 function getExpectJson($endpoint) {
-  $json = curlHelper(BACKEND_BASE_URL . $endpoint);
+  //$json = curlHelper(BACKEND_BASE_URL . $endpoint);
+  $json = request(array('url' => BACKEND_BASE_URL . $endpoint));
   return expectJson($json, $endpoint);
 }
 
@@ -301,7 +310,15 @@ function backendLogin($user, $pass) {
   if (!empty($res['data']['session'])) {
     // FIXME: ttl?
     // looks like 1 hour, supposed to renew every minute...
-    setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
+    //if (isset($res['data']['ttl'])) {
+      setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
+    /*
+    } else {
+      // lynx bridge hack
+      global $now;
+      setcookie('session', $res['data']['session'], $now + 3600, '/');
+    }
+    */
     return true;
   }
   // error
