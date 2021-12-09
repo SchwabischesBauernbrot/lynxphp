@@ -130,8 +130,9 @@ function renderPost($boardUri, $p, $options = false) {
     $flag = addslashes(htmlspecialchars($p['flag']));
     $postmeta .= '<span class="flag flag-'.$p['flag_cc'].'" title="'.$p['flagName'].'" alt="'.$p['flagName'].'"><img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '"></span>';
   }
-  if (!empty($p['post-capcode'])) {
-    $postmeta .= '<span class="post-capcode">' . htmlspecialchars($p['post-capcode']) . '</span>';
+  // post-
+  if (!empty($p['capcode'])) {
+    $postmeta .= ' <span class="post-capcode">' . htmlspecialchars($p['capcode']) . '</span>';
   }
   if (!empty($p['user-id'])) {
     $postmeta .= '<span class="user-id">' . htmlspecialchars($p['user-id']) . '</span>';
