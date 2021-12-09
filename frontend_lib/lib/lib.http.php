@@ -40,14 +40,14 @@ function request($options = array()) {
     'headers' => array(),
     'user' => false,
     'pass' => false,
+    'body' => false,
   ), $options));
-  $fields = '';
   $header = '';
   if (count($headers)) {
     $header = $headers;
   }
   //echo "http::request - url[$url] method[$method]\n";
-  return curlHelper($url, $fields, $header, $user, $pass, $method);
+  return curlHelper($url, $body, $header, $user, $pass, $method);
 }
 
 function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='AUTO') {
@@ -60,13 +60,15 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     exit(1);
   }
 
+  // but even if the method is POST, we want to make sure this is a string...
   if (is_array($fields) && $method === 'AUTO') {
-    $fields_string = '';
-    foreach($fields as $key=>$value) { $fields_string .= $key . '=' . urlencode($value) . '&'; }
-    $fields_string = rtrim($fields_string, '&');
+    $list = [];
+    foreach($fields as $key=>$value) { $list[] = $key . '=' . urlencode($value); }
+    $fields_string = join('&', $list);
   } else {
     $fields_string = $fields;
   }
+  //echo "curlHelper - fields[", gettype($fields_string), "] method[$method]<br>\n";
 
   if (!function_exists('curl_init')) {
     echo "PHP does not have the curl extension installed<br>\n";
@@ -81,6 +83,9 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   //set the url, number of POST vars, POST data
   curl_setopt($ch, CURLOPT_URL, $url);
   curl_setopt($ch, CURLOPT_POST, $hasFields);
+  // can be an urlencoded string or an array
+  // an array will set "Content-type to multipart/form-data"
+  // if you send files, this has to be an array
   curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
   //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
