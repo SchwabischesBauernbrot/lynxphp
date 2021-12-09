@@ -24,6 +24,11 @@ return array(
       */
     ),
     'modules' => array(
+      // add preview link to post links
+      array(
+        'pipeline' => 'PIPELINE_POST_LINKS',
+        'module' => 'post_link',
+      ),
       /*
       // format text
       array(
