@@ -23,6 +23,7 @@ if ($router->sendHeaders($req_method, $req_path)) {
   return;
 }
 
+// this lives in lib.handler
 sendBump($req_method, $req_path); // deal with template's static nav
 
 // work around nginx weirdness with PHP and querystrings
