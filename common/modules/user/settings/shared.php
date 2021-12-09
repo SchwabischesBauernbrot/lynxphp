@@ -44,7 +44,11 @@ return array(
       'time' => array(
         'label' => 'Display time as',
         'type'  => 'select',
-        'options' => array(),
+        'options' => array(
+          'utc time',
+          'local time',
+          'relative time',
+        ),
       ),
       'miltime' => array(
         'label' => 'Use 24h (military) time',
