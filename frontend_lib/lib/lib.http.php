@@ -163,7 +163,10 @@ function curl_log_report() {
     $m = ($l['method'] === 'AUTO' ? 'GET' : $l['method']);
     $joinChar = array(true => '&', false => '?');
     $hasQ = strpos($l['url'], '?') !== false;
-    echo '<li>' . $m . ' <a target=_blank href="' . $l['url'] . $joinChar[$hasQ] . 'prettyPrint=1">' . $l['url'] . '</a> took ' . $l['took'] . 'ms';
+
+    $clickUrl = str_replace(BACKEND_BASE_URL, BACKEND_PUBLIC_URL, $l['url']);
+
+    echo '<li>' . $m . ' <a target=_blank href="' . $clickUrl . $joinChar[$hasQ] . 'prettyPrint=1">' . $l['url'] . '</a> took ' . $l['took'] . 'ms';
     if ($m === 'POST' && isset($l['postData'])) {
       if (is_array($l['postData'])) {
         echo ' [', print_r($l['postData'], 1), ']';
