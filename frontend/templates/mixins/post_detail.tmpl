@@ -6,12 +6,19 @@
       <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
     </span>
     <span class="post-links">
-      <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">No.</a>
+      <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}" title="Externally link to this specific post">No.</a>
       <span class="post-quoters">
-        <a class="no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#postform">{{no}}</a>
+        <a class="no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#postform" title="Reply to this post">{{no}}</a>
       </span>
+      <!-- endchan put these before... -->
+      {{postlinks}}
+      <!-- reply is the primary interaction with share 2nd -->
+      <!--
+      we can use css to compress minimize options
+      or summary/details
+      -->
       <span class="replies mt-5 ml-5">{{replies}}</span>
-      <details style="display: inline">
+      <details style="display: inline; position: absolute;">
         <summary>Actions</summary>
         {{actions}}
         <!-- select class="jsonly postmenu">
