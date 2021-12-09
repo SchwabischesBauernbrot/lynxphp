@@ -22,7 +22,7 @@ if (is_array($banner) && count($banner)) {
   }
   $ih = (int)$h;
   $iw = (int)$w;
-  $io['tags']['board_header_top'] = '<img src="'. BASE_HREF . 'backend/' . $banner['image']. '" width="'.$w.'" height="'.$h.'">' . $io['tags']['board_header_top'];
+  $io['tags']['board_header_top'] = '<img src="'. BACKEND_PUBLIC_URL . $banner['image']. '" width="'.$w.'" height="'.$h.'">' . $io['tags']['board_header_top'];
 } else {
   // array() just means no banners
   // maybe say nothing?
