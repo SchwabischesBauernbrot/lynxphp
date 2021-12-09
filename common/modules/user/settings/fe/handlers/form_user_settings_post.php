@@ -34,7 +34,7 @@ if (!empty($res['setCookie'])) {
 if ($res['success']) {
   // maybe a js alert?
   echo "Success<br>\n";
-  redirectTo('/user/settings');
+  redirectTo('/user/settings.html');
 } else {
   wrapContent('Something went wrong...' . print_r($res, 1));
 }
