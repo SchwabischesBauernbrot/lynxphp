@@ -67,6 +67,22 @@ function renderPost($boardUri, $p, $options = false) {
   unset($a);
   $post_actions_html = join('<br>' . "\n", $post_actions_html_parts);
 
+  // should we have pre and post links around the no #123 part?
+  $post_links_html = '';
+  $links_io = array(
+    'boardUri' => $boardUri,
+    'p' => $p,
+    'links' => array(),
+  );
+  $pipelines[PIPELINE_POST_LINKS]->execute($links_io);
+  $post_link_html_parts = array();
+  if (count($links_io['links'])) {
+    foreach($links_io['links'] as &$a) {
+      $post_link_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
+    }
+  }
+  $post_links_html = join('<br>' . "\n", $post_link_html_parts);
+
   $templates = loadTemplates('mixins/post_detail');
   $checkable_template = $templates['loop0'];
   $posticons_template = $templates['loop1'];
@@ -186,6 +202,7 @@ function renderPost($boardUri, $p, $options = false) {
     'human_created_at' => gmdate('n/j/Y H:i:s', $p['created_at']),
     'links'     => $links_html,
     'actions'   => $post_actions_html,
+    'postlinks' => $post_links_html,
   );
   $tmp = replace_tags($templates['header'], $tags);
 
