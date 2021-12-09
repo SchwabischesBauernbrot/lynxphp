@@ -43,6 +43,10 @@ function request($options = array()) {
     'body' => false,
   ), $options));
   $header = '';
+
+  // workaround curlHelper compatibility (in at least consume_beRsrc)
+  if ($headers === '') $headers = array();
+  //echo "headers[", gettype($headers), "][", print_r($headers, 1), "]<br>\n";
   if (count($headers)) {
     $header = $headers;
   }
