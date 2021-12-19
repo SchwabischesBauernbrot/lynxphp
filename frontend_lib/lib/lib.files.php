@@ -196,8 +196,10 @@ function getThumbnail($file, $options = false) {
     $h = $file['h'];
     // audio/video won't have these set yet... but thumbnail will be
     if (empty($file['w']) || empty($file['h'])) {
-      $w = $file['tn_w'];
-      $h = $file['tn_h'];
+      if (!empty($file['tn_w']) && !empty($file['tn_h'])) {
+        $w = $file['tn_w'];
+        $h = $file['tn_h'];
+      }
     }
     while($w > $maxW) {
       $w *= 0.9;
