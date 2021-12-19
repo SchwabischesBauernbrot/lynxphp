@@ -73,6 +73,7 @@ require '../frontend_lib/lib/lib.form.php'; // form helper
 require '../frontend_lib/lib/lib.perms.php'; // permission helper
 // structures
 require '../frontend_lib/lib/nav.php'; // nav structure
+require '../frontend_lib/lib/expand.php'; // maybe more of a lib...
 require '../frontend_lib/lib/middlewares.php';
 
 // frontend handlers
