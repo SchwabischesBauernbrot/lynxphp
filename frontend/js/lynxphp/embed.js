@@ -71,6 +71,10 @@ class playlist {
     // we autoplay
     this.playing = true
     var navElem = document.querySelector('nav.stickynav')
+    if (!navElem) {
+      console.warn('disabling playlist player because stickynav not found')
+      return
+    }
     var hasPl = navElem.querySelector('a.playlist')
     if (!hasPl) return
     hasPl.innerHTML = '[&#10074;&#10074;]';
@@ -122,6 +126,10 @@ class playlist {
     if (this.playing) {
       this.stop()
       var navElem = document.querySelector('nav.stickynav')
+      if (!navElem) {
+        console.warn('disabling playlist player because stickynav not found')
+        return
+      }
       var hasPl = navElem.querySelector('a.playlist')
       if (!hasPl) return
       hasPl.innerHTML = '[&#9654;]';
@@ -131,6 +139,10 @@ class playlist {
   }
   openViewer() {
     var navElem = document.querySelector('nav.stickynav')
+    if (!navElem) {
+      console.warn('disabling playlist player because stickynav not found')
+      return
+    }
     var hasViewer = navElem.querySelector('.prevTrack')
     if (hasViewer) {
       return
@@ -179,6 +191,10 @@ class playlist {
   }
   enableUI() {
     var navElem = document.querySelector('nav.stickynav')
+    if (!navElem) {
+      console.warn('disabling playlist player because stickynav not found')
+      return
+    }
     //console.log('navElem', navElem)
     var hasPl = navElem.querySelector('a.playlist')
     if (hasPl) {
