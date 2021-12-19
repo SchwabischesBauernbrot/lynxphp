@@ -1,30 +1,117 @@
 <?php
 
 // FIXME: pass in template...
-function getNav($navItems, $options = array()) {
-  $list = isset($options['list']) ? $options['list'] : true;
-  $selected = isset($options['selected']) ? $options['selected'] :'';
-  $selectedURL = isset($options['selectedURL']) ? $options['selectedURL'] : false;
-  $replaces = isset($options['replaces']) ? $options['replaces'] : array();
-  $prelabel = isset($options['prelabel']) ? $options['prelabel'] :'';
-  $postlabel = isset($options['postlabel']) ? $options['postlabel'] :'';
+
+// old navItems format:
+//   label => urlTemplate(s)
+// new items format:
+// [] => array(label, alt, destinations)
+function getNav2($navItems, $options = array()) {
+  extract(ensureOptions(array(
+    'type' => 'list', // none, list
+    'list' => true,
+    'selected' => '',
+    'selectedURL' => false,
+    'replaces' => array(),
+    'prelabel' => '',
+    'postlabel'  => '',
+    'baseClasses' => array(),
+    // label => id
+    'ids' => array(),
+  ), $options));
+
+  // backwards compat
+  if ($list === false) $type = 'none';
 
   $nav_html = '';
-  if ($list) $nav_html = '<ul>';
-  foreach($navItems as $label => $urlTemplate) {
-    $url = replace_tags($urlTemplate, $replaces);
-    if ($list) $nav_html .= '<li>';
-    $class = '';
-    //echo "selectedURL[$selectedURL] url[$url]<br>\n";
-    if ($selectedURL && $selectedURL === $url) {
-      $class = ' class="bold"';
+  // maybe a look up is better?
+  switch($type) {
+    case 'none':
+    break;
+    case 'list':
+      $nav_html = '<ul>';
+    break;
+    /*
+    case 'nav':
+      $nav_html = '<nav class="navbar">';
+    break;
+    */
+  }
+  foreach($navItems as $data) {
+    $urlTemplate = $data['destinations'];
+    $label = $data['label'];
+    $alt = empty($data['alt']) ? '' : ' alt="' . $data['alt'] . '"';
+    if (is_array($urlTemplate)) {
+      // always link to first one
+      $url = replace_tags($urlTemplate[0], $replaces);
+      if ($selectedURL !== false) {
+        // maybe like pageURLs?
+        $checkUrl = array();
+        foreach($urlTemplate as $tmpl) {
+          $checkUrl[] = replace_tags($tmpl, $replaces);
+        }
+      //} else {
+        //$checkUrl = $url;
+      }
+    } else {
+      $url = replace_tags($urlTemplate, $replaces);
+      $checkUrl = $url;
+    }
+    switch($type) {
+      case 'none':
+      //case 'nav':
+      break;
+      case 'list':
+        $nav_html .= '<li>';
+      break;
+    }
+    $classes = $baseClasses;
+    if ($selectedURL !== false) {
+      if (is_array($checkUrl)) {
+        if (in_array($selectedURL, $checkUrl)) {
+          $classes['bold'] = 'bold';
+        }
+      } else {
+        if ($selectedURL === $url) {
+          $classes['bold'] = 'bold';
+        } else
+        if ($selectedURL === '' && $url === '.') {
+          $classes['bold'] = 'bold';
+        }
+      }
     }
     if ($selected === $label) {
-      $class = ' class="bold"';
+      $classes['bold'] = 'bold';
     }
-    $nav_html .= '<a' . $class . ' href="' . $url . '">' . $prelabel . $label . $postlabel . '</a>' . "\n";
+    $id = isset($ids[$label]) ? ' id="' . $ids[$label] . '"' : '';
+    $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
+    $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $alt . '>';
+    $nav_html .= $prelabel . $label . $postlabel . '</a>' . "\n";
   }
-  if ($list) $nav_html .= '</ul>';
+  switch($type) {
+    case 'none':
+    break;
+    case 'list':
+      $nav_html .= '</ul>';
+    break;
+    /*
+    case 'nav':
+      $nav_html .= '</nav>';
+    break;
+    */
+  }
+  return $nav_html;
+}
+
+function getNav($navItems, $options = array()) {
+  $newFormat = array();
+  foreach($navItems as $label => $urlTemplate) {
+    $newFormat[] = array(
+      'label' => $label,
+      'destinations' => $urlTemplate,
+    );
+  }
+  $nav_html= getNav2($newFormat, $options);
   return $nav_html;
 }
 
