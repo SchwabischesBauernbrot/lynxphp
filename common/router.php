@@ -177,39 +177,14 @@ class Router {
     }
     return $_SERVER['CONTENT_LENGTH'] > $this->max_length;
   }
+
   function getMaxMtime($cacheSettings, $routeParams) {
     $mtime = 0;
     if (isset($cacheSettings['databaseTables'])) {
       global $db;
       $mtime = $db->getLast($cacheSettings['databaseTables']);
     }
-    // could be promoted in the frontend router...
-    if (isset($cacheSettings['backend'])) {
-      $params = array();
-      foreach($routeParams as $k => $v) {
-        $params[':' . $k] = $v;
-      }
-      if (empty($params[':page'])) $params[':page'] = 1;
-      foreach($cacheSettings['backend'] as $be) {
-        //echo "checking[", print_r($be, 1), "] [", print_r($params, 1), "]\n";
-        // interpolate
-        $endpoint = str_replace(array_keys($params), array_values($params), $be['route']);
-        $result = request(array(
-          //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
-          'url' => BACKEND_BASE_URL . $endpoint,
-          'method' => 'HEAD',
-        ));
-        $headers = parseHeaders($result);
-        if (!isset($headers['last-modified'])) {
-          // if we don't have an anchor no way...
-          echo "No way to cache backend[", $be['route'], "], no cacheSettings\n";
-          return PHP_INT_MAX;
-          continue;
-        }
-        $ts = strtotime($headers['last-modified']);
-        $mtime = max($mtime, $ts);
-      }
-    }
+
     if (isset($cacheSettings['files'])) {
       //echo "in[$mtime]<br>\n";
       //print_r($routeParams);
@@ -237,12 +212,16 @@ class Router {
 
   // do we have a cached copy
   function isUncached($key, $routeParams) {
+    if (DEV_MODE) {
+      header('X-Debug-isUncached: ' . (isset($this->routeOptions[$key]['cacheSettings']) ? 'cacheable' : 'not'));
+    }
     // no caching
     if (!isset($this->routeOptions[$key]['cacheSettings'])) {
       //echo "No cacheSettings for [$key]";
       //print_r($this->routeOptions);
       return true; // render content
     }
+
     //echo "key[$key]<br>\n";
     //print_r($this->routeOptions['cacheSettings'][$key]);
     $cacheSettings = $this->routeOptions[$key]['cacheSettings'];
@@ -260,16 +239,130 @@ class Router {
       // since most endpoints aren't going to be json...
       'contentType' => isset($cacheSettings['contentType']) ? $cacheSettings['contentType'] : $this->defaultContentType,
     );
-    $mtime = $this->getMaxMtime($cacheSettings, $routeParams);
-    global $now;
-    $diff = $now - $mtime;
-    //echo "last change[$diff]<br>\n";
-    if (checkCacheHeaders($mtime, $options)) {
-      // it's cached!
-      // roughly 120ms rn
-      // not any faster tbh
-      return false;
+
+    // frontend only thing
+    // lets move the HEAD requests upfront here
+    // so we can pass the result to etag engine too
+
+    // plan for the worst
+    // FIXME: rename check to canUse
+    $checkMtime = false;
+    $checkEtag = false;
+    // accumulators
+    $maxMtime = 0;
+    $compoundEtags = array();
+
+    if (BACKEND_HEAD_SUPPORT && isset($cacheSettings['backend'])) {
+      $params = array();
+      foreach($routeParams as $k => $v) {
+        $params[':' . $k] = $v;
+      }
+      if (empty($params[':page'])) $params[':page'] = 1;
+      //echo '<pre>', print_r($cacheSettings['backend'], 1), '</pre>', "\n";
+      // hope for the best
+      $checkMtime = true;
+      $checkEtag = true;
+      // ask backend
+      foreach($cacheSettings['backend'] as $be) {
+        //echo "checking[", print_r($be, 1), "] [", print_r($params, 1), "]\n";
+        // interpolate
+        $endpoint = str_replace(array_keys($params), array_values($params), $be['route']);
+        // maybe log this? I could see it being helpful
+        $result = request(array(
+          //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
+          'url' => BACKEND_BASE_URL . $endpoint,
+          'method' => 'HEAD',
+        ));
+        $headers = parseHeaders($result);
+        //echo "<pre>header", htmlspecialchars(print_r($headers, 1)), "</pre>\n";
+
+        // check the interesting header
+
+        // etag
+        $etag = empty($headers['ETag']) ? false : $headers['ETag'];
+        if ($checkEtag) {
+          if ($etag) {
+            $compoundEtags[] = $etag;
+          } else {
+            $checkEtag = false;
+            $compoundEtags = array(); // release some memory
+            // no dev warnings needed as this is a edge case...
+          }
+        }
+        // last-modified
+        if ($checkMtime) {
+          if (isset($headers['last-modified'])) {
+            $ts = strtotime($headers['last-modified']);
+            $maxMtime = max($maxMtime, $ts);
+          } else {
+            if (DEV_MODE) {
+              if ($etag) {
+                //echo "No last-modified on backend[", $be['route'], "]\n";
+              } else {
+                echo "No way to cache backend[", $be['route'], "], no cacheSettings on backend?\n";
+              }
+            }
+            $checkMtime = false;
+            $maxMtime = PHP_INT_MAX;
+            // if this one doesn't have it, we're done, it's not mtime cacheable
+            // but we still need to check the rest for eTag now..
+          }
+        }
+
+
+        // if both cache systems failed, we don't need to check any more
+        if (!$checkMtime && !$checkEtag) {
+          if (DEV_MODE) {
+            echo "No way to cache this frontend route\n";
+          }
+          break;
+        }
+      }
     }
+    if (DEV_MODE) {
+      header('X-Debug-isUncached-mtime: ' . ($checkMtime ? 'use' : 'ignore'));
+      header('X-Debug-isUncached-eTag: ' . ($checkEtag ? 'use' : 'ignore'));
+    }
+
+    $mtime = 0;
+    $eTag = '';
+    // if some way to cache is available (mtime or etag)
+    if ($maxMtime !== PHP_INT_MAX || $checkEtag) {
+      // get the other timestamps involved
+      $mtime = $this->getMaxMtime($cacheSettings, $routeParams);
+      // see if we need to mixin the max BE data timestamp
+      if ($maxMtime && $maxMtime !== PHP_INT_MAX) {
+        $mtime = max($mtime, $maxMtime);
+      }
+      if ($checkEtag) {
+        //echo "etag system[$mtime] [", count($compoundEtags), "]<br>\n";
+        $eTag = sha1($mtime . '@' . join(',', $compoundEtags));
+        // reset mtime if we can't use it
+        if ($maxTime === PHP_INT_MAX) $mtime = 0;
+      }
+    }
+
+    // is cacheable in some form
+    if (($mtime && $mtime !== PHP_INT_MAX) || $eTag) {
+      //global $now;
+      //$diff = $now - $mtime;
+      //echo "last change[$diff]<br>\n";
+      $cacheHeaderOptions = $options;
+
+      // inject etag if needed
+      if ($eTag) {
+        $cacheHeaderOptions['etag'] = $eTag;
+      }
+
+      // 304 processing
+      if (checkCacheHeaders($mtime, $cacheHeaderOptions)) {
+        // it's cached!
+        // roughly 120ms rn
+        // not any faster tbh
+        return false;
+      }
+    }
+
     return true; // render content
   }
 
@@ -462,8 +555,17 @@ class Router {
     if ($res === false) return false; // 404 passthru
     $key = $res['request']['method'] . '_' . $res['match']['cond'];
     $uncached = $this->isUncached($key, $res['match']['params']);
+    if (DEV_MODE) {
+      header('X-Debug-sendHeaders-key: ' . $key);
+      header('X-Debug-sendHeaders-cache: ' . ($uncached ? 'miss' : 'hit'));
+    }
+    // HEAD can only return headers
     if ($res['isHead']) {
       //header('connection: close');
+      if (DEV_MODE) {
+        header('X-Debug-sendHeaders-isHead: true');
+      }
+      // don't need to process content
       return true;
     }
     $this->headersSent = true;
