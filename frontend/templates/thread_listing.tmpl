@@ -1,11 +1,81 @@
+<style>
+/*
+  width: 0;
+  height: 0;
+*/
+  /* animation: test 2s ease forwards; */
+/*
+.expander2 {
+  display: none;
+}
+.expand2Link:focus ~ .expander2, .within:focus-within ~ .expander2 {
+  display: block;
+  color: red;
+}
+
+.reverse {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+iframe[src*="."] {
+  display: none;
+}
+
+iframe[src*="."] ~ a {
+  display: none;
+}
+
+iframe[src*="/thread/"] ~ a {
+  display: none;
+}
+
+iframe[src^="/"] ~ a {
+  display: none;
+}
+
+.collapse2Link:focus ~ .expander2 {
+  animation: test 2s ease forwards;
+  color: inherit;
+}
+
+@keyframes fade_in {
+  0% {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  100% {
+    opacity: 1;
+    width: 700px;
+    height: 50vh;
+  }
+}
+
+@keyframes fade_out {
+  0% {
+    opacity: 1;
+    width: 700px;
+    height: 50vh;
+  }
+  100% {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+}
+*/
+</style>
 <form action="/forms/board/{{uri}}/actions" method="POST" enctype="application/x-www-form-urlencoded">
 <input type="hidden" name="page" value="{{pagenum}}">
   {{boardNav}}
   {{threads}}
 <!-- loop -->
+2asdf
     <a class="{{class}}" href="{{uri}}/page/{{pagenum}}"> [{{pagenum}}]</a>
 <!-- end -->
 <!-- loop -->
+3asdf
   <div class="pages">
     Page:
     {{pages}} |
@@ -15,6 +85,7 @@
   </div>
 <!-- end -->
 <!-- loop -->
+4asdf
           <div class="post-file">
             <span class="post-file-info">
               <span>
@@ -31,13 +102,16 @@
           </div>
 <!-- end -->
 <!-- loop -->
+  <!-- beginning of each thread -->
   <hr size="1">
   <div class="thread" id="threadsContainer">
 <!-- end -->
 <!-- loop -->
+  <!-- end of each thread -->
   </div>
 <!-- end -->
 <!-- loop -->
+7asdf
     <div class="anchor" id="{{no}}"></div>
     <div class="post-container {{op}}" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}">
       <div class="post-info">
@@ -65,6 +139,12 @@
           {{files}}
         </div>
         <pre class="post-message">{{message}}</pre>
+        <div class="cb mt-5 ml-5">2 replies omitted. <a href="{{uri}}/thread/{{threadNum}}.html">View the full thread</a></div>
       </div>
+      X replies omitted. <a class="nav-item" id="expandLink" target="threadView" href="inline_thread.html" tabindex="0">View the full thread</a>
+      <div id="expander2">
+        X
+        <iframe name="threadView" width=100%></iframe>
+      </div>
+
     </div>
-<!-- end -->
