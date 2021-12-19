@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <base href="{{basehref}}">
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width initial-scale=1">
-  <noscript>
-    <style>.jsonly { display: none!important; }</style>
-  </noscript>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/lynxphp.css">
   <!-- only really need this for the board pages -->
   <link rel="stylesheet" href="css/expand.css">
+  <noscript><style>
+    .jsonly { display: none!important; }
+    .nojsonly-block { display: block!important; }
+  </style></noscript>
   <!-- link id="codetheme" rel="stylesheet" data-theme="ir-black" href="css/codethemes/ir-black.css" -->
   <!-- link rel="manifest" href="/site.webmanifest" -->
   <!-- link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -20,11 +21,14 @@
   <link rel="mask-icon" href="/file/safari-pinned-tab.svg" color="#5bbad5">
   <meta name="msapplication-TileColor" content="#00aba9">
   <meta name="theme-color" content="#ffffff" -->
-  <noscript><style>
-    .jsonly { display: none!important; }
-  </style></noscript>
-  <!-- script src="/js/all.js?v=3e2b361">
-  </script -->
+  <style>
+details summary {
+  cursor: pointer;
+}
+#boardsNav[open] summary {
+  font-weight: bold;
+}
+  </style>
   <title></title>
   <!-- meta property="og:site_name" value="">
   <meta property="og:url" content="https://{{basehref}}">
@@ -34,17 +38,41 @@
 </head>
 <body id="top">
   <nav class="navbar">
-    <a class="nav-item" href=".">Home</a>
-    <a class="nav-item" href="boards.html">Boards</a>
-    {{nav}}
+    <!-- items should not be out of order... -->
+    <a class="nav-item" href="." alt="Home">Home</a>
+    {{boards}}
+    <details id="boardsNav">
+      <summary class="nav-item">Boards</a></summary>
+      <!-- 50% is weird, maybe 1/3 or just go full screen... ? -->
+      <div id="boardsSubpage" style="position: absolute; top: 32px; z-index: 1; padding: 5px; background-color: var(--background-rest);">
+        <!-- class="nojsonly-block" -->
+        <iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" srcdoc='<a style="display: block; line-height: 100vh; text-align: center; width: 100vw; height: 100vh;" target="boardFrame" href="/boards_inline.html">Please click to load all the html for full board list</a>'></iframe>
+      </div>
+    </details>
+<!--
+<style>
+#expander {
+  display: none;
+  width: 100%;
+}
+#expandLink:focus ~ #expander {
+  display: block;
+  color: red;
+}
+</style>
+<a class="nav-item" id="expandLink" target="boardView" href="inline_boards.html" tabindex="0">Boards</a>
+-->
+    {{leftNav}}
 <!-- loop -->
     <a class="nav-item" href="{{url}}">{{label}}</a>
 <!-- end -->
-    <!-- a class="nav-item" href="overboard.php">Overboard</a -->
-    <a class="nav-item" href="help">Help</a>
     <!-- a class="nav-item" href="ip" title="This IP is what our server sees, we're showing you so you can be aware and protect it">IP: ip</a -->
-    <a class="nav-item right" id="settings" href="user/settings.html"></a>
-    <a class="nav-item right" href="control_panel.php">Account</a>
+    {{rightNav}}
+<!-- div id="expander">
+  X
+  <iframe name="boardView" width=100%></iframe>
+</div -->
+    <!-- a class="nav-item right" id="settings" href="user/settings.html"></a -->
   </nav>
   <main>
   <div class="container">
