@@ -79,7 +79,10 @@ function renderPostFormHTML($boardUri, $options = false) {
     'sage'     => array('type' => 'checkbox',      'label' => 'Sage'),
     'subject'  => array('type' => 'text',          'label' => 'Subject',
       'maxlength' => 150, 'autocomplete' => 'off'),
-    'message'  => array('type' => 'textarea',      'label' => 'Message', 'autocomplete' => 'off'),
+      // FIXME: come up with a better way than HTML in the label...
+      // array based label?
+    'message'  => array('type' => 'textarea',      'label' => 'Message',
+      'postlabel' => '<span class="messageCounter"></span>', 'autocomplete' => 'off'),
     'files'    => array('type' => 'multidropfile', 'label' => 'Files',
       'postlabel' => 'Max ' . $maxfiles . ' files</small><small>' . number_abbr($maxfilesize) . ' total'),
   );
