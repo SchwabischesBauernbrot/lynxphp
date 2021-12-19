@@ -1,7 +1,20 @@
+.nojsonly-block {
+  display: none;
+}
+
 .lpPostForm textarea {
   width: 100%;
 }
 
 .lpPostForm input[name="captcha"] {
   width: 100px;
+}
+
+/* ported from hidefileinput.js */
+.form-post input[name="files[]"] {
+  /* not using display: none because we still want to show the browser prompt for a "required" file */
+  position: absolute;
+  border: none;
+  height: 1px;
+  width: 1px;
 }
