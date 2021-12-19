@@ -18,14 +18,11 @@
       or summary/details
       -->
       <span class="replies mt-5 ml-5">{{replies}}</span>
-      <details style="display: inline; position: absolute;">
+      <details style="display: inline;">
         <summary>Actions</summary>
+        <div style="position: absolute; z-index: 1; background-color: {{backgroundColorCSS}}; padding: 5px;">
         {{actions}}
-        <!-- select class="jsonly postmenu">
-          <option value="single">Hide</option>
-          <option value="fid">Filter ID</option>
-          <option value="fname">Filter Name</option>
-        </select -->
+        </div>
       </details>
       {{links}}
     </span>
@@ -33,6 +30,7 @@
   <div class="post-data">
     <div class="post-files">{{files}}</div>
     <pre class="post-message">{{message}}</pre>
+    {{omitted}}
     <!-- leave a place for js to dump these -->
   </div>
 </div>
@@ -53,21 +51,11 @@
     </span>
     <div class="post-file-src" data-type="image" data-attachment="false">
       <!-- I have no clue how to make this cleaner -->
-      <style>
-      details[open].img#{{fileid}} > summary::after {
-        content: url({{path}});
-      }
-      </style>
-      <details id="{{fileid}}" class="postFile {{majorMimeType}}">
-        <summary>
-          {{thumb}}
-        </summary>
-        {{avmedia}}
-      </details>
+      {{expander}}
     </div>
     <span class="post-file-info">
       <span>
-        <a href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{filename}}</a>
+        <a href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{shortfilename}}</a>
       </span>
       <span>({{size}}, {{width}}x{{height}})</span>
     </span>
@@ -78,4 +66,24 @@
 <!-- end -->
 <!-- loop -->
   <a class="quote" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">&gt;&gt;{{no}}</a>
+<!-- end -->
+<!-- loop -->
+    <div class="cb mt-5 ml-5">
+      <!-- a class="expand2Link" target="thread{{threadNum}}View" href="{{threadUrl}}" tabindex="0">Expand Thread</a>
+      <a href="#" tabindex="0">Expand Thread</a>
+      <textarea></textarea>
+      <div class="expander2" id="threadExpander{{threadNum}}">
+        X
+        < frameborder=0 >
+        <iframe name="thread{{threadNum}}View" width=700 style="height: 50vh;"></iframe>
+      </div -->
+      <details class="threadExpander">
+        <summary>{{replies_omitted}} replies omitted. <!-- a href="{{uri}}/thread/{{threadNum}}.html">View the full thread</a --> Click to expand viewer</summary>
+        <div>
+          <!-- meta http-equiv="refresh" content="0;URL={{threadUrl}}" / -->
+          <iframe title="expanded thread viwer" name="thread{{threadNum}}View" width=700 style="height: 50vh;" srcdoc='<a id="link" style="display: block; line-height: 100vh; text-align: center; width: 700px; height: 100vh;" target="thread{{threadNum}}View" href="{{threadUrl}}">Please click to load all the html for full thread #{{threadNum}}</a>'>
+          </iframe>
+        </div>
+      </details>
+    </div>
 <!-- end -->
