@@ -6,7 +6,7 @@ PIPELINE_BOARD_FOOTER_TMPL
   *tags
     tag => value
 PIPELINE_BOARD_NAV
-  *Label => url
+  *Label => url (or array of URLs, first one is linked)
 PIPELINE_BOARD_STICKY_NAV*
   html string
 PIPELINE_BOARD_DETAILS_TMPL
@@ -40,8 +40,8 @@ PIPELINE_THREAD_ICONS
 PIPELINE_POST_PREPROCESS (p)
 PIPELINE_POST_POSTPREPROCESS
   posts
-  boardThreads
-  pagenum
+  boardThreads (is this used? just nice to have? overboard may not be able to provide this)
+  pagenum (is this used? just nice to have? overboard doesn't have this)
 PIPELINE_POST_TEXT_FORMATTING (p)*
   safeCom
   boardUri
@@ -86,6 +86,12 @@ PIPELINE_USER_NAV
 PIPELINE_USER_HEADER_TMPL
 
 PIPELINE_SITE_HEAD
+PIPELINE_SITE_LEFTNAV
+  navItems
+    *Label => url (or array of URLs, first one is linked)
+PIPELINE_SITE_RIGHTNAV
+  navItems
+    *Label => url (or array of URLs, first one is linked)
 // we can have one pipeline adjust all this data
 // and likely would be less overhead
 PIPELINE_SITE_FOOTER_HEADER
