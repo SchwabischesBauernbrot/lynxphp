@@ -1,14 +1,14 @@
 <?php
 return array(
-  'name' => 'last_posts',
+  'name' => 'board_over',
   'version' => 1,
   'resources' => array(
     array(
-      'name' => 'last_posts',
+      'name' => 'overboard',
       'params' => array(
-        'endpoint' => 'opt/:boardUri/thread/:thread/last50',
+        'endpoint' => 'lynx/overboard.json',
         'unwrapData' => true,
-        'requires' => array('boardUri', 'thread'),
+        //'requires' => array('boardUri'),
         //'params' => 'querystring',
       ),
     ),
