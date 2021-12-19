@@ -30,6 +30,15 @@ $res = $pkg->useResource('save_settings', array(),
 if (!empty($res['setCookie'])) {
   setcookie('session', $res['setCookie']['session'], $res['setCookie']['ttl'], '/');
 }
+if (!empty($res['setCookies'])) {
+  foreach($res['setCookies'] as $c) {
+    if (isset($ct['ttl'])) {
+      setcookie($c['key'], $c['val'], $c['ttl'], '/');
+    } else {
+      setcookie($c['key'], $c['val'], 0, '/');
+    }
+  }
+}
 
 if ($res['success']) {
   // maybe a js alert?
