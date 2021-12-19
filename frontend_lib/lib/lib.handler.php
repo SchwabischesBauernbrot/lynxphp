@@ -32,6 +32,7 @@ function sendBump($req_method, $req_path) {
          ($req_path === '/forms/login' && $req_method === 'POST') ||
          ($req_path === '/forms/login.php' && $req_method === 'POST') ||
          strpos($req_path, 'user/settings/themedemo/') !== false ||
+         strpos($req_path, '_inline.html') !== false ||
          strpos($req_path, '/preview/') !== false ||
          strpos($req_path, '/refresh') !== false ||
          $req_path === '/logout' ||
@@ -53,8 +54,9 @@ function wrapContentData($options = false) {
 
   extract(ensureOptions(array(
      // only should be used when we know we're opening a ton of requests in parallel
-    'noWork' => false,
-    'settings' => false,
+    'noWork'      => false,
+    'settings'    => false,
+    'closeHeader' => true,
   ), $options));
 
   $enableJs = true;
@@ -81,16 +83,28 @@ function wrapContentData($options = false) {
     'userSettings' => $userSettings,
     'enableJs' => $enableJs,
     'doWork' => !$noWork,
+    'closeHeader' => $closeHeader,
   );
 }
 
-function wrapContentHeader($row) {
+// inline use this direct...
+/*
+<!DOCTYPE html>
+<html>
+<head id="settings">
+  <base href="$BASE_HREF" target="_parent">
+  $head_html
+</head>
+<body id="top">
+*/
+// we'd have to pull all that structure out of the header
+// how would we inject stuff into the head?
+// {{header}} could insert all that..
+// or just section it off like footer
+function wrapContentGetHeadHTML($row) {
   global $pipelines;
-
   $siteSettings = $row['siteSettings'];
   $userSettings = $row['userSettings'];
-  $enableJs = $row['enableJs'];
-
   $io = array(
     'siteSettings' => $siteSettings,
     'userSettings' => $userSettings,
@@ -101,13 +115,88 @@ function wrapContentHeader($row) {
     const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
     const DISABLE_JS = false
   </script>';
+  return $head_html;
+}
+
+function wrapContentHeader($row) {
+  global $pipelines;
+
+  $siteSettings = $row['siteSettings'];
+  $userSettings = $row['userSettings'];
+  $enableJs = $row['enableJs'];
+
+  /*
+  $io = array(
+    'siteSettings' => $siteSettings,
+    'userSettings' => $userSettings,
+    'head_html' => '',
+  );
+  $pipelines[PIPELINE_SITE_HEAD]->execute($io);
+  $head_html = $io['head_html'] . "\n" . '<script>
+    const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
+    const DISABLE_JS = false
+  </script>';
+  */
+  $head_html = wrapContentGetHeadHTML($row);
 
   $templates = loadTemplates('header');
+
+  // iframe are immediately loaded
+  // can use names and links to load content
+  $boards_html = getexpander(
+    '<a href="boards.php" target="boardView">Boards</a>',
+    '<iframe name=boardView src="loaded_iframe" style="display: none"></iframe>', array(
+      'classes' => array('nav-item')
+    )
+  );
+
+  $boards_html = <<<EOB
+EOB;
+
+  // FIXME: select the right page...
+
+  $leftNavItems = array(
+    //'Home' => '.',
+    //'Boards' => 'boards.html',
+    //'Help' => 'help.html',
+  );
+  $leftNav_io = array(
+    'navItems' => $leftNavItems,
+  );
+  $pipelines[PIPELINE_SITE_LEFTNAV]->execute($leftNav_io);
+
+  $leftNav_html = getNav($leftNav_io['navItems'], array(
+    'type' => 'none', 'baseClasses' => array('nav-item'),
+    //'selected' => 'none of those',
+    'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
+  ));
+
+  $rightNavItems = array(
+    '' => 'user/settings.html',
+    'Account' => array('control_panel.php', 'forms/login.html') ,
+  );
+  $rightNavItems2 = array(
+    array('label' => '', 'alt' => 'Settings', 'destinations' => 'user/settings.html'),
+    array('label' => 'Account', 'destinations' => array('control_panel.php', 'forms/login.html')),
+  );
+  $rightNav_io = array(
+    'navItems' => $rightNavItems2,
+  );
+  $pipelines[PIPELINE_SITE_RIGHTNAV]->execute($rightNav_io);
+  $rightNav_html = getNav2($rightNav_io['navItems'], array(
+    'type' => 'none', 'baseClasses' => array('nav-item', 'right'),
+    'ids' => array('' => 'settings'),
+    'selected' => 'none of those', // has to be set for settings not to be highlighted
+    'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
+  ));
+
   // how and when does this change?
   // FIXME: cacheable...
   global $BASE_HREF;
   $tags = array(
-    'nav' => '',
+    'leftNav'  => $leftNav_html,
+    'rightNav' => $rightNav_html,
+    'boards'   => $boards_html,
     'basehref' => $BASE_HREF,
     'title' => empty($siteSettings['siteName']) ? '': $siteSettings['siteName'],
     // maybe head insertions is better?
@@ -128,6 +217,7 @@ function wrapContentFooter($row) {
   global $pipelines;
   $enableJs = $row['enableJs'];
   $doWork = $row['doWork'];
+  $closeHeader = $row['closeHeader'];
 
   // a script could be
   // - a relative url
@@ -149,10 +239,17 @@ function wrapContentFooter($row) {
       'js/localstorage.js',
       // click to reply
       'js/jschan/quote.js',
+      // preview quotes on hover
       'js/jschan/hover.js',
+      // make top form draggable
+      'js/jschan/dragable.js',
+      // post form message character counter
+      // you need to set message limits
+      //'js/jschan/counter.js',
       // lynxphp
       'js/lynxphp/embed.js',
       'js/lynxphp/refresh.js',
+      'js/lynxphp/expander.js',
     ),
   );
   // THINK: how do we let JS live in module directories
@@ -192,7 +289,10 @@ function wrapContentFooter($row) {
     'end' => $scripts_html . $io['end_html'],
   );
   $footer = loadTemplates('footer');
-  echo replace_tags($footer['header'], $tags);
+  if ($closeHeader) {
+    echo $footer['header'];
+  }
+  echo replace_tags($footer['loop0'], $tags);
   flush();
   // lets put this before the report, so we can profile it
   // call backend worker
