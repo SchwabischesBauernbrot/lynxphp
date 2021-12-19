@@ -29,7 +29,7 @@ if (!defined('BACKEND_BASE_URL')) define('BACKEND_BASE_URL', 'http://localhost/b
 if (!defined('BACKEND_PUBLIC_URL')) define('BACKEND_PUBLIC_URL', 'https://' . $HTTP_HOST . '/backend/');
 
 if (!defined('BACKEND_TYPE')) define('BACKEND_TYPE', 'default');
-
+if (!defined('BACKEND_HEAD_SUPPORT')) define('BACKEND_HEAD_SUPPORT', true);
 
 // what request path is the site design to run under
 // cannot include protocol
