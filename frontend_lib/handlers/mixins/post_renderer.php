@@ -1,5 +1,15 @@
 <?php
 
+function snippet($text, $size = 10, $tail='...') {
+  $text = stripslashes($text);
+  if (isset($text[$size + 1])) {
+    $arr = explode('_$3pR_', wordwrap($text, $size, '_$3pR_', true));
+    $text = array_shift($arr) . $tail;
+  }
+  return $text;
+}
+
+
 // the 4chan format is p. shitty
 // missing threadid and boardUri...
 // would be handy to have this in JS for dynamic content
@@ -12,7 +22,10 @@ function renderPost($boardUri, $p, $options = false) {
 
   // unpack options
   extract(ensureOptions(array(
-    'checkable' => false,
+    'checkable'  => false,
+    'postCount'  => false,
+    'topReply' => false,
+    'noOmit'   => false,
   ), $options));
 
   //$isBO = perms_isBO($boardUri);
@@ -33,13 +46,25 @@ function renderPost($boardUri, $p, $options = false) {
     'admin'  => array(),
   );
 
+  /*
+  if ($postCount !== false) {
+    echo "postCount[$postCount] [$threadId]<br>\n";
+  } else {
+    echo "no postCount<br>\n" . gettrace();
+  }
+  */
+
   global $pipelines;
   // pretext processing...
   $action_io = array(
     'boardUri' => $boardUri,
     'p' => $p,
     'actions'  => $post_actions,
+    // FIXME: pass post count...
   );
+  if ($postCount !== false) {
+    $action_io['postCount'] = $postCount;
+  }
   if ($isOP) {
     $pipelines[PIPELINE_THREAD_ACTIONS]->execute($action_io);
   }
@@ -83,6 +108,7 @@ function renderPost($boardUri, $p, $options = false) {
   }
   $post_links_html = join('<br>' . "\n", $post_link_html_parts);
 
+  // os disk cache will handle caching
   $templates = loadTemplates('mixins/post_detail');
   $checkable_template = $templates['loop0'];
   $posticons_template = $templates['loop1'];
@@ -90,6 +116,7 @@ function renderPost($boardUri, $p, $options = false) {
   $file_template      = $templates['loop3'];
   $replies_template   = $templates['loop4'];
   $reply_template     = $templates['loop5'];
+  $omitted_template   = $templates['loop6'];
 
   $postmeta = '';
   if ($checkable) {
@@ -128,7 +155,7 @@ function renderPost($boardUri, $p, $options = false) {
   }
   if (!empty($p['flag'])) {
     $flag = addslashes(htmlspecialchars($p['flag']));
-    $postmeta .= '<span class="flag flag-'.$p['flag_cc'].'" title="'.$p['flagName'].'" alt="'.$p['flagName'].'"><img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '"></span>';
+    $postmeta .= ' <span class="flag flag-'.$p['flag_cc'].'" title="'.$p['flagName'].'" alt="'.$p['flagName'].'"><img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '"></span>';
   }
   // post-
   if (!empty($p['capcode'])) {
@@ -142,6 +169,46 @@ function renderPost($boardUri, $p, $options = false) {
     $postmeta = '      <label>' . "\n" . $postmeta . '      </label>';
   }
 
+  $omitted_html = '';
+  if ($isOP) {
+    //echo "threadId[$threadId] postCount[$postCount]<br>\n";
+    // reply_count
+    // file_count
+    //echo "<pre>thread[", print_r($p, 1), "]</pre>\n";
+
+    // total - rpp
+    $rOmitted = $postCount - 5;
+    if ($rOmitted < 0) $rOmitted = 0;
+    if (!$noOmit && $rOmitted) {
+
+      //$lastPost = $posts[count($posts) - 1];
+      $add_html = '';
+      $threadUrl = '/' . $boardUri . '/thread/' . $threadId . '_inline.html';
+      $expandUrl = $threadUrl;
+      if ($topReply) {
+        //while we can, we shouldn't...
+        //$expandUrl .= '#' . $topReply;
+        // didn't work because the anchor is only set on the iframe
+        /*
+        $add_html = '
+        <style>
+          #'.$topReply.':target ~ #threadExpander' . $threadId . ' {
+            display: block;
+          }
+        </style>
+        ';
+        */
+      }
+
+      $omit_tags = array(
+        'replies_omitted' => $rOmitted ? $rOmitted : '',
+        'uri'       => $boardUri,
+        'threadNum' => $threadId,
+        'threadUrl' => $expandUrl,
+      );
+      $omitted_html = $add_html . replace_tags($omitted_template, $omit_tags);
+    }
+  }
   // tn_w, tn_h aren't enabled yet
   $files_html = '';
   foreach($p['files'] as $file) {
@@ -157,18 +224,36 @@ function renderPost($boardUri, $p, $options = false) {
       $path = BACKEND_PUBLIC_URL . $path;
     }
     $majorMimeType = getFileType($file);
+    $fileSha256 = 'f' . uniqid();
+    $thumb   = getThumbnail($file, array('type' => $majorMimeType));
+    $avmedia = getAudioVideo($file, array('type' => $majorMimeType));
+    $shortenSize = 10;
+    if (!empty($file['tn_w'])) {
+      //$shortenSize = max($shortenSize, (int)($file['tn_w'] / 8));
+    } else {
+      // we can make some estimate off the aspect ratio...
+      $w = getThumbnailWidth($file, array('type' => $majorMimeType));
+      //echo "w[$w]<Br>\n";
+      // 154 / 8 = 20190419-_DSF2773.j... ~20 chars
+      $shortenSize = max($shortenSize, (int)($w / 8) - 10);
+    }
     $fTags = array(
       'path' => $path,
-      // sha256
-      'fileid' => 'f' .  uniqid(),
+      'expander' => getExpander($thumb, $avmedia, array(
+        'classes' => array('postFile', $majorMimeType),
+        'labelId' => $fileSha256,
+        'styleContentUrl' => $path,
+      )),
+      'fileid' => $fileSha256,
       'filename' => $file['filename'],
-      'size' => empty($file['size']) ? 'Unknown' : $file['size'],
+      'shortfilename' => snippet($file['filename'], $shortenSize),
+      'size' => empty($file['size']) ? 'Unknown' : formatBytes($file['size']),
       'width' => $file['w'],
       'height' => $file['h'],
       'majorMimeType' => $majorMimeType,
-      'thumb' => getThumbnail($file, array('type' => $majorMimeType)),
+      'thumb' => $thumb,
       //'viewer' => getViewer($file, array('type' => $majorMimeType)),
-      'avmedia' => getAudioVideo($file, array('type' => $majorMimeType)),
+      'avmedia' => $avmedia,
       'path' => $path,
       'tn_w' => empty($file['tn_w']) ? 0 : $file['tn_w'],
       'tn_h' => empty($file['tn_h']) ? 0 : $file['tn_h'],
@@ -199,11 +284,14 @@ function renderPost($boardUri, $p, $options = false) {
     'postmeta'  => $postmeta,
     'files'     => $files_html,
     'replies'   => $replies_html,
+    // for actions details/summary
+    'backgroundColorCSS' => $isOP ? 'var(--background-rest)' : 'var(--post-color)',
     'jstime'    => gmdate('Y-m-d', $p['created_at']) . 'T' . gmdate('H:i:s.v', $p['created_at']) . 'Z',
     'human_created_at' => gmdate('n/j/Y H:i:s', $p['created_at']),
     'links'     => $links_html,
     'actions'   => $post_actions_html,
     'postlinks' => $post_links_html,
+    'omitted'   => $omitted_html,
   );
   $tmp = replace_tags($templates['header'], $tags);
 
