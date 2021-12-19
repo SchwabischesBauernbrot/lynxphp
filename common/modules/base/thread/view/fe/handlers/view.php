@@ -35,10 +35,14 @@ $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
 
 $posts_html = '';
 $files = 0;
+$cnt = count($boardData['posts']);
 foreach($boardData['posts'] as $post) {
   //echo "<pre>", print_r($post, 1), "</pre>\n";
   $tmp = $post_template;
-  $posts_html .= renderPost($boardUri, $post, array('checkable' => true));
+  $posts_html .= renderPost($boardUri, $post, array(
+    'checkable' => true, 'postCount' => $cnt,
+    'noOmit' => true,
+  ));
   $files += count($post['files']);
 }
 
