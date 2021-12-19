@@ -30,19 +30,31 @@ if (is_array($boards)) {
   }
 }
 
-$logo = 'images/default_logo.png';
+$logoURL = 'images/default_logo.png';
+$logoW = 279;
+$logoH = 180;
+$logoAlt = 'Site logo';
 if (!empty($settings['site']['logo'])) {
-  if (strpos($settings['site']['logo'], '://') === false) {
-    $logo = BACKEND_PUBLIC_URL . $settings['site']['logo'];
-  } else {
-    $logo = $settings['site']['logo'];
+  $logo = $settings['site']['logo'];
+  if (!empty($logo['url'])) {
+    if (strpos($logo['url'], '://') === false) {
+      $logoURL = BACKEND_PUBLIC_URL . $logo['url'];
+    } else {
+      $logoURL = $logo['url'];
+    }
   }
+  if (!empty($logo['w'])) $logoW = $logo['w'];
+  if (!empty($logo['h'])) $logoH = $logo['h'];
+  if (!empty($logo['alt'])) $logoAlt = $logo['alt'];
 }
 
 $tags = array(
   'siteName' => empty($settings['site']['siteName']) ? 'New PHPLynx Site' : $settings['site']['siteName'],
   'slogan' => empty($settings['site']['slogan']) ? 'Go into <a href="admin/settings">Account > Admin interface > Settings</a> to set Name/Slogan' : $settings['site']['slogan'],
-  'logoURL' => $logo,
+  'logoURL' => $logoURL,
+  'logoAlt' => $logoAlt,
+  'logoW' => $logoW,
+  'logoH' => $logoH,
   'boards' => $boards_html,
 );
 
