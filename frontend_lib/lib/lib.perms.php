@@ -29,8 +29,10 @@ function perms_getBoards() {
   // handles 401 badly...
   if (!isLoggedIn()) return false;
 
+  static $accountCache = array();
   global $scratch, $now;
   $key = 'user_session' . $_COOKIE['session'];
+  //echo "key[$key]<br>\n";
   $user = $scratch->get($key);
   //echo "<pre>", print_r($user, 1), "</pre>\n";
   // ensure $user['account']
@@ -43,6 +45,10 @@ function perms_getBoards() {
     //echo "Old user data now[$now] [", $user['account_ts'], "]<br>\n";
     $getAccount = true;
   }
+  if (isset($accountCache[$_COOKIE['session']])) {
+    // prevent a bunch of calls to the backend if have an expired session
+    $getAccount = false;
+  }
   if ($getAccount) {
     $account = backendLynxAccount();
     //echo '<pre>account[', print_r($account, 1), "</pre>\n";
@@ -53,9 +59,10 @@ function perms_getBoards() {
     } else {
       // backend problem? not parseable
       // either way we don't want invalid data in our cache...
+      $accountCache[$_COOKIE['session']] = false;
     }
   }
-  $account = $user['account'];
+  $account = empty($user['account']) ? '' : $user['account'];
   $boards = empty($account['ownedBoards']) ? array() : $account['ownedBoards'];
   return $boards;
 }
