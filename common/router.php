@@ -212,9 +212,9 @@ class Router {
 
   // do we have a cached copy
   function isUncached($key, $routeParams) {
-    if (DEV_MODE) {
+    //if (DEV_MODE) {
       header('X-Debug-isUncached: ' . (isset($this->routeOptions[$key]['cacheSettings']) ? 'cacheable' : 'not'));
-    }
+    //}
     // no caching
     if (!isset($this->routeOptions[$key]['cacheSettings'])) {
       //echo "No cacheSettings for [$key]";
@@ -319,10 +319,10 @@ class Router {
         }
       }
     }
-    if (DEV_MODE) {
+    //if (DEV_MODE) {
       header('X-Debug-isUncached-mtime: ' . ($checkMtime ? 'use' : 'ignore'));
       header('X-Debug-isUncached-eTag: ' . ($checkEtag ? 'use' : 'ignore'));
-    }
+    //}
 
     $mtime = 0;
     $eTag = '';
@@ -555,16 +555,16 @@ class Router {
     if ($res === false) return false; // 404 passthru
     $key = $res['request']['method'] . '_' . $res['match']['cond'];
     $uncached = $this->isUncached($key, $res['match']['params']);
-    if (DEV_MODE) {
-      header('X-Debug-sendHeaders-key: ' . $key);
+    //if (DEV_MODE) {
+      //header('X-Debug-sendHeaders-key: ' . $key);
       header('X-Debug-sendHeaders-cache: ' . ($uncached ? 'miss' : 'hit'));
-    }
+    //}
     // HEAD can only return headers
     if ($res['isHead']) {
       //header('connection: close');
-      if (DEV_MODE) {
-        header('X-Debug-sendHeaders-isHead: true');
-      }
+      //if (DEV_MODE) {
+        //header('X-Debug-sendHeaders-isHead: true');
+      //}
       // don't need to process content
       return true;
     }
