@@ -1,0 +1,63 @@
+<h1 class="board-title">Board List</h1>
+{{overboard}}
+<div class="flexcenter mv-10">
+  <form class="form-post" action="{{action}}" method="POST">
+    <!-- hide nsfw, languages, filter out abandoned boards -->
+    <div class="row">
+      <div class="label">Search</div>
+      <input type="text" name="search" placeholder="Uri or tags" value="{{search}}">
+    </div>
+    <div class="row">
+      <div class="label">Sort</div>
+      <select name="sort">
+        <option value="popularity"{{popularitySelected}}>Popularity</option>
+        <option value="activity"{{latestSelected}}>Latest Activity</option>
+      </select>
+    </div>
+    <div class="row">
+      <div class="label">Order</div>
+      <select name="direction">
+        <option value="desc"{{descSelected}}>Descending</option>
+        <option value="asc"{{ascSelected}}>Ascending</option>
+      </select>
+    </div>
+    <input type="submit" value="Filter">
+  </form>
+</div>
+<h4 class="board-description">
+Local Boards</h4>
+<div class="table-container flex-center mv-10 text-center">
+<table class="boardtable w900">
+  <tr>
+    <th>Board</th>
+    <th>Description</th>
+    {{fields}}
+    <!-- th>PPH</th>
+    <th>Users</th -->
+    <th>Posts</th>
+    <th>Last Activity
+{{boards}}
+<!-- loop -->
+  <h4 class="board-description">or try the <a href="overboard.php">overboard</a></h4>
+<!-- end -->
+<!-- loop -->
+  <tr>
+    <td>
+      <span class="left"></span><a href="{{uri}}/">/{{uri}}/ - {{title}}</a>
+    </td>
+    <td>{{description}}</td>
+    <!-- td>{{pph}}</td>
+    <td>{{users}}</td -->
+    <td>{{posts}}</td>
+    <td style="background-color: #{{lastActivityColor}}">{{last_post}}</td>
+<!-- end -->
+</table>
+</div>
+
+<div class="pages text-center mt-5 mv-0">
+Page:
+{{pages}}
+<!-- loop -->
+  <a class="{{bold}}" href="boards?{{qs}}">[{{page}}]</a>
+<!-- end -->
+</div>
