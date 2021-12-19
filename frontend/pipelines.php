@@ -78,6 +78,8 @@ $frontEndPipelines = array(
   'PIPELINE_USER_HEADER_TMPL',
 
   'PIPELINE_SITE_HEAD',
+  'PIPELINE_SITE_LEFTNAV',
+  'PIPELINE_SITE_RIGHTNAV',
   // we can have one pipeline adjust all this data
   // and likely would be less overhead
   'PIPELINE_SITE_FOOTER_HEADER',
