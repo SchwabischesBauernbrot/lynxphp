@@ -20,6 +20,7 @@ function replace_tags($template, $tags) {
   return str_replace(array_map('tagify', array_keys($tags)), array_values($tags), $template);
 }
 
+// os disk cache will handle caching
 function loadTemplatesFile($path) {
   $lines = @file($path);
   if (!is_array($lines)) {
