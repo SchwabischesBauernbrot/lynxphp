@@ -49,30 +49,12 @@ details summary {
         <iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" srcdoc='<a style="display: block; line-height: 100vh; text-align: center; width: 100vw; height: 100vh;" target="boardFrame" href="/boards_inline.html">Please click to load all the html for full board list</a>'></iframe>
       </div>
     </details>
-<!--
-<style>
-#expander {
-  display: none;
-  width: 100%;
-}
-#expandLink:focus ~ #expander {
-  display: block;
-  color: red;
-}
-</style>
-<a class="nav-item" id="expandLink" target="boardView" href="inline_boards.html" tabindex="0">Boards</a>
--->
     {{leftNav}}
 <!-- loop -->
     <a class="nav-item" href="{{url}}">{{label}}</a>
 <!-- end -->
     <!-- a class="nav-item" href="ip" title="This IP is what our server sees, we're showing you so you can be aware and protect it">IP: ip</a -->
     {{rightNav}}
-<!-- div id="expander">
-  X
-  <iframe name="boardView" width=100%></iframe>
-</div -->
-    <!-- a class="nav-item right" id="settings" href="user/settings.html"></a -->
   </nav>
   <main>
   <div class="container">
