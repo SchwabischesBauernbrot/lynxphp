@@ -98,6 +98,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     foreach($header as $k => $v) {
       $headers[] = $k . ': ' . $v;
     }
+    //echo '<pre>headers', print_r($headers, 1), '</pre>', "\n";
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
   }
   if ($user && $pass) {
@@ -123,16 +124,19 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   if ($method === 'HEAD') {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'HEAD');
     curl_setopt($ch, CURLOPT_HEADER, true); // include response header in output
+    curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+    curl_setopt($ch, CURLOPT_NOBODY, 1);
+    curl_setopt($ch, CURLOPT_VERBOSE, 1);
   }
   //curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false);
+  curl_setopt($ch, CURLOPT_TIMEOUT, 45);
 
   //execute post
   $result = curl_exec($ch);
 
-  //close handle
-  curl_close($ch);
   if (DEV_MODE) {
     global $curlLog;
+    $infos = curl_getinfo($ch);
     $curlLog[] = array(
       'method' => $method,
       'url' => $url,
@@ -140,8 +144,12 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
       'postData' => $fields_string,
       'took' => (microtime(true) - $start) * 1000,
       'result' => $result,
+      'curlInfo' => $infos,
     );
   }
+
+  //close handle
+  curl_close($ch);
 
   return $result;
 }
