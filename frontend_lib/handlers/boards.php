@@ -1,5 +1,6 @@
 <?php
 
+/*
 function secondsToTime($inputSeconds) {
   global $now;
 
@@ -9,6 +10,7 @@ function secondsToTime($inputSeconds) {
   $diff = $then->diff(new DateTime(gmdate('Y-m-d H:i:s', $now)));
   return array('years' => $diff->y, 'months' => $diff->m, 'days' => $diff->d, 'hours' => $diff->h, 'minutes' => $diff->i, 'seconds' => $diff->s);
 }
+*/
 
 function relativeColor($relativeTo) {
   global $now;
@@ -23,7 +25,7 @@ function relativeColor($relativeTo) {
   $diff = $now - $relativeTo;
   $minAgo = floor($diff / $MINUTE);
 
-  $r=0; $g=0; $b=0;
+  $r = 0; $g = 0; $b = 0;
   if ($diff < $MINUTE) {
     $g = 0.7; $b = 1;
   } else
@@ -51,7 +53,7 @@ function relativeColor($relativeTo) {
   return sprintf('%02x%02x%02x', $r * 255, $g * 255, $b * 255);
 }
 
-function getBoardsHandler() {
+function getBoardsHandlerEngine() {
   global $now;
 
   $pageNum = 1;
@@ -96,8 +98,8 @@ function getBoardsHandler() {
   $templates = loadTemplates('board_listing');
   $overboard_template = $templates['loop0'];
   $board_template     = $templates['loop1'];
-  $page_template     = $templates['loop2'];
-  //echo "<pre>pages_template", htmlspecialchars(print_r($page_template, 1)), "</pre>\n";
+  $page_tmpl     = $templates['loop2'];
+  //echo "<pre>pages_template", htmlspecialchars(print_r($page_tmpl, 1)), "</pre>\n";
 
   $boards_html = '';
   foreach($boards as $c=>$b) {
@@ -126,55 +128,55 @@ function getBoardsHandler() {
 
       $last = '';
       if ($seconds) {
-        $last = $seconds . ' seconds ago';
+        $s = 's';
+        if ($seconds === 1) $s = '';
+        $last = $seconds . ' second' . $s . ' ago';
       }
       if ($minutes) {
-        $last = $minutes    . ' minute ago';
+        $s = 's';
+        if ($minutes === 1) $s = '';
+        $last = $minutes . ' minute' . $s . ' ago';
       }
       if ($hours) {
-        $last = $hours   . ' hour(s) ago';
-        $color = '7cd900';
+        $s = 's';
+        if ($hours === 1) $s = '';
+        $last = $hours   . ' hour' . $s . ' ago';
       }
       if ($days) {
-        $last = $days    . ' day(s) ago';
-        $color = 'd9b900'; // yellow
+        $s = 's';
+        if ($days === 1) $s = '';
+        $last = $days    . ' day' . $s . ' ago';
       }
       if ($weeks) {
-        $last = $weeks   . ' week(s) ago';
-        $color = 'd95200'; // orange
+        $s = 's';
+        if ($weeks === 1) $s = '';
+        $last = $weeks   . ' week' . $s . ' ago';
       }
       if ($months) {
-        $last = $months  . ' month(s) ago';
-        $color = 'c50000'; // red
+        $s = 's';
+        if ($months === 1) $s = '';
+        $last = $months  . ' month' . $s . ' ago';
       }
 
       $color = relativeColor($b['last']['updated_at']);
     }
 
-    $tmp = $board_template;
-    $tmp = str_replace('{{uri}}', $b['uri'], $tmp);
-    $tmp = str_replace('{{title}}', htmlspecialchars($b['title']), $tmp);
-    $tmp = str_replace('{{description}}', htmlspecialchars($b['description']), $tmp);
-    $tmp = str_replace('{{threads}}', $b['threads'], $tmp);
-    $tmp = str_replace('{{posts}}', $b['posts'], $tmp);
-    $tmp = str_replace('{{lastActivityColor}}', $color, $tmp);
-    $tmp = str_replace('{{last_post}}', $last, $tmp);
-    $boards_html .= $tmp . "\n";
+    $tags = array(
+      'uri' => $b['uri'],
+      'title' => htmlspecialchars($b['title']),
+      'description' => htmlspecialchars($b['description']),
+      'threads' => $b['threads'],
+      'posts' => $b['posts'],
+      'lastActivityColor' => $color,
+      'last_post' => $last,
+    );
+    $boards_html .= replace_tags($board_template, $tags) . "\n";
   }
 
-  $content = $templates['header'];
-  $content = str_replace('{{overboard}}', '', $content);
-  $content = str_replace('{{fields}}', '', $content);
-
-  $content = str_replace('{{search}}', $params['search'], $content);
-  $content = str_replace('{{popularitySelected}}', $params['sort'] === 'popularity' ? ' selected' : '', $content);
-  $content = str_replace('{{latestSelected}}', $params['sort'] === 'activity' ? ' selected' : '', $content);
-
-  $content = str_replace('{{descSelected}}', $reverse_list ? ' selected' : '', $content);
-  $content = str_replace('{{ascSelected}}', $reverse_list ? '' : ' selected', $content);
-
-
   $page_html = '';
+  // FIXME: we should tightly control the page links
+  // so we can generate a static page for each page...
+  // boards/1.html
   if (isset($res['data']['pageCount'])) {
     //print_r($params);
     $qParams = array();
@@ -183,47 +185,65 @@ function getBoardsHandler() {
     if ($params['direction'] !== 'desc') $qParams['direction'] = 'asc';
     $qs = paramsToQuerystringGroups($qParams);
     for($i = 0; $i < $res['data']['pageCount']; $i++) {
-      $tmp = $page_template;
-      // we lose dir and sort
-      $tmp = str_replace('{{page}}', ($i + 1), $tmp);
-      $tmp = str_replace('{{qs}}', 'page=' . ($i + 1) . '&' . join('&', $qs), $tmp);
-      $tmp = str_replace('{{bold}}', $pageNum == $i + 1 ? 'bold' : '', $tmp);
-      $page_html .= $tmp;
+      $tags = array(
+        'page' => $i + 1,
+        'qs' => 'page=' . ($i + 1) . '&' . join('&', $qs),
+        'bold' => $pageNum == $i + 1 ? 'bold' : '',
+      );
+      $page_html .= replace_tags($page_tmpl, $tags) . "\n";
     }
   } else {
-    $tmp = $page_template;
-    $tmp = str_replace('{{page}}', 1, $tmp);
-    $tmp = str_replace('{{bold}}', 'bold', $tmp);
-    $page_html .= $tmp;
+    $tags = array(
+      'page' => 1,
+      'qs' => 'page=1&' . join('&', $qs),
+      'bold' => 'bold',
+    );
+    $page_html .= replace_tags($page_tmpl, $tags) . "\n";
   }
 
-  $content = str_replace('{{pages}}',  $page_html, $content);
-  $content = str_replace('{{boards}}', $boards_html, $content);
-  // FIXME get named route
   global $BASE_HREF;
-  $content = str_replace('{{action}}', $BASE_HREF . 'boards.php', $content);
+  $tags = array(
+    'overboard' => '',
+    'fields' => '',
+    'search' => $params['search'],
+    'popularitySelected' => $params['sort'] === 'popularity' ? ' selected' : '',
+    'latestSelected' => $params['sort'] === 'activity' ? ' selected' : '',
+    'descSelected' => $reverse_list ? ' selected' : '',
+    'ascSelected' => $reverse_list ? '' : ' selected',
+    'pages' => $page_html,
+    'boards' => $boards_html,
+    // FIXME get named route
+    'action' => $BASE_HREF . 'boards.html',
+  );
+  $content = replace_tags($templates['header'], $tags);
 
-  wrapContent($content, array('settings' => $settings));
+  return array(
+    'content' => $content,
+    'settings' => $settings,
+  );
 }
 
-// move into a module...
-function getOverboardHandler() {
-  $templates = loadTemplates('thread_listing');
-  $boards_html = '';
-  /*
-  $boards = getBoards();
-  foreach($boards as $c=>$b) {
-    $tmp = $templates['loop0'];
-    $boards_html .= $tmp . "\n";
-  }
-  */
-  $content = $templates['header'];
-  $content = str_replace('{{uri}}', 'overboard', $content);
-  $content = str_replace('{{title}}', 'Overboard Index', $content);
-  $content = str_replace('{{description}}', 'content from all of our boards', $content);
-  $content = str_replace('{{boards}}', $boards_html, $content);
+function getInlineBoardsHandler() {
+  $res = getBoardsHandlerEngine();
 
-  wrapContent($content);
+$row = wrapContentData(array());
+$head_html = wrapContentGetHeadHTML($row);
+global $BASE_HREF;
+echo <<<EOB
+<!DOCTYPE html>
+<html>
+<head id="settings">
+  <base href="$BASE_HREF" target="_parent">
+  $head_html
+</head>
+<body id="top">
+EOB;
+  echo $res['content'];
+}
+
+function getBoardsHandler() {
+  $res = getBoardsHandlerEngine();
+  wrapContent($res['content'], array('settings' => $res['settings']));
 }
 
 // probably shoudl be moved into a lib or inlined...
@@ -241,12 +261,12 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   $templates = loadTemplates('thread_listing');
   //echo join(',', array_keys($templates));
 
-  $page_template = $templates['loop0'];
+  $page_tmpl = $templates['loop0'];
   $boardnav_html = $templates['loop1'];
   $file_template = $templates['loop2'];
-  $threadhdr_template = $templates['loop3'];
-  $threadftr_template = $templates['loop4'];
-  $thread_template = $templates['loop5'];
+  $threadHdr_tmpl = $templates['loop3'];
+  $threadFtr_tmpl = $templates['loop4'];
+  $thread_tmpl = $templates['loop5'];
 
   extract(ensureOptions(array(
     'noBoardHeaderTmpl' => false,
@@ -285,14 +305,44 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
 
   $threads_html = '';
   foreach($pageData as $thread) {
+    //echo "<pre>", print_r($thread, 1), "</pre>\n";
+    //echo "[", $thread['posts'][0]['no'], "] replies[", $thread['thread_reply_count'], "]<br>\n";
     if (!isset($thread['posts'])) continue;
     $posts = $thread['posts'];
+    $threadId = $posts[0]['no'];
     //echo "count[", count($posts), "]<br>\n";
-    $threads_html .= $threadhdr_template;
+    $threads_html .= $threadHdr_tmpl;
+    // we only include 6...
+    //$cnt = count($posts);
     foreach($posts as $i => $post) {
-      $threads_html .= renderPost($boardUri, $post, array('checkable' => true));
+      //if ($i === 0) $threads_html .= $threadHdr_tmpl;
+      $topReply = isset($posts[1]) ? $posts[1]['no'] : false;
+      $threads_html .= renderPost($boardUri, $post, array(
+        'checkable' => true, 'postCount' => $thread['thread_reply_count'],
+        'topReply' => $topReply,
+      ));
+      //if ($i === count($posts) - 1) $threads_html .= $threadFtr_tmpl;
     }
-    $threads_html .= $threadftr_template;
+    $expander_html = '';
+    /*
+    // rpp
+    if ($thread['thread_reply_count'] > 5) {
+      //$lastPost = $posts[count($posts) - 1];
+      $threadUrl = '/' . $boardUri . '/thread/' . $threadId . '.html';
+      if (isset($posts[1])) {
+        $secondPost = $posts[1];
+        $threadUrl .= '#' . $secondPost['no'];
+      }
+      $expander_html = '<a class="expand2Link" target="thread' . $threadId . 'View" href="'. $threadUrl . '" tabindex="0">Expand Thread</a>';
+    }
+    */
+    $threadFtr_tags = array(
+      'threadNum' => $threadId,
+      // iframe could use loading=lazy but FF doesn't yet support it
+      // consider it when it's added
+      'expander'  => $expander_html,
+    );
+    $threads_html .= replace_tags($threadFtr_tmpl, $threadFtr_tags);
   }
 
   $p = array(
