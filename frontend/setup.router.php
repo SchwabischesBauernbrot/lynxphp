@@ -131,6 +131,27 @@ $frontendRouterData = array(
 
     ),
   ),
+  /*
+  'site' => array(
+    'file'   => 'textfiles',
+    'routes' => array(
+      'robots' => array(
+        'route'  => '/robots.txt',
+        'func'   => 'getRobotsHandler',
+        'options' => array(
+          'cacheSettings' => array(
+            'files' => array(
+            ),
+          ),
+        ),
+      ),
+      'humans' => array(
+        'route'  => '/humans.txt',
+        'func'   => 'getHumansHandler',
+      ),
+    ),
+  ),
+  */
   'boards' => array(
     'file'   => 'boards',
     'routes' => array(
@@ -147,16 +168,10 @@ $frontendRouterData = array(
           ),
         ),
       ),
-      'filter' => array(
-        'method' => 'POST',
-        'route'  => '/boards.php',
-        'func'   => 'getBoardsHandler',
-      ),
-      // move into module?
-      'overboard' => array(
-        // non-dynamic version
-        'route'  => '/overboard.html',
-        'func'   => 'getOverboardHandler',
+      'inline_list' => array(
+        'route'  => '/boards_inline.html',
+        'func'   => 'getInlineBoardsHandler',
+        /*
         'options' => array(
           'cacheSettings' => array(
             'files' => array(
@@ -166,6 +181,12 @@ $frontendRouterData = array(
             ),
           ),
         ),
+        */
+      ),
+      'filter' => array(
+        'method' => 'POST',
+        'route'  => '/boards.php',
+        'func'   => 'getBoardsHandler',
       ),
       'view' => array(
         'route'  => '/:uri/',
