@@ -94,6 +94,63 @@ function getFileType($file) {
   return $type;
 }
 
+function getThumbnailWidth($file, $options = false) {
+  extract(ensureOptions(array(
+     // only should be used when we know we're opening a ton of requests in parallel
+    'maxW' => 0,
+    'type' => false,
+  ), $options));
+  if (!$type) $type = getFileType($file);
+
+  // thumbnailable?
+  if ($type === 'img' || $type === 'audio' || $type === 'video') {
+    if (isset($file['thumbnail_path'])) {
+      $type = 'img';
+    }
+  }
+
+  if ($type !== 'img') {
+    // no thumbnail yet for video/audio
+    $file['tn_w'] = 209;
+    $file['tn_h'] = 64;
+    $type = 'img';
+  }
+
+  // figure out thumb size
+  if (empty($file['tn_w']) || empty($file['tn_h'])) {
+    $w = $file['w'];
+    $h = $file['h'];
+    while($h > 240) {
+      $w *= 0.9;
+      $h *= 0.9;
+    }
+  } else {
+    $w = $file['tn_w'];
+    $h = $file['tn_h'];
+  }
+
+  if ($maxW !== 0) {
+    $w = $file['w'];
+    $h = $file['h'];
+    // audio/video won't have these set yet... but thumbnail will be
+    if (empty($file['w']) || empty($file['h'])) {
+      $w = $file['tn_w'];
+      $h = $file['tn_h'];
+    }
+    while($w > $maxW) {
+      $w *= 0.9;
+      $h *= 0.9;
+    }
+  }
+  if (!$w || !$h) {
+    $w = 240;
+    $h = 240;
+  }
+  $w = (int)$w;
+  $h = (int)$h;
+  return $w;
+}
+
 function getThumbnail($file, $options = false) {
   extract(ensureOptions(array(
      // only should be used when we know we're opening a ton of requests in parallel
@@ -157,7 +214,7 @@ function getThumbnail($file, $options = false) {
   if (strpos($thumb, '://') === false) {
     $thumb = BACKEND_PUBLIC_URL . $thumb;
   }
-  return '<' . $type . ' class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=no />';
+  return '<' . $type . ' class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=none />';
 }
 
 function getAudioVideo($file, $options = false) {
@@ -175,6 +232,7 @@ function getAudioVideo($file, $options = false) {
   return getViewer($file, $options);
 }
 
+// anything use this bsides getAudioVideo?
 function getViewer($file, $options = false) {
   extract(ensureOptions(array(
      // only should be used when we know we're opening a ton of requests in parallel
