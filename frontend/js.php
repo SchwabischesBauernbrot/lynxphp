@@ -50,13 +50,22 @@ foreach($pkg->frontend_packages as $fe_pkg) {
     // could do generated JS here too tbh
     // but need to see how that would work with generate.php
     if (count($scripts)) {
-      //echo "checking[", $j['file'], "]<br>\n";
+      //echo "checking[", getcwd(), '/', $dir . $j['file'], "][", realpath(getcwd() . '/' . $dir . $j['file']), "]<br>\n";
       // data.php js.file needs to match script in js_add_script
-      if (!in_array($j['file'], $scripts)) {
+      if (!in_array(basename($j['file']), $scripts)) {
         continue;
       }
     }
+    //echo "dir[$dir][", print_r($j, 1), "]<br>\n";
     $path = $dir . $j['file'];
+    if (!empty($j['module'])) {
+      if (empty($packages[$j['module']])) {
+        echo '// module [', $j['module'], '] does not exist', "\n";
+      }
+      $otherPkg = $packages[$j['module']];
+      $path = $otherPkg->dir . 'fe/js/' . $j['file'];
+      //echo "module updated path to [$path]<br>\n";
+    }
     $max = max($max, filemtime($path));
     $size += filesize($path);
     $paths[] = $path;
