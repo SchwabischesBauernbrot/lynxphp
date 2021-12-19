@@ -22,6 +22,23 @@ $fePkgs = array(
         ),
       ),
       array(
+        'route'   => '/:uri/thread/:num_inline.html',
+        'handler' => 'inline_view',
+        'options' => array(
+          'cacheSettings' => array(
+            'files' => array(
+              // theme is also would affect this caching
+              'templates/header.tmpl', // wrapContent
+              'templates/footer.tmpl', // wrapContent
+              'templates/mixins/board_header.tmpl', // board_portal
+              'templates/mixins/board_footer.tmpl', // board_portal
+              'templates/mixins/post_detail.tmpl', // renderPost
+              'templates/mixins/post_actions.tmpl', // renderPostActions
+            ),
+          ),
+        ),
+      ),
+      array(
         'route'   => '/:boardUri/thread/:num/refresh',
         'handler' => 'refresh',
         /*
