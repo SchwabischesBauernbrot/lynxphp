@@ -1513,7 +1513,7 @@ row.wrap.sb .col {
   display: inline-block;
   width: 16px;
   height: 11px;
-  background:url(/file/flags.png) no-repeat;
+  background:url(../images/img/flags.png) no-repeat;
   image-rendering: crisp-edges;
   image-rendering: pixelated;
   image-rendering: -webkit-optimize-contrast;
