@@ -81,7 +81,14 @@ function consume_beRsrc($options, $params = '') {
   if (!empty($options['expectJson']) || !empty($options['unwrapData'])) {
     $obj = expectJson($responseText, $options['endpoint'], $options);
     if ($obj) {
-      if (!empty($options['unwrapData'])) return $obj['data'];
+      if (!empty($options['unwrapData'])) {
+        if (isset($obj['data'])) {
+          return $obj['data'];
+        } else {
+          // likely backend problem..
+          return false;
+        }
+      }
     }
     return $obj;
   }
