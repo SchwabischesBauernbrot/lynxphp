@@ -416,7 +416,12 @@ function makePostHandler($request) {
   $endpoint = 'lynx/newThread';
   global $BASE_HREF;
   $redir = $BASE_HREF . $boardUri . '/';
-  $headers = array('HTTP_X_FORWARDED_FOR' => getip(), 'sid' => getCookie('session'));
+  $headers = array(
+    // was HTTP_X_FORWARDED_FOR
+    // but this is the actual header on the wire...
+    'x-forwarded-for' => getip(),
+    'sid' => getCookie('session'),
+  );
   $row = array(
     // noFlag
     'name'     => getOptionalPostField('name'),
@@ -430,7 +435,9 @@ function makePostHandler($request) {
     'files'    => json_encode($files),
     // flag
   );
+  // has thread
   if (!empty($_POST['thread'])) {
+    // make a reply
     $row['threadId'] = $_POST['thread'];
     $endpoint = 'lynx/replyThread';
     $redir .= 'thread/' . $_POST['thread'];
