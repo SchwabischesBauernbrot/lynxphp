@@ -111,6 +111,9 @@ function renderBoardPortalHeaderEngine($row, $boardUri, $boardData) {
     //$renderPostFormUrl .= 'thread/' . $threadNum . '.html';
   } else
   if ($pagenum) {
+    // why is page important?
+    // new threads appear on page one...
+    // and you can't make a reply from the listing...
     $renderPostFormOptions['page'] = $pagenum;
     //$renderPostFormUrl .= 'page/' . $pagenum;
   }
@@ -118,6 +121,9 @@ function renderBoardPortalHeaderEngine($row, $boardUri, $boardData) {
 
   $stickNav_html = '';
   $pipelines[PIPELINE_BOARD_STICKY_NAV]->execute($stickNav_html);
+
+  if (!isset($boardData['title'])) $boardData['title'] = 'Communication problem';
+  if (!isset($boardData['description'])) $boardData['description'] = 'try again in a bit';
 
   return replace_tags($row['tmpl'], array_merge($row['tags'], array(
     'uri' => $boardUri,
