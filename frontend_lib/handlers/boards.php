@@ -399,6 +399,21 @@ function getBoardSettingsHandler($request) {
   getBoardSettings($boardUri);
 }
 
+function retryCaptcha($boardUri, $row) {
+  // regenerate post form...
+  // how did $row get threadId = 1
+  // FIXME: need a shorthand for files
+  $postform = renderPostFormHTML($boardUri, array(
+    'reply' => $row['threadId'],
+    'formId' => 'bottom_postform',
+    'showClose' => false,
+    'values' => $row,
+  ));
+  //echo "<pre>", htmlspecialchars(print_r($postform, 1)), "</pre>\n";
+  // 'Thread #' . $row['thread'] . '<br>'. "\n"
+  wrapContent('Your Captcha was invalid, please try again: <br>' . "\n" . $postform);
+}
+
 function makePostHandler($request) {
   global $pipelines, $max_length;
   $boardUri = $request['params']['uri'];
@@ -442,6 +457,19 @@ function makePostHandler($request) {
     $endpoint = 'lynx/replyThread';
     $redir .= 'thread/' . $_POST['thread'];
   }
+  if (!empty($_POST['files_already_uploaded'])) {
+    $already = json_decode($_POST['files_already_uploaded'], true);
+    if (!is_array($already)) {
+      echo "boards::makePostHanlder - Can't decode[", htmlspecialchars($_POST['files_already_uploaded']), "]<br>\n";
+      $already = array();
+    }
+    $files = json_decode($row['files']);
+    if (!is_array($files)) $files = array();
+    // don't do anything about duplicates
+    // you could make patterns...
+    $row['files'] = json_encode(array_merge($already, $files));
+  }
+
   $io = array(
     'boardUri' => $boardUri,
     'endpoint' => $endpoint,
@@ -458,8 +486,13 @@ function makePostHandler($request) {
   $headers = $io['headers'];
   $redir   = $io['redir'];
   if (!empty($io['error'])) {
-    echo "error";
     //print_r($io);
+    // FIXME: clean this up better
+    if ($io['error'] === 'CAPTCHA is required') {
+      retryCaptcha($boardUri, $row);
+      return;
+    }
+    echo "error";
     wrapContent($io['error']);
     return;
   }
@@ -476,6 +509,7 @@ function makePostHandler($request) {
   //echo "json[$json]<br>\n";
   $result = json_decode($json, true);
   if ($result === false) {
+    // invalid json
     wrapContent('Post Error: <pre>' . $json . '</pre>');
   } else {
     //echo "<pre>", $endpoint, print_r($result, 1), "</pre>\n";
@@ -485,7 +519,16 @@ function makePostHandler($request) {
       // success
       redirectTo($redir);
     } else {
-      wrapContent('Post Error: ' . print_r($result, 1));
+      // valid json
+      if ($result['data'] === 'Expired captcha.' || $result['data'] === 'Wrong captcha.') {
+        //print_r($row);
+        retryCaptcha($boardUri, $row);
+      } else
+      if ($result['data'] === 'Thread not found.') {
+        wrapContent('Thread ' . $_POST['thread'] . ' not found' . "\n");
+      } else {
+        wrapContent('Post Error: ' . print_r($result, 1));
+      }
     }
   }
 }
