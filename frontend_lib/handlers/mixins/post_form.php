@@ -42,18 +42,20 @@ function number_abbr($number) {
 
 function renderPostFormHTML($boardUri, $options = false) {
   $type = 'Thread';
-  $values = array();
   $tagThread = '';
+  $button = 'Create thread';
 
   extract(ensureOptions(array(
-    'reply'     => false,
+    'reply'     => false, // needs to be the threadId
     'showClose' => true,
+    'values'    => array(),
     'formId'    => 'postform',
   ), $options));
 
 
   if ($reply) {
-    $type = 'Reply';
+    $type = 'Reply on thread #<a href="' . $boardUri . '/thread/' . $reply .'.html">' . $reply . '</a>';
+    $button = 'Add reply';
     $tagThread = '<input type="hidden" name="thread" value="' . $reply . '">';
     $values['thread'] = $reply;
   }
@@ -98,7 +100,7 @@ function renderPostFormHTML($boardUri, $options = false) {
   $postFormHTML = '<section class="row jsonly">' . $postFormHTML . '</section>';
 
   $formOptions = array_merge(jsChanStyle(), array(
-    'buttonLabel' => 'New ' . $type,
+    'buttonLabel' => $button,
     'formId'      => $formId,
     'postFormTag' => $postFormHTML,
   ));
@@ -118,6 +120,10 @@ function renderPostFormHTML($boardUri, $options = false) {
   return generateForm($boardUri . '/post', $formfields, $values, $formOptions);
 }
 
+// url is not really the form action
+// renderPostFormHTML goes to boardUri/post
+// action tag is used to create the anchor link to open form
+// so this function create a link with a collapsed form...
 function renderPostForm($boardUri, $url, $options = false) {
   global $pipelines;
 
