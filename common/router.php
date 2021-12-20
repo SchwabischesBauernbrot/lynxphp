@@ -184,7 +184,36 @@ class Router {
       global $db;
       $mtime = $db->getLast($cacheSettings['databaseTables']);
     }
-
+/*
+    // could be promoted in the frontend router...
+    if (isset($cacheSettings['backend'])) {
+      $params = array();
+      foreach($routeParams as $k => $v) {
+        $params[':' . $k] = $v;
+      }
+      if (empty($params[':page'])) $params[':page'] = 1;
+      foreach($cacheSettings['backend'] as $be) {
+        //echo "checking[", print_r($be, 1), "] [", print_r($params, 1), "]\n";
+        // interpolate
+        $endpoint = str_replace(array_keys($params), array_values($params), $be['route']);
+        $result = request(array(
+          //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
+          'url' => BACKEND_BASE_URL . $endpoint,
+          'method' => 'HEAD',
+        ));
+        $headers = parseHeaders($result);
+        if (!isset($headers['last-modified'])) {
+          // if we don't have an anchor no way...
+          // should only show if in DEV_MODE but backend doesn't have a dev mode...
+          echo "No way to cache backend[", $be['route'], "], no cacheSettings\n";
+          return PHP_INT_MAX;
+          continue;
+        }
+        $ts = strtotime($headers['last-modified']);
+        $mtime = max($mtime, $ts);
+      }
+    }
+*/
     if (isset($cacheSettings['files'])) {
       //echo "in[$mtime]<br>\n";
       //print_r($routeParams);
@@ -338,7 +367,7 @@ class Router {
         //echo "etag system[$mtime] [", count($compoundEtags), "]<br>\n";
         $eTag = sha1($mtime . '@' . join(',', $compoundEtags));
         // reset mtime if we can't use it
-        if ($maxTime === PHP_INT_MAX) $mtime = 0;
+        if ($maxMtime === PHP_INT_MAX) $mtime = 0;
       }
     }
 
