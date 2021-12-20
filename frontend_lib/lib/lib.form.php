@@ -211,6 +211,16 @@ function generateForm($action, $fields, $values, $options = false) {
         $html .= '<input type=file name="'.$field.'">';
       break;
       case 'multidropfile':
+        if ($value && $value !== '[]') {
+          //echo "<pre>", print_r($value, 1), "</pre>\n";
+          $files = json_decode($value, true);
+          $html .= '<ul>';
+          foreach($files as $file) {
+            $html .= '<li>' . $file['name'] . ' ' . formatBytes($file['size']) . "\n";
+          }
+          $html .= '</ul>';
+          $html .= '<input type=hidden name="'. $field. '_already_uploaded" value=\'' . $value . '\'>';
+        }
         $html .= '<span class="col">
                     <label class="jsonly postform-style filelabel" for="file">
                       Select/Drop/Paste files
@@ -224,6 +234,7 @@ function generateForm($action, $fields, $values, $options = false) {
                       Spoiler
                     </label>
                   </noscript>';
+
       break;
       default:
         //echo "No such type [", $details['type'], "]<br>\n";
