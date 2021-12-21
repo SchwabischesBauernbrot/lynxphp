@@ -89,6 +89,7 @@ $pageData = array(
         'files' => array(),
       ),
     ),
+    'thread_reply_count' => 1,
   ),
   array(
     'posts' => array(
@@ -144,6 +145,7 @@ $pageData = array(
         'files' => array(),
       ),
     ),
+    'thread_reply_count' => 3,
   )
 );
 
