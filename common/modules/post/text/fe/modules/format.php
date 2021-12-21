@@ -96,13 +96,26 @@ if (count($btLookups)) {
 
 $replaces = array(
   // >>>/malform/35@ThreadNum
-  '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/(\d+)@(\d+)(\s*)/m' => function ($matches) {
+  '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/(\d+)@(\d+)(\s*)/m' => function ($matches) use ($io) {
     global $btLookups;
     $btLookups[$matches[1]][$matches[2]] = $matches[3];
     // obsecure output so it's not re-interpreted
+    // &sol; is a "/"
+
+    $addBoard = false;
+    $targetUri = $matches[1];
+    //if ($io['inMixedBoards']) $addBoard = true;
+    if ($targetUri !== $io['boardUri']) {
+      $addBoard = true;
+    }
+
+    $board = '';
+    if ($addBoard) {
+      $board = $targetUri . '&sol;';
+    }
     $str = '<a class="quote"
-      href="' . $matches[1] . '/thread/' . $matches[3] . '.html#' . $matches[2] . '">&gt;&gt;&sol;' .
-      $matches[1] . '&sol;' . $matches[2] . '/</a>' . $matches[4];
+      href="' . $targetUri . '/thread/' . $matches[3] . '.html#' . $matches[2] . '">&gt;&gt;&sol;' .
+      $board . $matches[2] . '/</a>' . $matches[4];
     //echo "<pre>matches[", htmlspecialchars($str), "]", print_r($matches, 1), "</pre>\n";
 
     return $str;
