@@ -22,8 +22,18 @@ $io = array(
 );
 $pipelines[PIPELINE_MODULE_USER_SETTINGS_FIELDS]->execute($io);
 
+// might be better to just call /opt/settings
+// since the wrap will need all that data anyways
 $data = $pkg->useResource('settings');
 $values = $data['settings'];
+
+// if not cookie, we can use $data['session'] to set it...
+
+// user doesn't have a session coookie
+if (!isset($_COOKIE['session'])) {
+  global $now;
+  setcookie('session', $data['session'], (int)$now + 86400, '/');
+}
 //echo '<pre>values[', print_r($values, 1), "]</pre>\n";
 
 $html = generateForm($params['action'], $io['fields'], $values);
