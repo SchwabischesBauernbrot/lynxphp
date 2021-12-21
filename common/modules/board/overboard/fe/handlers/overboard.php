@@ -61,6 +61,7 @@ foreach($overboardData['threads'] as $thread) {
   foreach($posts as $i => $post) {
     $threads_html .= renderPost($bUri, $post, array(
       'checkable' => true, 'postCount' => $thread['thread_reply_count'],
+      'inMixedBoards' => true
     ));
   }
   $threads_html .= $threadftr_template;
