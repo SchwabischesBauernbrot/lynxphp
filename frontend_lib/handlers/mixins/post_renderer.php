@@ -26,6 +26,7 @@ function renderPost($boardUri, $p, $options = false) {
     'postCount'  => false,
     'topReply' => false,
     'noOmit'   => false,
+    'inMixedBoards' => false,
   ), $options));
 
   //$isBO = perms_isBO($boardUri);
@@ -268,6 +269,15 @@ function renderPost($boardUri, $p, $options = false) {
   // pass in p and get it back modified
   $p['safeCom'] = htmlspecialchars($p['com']);
   $p['boardUri'] = $boardUri; // communicate what board we're on
+  // we'll we communicate what board this post is on
+  // but we don't communicate what type of page
+  // we need to know if this is mix board context like overboard
+
+  // if mixed context, just always show it?
+  // no, it has nothing to do where it's from
+  // it has to do where it's pointing...
+  //$p['inMixedBoards'] = $inMixedBoards; // just means don't strip anything
+  // well from that we can assume to strip $boardUri
   $pipelines[PIPELINE_POST_TEXT_FORMATTING]->execute($p);
 
   $links_html = '';
