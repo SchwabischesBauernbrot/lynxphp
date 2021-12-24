@@ -36,4 +36,7 @@ if (!defined('DISABLE_MODULES')) define('DISABLE_MODULES', array());
 if (!defined('USER')) define('USER', 'www-data'); // debian
 if (!defined('IN_GENERATE')) define('IN_GENERATE', false);
 
+// only frontend needs to check this...
+//define('BACKEND', true); // need to set this on the FE too
+define('BACKEND_HEAD_SUPPORT', false);
 ?>
