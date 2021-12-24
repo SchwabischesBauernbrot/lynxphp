@@ -122,6 +122,7 @@ function getBoard($boardUri, $options = false) {
   return $row;
 }
 
+// scatter/gather
 function getBoards($boardUris) {
   global $db, $models;
   if (is_array($boardUris)) {
@@ -382,6 +383,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
       $threads[$tk] = array(
         'posts' => array_merge(array($op), $threads[$tk]['posts'])
       );
+      $threads[$tk]['thread_reply_count'] = count($threads[$tk]['posts']);
     }
     $threads = array_values($threads);
     //echo "<pre>[", print_r($threads, 1), "]</pre>\n";
