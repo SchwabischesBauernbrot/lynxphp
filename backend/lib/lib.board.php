@@ -124,11 +124,16 @@ $getPostFilesModel = array();
 function getPostFilesModel($boardUri) {
   global $db, $models, $getPostFilesModel;
 
+  // just use an internal cache
+  /*
   if (!empty($getPostFilesModel[$boardUri])) {
-    echo "getPostFilesModel called for [$boardUri] last call[$getPostFilesModel] trace[", gettrace(), "]<br>\n";
+    echo "getPostFilesModel called for [$boardUri] last call[", print_r($getPostFilesModel[$boardUri], 1), "]
+    <br>\n<br>\n
+    current trace[", gettrace(), "]<br>\n";
   } else {
     $getPostFilesModel[$boardUri] = $boardUri . '_' . gettrace();
   }
+  */
 
   $cnt = $db->count($models['board'], array('criteria'=>array(
       array('uri', '=', $boardUri),
