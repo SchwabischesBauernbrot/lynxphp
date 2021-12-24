@@ -36,9 +36,11 @@ $queue = new $queue_type_class;
 include '../common/workqueue.php';
 $workqueue = new work_queue;
 
+/*
 // set up cache tracker
 include 'lib/lib.cache_tracker.php';
 $cache_tracker = new cache_tracker;
+*/
 
 $tpp = 10; // threads per page
 
