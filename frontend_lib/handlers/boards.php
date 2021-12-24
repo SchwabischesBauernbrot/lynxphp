@@ -177,13 +177,15 @@ function getBoardsHandlerEngine() {
   // FIXME: we should tightly control the page links
   // so we can generate a static page for each page...
   // boards/1.html
+
+  $qParams = array();
+  if ($params['search']) $qParams['search'] = $params['search'];
+  if ($params['sort'] !== 'activity') $qParams['sort'] = $params['sort'];
+  if ($params['direction'] !== 'desc') $qParams['direction'] = 'asc';
+  $qs = paramsToQuerystringGroups($qParams);
+
   if (isset($res['data']['pageCount'])) {
     //print_r($params);
-    $qParams = array();
-    if ($params['search']) $qParams['search'] = $params['search'];
-    if ($params['sort'] !== 'activity') $qParams['sort'] = $params['sort'];
-    if ($params['direction'] !== 'desc') $qParams['direction'] = 'asc';
-    $qs = paramsToQuerystringGroups($qParams);
     for($i = 0; $i < $res['data']['pageCount']; $i++) {
       $tags = array(
         'page' => $i + 1,
