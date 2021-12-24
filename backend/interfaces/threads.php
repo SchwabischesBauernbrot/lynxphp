@@ -4,6 +4,7 @@ function getThread($boardUri, $threadNum, $options = false) {
   // unpack options
   extract(ensureOptions(array(
     'posts_model' => false,
+    'post_files_model' => false,
     'since_id'    => false,
     'includeOP'   => true,
   ), $options));
@@ -17,7 +18,14 @@ function getThread($boardUri, $threadNum, $options = false) {
       return;
     }
   }
-  $post_files_model = getPostFilesModel($boardUri);
+  if ($post_files_model === false) {
+    $post_files_model = getPostFilesModel($boardUri);
+    if ($post_files_model === false) {
+      // this board does not exist
+      sendResponse(array(), 404, 'Board files not found');
+      return;
+    }
+  }
 
   //$filesFields = array_keys($post_files_model['fields']);
   //$filesFields[] = 'fileid';
