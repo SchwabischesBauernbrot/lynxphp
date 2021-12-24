@@ -40,13 +40,21 @@ class Router {
 
   // used for attaching subrouters
   // usually star(/*) routes
-  function all($cond, $func) {
+  function all($cond, $router) {
     //echo "INSTALLING [$cond] in ALL<br>\n";
     //print_r($this->methods);
     foreach(array_keys($this->methods) as $method) {
       //echo "INSTALLING [$cond] in [$method]<br>\n";
-      $this->methods[$method][$cond] = $func;
+      $this->methods[$method][$cond] = $router;
     }
+    /*
+    // copy over options
+    foreach($router->routeOptions as $methodCond => $opt) {
+      // FIXME: we need to stitch together /opt and /boards
+      // so we know the difference between /4chan and /boards..
+      $this->routeOptions[$methodCond] = $opt;
+    }
+    */
   }
 
 
@@ -58,9 +66,19 @@ class Router {
   // context can be set up in a func before the include
   // used by frontend packages
   function addMethodRoute($method, $cond, $func, $options = false) {
+    /*
+    if (isset($this->methods[$method][$cond])) {
+      echo "router::addMethodRoute - Warning, route already defined<br>\n";
+    }
+    */
     //echo "Installing [$method][$cond]<br>\n";
     $this->methods[$method][$cond] = $func;
     //echo "options[", print_r($options, 1), "]\n";
+    /*
+    if (isset($this->routeOptions[$method . '_' . $cond])) {
+      echo "router::addMethodRoute - Warning, routeOptions defined<br>\n";
+    }
+    */
     $this->routeOptions[$method . '_' . $cond] = $options;
   }
   /*
@@ -96,11 +114,18 @@ class Router {
       foreach($groupData['routes'] as $routeData) {
         // routeData: func, options, loggedin(, method, route)
         $method = empty($routeData['method']) ? 'GET' : $routeData['method'];
-        //echo "method[$method][", $routeData['route'], "]<br>\n";
-        if (isset($this->methods[$method][$routeData['route']])) {
+        $route = $routeData['route'];
+        if (0) {
+          echo "method[$method][", $route, "]";
+          if (isset($routeData['file'])) {
+            echo "file[", $routeData['file'], "]\n";
+          }
+          echo "<br>\n";
+        }
+        if (isset($this->methods[$method][$route])) {
           echo "router::import - Warning, route already defined<br>\n";
         }
-        $route = $routeData['route'];
+
         $this->methods[$method][$route] = function($request) use ($routeData, $groupData, $adjDir) {
           if (isset($routeData['file'])) {
             include $adjDir . '/' . $routeData['file'] . '.php';
@@ -118,22 +143,24 @@ class Router {
             echo "router::import - No function defined<br>\n";
           }
         };
-        // promote options from routeData into the router internal structure
-        if (isset($routeData['options'])) {
-          $this->routeOptions[$method . '_' . $routeData['route']] = $routeData['options'];
-        }
+        $methodRoute = $method . '_' . $route;
         // trade some cpu for memory
         if (isset($routeData['route'])) unset($routeData['route']);
         if (isset($routeData['method'])) unset($routeData['method']);
+
+        // promote options from routeData into the router internal structure
+        if (isset($routeData['options'])) {
+          $this->routeOptions[$methodRoute] = $routeData['options'];
+        }
         // normalize some options
         //if (!isset($routeData['options'])) $routeData['options'] = array();
         //if (!isset($routeData['loggedIn'])) $routeData['loggedIn'] = false;
 
-        $methodRoute = $method . '_' . $route;
 
         // move loggedIn and cacheSettings into routeOptions?
         // allow these outside of the options sub
         if (isset($routeData['cacheSettings'])) {
+          //echo "<pre>Promoting [$methodRoute] cacheSettings[", print_r($routeData['cacheSettings'], 1), "]</pre>\n";
           $this->routeOptions[$methodRoute]['cacheSettings'] = $routeData['cacheSettings'];
           unset($routeData['cacheSettings']);
         }
@@ -150,6 +177,8 @@ class Router {
         }
       }
     }
+    //echo "done import<br>\n";
+    //echo "<pre>routeOption keys[", print_r(array_keys($this->routeOptions), 1), "]</pre>\n";
   }
 
   function debug($method = false) {
@@ -240,25 +269,38 @@ class Router {
   }
 
   // do we have a cached copy
-  function isUncached($key, $routeParams) {
+  function isUncached($key, $routeParams, $routeOptions) {
     //if (DEV_MODE) {
-      header('X-Debug-isUncached: ' . (isset($this->routeOptions[$key]['cacheSettings']) ? 'cacheable' : 'not'));
+    $cacheable = isset($routeOptions['cacheSettings']);
+    //header('X-Debug-isUncached: ' . $key . '-' . ($cacheable ? 'cacheable' : 'not'));
     //}
     // no caching
-    if (!isset($this->routeOptions[$key]['cacheSettings'])) {
+    if (!$cacheable) {
       //echo "No cacheSettings for [$key]";
+      //echo "<pre>cacheSettings", print_r($cacheSettings, 1), "</pre>";
+      //echo "<pre>this->routeOptions", print_r($this->routeOptions, 1), "</pre>";
       //print_r($this->routeOptions);
+      header('X-Debug-isUncached: ' . $key . '-no_cacheSettings');
       return true; // render content
     }
+    //echo "<pre>routeOptions", print_r($routeOptions, 1), "</pre><br>\n";
 
     //echo "key[$key]<br>\n";
     //print_r($this->routeOptions['cacheSettings'][$key]);
-    $cacheSettings = $this->routeOptions[$key]['cacheSettings'];
-    // need dbtables or files
-    if (!isset($cacheSettings['databaseTables']) && !isset($cacheSettings['files'])) {
+    //$cacheSettings = $this->routeOptions[$key]['cacheSettings'];
+    $cacheSettings = $routeOptions['cacheSettings'];
+    //echo "<pre>cacheSettings", print_r($cacheSettings, 1), "</pre><br>\n";
+
+    // have something useable...
+    if (!isset($cacheSettings['databaseTables']) && !isset($cacheSettings['files'])
+       && !isset($cacheSettings['backend'])) {
       //echo "No cacheSettings keys", print_r($cacheSettings);
+      header('X-Debug-isUncached: ' . $key . '-no_useable_cacheSettings');
       return true; // render content
     }
+
+
+
     // backend hack
     if (getQueryField('prettyPrint')) {
       $cacheSettings['contentType'] = 'text/html';
@@ -281,6 +323,7 @@ class Router {
     $maxMtime = 0;
     $compoundEtags = array();
 
+    // why don't we get a warning about BACKEND_HEAD_SUPPORT not being set?
     if (BACKEND_HEAD_SUPPORT && isset($cacheSettings['backend'])) {
       $params = array();
       foreach($routeParams as $k => $v) {
@@ -347,18 +390,22 @@ class Router {
           break;
         }
       }
+      header('X-Debug-isUncached-febemtime: ' . ($checkMtime ? 'use' : 'ignore'));
+      header('X-Debug-isUncached-febeeTag: ' . ($checkEtag ? 'use' : 'ignore'));
     }
     //if (DEV_MODE) {
-      header('X-Debug-isUncached-mtime: ' . ($checkMtime ? 'use' : 'ignore'));
-      header('X-Debug-isUncached-eTag: ' . ($checkEtag ? 'use' : 'ignore'));
     //}
+    //header('X-Debug-isUncached-maxMtime: ' . $maxMtime);
 
+    // fe and be only thing
     $mtime = 0;
     $eTag = '';
     // if some way to cache is available (mtime or etag)
     if ($maxMtime !== PHP_INT_MAX || $checkEtag) {
       // get the other timestamps involved
+      // has some be only things
       $mtime = $this->getMaxMtime($cacheSettings, $routeParams);
+      //header('X-Debug-isUncached-actualMtime: ' . $mtime);
       // see if we need to mixin the max BE data timestamp
       if ($maxMtime && $maxMtime !== PHP_INT_MAX) {
         $mtime = max($mtime, $maxMtime);
@@ -369,7 +416,10 @@ class Router {
         // reset mtime if we can't use it
         if ($maxMtime === PHP_INT_MAX) $mtime = 0;
       }
+    } else {
+      header('X-Debug-isUncached: noEtag-Or-febePHP_INT_MAX');
     }
+    //header('X-Debug-isUncached-finalMtime: ' . $mtime);
 
     // is cacheable in some form
     if (($mtime && $mtime !== PHP_INT_MAX) || $eTag) {
@@ -390,17 +440,23 @@ class Router {
         // not any faster tbh
         return false;
       }
+    } else {
+      header('X-Debug-isUncached: noEtag-Or-PHP_INT_MAX');
     }
 
     return true; // render content
   }
 
   // call handler func
-  function callHandler($match, $request, $isHead) {
+  function callHandler($res) {
+    $match = $res['match'];
+    $request = $res['request'];
+    $isHead = $res['isHead'];
+
     $params = $match['params'];
     // if (not cache) && (not head)
     // could just pass route
-    if ($this->isUncached($request['method'] . '_' . $match['cond'], $params)) {
+    if ($this->isUncached($request['method'] . '_' . $match['cond'], $params, $res['routeOptions'])) {
       if ($isHead) {
         //header('connection: close');
         return;
@@ -414,6 +470,8 @@ class Router {
 
   // is path supposed to start with /? seems to be yes
   // determineRoute? run
+  // since we call another router
+  // we need to communicate the exact cacheOptions
   function findRoute($method, $path, $level = 0) {
     $isHead = false;
     if ($method === 'HEAD') {
@@ -541,39 +599,32 @@ class Router {
         }
         echo '</ul>', "\n";
       }
-      if (count($matches) === 1) {
-        return array(
-          'match' => $matches[0],
-          'isHead' => $isHead,
-          'request' => $request
-        );
-      } else {
-        $use = false;
+
+      // default to first
+      $match = $matches[0];
+      if (count($matches) !== 1) {
         $minScore = 99;
         foreach($matches as $c => $row) {
           $score = levenshtein($row['cond'], $path);
           if ($score < $minScore) {
-            $use = $row;
+            $match = $row;
             $minScore = $score;
           }
           //echo "[$c][", print_r($row, 1), "]=[$score]<br>\n";
         }
-        if ($use) {
-          return array(
-            'match' => $use,
-            'isHead' => $isHead,
-            'request' => $request
-          );
-
-        } else {
-          // not sure, just use first
-          return array(
-            'match' => $matches[0],
-            'isHead' => $isHead,
-            'request' => $request
-          );
-        }
       }
+      //echo "key[", $method . '_' . $match['cond'], "]<br>\n";
+      //echo "<pre>[", print_r($this->routeOptions, 1), "]</pre>\n";
+      $routeOptions = $this->routeOptions[$method . '_' . $match['cond']];
+      return array(
+        'match' => $match,
+        'isHead' => $isHead,
+        'request' => $request,
+        // is already in request...
+        //'method' => $method,
+        'routeOptions' => $routeOptions,
+      );
+
     }
     // can't handle 404 here because sometimes we return to another router
     return false;
@@ -583,7 +634,7 @@ class Router {
     $res = $this->findRoute($method, $path);
     if ($res === false) return false; // 404 passthru
     $key = $res['request']['method'] . '_' . $res['match']['cond'];
-    $uncached = $this->isUncached($key, $res['match']['params']);
+    $uncached = $this->isUncached($key, $res['match']['params'], $res['routeOptions']);
     //if (DEV_MODE) {
       //header('X-Debug-sendHeaders-key: ' . $key);
       header('X-Debug-sendHeaders-cache: ' . ($uncached ? 'miss' : 'hit'));
@@ -612,7 +663,7 @@ class Router {
       $func = $res['match']['func'];
       $func($request);
     } else {
-      $this->callHandler($res['match'], $res['request'], $res['isHead']);
+      $this->callHandler($res);
     }
     return true;
   }
