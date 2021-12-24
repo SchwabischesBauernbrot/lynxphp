@@ -27,6 +27,8 @@ function ensureQuerystring() {
     $chunks = explode('&', $querystring);
     $qs = array();
     foreach($chunks as $c) {
+      if (!$c) continue; // skip empties
+      //if (strpos('=', $c) !== false) {
       list($k, $v) = explode('=', $c);
       $qs[$k] = $v;
       if (empty($_GET[$k])) {
@@ -34,6 +36,7 @@ function ensureQuerystring() {
         // could stomp POST values...
         $_REQUEST[$k] = $v;
       }
+      //}
     }
     //print_r($qs);
   }
