@@ -510,7 +510,8 @@ class Router {
             'cond' => $cond, 'params' => array(), 'func' => $func,
            ),
           'isHead' => $isHead,
-          'request' => $request
+          'request' => $request,
+          'routeOptions' => $this->routeOptions[$method . '_' . $cond],
         );
       }
       $csegs = explode('/', $cond);
