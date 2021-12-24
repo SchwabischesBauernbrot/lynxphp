@@ -169,7 +169,8 @@ function sendResponse2($data, $options = array()) {
     // and we need that to stop executing user generate js
     // but isn't it the default?
     _doHeaders($mtime, array('contentType' => 'text/html'));
-    $output = '<code>' . htmlspecialchars(json_encode($resp, JSON_PRETTY_PRINT)) . "</code>\n";
+    // code needs <br>s
+    $output = '<pre>' . htmlspecialchars(json_encode($resp, JSON_PRETTY_PRINT)) . "</pre>\n";
   } else {
     _doHeaders($mtime, array('contentType' => 'application/json'));
     $output = json_encode($resp);
