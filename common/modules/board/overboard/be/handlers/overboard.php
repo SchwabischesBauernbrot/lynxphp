@@ -1,26 +1,72 @@
-<?php
+    <?php
 $params = $get();
 
-/*
-$boardData = boardMiddleware($request);
-if (!$boardData) {
-  return sendResponse(array());
+// we have to look at ALL threads
+$boards = listBoards();
+$threadTimes = array();
+foreach($boards as $i => $b) {
+  //echo "<pre>b[", print_r($b, 1), "]</pre>\n";
+  $uri = $b['uri'];
+  $boards[$i]['threads'] = boardCatalog($uri);
+  // make a list of threads
+  foreach($boards[$i]['threads'] as $pageThreads) {
+    //echo "<pre>t[", print_r($t, 1), "]</pre>\n";
+    //if (!count($p)) continue; // no threads on this board
+    foreach($pageThreads as $t) {
+      // could push it off
+      $time = $t['updated_at'];
+      //echo "time[$time]<br>\n";
+      if (!isset($threads[$time])) {
+        $threadTimes[$time] = array();
+      }
+
+      //$thread = $t;
+      //$thread['post'] = array_slice($t, 1);
+      $t['boardUri'] = $uri;
+      $threadTimes[$time][] = $t;
+    }
+  }
+}
+krsort($threadTimes);
+
+$threads = array();
+foreach($threadTimes as $times) {
+  foreach($times as $t) {
+    $threads[] = $t;
+  }
 }
 
-global $db, $models, $tpp;
-$res = $db->find($models['board_banner'], array('criteria' => array(
-  array('board_id', '=', $boardData['boardid']),
-)));
-$banners = $db->toArray($res);
-// just pass through the settings for now...
-boardRowFilter($boardData, $boardData['json'], array('jsonFields' => 'settings'));
-// I don't think this is required
-$posts_model = getPostsModel($boardData['uri']);
-$boardData['threadCount'] = getBoardThreadCount($boardData['uri'], $posts_model);
-$boardData['pageCount'] = ceil($boardData['threadCount']/$tpp);
+// a limit
+// FIXME paging?
+$threads = array_slice($threads, 0, 50);
+
+/*
+$models = array();
+foreach($threads as $i => $t) {
+  if (!isset($models[$t['boardUri']])) {
+    $models[$t['boardUri']] = array(
+      'posts' => getPostsModel($t['boardUri']),
+      'files' => getPostFilesModel($t['boardUri']),
+    );
+  }
+}
 */
 
-// 'board' => $boardData
-sendResponse($banners, 200, '', array());
+// now load in the posts
+foreach($threads as $i => $t) {
+  $model = $models[$t['boardUri']];
+  // there's tpp but it's like 10...
+  $threads[$i]['posts'] = getThread($t['boardUri'], $t['no'], array(
+    //'posts_model' => $model['post'],
+    //'post_files_model' => $model['files'],
+  ));
+  $threads[$i]['thread_reply_count'] = count($threads[$i]['posts']);
+  // post previw = 5
+  $threads[$i]['posts'] = array_slice($threads[$i]['posts'], 0, 5);
+}
+
+sendResponse2(array(
+  'threads' => $threads,
+));
 
 ?>
