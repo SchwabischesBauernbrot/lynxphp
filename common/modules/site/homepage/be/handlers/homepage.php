@@ -30,6 +30,16 @@ $res = array_slice($res, 0, 10);
 
 // FIXME: not very cacheable like this...
 $settings = getSettings();
+$logo = $settings['site']['logo'];
+//echo "logo[$logo]<br>\n";
+$size = getimagesize($settings['site']['logo']);
+
+$settings['site']['logo'] = array(
+  'url' => $logo,
+  'w' => $size[0],
+  'h' => $size[1],
+  //'alt' => '',
+);
 
 // recent posts/images?
 // are we trying to be lynxchan compatible?
