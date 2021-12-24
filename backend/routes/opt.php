@@ -24,8 +24,8 @@ return array(
         'route' => '/boards/:uri/:page',
         'file'  => 'board_page',
         'cacheSettings' => array(
-            'databaseTables' => array('user_sessions', 'board_{{uri}}_public_posts',
-              'board_{{uri}}_public_post_files', 'boards'),
+          'databaseTables' => array('user_sessions', 'board_{{uri}}_public_posts',
+            'board_{{uri}}_public_post_files', 'boards'),
         ),
       ),
       'boardThread' => array(
