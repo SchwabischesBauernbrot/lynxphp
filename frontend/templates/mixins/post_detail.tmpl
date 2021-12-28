@@ -47,16 +47,17 @@
 <!-- end -->
 <!-- loop -->
   <div class="post-file">
-    <span class="post-file-info">
-    </span>
     <div class="post-file-src" data-type="image" data-attachment="false">
       <!-- I have no clue how to make this cleaner -->
       {{expander}}
     </div>
     <span class="post-file-info">
       <span>
-        <a href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{shortfilename}}</a>
+        <a class="filename" href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{shortfilename}}</a>
       </span>
+      <!-- how would we implement this without js -->
+      <span class="jsonly jsMediaActions"></span>
+      <!-- what about video/audio length ... -->
       <span>({{size}}, {{width}}x{{height}})</span>
     </span>
   </div>
