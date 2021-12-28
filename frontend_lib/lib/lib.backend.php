@@ -105,6 +105,7 @@ function expectJson($json, $endpoint = '', $options = array()) {
     if (!empty($options['inWrapContent'])) {
       echo 'Backend error (consume_beRsrc): ' .  $endpoint . ': ' . $json, "\n";
     } else {
+      http_response_code(500);
       wrapContent('Backend JSON parsing error: ' .  $endpoint . ': ' . $json . "\n");
     }
     return false;
@@ -113,6 +114,7 @@ function expectJson($json, $endpoint = '', $options = array()) {
     if (!empty($options['inWrapContent'])) {
       echo 'Backend configuration error: ' .  $obj['message'], "\n";
     } else {
+      http_response_code(500);
       wrapContent('Backend configuration error: ' .  $obj['message'] . "\n");
     }
     exit(1);
@@ -145,7 +147,7 @@ function expectJson($json, $endpoint = '', $options = array()) {
       } else {
         // FIXME get named route
         global $BASE_HREF;
-        return redirectTo($BASE_HREF . 'forms/login');
+        return redirectTo($BASE_HREF . 'forms/login.html');
       }
     }
   }
