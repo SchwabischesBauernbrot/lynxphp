@@ -1,10 +1,9 @@
 <?php
 
 // frontend
-
-// FIXME: we need access to package
 $params = $getHandler();
 
+// input parameters
 $boardUri = $request['params']['board'];
 // .json or .html?
 $id = str_replace('.html', '', $request['params']['id']);
@@ -38,6 +37,7 @@ if (!empty($res['final'])) {
   echo "<pre>decode", htmlspecialchars(print_r($res, 1)), "</pre>\n";
   */
   // no wrap since we're embedded
+  http_response_code(500);
   echo "Error rendering post[$id] on board[$boardUri]<br>\n";
 }
 
