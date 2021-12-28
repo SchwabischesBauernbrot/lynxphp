@@ -98,6 +98,9 @@ function renderTabs($tabs, $options = array()) {
         'name="' . $name . '" role="button">';
       $html .= '<label id="tabLabel_'.$stb.'" for="tab_' . $stb . '">X</label>
       <style>
+      #tabLabel_CLOSEALL {
+        cursor: pointer;
+      }
       #tab_'.$stb.'.tab + label {
         display: none;
         padding: 10px;
