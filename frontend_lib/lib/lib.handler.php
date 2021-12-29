@@ -57,6 +57,7 @@ function wrapContentData($options = false) {
     'noWork'      => false,
     'settings'    => false,
     'closeHeader' => true,
+    'canonical'   => false,
   ), $options));
 
   $enableJs = true;
@@ -84,6 +85,7 @@ function wrapContentData($options = false) {
     'enableJs' => $enableJs,
     'doWork' => !$noWork,
     'closeHeader' => $closeHeader,
+    'canonical' => $canonical,
   );
 }
 
@@ -101,6 +103,7 @@ function wrapContentData($options = false) {
 // how would we inject stuff into the head?
 // {{header}} could insert all that..
 // or just section it off like footer
+// used for _inline.html pages
 function wrapContentGetHeadHTML($row) {
   global $pipelines;
   $siteSettings = $row['siteSettings'];
@@ -114,7 +117,11 @@ function wrapContentGetHeadHTML($row) {
   $head_html = $io['head_html'] . "\n" . '<script>
     const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
     const DISABLE_JS = false
-  </script>';
+  </script>' . "\n";
+
+  if (!empty($row['canonical'])) {
+    $head_html .= '<link rel="canonical" href="' . $row['canonical'] . '" />';
+  }
   return $head_html;
 }
 
