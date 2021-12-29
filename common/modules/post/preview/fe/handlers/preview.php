@@ -26,10 +26,19 @@ if (!empty($res['final'])) {
 
   // could we include the post form
   // well we want to make sure they know the context before replying...
+  $wrapOptions = array();
+
+  if (CANONICAL_BASE) {
+    $wrapOptions = array(
+      // FIXME: don't require the trailing slash
+      'canonical' => CANONICAL_BASE . $boardUri . '/preview/' . $id,
+    );
+  }
 
   wrapContent(renderPost($boardUri, $res['final'], array(
     'checkable' => false,
-  )));
+    'postCount' => $res['postCount'],
+  )), $wrapOptions);
 } else {
   /*
   echo "boardUri[$boardUri] id[$id]<br>\n";
