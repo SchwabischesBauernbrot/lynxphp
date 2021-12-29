@@ -14,7 +14,7 @@ $params = $getModule();
 // PHPS_ELF
 $on_preview_page = strpos($_SERVER['REQUEST_URI'], '/preview/') !== false;
 if (!$on_preview_page) {
-  $io['links'][] = array('label' => '[Preview]', 'link' => '/' . $io['boardUri'] . '/preview/' . $io['p']['no']);
+  $io['links'][] = array('label' => '[Preview]', 'link' => '/' . $io['boardUri'] . '/preview/' . $io['p']['no'] . '.html');
 }
 // else we already have No and number on the page...
 
