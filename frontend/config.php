@@ -59,5 +59,7 @@ if (!defined('USER')) define('USER', 'www-data'); // debian
 if (!defined('DISABLE_MODULES')) define('DISABLE_MODULES', array());
 if (!defined('DISABLE_WORK')) define('DISABLE_WORK', false);
 if (!defined('AUTH_DIRECT')) define('AUTH_DIRECT', false);
+// has to end with a trailing slash
+if (!defined('CANONICAL_BASE')) define('CANONICAL_BASE', false);
 
 ?>
