@@ -14,25 +14,34 @@ function refreshPosts(manual) {
 
   // we have to ask the backend, is there anything new...
   const loc = whereAmI()
-  fetch(getRefreshUrl(loc)).then(res => res.text()).then(html => {
-    var result = refreshCallback(null, html)
+  let statusCode = false
+  fetch(getRefreshUrl(loc)).then(res => { statusCode = res.status; return res.text() } ).then(html => {
+    //console.log('refreshPosts - status', statusCode)
+    var result
+    if (statusCode === 500) {
+      // we get a 500 warning in the js console already
+      //console.warn('backend problem')
+      result = { foundNewReplies: false }
+    } else {
+      result = refreshCallback(null, html)
 
-    if (result.foundNewReplies) {
-      console.log('new replies', result.posts.length)
-      for(var i in result.posts) {
-        var post = result.posts[i]
-        //console.log('firing event')
-        const newPostEvent = new CustomEvent('addPost', {
-           detail: post
-        })
-        //dispatch the event so quote click handlers, image expand, etc can be added in separate scripts by listening to the event
-        setTimeout(() => {
-          //console.log('dispatching event')
-          window.dispatchEvent(newPostEvent)
-        }, 50);
+      if (result.foundNewReplies) {
+        console.log('new replies', result.posts.length)
+        for(var i in result.posts) {
+          var post = result.posts[i]
+          //console.log('firing event')
+          const newPostEvent = new CustomEvent('addPost', {
+             detail: post
+          })
+          //dispatch the event so quote click handlers, image expand, etc can be added in separate scripts by listening to the event
+          setTimeout(() => {
+            //console.log('dispatching event')
+            window.dispatchEvent(newPostEvent)
+          }, 50);
+        }
+      //} else {
+        //console.log('result foundNewReplies is falsish', result)
       }
-    //} else {
-      //console.log('result foundNewReplies is falsish', result)
     }
 
     // refreshButton.style.display = 'inline'
@@ -156,7 +165,7 @@ if (!DISABLE_JS) {
     if (rect.bottom < window.innerHeight) {
       // refresh post would set this...
       unreadPosts = 0
-
+      console.log('refresh - restorigin original title')
       document.title = originalTitle
     }
 
