@@ -187,7 +187,7 @@ function curl_log_report() {
     echo $l['trace'];
     echo '<details>';
     echo '  <summary>Response</summary>', "\n";
-    if ($l['result'][0] === '[' || $l['result'][0] === '{') {
+    if (isset($l['result']) && $l['result'][0] === '[' || $l['result'][0] === '{') {
       echo '  <pre>', htmlspecialchars(json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT)), '</pre>', "\n";
     } else {
       if ($l['method'] === 'HEAD') {
