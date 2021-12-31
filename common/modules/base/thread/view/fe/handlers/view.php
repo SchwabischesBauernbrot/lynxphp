@@ -77,6 +77,7 @@ $boardPortal = getBoardPortal($boardUri, $boardData, array(
   'isThread' => true,
   'threadNum' => $threadNum,
   'threadClosed' => $closed,
+  'maxMessageLength' => $boardData['maxMessageLength'],
 ));
 
 // this will include all scripts, not just this one...
