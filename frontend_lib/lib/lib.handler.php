@@ -252,7 +252,7 @@ function wrapContentFooter($row) {
       'js/jschan/dragable.js',
       // post form message character counter
       // you need to set message limits
-      //'js/jschan/counter.js',
+      'js/jschan/counter.js',
       // lynxphp
       'js/lynxphp/embed.js',
       'js/lynxphp/refresh.js',
