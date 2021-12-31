@@ -12,6 +12,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'threadNum' => 0,
     'noBoardHeaderTmpl' => false,
     'threadClosed' => false,
+    'maxMessageLength' => false,
   ), $options));
 
   $templates = loadTemplates('mixins/board_header');
@@ -82,7 +83,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   // if threadNum, is it locked?
   $form_html = $threadClosed ? '' : renderPostFormHTML($boardUri, array(
     'showClose' => false, 'formId' => 'bottom_postform',
-    'reply' => $threadNum,
+    'reply' => $threadNum, 'maxMessageLength' => $maxMessageLength,
   ));
 
   return array(
@@ -94,6 +95,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     // used in footer
     'boardNav' => $boardNav,
     'postForm' => $form_html,
+    'maxMessageLength' => $maxMessageLength,
   );
 }
 
@@ -104,7 +106,9 @@ function renderBoardPortalHeaderEngine($row, $boardUri, $boardData) {
   $pagenum   = $row['pagenum'];
   //$tmpl      = $row['tmpl'];
 
-  $renderPostFormOptions = array();
+  $renderPostFormOptions = array(
+    'maxMessageLength' => $row['maxMessageLength'],
+  );
   //$renderPostFormUrl = $boardUri . '/';
   if ($threadNum) {
     $renderPostFormOptions['reply'] = $threadNum;
