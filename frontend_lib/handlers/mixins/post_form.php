@@ -50,6 +50,7 @@ function renderPostFormHTML($boardUri, $options = false) {
     'showClose' => true,
     'values'    => array(),
     'formId'    => 'postform',
+    'maxMessageLength' => false,
   ), $options));
 
 
@@ -88,6 +89,9 @@ function renderPostFormHTML($boardUri, $options = false) {
     'files'    => array('type' => 'multidropfile', 'label' => 'Files',
       'postlabel' => 'Max ' . $maxfiles . ' files</small><small>' . number_abbr($maxfilesize) . ' total'),
   );
+  if ($maxMessageLength) {
+    $formfields['message']['maxLength'] = $maxMessageLength;
+  }
   if (!isLoggedIn()) {
     $formfields['postpassword'] = array('type' => 'password',      'label' => 'Passwords', 'maxlength' => 50);
   }
