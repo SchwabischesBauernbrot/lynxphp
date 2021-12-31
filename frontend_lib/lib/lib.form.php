@@ -161,8 +161,11 @@ function generateForm($action, $fields, $values, $options = false) {
         $html .= '<input type=number name="'.$field.'" value="' . $value . '">';
       break;
       case 'textarea':
+        // minlength isn't official but jschan uses it in counter.js
+        $mnl = isset($details['minLength']) ? ' minLength="' . $details['minLength'] . '"' : '';
+        $mxl = isset($details['maxLength']) ? ' maxLength="' . $details['maxLength'] . '"' : '';
         // do we need to escape?
-        $html .= '<textarea name="'.$field.'"'.$ac.'>'.$value.'</textarea>';
+        $html .= '<textarea name="'.$field.'"'.$ac.$mnl.$mxl.'>'.$value.'</textarea>';
       break;
       case 'select':
         $html .= '<select name="' . $field . '">';
