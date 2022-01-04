@@ -14,6 +14,7 @@ function boardDBtoAPI(&$row) {
   $row['user'] = $urpw['username'];
   */
   unset($row['userid']);
+  $row['maxMessageLength'] = 0;
 }
 
 // get list of boards
