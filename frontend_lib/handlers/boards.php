@@ -215,7 +215,7 @@ function getBoardsHandlerEngine() {
     'pages' => $page_html,
     'boards' => $boards_html,
     // FIXME get named route
-    'action' => $BASE_HREF . 'boards.html',
+    'action' => $BASE_HREF . 'boards.php',
   );
   $content = replace_tags($templates['header'], $tags);
 
