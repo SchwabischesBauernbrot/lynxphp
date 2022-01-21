@@ -38,5 +38,6 @@ if (!defined('IN_GENERATE')) define('IN_GENERATE', false);
 
 // only frontend needs to check this...
 //define('BACKEND', true); // need to set this on the FE too
-define('BACKEND_HEAD_SUPPORT', false);
+// we do this because the front may include us for a reason maybe?
+if (!defined('BACKEND_HEAD_SUPPORT')) define('BACKEND_HEAD_SUPPORT', false);
 ?>
