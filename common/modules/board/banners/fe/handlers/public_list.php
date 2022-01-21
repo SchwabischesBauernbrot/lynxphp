@@ -43,7 +43,7 @@ if (is_array($banners)) {
 
     $tmp = str_replace('{{w}}', $iw, $tmp);
     $tmp = str_replace('{{h}}', $ih, $tmp);
-    $tmp = str_replace('{{image}}', $banner['image'], $tmp);
+    $tmp = str_replace('{{image}}', BACKEND_PUBLIC_URL . $banner['image'], $tmp);
     $banners_html .= $tmp;
   }
 }
