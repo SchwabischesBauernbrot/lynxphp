@@ -621,6 +621,7 @@ function renderBoardCatalog($boardUri) {
         }
         // need $BASE_HREF..
         // do we? we have it in the base tag...
+        //echo "page[$pageNum]<br>\n";
         $tags = array(
           'uri' => $boardUri,
           'subject' => htmlspecialchars($thread['sub']),
@@ -631,7 +632,8 @@ function renderBoardCatalog($boardUri) {
           'human_created_at' => gmdate('n/j/Y H:i:s', $thread['created_at']),
           'replies' => $thread['reply_count'],
           'files' => $thread['file_count'],
-          'page' => $pageNum,
+          // starts at 0
+          'page' => $pageNum + 1,
           'tile_image' => replace_tags($image_template, $tile_tags),
         );
         $tiles_html .= replace_tags($tile_template, $tags);
