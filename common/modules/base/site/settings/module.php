@@ -12,6 +12,13 @@ return array(
         'unwrapData' => true,
         'requires' => array(),
         'params' => 'querystring',
+        'cacheSettings' => array(
+          // site_settings
+          // user/setting
+          // user_sessions but we only care if the data changes tbh
+          'databaseTables' => array('users', 'site_settings'),
+          //'files' => array(),
+        ),
       ),
     ),
     array(
