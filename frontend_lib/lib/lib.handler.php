@@ -66,6 +66,16 @@ function wrapContentData($options = false) {
     // FIXME: caching
     //echo "packages[", print_r(array_keys($packages), 1), "]<br>\n";
     $settings = $packages['base_settings']->useResource('settings', false, array('inWrapContent'=>true));
+
+    // how do I get the mtime from a resource
+    // what's the mtime of this?
+    // router?
+    // then we'll need the key, routeParams and routeOptions
+    // we should be able to extract it from the router after the call
+    //
+    // index sets the header, so we have to inform when we set up the route
+    //   calling this to manage
+
   }
   //echo "<pre>", print_r($settings, 1), "</pre>\n";
   if (empty($settings) || !is_array($settings)) {
@@ -80,12 +90,15 @@ function wrapContentData($options = false) {
   }
 
   return array(
+    // this currently drives the title tag
     'siteSettings' => $siteSettings,
+    // FIXME: I don't think this is even used
     'userSettings' => $userSettings,
     'enableJs' => $enableJs,
     'doWork' => !$noWork,
     'closeHeader' => $closeHeader,
     'canonical' => $canonical,
+    //'mtime' => $mtime,
   );
 }
 
@@ -114,6 +127,7 @@ function wrapContentGetHeadHTML($row) {
     'head_html' => '',
   );
   $pipelines[PIPELINE_SITE_HEAD]->execute($io);
+
   $head_html = $io['head_html'] . "\n" . '<script>
     const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
     const DISABLE_JS = false
@@ -150,12 +164,14 @@ function wrapContentHeader($row) {
 
   // iframe are immediately loaded
   // can use names and links to load content
+  /*
   $boards_html = getexpander(
     '<a href="boards.php" target="boardView">Boards</a>',
     '<iframe name=boardView src="loaded_iframe" style="display: none"></iframe>', array(
       'classes' => array('nav-item')
     )
   );
+  */
 
   $boards_html = <<<EOB
 EOB;
