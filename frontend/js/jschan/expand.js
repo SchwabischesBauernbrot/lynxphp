@@ -7,48 +7,60 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
   }
 
+  // grab from settings
   const volumeSetting = document.getElementById('volume-setting');
-  let volumeLevel = localStorage.getItem('volume');
-  const changeVolume = (change) => {
-    volumeLevel = volumeSetting.value;
-    const allMedia = document.querySelectorAll('audio,video');
-    for (let i = 0; i < allMedia.length; i++) {
-      allMedia[i].volume = volumeLevel/100;
+  let volumeLevel = localStorage.getItem('volume')
+  if (volumeLevel === 'undefined') volumeLevel = 50
+  //console.log('volumeLevel', volumeLevel)
+  if (volumeSetting) {
+    const changeVolume = (change) => {
+      volumeLevel = volumeSetting.value;
+      const allMedia = document.querySelectorAll('audio,video');
+      for (let i = 0; i < allMedia.length; i++) {
+        allMedia[i].volume = parseInt(volumeLevel)/100;
+      }
+      console.log('adjusting default volume', volumeLevel);
+      setLocalStorage('volume', volumeLevel);
     }
-    console.log('adjusting default volume', volumeLevel);
-    setLocalStorage('volume', volumeLevel);
+    volumeSetting.value = volumeLevel;
+    volumeSetting.addEventListener('change', changeVolume, false);
   }
-  volumeSetting.value = volumeLevel;
-  volumeSetting.addEventListener('change', changeVolume, false);
 
   const loopSetting = document.getElementById('loop-setting');
   let loopEnabled = localStorage.getItem('loop') == 'true';
-  const toggleLoop = (change) => {
-    loopEnabled = loopSetting.checked;
-    console.log('toggling video/audio looping', loopEnabled);
-    setLocalStorage('loop', loopEnabled);
+  if (loopSetting) {
+    const toggleLoop = (change) => {
+      loopEnabled = loopSetting.checked;
+      console.log('toggling video/audio looping', loopEnabled);
+      setLocalStorage('loop', loopEnabled);
+    }
+    loopSetting.checked = loopEnabled;
+    loopSetting.addEventListener('change', toggleLoop, false);
   }
-  loopSetting.checked = loopEnabled;
-  loopSetting.addEventListener('change', toggleLoop, false);
 
   const imageloadingbarsSetting = document.getElementById('imageloadingbars-setting');
   let imageloadingbarsEnabled = localStorage.getItem('imageloadingbars') == 'true';
-  const toggleImageloadingbars = (change) => {
-    imageloadingbarsEnabled = imageloadingbarsSetting.checked;
-    console.log('toggling video/audio imageloadingbarsing', imageloadingbarsEnabled);
-    setLocalStorage('imageloadingbars', imageloadingbarsEnabled);
+  if (localStorage.getItem('imageloadingbars') === 'undefined') imageloadingbarsEnabled = 'true'
+  if (imageloadingbarsSetting) {
+    const toggleImageloadingbars = (change) => {
+      imageloadingbarsEnabled = imageloadingbarsSetting.checked;
+      console.log('toggling video/audio imageloadingbarsing', imageloadingbarsEnabled);
+      setLocalStorage('imageloadingbars', imageloadingbarsEnabled);
+    }
+    imageloadingbarsSetting.checked = imageloadingbarsEnabled;
+    imageloadingbarsSetting.addEventListener('change', toggleImageloadingbars, false);
   }
-  imageloadingbarsSetting.checked = imageloadingbarsEnabled;
-  imageloadingbarsSetting.addEventListener('change', toggleImageloadingbars, false);
 
   if (!isCatalog) { //dont expand on catalog
     const thumbs = document.getElementsByClassName('post-file-src');
     const toggle = function(thumb, expanded, filename, src) {
       if (thumb.style.display === 'none') { //closing
+        //console.log('closing', thumb, expanded, filename)
         thumb.style.display = '';
         expanded.style.display = 'none';
         filename.style.maxWidth = '';
       } else { //expanding
+        //console.log('expanding', thumb, expanded, filename)
         thumb.style.display = 'none';
         expanded.style.display = '';
         if (expanded.offsetWidth >= filename.offsetWidth) {
@@ -57,6 +69,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       }
       //handle css thing for play icon on vid/audio
       const close = thumb.nextSibling.textContent === '[Close]' ? thumb.nextSibling : null;
+      //console.log('close', close)
       if (close) {
         expanded.loop = loopEnabled;
         expanded.volume = volumeLevel/100;
@@ -81,33 +94,47 @@ window.addEventListener('DOMContentLoaded', (event) => {
         return;
       }
       e.preventDefault();
-      const fileAnchor = this.children[0];
+      //console.log('this', this.children)
+      //const fileAnchor = this.children[0];
+      const fileAnchor = this.querySelector('a.jsonly')
+      //console.log('fileAnchor', fileAnchor)
+
       const fileHref = fileAnchor.href;
       const type = this.dataset.type;
-      const thumbElement = fileAnchor.children[0];
-      const fileName = this.previousElementSibling;
+      //const thumbElement = fileAnchor.children[0];
+      const thumbElement = fileAnchor.querySelector('img')
+
+      //console.log('thumbElement', thumbElement)
+      //const fileName = this.previousElementSibling;
+      const fileName = this.parentNode.querySelector('.filename')
+      //console.log('fileName', fileName)
       const pfs = this.closest('.post-file-src');
-      let expandedElement = type === 'image' ? thumbElement.nextElementSibling : fileAnchor.nextElementSibling;
+      let expandedElement = type === 'img' ? thumbElement.nextElementSibling : fileAnchor.nextElementSibling;
+      //console.log('expandedElement', expandedElement, 'type', type)
 
       if (expandedElement) {
         toggle(thumbElement, expandedElement, fileName, pfs);
       } else if (thumbElement.style.opacity !== '0.5') {
         let source;
         switch(type) {
-          case 'image':
+          case 'img':
             e.preventDefault();
             fileAnchor.style.minWidth = fileAnchor.offsetWidth+'px';
             fileAnchor.style.minHeight = fileAnchor.offsetHeight+'px';
             thumbElement.style.opacity = '0.5';
             thumbElement.style.cursor = 'wait'
-            if (localStorage.getItem('imageloadingbars') == 'true') {
+            // why are we loading this instead of using imageloadingbarsEnabled?
+            if (localStorage.getItem('imageloadingbars') === 'true' || localStorage.getItem('imageloadingbars') === 'undefined') {
+              //console.log('doing bars')
               const request = new XMLHttpRequest();
               request.onprogress = (e) => {
                 const progress = Math.floor((e.loaded/e.total)*100);
                 const progressWidth = Math.floor((e.loaded/e.total)*thumbElement.offsetWidth);
+                //console.log('onprogress', progress, progressWidth)
                 if (progress >= 100) {
                   pfs.removeAttribute('data-loading');
                 } else {
+                  // probably doesn't work in chrome49...
                   pfs.setAttribute('data-loading', progress);
                   pfs.style = `--data-loading: ${progressWidth}px`;
                 }
@@ -182,9 +209,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
             toggle(thumbElement, expandedElement, fileName, pfs);
             source.src = fileHref;
             break;
-          deault:
+          default:
+            console.warn('unknown type', type)
             return;
         }
+      } else {
+        console.warn('opacity isnt right?')
       }
     };
 
