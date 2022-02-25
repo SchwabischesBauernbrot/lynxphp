@@ -183,6 +183,25 @@ $frontendRouterData = array(
         ),
         */
       ),
+      'inline_loader_list' => array(
+        'route'  => '/boards_cacheable.html',
+        'func'   => 'getInlineBoardsLoaderHandler',
+        'options' => array(
+          'cacheSettings' => array(
+            'files' => array(
+              // theme is also would affect this caching
+              'templates/header.tmpl', // wrapContent
+              'templates/footer.tmpl', // wrapContent
+            ),
+            'backend' => array(
+              array(
+                'route' => 'opt/settings',
+                'method' => 'GET',
+              ),
+            ),
+          ),
+        ),
+      ),
       'filter' => array(
         'method' => 'POST',
         'route'  => '/boards.php',
