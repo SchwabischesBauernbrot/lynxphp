@@ -187,6 +187,7 @@ $frontendRouterData = array(
         'route'  => '/boards_cacheable.html',
         'func'   => 'getInlineBoardsLoaderHandler',
         'options' => array(
+          // FIXME: a settings to just flat out ALWAYS cache this forever
           'cacheSettings' => array(
             'files' => array(
               // theme is also would affect this caching
