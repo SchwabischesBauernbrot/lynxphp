@@ -93,6 +93,7 @@ function wrapContentData($options = false) {
     // this currently drives the title tag
     'siteSettings' => $siteSettings,
     // FIXME: I don't think this is even used
+    // but we have a unified call, so there's no cost atm
     'userSettings' => $userSettings,
     'enableJs' => $enableJs,
     'doWork' => !$noWork,
