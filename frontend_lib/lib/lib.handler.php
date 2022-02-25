@@ -253,10 +253,13 @@ function wrapContentFooter($row) {
       // post form message character counter
       // you need to set message limits
       'js/jschan/counter.js',
+      // expand media
+      'js/jschan/expand.js',
       // lynxphp
       'js/lynxphp/embed.js',
       'js/lynxphp/refresh.js',
-      'js/lynxphp/expander.js',
+      'js/lynxphp/expander_thread.js',
+      //'js/lynxphp/expander_media.js',
     ),
   );
   // THINK: how do we let JS live in module directories
