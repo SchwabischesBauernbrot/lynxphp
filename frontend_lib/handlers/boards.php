@@ -228,9 +228,9 @@ function getBoardsHandlerEngine() {
 function getInlineBoardsHandler() {
   $res = getBoardsHandlerEngine();
 
-$row = wrapContentData(array());
-$head_html = wrapContentGetHeadHTML($row);
-global $BASE_HREF;
+  $row = wrapContentData(array());
+  $head_html = wrapContentGetHeadHTML($row);
+  global $BASE_HREF;
 echo <<<EOB
 <!DOCTYPE html>
 <html>
@@ -241,6 +241,33 @@ echo <<<EOB
 <body id="top">
 EOB;
   echo $res['content'];
+}
+
+// we're a small webpage that's cacheable
+function getInlineBoardsLoaderHandler() {
+  $row = wrapContentData(array());
+  $head_html = wrapContentGetHeadHTML($row);
+  // index already puts a header on this based on router config
+  global $BASE_HREF;
+  echo <<<EOB
+<!DOCTYPE html>
+<html>
+<head id="settings">
+  <base href="$BASE_HREF">
+  $head_html
+</head>
+<body id="top">
+<a class="nojsonly-block" style="line-height: 100vh; text-align: center; width: 100vw; height: 100vh;" target="boardFrame" href="/boards_inline.html">Please click to load all the html for full board list</a>
+EOB;
+
+  // index already did headers
+  // nothing more we can set because we're in immediate mode
+  /*
+  checkCacheHeaders(array(
+    'fileSize' => strlen($str), // for etag
+    'contentType' => 'text/html',
+  ));
+  */
 }
 
 function getBoardsHandler() {
