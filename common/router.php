@@ -243,10 +243,12 @@ class Router {
       }
     }
 */
+    //print_r($cacheSettings);
     if (isset($cacheSettings['files'])) {
       //echo "in[$mtime]<br>\n";
       //print_r($routeParams);
       foreach($cacheSettings['files'] as $file) {
+        //echo "file[$file]<br>\n";
         foreach($routeParams as $param => $val) {
           if (is_array($val)) {
             echo "router::getMaxMitme error - params[$param] val[", print_r($val, 1), "] file[$file]\n";
@@ -255,6 +257,7 @@ class Router {
           }
           $file = str_replace('{{route.'. $param . '}}', $val, $file);
         }
+        //echo "adjFile[$file]<br>\n";
         if (file_exists($file)) {
           $mtime = max($mtime, filemtime($file));
         } else {
@@ -269,6 +272,7 @@ class Router {
   }
 
   // do we have a cached copy
+  // , $alwaysSetHeaders = false
   function isUncached($key, $routeParams, $routeOptions) {
     //if (DEV_MODE) {
     $cacheable = isset($routeOptions['cacheSettings']);
@@ -320,8 +324,25 @@ class Router {
     $checkMtime = false;
     $checkEtag = false;
     // accumulators
+    // should this be PHP_INT_MAX?
+    // zero means we don't need to check backend
     $maxMtime = 0;
     $compoundEtags = array();
+
+    // does this routes data change depending on BE calls?
+    // need to ignore whether or not config tells us to check it
+    // this is really important for setting headers on FE
+    if (isset($cacheSettings['backend'])) {
+      // mtime matters, we were supposed to check the backend
+      // but it doesn't support it, we can't get mtime
+      // so it's not useable
+
+      // this will force no cache
+      // because we should be dependent upon backend
+      // but it can't provide (or we don't check)
+      // if we cached it, it would likely be wrong
+      $maxMtime = PHP_INT_MAX;
+    }
 
     // why don't we get a warning about BACKEND_HEAD_SUPPORT not being set?
     if (BACKEND_HEAD_SUPPORT && isset($cacheSettings['backend'])) {
@@ -374,6 +395,10 @@ class Router {
                 echo "No way to cache backend[", $be['route'], "], no cacheSettings on backend?\n";
               }
             }
+            if ($checkMtime) {
+              // this is the one that failed it...
+              header('X-Debug-isUncached-backendFailure: ' . $endpoint);
+            }
             $checkMtime = false;
             $maxMtime = PHP_INT_MAX;
             // if this one doesn't have it, we're done, it's not mtime cacheable
@@ -384,6 +409,7 @@ class Router {
 
         // if both cache systems failed, we don't need to check any more
         if (!$checkMtime && !$checkEtag) {
+          header('X-Debug-isUncached-backend-status: no-way-to-cache');
           if (DEV_MODE) {
             echo "No way to cache this frontend route\n";
           }
@@ -400,12 +426,16 @@ class Router {
     // fe and be only thing
     $mtime = 0;
     $eTag = '';
+
+    //echo "maxMtime[$maxMtime] checkEtag[$checkEtag]<br>\n";
+
     // if some way to cache is available (mtime or etag)
     if ($maxMtime !== PHP_INT_MAX || $checkEtag) {
       // get the other timestamps involved
       // has some be only things
       $mtime = $this->getMaxMtime($cacheSettings, $routeParams);
-      //header('X-Debug-isUncached-actualMtime: ' . $mtime);
+      header('X-Debug-isUncached-actualMtime: ' . $mtime . '_was_' . $maxMtime);
+
       // see if we need to mixin the max BE data timestamp
       if ($maxMtime && $maxMtime !== PHP_INT_MAX) {
         $mtime = max($mtime, $maxMtime);
@@ -433,13 +463,30 @@ class Router {
         $cacheHeaderOptions['etag'] = $eTag;
       }
 
+      //echo "mtime[$mtime] cacheHeaderOptions[", print_r($cacheHeaderOptions, 1), "]<br>\n";
+      if (!$mtime) {
+        header('X-Debug-isUncached-mtimeFalish: ' . $mtime);
+      }
       // 304 processing
+      header('X-Debug-isUncached-settings: ' . $mtime.'_'.$eTag);
       if (checkCacheHeaders($mtime, $cacheHeaderOptions)) {
         // it's cached!
         // roughly 120ms rn
         // not any faster tbh
         return false;
       }
+      // not cached
+      header('X-Debug-isUncached-notcached: clientDidNotRequest');
+      // frontend only, right now...
+      /*
+      if ($alwaysSetHeaders) {
+        // looks like checkCacheHeaders already alwaysSetHeaders
+        // mtime is 0? we have etag
+        // if !mtime, we don't set LastMod
+        header('X-Debug-isUncached: setting_mtime_' . $mtime.'_'.$eTag);
+        //_doHeaders($mtime, $cacheHeaderOptions);
+      }
+      */
     } else {
       header('X-Debug-isUncached: noEtag-Or-PHP_INT_MAX');
     }
@@ -631,15 +678,17 @@ class Router {
     return false;
   }
 
+  // index calls this to see if our output is cacheable
   function sendHeaders($method, $path) {
     $res = $this->findRoute($method, $path);
     if ($res === false) return false; // 404 passthru
     $key = $res['request']['method'] . '_' . $res['match']['cond'];
     $uncached = $this->isUncached($key, $res['match']['params'], $res['routeOptions']);
-    //if (DEV_MODE) {
+    // we only run in the frontend
+    if (DEV_MODE) {
       //header('X-Debug-sendHeaders-key: ' . $key);
       header('X-Debug-sendHeaders-cache: ' . ($uncached ? 'miss' : 'hit'));
-    //}
+    }
     // HEAD can only return headers
     if ($res['isHead']) {
       //header('connection: close');
