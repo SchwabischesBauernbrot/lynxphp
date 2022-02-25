@@ -19,6 +19,7 @@
 </details>
 */
 // iframeId*
+// label is basically thumbnail tag (getThumbnail)
 function getExpander($label, $content, $options = array()) {
   extract(ensureOptions(array(
     'type' => 'media', // media/iframe
@@ -44,21 +45,53 @@ function getExpander($label, $content, $options = array()) {
 
   $style = '';
   if ($labelId && $styleContentUrl) {
+/*
     $style = '<style>
 details[open].img#' . $labelId . ' > summary::after {
   content: url(' . $styleContentUrl . ');
 }
 </style>';
+*/
+// only after click will collapse it
+    $style = '<style>
+details[open].img#' . $labelId . ' > summary::after {
+  content: \'\';
+  //background-image: url(' . $styleContentUrl . ');
+  background-size: 1440px 1791px;
+  display: inline-block;
+  width: 1440px;
+  height: 1791px;
+}
+details.img#' . $labelId . ' .contentarea {
+  width: 100vw;
+  padding-bottom: 1794px;
+}
+details[open].img#' . $labelId . ' .contentarea {
+  background: url(' . $styleContentUrl . ');
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 0;
+  z-index: -1;
+}
+</style>';
   }
 
   $id = $labelId !== false ? ' id="' . $labelId . '"' : '';
+  $classes[] = 'nojsonly-block';
   $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
 
+  // nojs
   $html = $style;
   $html .= '<details' . $id . $class . '>' . "\n";
   $html .= '<summary>' . $label . '</summary>' . "\n";
   $html .= $content . "\n";
-  $html .= '</details>' . "\n";
+  $html .= '<div class="contentarea"></div></details>' . "\n";
+  // for js
+  // we need to reserve the space to avoid relayout
+  // we can't just have JS insert these later...
+  // or manipulate the html above...
+  $html .= '<a class="jsonly" href="' . $styleContentUrl . '">' . $label . '</a>';
   return $html;
 }
 
