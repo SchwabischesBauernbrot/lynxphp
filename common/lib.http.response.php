@@ -104,6 +104,7 @@ function cachePageContentsForever($mtime = 0) {
 // used in router to check incoming request to see if it's cached or not
 // FIXME: redo these parameters
 // really an incoming request thing but drives responses
+// we always set headers here
 function checkCacheHeaders($mtime, $options = false) {
   //header('X-Debug-checkCacheHeaders-mtime: ' . $mtime);
   extract(ensureOptions(array(
@@ -144,6 +145,7 @@ function checkCacheHeaders($mtime, $options = false) {
     // maybe just exit?
     return true;
   }
+  // you know if this is a 304 or not, this path is not 304
   _doHeaders($mtime, array('contentType' => $contentType, 'lastMod' => $lastmod, 'etag' => $etag));
   // maybe return etag so it doesn't have to be generated?
   return false;
