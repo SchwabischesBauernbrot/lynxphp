@@ -37,6 +37,8 @@ details summary {
   {{head}}
 </head>
 <body id="top">
+<!-- span class="jsonly">JS is enabled</span>
+<span class="nojsonly-block">JS is disabled</span -->
   <nav class="navbar">
     <!-- items should not be out of order... -->
     <a class="nav-item" href="." alt="Home">Home</a>
@@ -45,8 +47,11 @@ details summary {
       <summary class="nav-item">Boards</a></summary>
       <!-- 50% is weird, maybe 1/3 or just go full screen... ? -->
       <div id="boardsSubpage" style="position: absolute; top: 32px; z-index: 1; padding: 5px; background-color: var(--background-rest);">
+        <!-- meta tag refresh loads the content onload, instead of waiting for it to be used -->
         <!-- class="nojsonly-block" -->
-        <iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" srcdoc='<a style="display: block; line-height: 100vh; text-align: center; width: 100vw; height: 100vh;" target="boardFrame" href="/boards_inline.html">Please click to load all the html for full board list</a>'></iframe>
+        <!-- display: block; -->
+        <!-- iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" srcdoc='<a class="nojsonly-block" style="line-height: 100vh; text-align: center; width: 100vw; height: 100vh;" target="boardFrame" href="/boards_inline.html">Please click to load all the html for full board list</a>'></iframe -->
+        <iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" src="/boards_cacheable.html"></iframe>
       </div>
     </details>
     {{leftNav}}
