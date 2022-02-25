@@ -280,7 +280,8 @@ function getViewer($file, $options = false) {
   }
   // loop
   // can't loop because of how we collapse
-  return '<' . $type . ' class="" src="' . $path . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls  preload=none />';
+  // class="" ?
+  return '<' . $type . '  src="' . $path . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls  preload=none />';
 }
 
 ?>
