@@ -46,9 +46,9 @@
           <img src="images/img/{{icon}}.png" height="14" width="14" title="{{title}}">
 <!-- end -->
 <!-- loop -->
-  <div class="post-file">
-    <div class="post-file-src" data-type="image" data-attachment="false">
-      <!-- I have no clue how to make this cleaner -->
+  <div class="post-file {{majorMimeType}}">
+    <!-- src is more like media... -->
+    <div class="post-file-src" data-type="{{majorMimeType}}" data-attachment="false">
       {{expander}}
     </div>
     <span class="post-file-info">
