@@ -220,6 +220,8 @@ function renderPost($boardUri, $p, $options = false) {
 
     // disbale images until we can mod...
     $path = $file['path'];
+    $ext = pathinfo($file['filename'], PATHINFO_EXTENSION);
+    $noext = str_replace('.'.$ext, '', $file['filename']);
     // if not an absolute URL
     if (strpos($path, '://') === false) {
       $path = BACKEND_PUBLIC_URL . $path;
@@ -247,7 +249,8 @@ function renderPost($boardUri, $p, $options = false) {
       )),
       'fileid' => $fileSha256,
       'filename' => $file['filename'],
-      'shortfilename' => snippet($file['filename'], $shortenSize),
+      'majorMimeType' => $majorMimeType,
+      'shortfilename' => snippet($noext, $shortenSize) . ' ' . $ext,
       'size' => empty($file['size']) ? 'Unknown' : formatBytes($file['size']),
       'width' => $file['w'],
       'height' => $file['h'],
