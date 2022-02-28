@@ -18,7 +18,10 @@ class Dragable {
     this.target.style.right = 'unset';
     this.target.addEventListener('opened', e => this.updateMaxSizes(e));
     this.handle.addEventListener('mousedown', e => this.startDrag(e));
-    this.handle.addEventListener('touchstart', e => this.startDrag(e));
+    // chrome51
+    // passive means the scroll can't be cancelled
+    // but we do cancell it...
+    this.handle.addEventListener('touchstart', e => this.startDrag(e), { passive: false });
     document.addEventListener('mouseup', e => this.stopDrag(e));
     document.addEventListener('touchend', e => this.stopDrag(e));
     window.addEventListener('resize', e => this.updateMaxSizes(e));
