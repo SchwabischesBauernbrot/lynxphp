@@ -257,10 +257,14 @@ function renderPost($boardUri, $p, $options = false) {
       // 154 / 8 = 20190419-_DSF2773.j... ~20 chars
       $shortenSize = max($shortenSize, (int)($w / 8) - 10);
     }
+    $tn_w = empty($file['tn_w']) ? 0 : $file['tn_w'];
+    $tn_h = empty($file['tn_h']) ? 0 : $file['tn_h'];
     $fTags = array(
       'path' => $path,
       'expander' => getExpander($thumb, $avmedia, array(
         'classes' => array('postFile', $majorMimeType),
+        'tn_sz' => array($tn_w, $tn_h),
+        'sz' => array($file['w'], $file['h']),
         'labelId' => $fileSha256,
         'styleContentUrl' => $path,
       )),
@@ -277,8 +281,8 @@ function renderPost($boardUri, $p, $options = false) {
       // not currently used but we'll include it incase they want to do something different
       'avmedia' => $avmedia,
       'path' => $path,
-      'tn_w' => empty($file['tn_w']) ? 0 : $file['tn_w'],
-      'tn_h' => empty($file['tn_h']) ? 0 : $file['tn_h'],
+      'tn_w' => $tn_w,
+      'tn_h' => $tn_h,
     );
 
     $ftmpl = replace_tags($file_template, $fTags);
