@@ -23,8 +23,9 @@ function redirectTo($url, $options = false) {
 // not POSTING to this page or this page or ANY this page
 // and reqpath does not have .youtube
 $sentBump = false;
+$sentHead = false;
 function sendBump($req_method, $req_path) {
-  global $sentBump;
+  global $sentBump, $sentHead;
   if (
       !(
          ($req_path === '/signup' && $req_method === 'POST') ||
@@ -40,6 +41,14 @@ function sendBump($req_method, $req_path) {
       ) && strpos($req_path, '/.youtube') === false) {
     // make sure first lines of output are see-able
     //if (DEV_MODE)
+    // legit top of doc
+    echo <<<EOB
+<!DOCTYPE html>
+<html lang="en">
+EOB;
+    // could output the enter HEAD here too...
+    // need $row
+    $row = wrapContentData(array()); echo wrapContentGetHeadHTML($row, true); $sentHead = true;
     echo '<!-- lib.handler::sendBump [', $req_method, '][', $req_path, '] -->';
     echo '<div style="height: 40px;"></div>', "\n"; flush();
     $sentBump = true;
@@ -56,6 +65,7 @@ function wrapContentData($options = false) {
      // only should be used when we know we're opening a ton of requests in parallel
     'noWork'      => false,
     'settings'    => false,
+    // close the div and main tags
     'closeHeader' => true,
     'canonical'   => false,
   ), $options));
@@ -65,7 +75,15 @@ function wrapContentData($options = false) {
     // this can cause an infinite loop if backend has an error...
     // FIXME: caching
     //echo "packages[", print_r(array_keys($packages), 1), "]<br>\n";
-    $settings = $packages['base_settings']->useResource('settings', false, array('inWrapContent'=>true));
+    global $g_settings;
+    if (!$g_settings) {
+      $settings = $packages['base_settings']->useResource('settings', false, array('inWrapContent'=>true));
+      // miss
+      $g_settings = $settings;
+    } else {
+      // hit
+      $settings = $g_settings;
+    }
 
     // how do I get the mtime from a resource
     // what's the mtime of this?
@@ -118,8 +136,11 @@ function wrapContentData($options = false) {
 // {{header}} could insert all that..
 // or just section it off like footer
 // used for _inline.html pages
-function wrapContentGetHeadHTML($row) {
+//
+// why don't we fastout?
+function wrapContentGetHeadHTML($row, $fullHead = false) {
   global $pipelines;
+
   $siteSettings = $row['siteSettings'];
   $userSettings = $row['userSettings'];
   $io = array(
@@ -129,7 +150,21 @@ function wrapContentGetHeadHTML($row) {
   );
   $pipelines[PIPELINE_SITE_HEAD]->execute($io);
 
-  $head_html = $io['head_html'] . "\n" . '<script>
+  $term = DEV_MODE ? "\n" : '';
+  $head_html = $term;
+
+  if ($fullHead) {
+    $templates = loadTemplates('head');
+    global $BASE_HREF;
+    $tags = array(
+      'backend_url' => BACKEND_PUBLIC_URL,
+      'basehref' => $BASE_HREF,
+    );
+    $head_html .= '<head>' . $term;
+    $head_html .= replace_tags($templates['header'], $tags) . $term;
+  }
+
+  $head_html .= $io['head_html'] . "\n" . '<script>
     const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
     const DISABLE_JS = false
   </script>' . "\n";
@@ -137,6 +172,12 @@ function wrapContentGetHeadHTML($row) {
   if (!empty($row['canonical'])) {
     $head_html .= '<link rel="canonical" href="' . $row['canonical'] . '" />';
   }
+  $head_html .= '</head>' . $term;
+
+  // we don't get css/style, css/lynxphp or css/expand
+  // beacuse we don't parse the html of header
+  // though we could move them into here as an array
+  // but then the designers custom stylesheet wouldn't be moved in
   return $head_html;
 }
 
@@ -159,7 +200,12 @@ function wrapContentHeader($row) {
     const DISABLE_JS = false
   </script>';
   */
-  $head_html = wrapContentGetHeadHTML($row);
+
+  global $sentHead;
+  if (!$sentHead) {
+    $head_html = wrapContentGetHeadHTML($row, true);
+    echo $head_html;
+  }
 
   $templates = loadTemplates('header');
 
@@ -218,22 +264,28 @@ EOB;
   // FIXME: cacheable...
   global $BASE_HREF;
   $tags = array(
+    // not used
+    'backend_url' => BACKEND_PUBLIC_URL,
     'leftNav'  => $leftNav_html,
     'rightNav' => $rightNav_html,
     'boards'   => $boards_html,
     'basehref' => $BASE_HREF,
     'title' => empty($siteSettings['siteName']) ? '': $siteSettings['siteName'],
     // maybe head insertions is better?
-    'head' => $head_html,
+    // not used
+    //'head' => $head_html,
     'jsenable' => $enableJs ? '' : '<!-- ',
     'jsenable2' => $enableJs ? '' : ' -->',
   );
 
+  // we could place the open body tag here...
   echo replace_tags($templates['header'], $tags);
   global $sentBump;
   if (!$sentBump) {
+    // can't use sendBump() with out method and path
     // make sure first lines of output are see-able
     echo '<div style="height: 40px;"></div>', "\n"; flush();
+    $sentBump = true;
   }
 }
 
