@@ -156,6 +156,8 @@ function getThumbnail($file, $options = false) {
      // only should be used when we know we're opening a ton of requests in parallel
     'maxW' => 0,
     'type' => false,
+    'alt' => 'thumbnail',
+    'noLazyLoad' => false,
   ), $options));
   if (!$type) $type = getFileType($file);
 
@@ -216,7 +218,8 @@ function getThumbnail($file, $options = false) {
   if (strpos($thumb, '://') === false) {
     $thumb = BACKEND_PUBLIC_URL . $thumb;
   }
-  return '<' . $type . ' class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls loop preload=none />';
+  $loading = $noLazyLoad ? '' : 'loading="lazy"';
+  return '<img class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" ' . $loading . ' alt="' . $alt . '" />';
 }
 
 function getAudioVideo($file, $options = false) {
