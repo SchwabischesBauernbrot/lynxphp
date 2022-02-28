@@ -1,42 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <base href="{{basehref}}">
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/lynxphp.css">
-  <!-- only really need this for the board pages -->
-  <link rel="stylesheet" href="css/expand.css">
-  <noscript><style>
-    .jsonly { display: none!important; }
-    .nojsonly-block { display: block!important; }
-  </style></noscript>
-  <!-- link id="codetheme" rel="stylesheet" data-theme="ir-black" href="css/codethemes/ir-black.css" -->
-  <!-- link rel="manifest" href="/site.webmanifest" -->
-  <!-- link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="apple-touch-icon" sizes="144x144" href="/file/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/file/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/file/favicon-16x16.png">
-  <link rel="mask-icon" href="/file/safari-pinned-tab.svg" color="#5bbad5">
-  <meta name="msapplication-TileColor" content="#00aba9">
-  <meta name="theme-color" content="#ffffff" -->
-  <style>
-details summary {
-  cursor: pointer;
-}
-#boardsNav[open] summary {
-  font-weight: bold;
-}
-  </style>
-  <title></title>
-  <!-- meta property="og:site_name" value="">
-  <meta property="og:url" content="https://{{basehref}}">
-  <meta property="og:description" content="" -->
-  <!-- allow modules to hook into head tag -->
-  {{head}}
-</head>
-<body id="top">
+<!-- we'll leave the open body tag here so designers can mess with it -->
+<body>
+<a name="top">
 <!-- span class="jsonly">JS is enabled</span>
 <span class="nojsonly-block">JS is disabled</span -->
   <nav class="navbar">
@@ -50,8 +14,8 @@ details summary {
         <!-- meta tag refresh loads the content onload, instead of waiting for it to be used -->
         <!-- class="nojsonly-block" -->
         <!-- display: block; -->
-        <!-- iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" srcdoc='<a class="nojsonly-block" style="line-height: 100vh; text-align: center; width: 100vw; height: 100vh;" target="boardFrame" href="/boards_inline.html">Please click to load all the html for full board list</a>'></iframe -->
-        <iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" src="/boards_cacheable.html"></iframe>
+        <iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" srcdoc='<a class="nojsonly-block" style="line-height: 100vh; text-align: center; width: 100vw; height: 100vh;" target="boardFrame" href="/boards_inline.html">Please click to load all the html for full board list</a>'></iframe>
+        <!-- iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" src="/boards_cacheable.html"></iframe -->
       </div>
     </details>
     {{leftNav}}
