@@ -146,6 +146,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 pfs.removeAttribute('style');
                 const blob = this.response;
                 source.src = window.URL.createObjectURL(blob);
+                source.alt = "image for " + fileHref
                 thumbElement.style.opacity = '';
                 thumbElement.style.cursor = '';
                 fileAnchor.appendChild(expandedElement);
@@ -164,6 +165,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 fileAnchor.appendChild(expandedElement);
                 toggle(thumbElement, expandedElement, fileName, pfs);
               }
+              source.alt = "image for " + fileHref
               source.src = fileHref;
             }
             break;
@@ -200,9 +202,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
               expandedElement.style.backgroundSize = 'contain';
               expandedElement.style.minWidth = thumbElement.width+'px';
               expandedElement.style.paddingTop = thumbElement.height+'px';
+              source.alt = "audio for " + fileHref
             } else {
               expandedElement.style.minWidth = fileAnchor.offsetWidth+'px';
               expandedElement.style.minHeight = fileAnchor.offsetHeight+'px';
+              source.alt = "video for " + fileHref
             }
             pfs.appendChild(expandedElement);
             fileAnchor.appendChild(closeSpan);
