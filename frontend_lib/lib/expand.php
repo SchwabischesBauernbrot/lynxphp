@@ -37,6 +37,8 @@ function getExpander($label, $content, $options = array()) {
     'target' => false, // has to be unique per page...
     'aLabel' => 'Please click to load all the full html for this section',
     'aHref'  => '/', // almost required
+    'tn_sz' => array(),
+    'sz'    => array(),
 
     'classes' => array(),
     'labelId' => false,
@@ -52,31 +54,46 @@ details[open].img#' . $labelId . ' > summary::after {
 }
 </style>';
 */
+$r = 1;
+if ($sz[1]) {
+  if ($sz[1] < $sz[0]) {
+    $r = ($sz[1] / $sz[0]) * 100;
+  } else {
+    $r = ($sz[0] / $sz[1]) * 100;
+  }
+}
+// ' . $sz[1] . 'px
+
 // only after click will collapse it
+// background-image: url(' . $styleContentUrl . ');
     $style = '<style>
 details[open].img#' . $labelId . ' > summary::after {
   content: \'\';
-  //background-image: url(' . $styleContentUrl . ');
-  background-size: 1440px 1791px;
+  background-color: #00000000;
+  background-size: ' . $sz[0] . 'px ' . $sz[1]. 'px;
   display: inline-block;
-  width: 1440px;
-  height: 1791px;
+  width: ' . $sz[0] . 'px;
+  height: ' . $sz[1] . 'px;
+  position: absolute;
+  top: 0;
 }
 details.img#' . $labelId . ' .contentarea {
-  width: 100vw;
-  padding-bottom: 1794px;
+  width: 95vw;
+  padding-bottom: ' . $r . '%;
 }
 details[open].img#' . $labelId . ' .contentarea {
   background: url(' . $styleContentUrl . ');
   background-size: contain;
   background-repeat: no-repeat;
-  position: absolute;
-  top: 0;
-  z-index: -1;
 }
 </style>';
   }
-
+  // latest chrome wont let you slip it under
+/*
+  position: absolute;
+  top: 0;
+  z-index: -1;
+*/
   $id = $labelId !== false ? ' id="' . $labelId . '"' : '';
   $classes[] = 'nojsonly-block';
   $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
