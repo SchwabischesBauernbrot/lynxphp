@@ -225,6 +225,8 @@ function getBoardsHandlerEngine() {
   );
 }
 
+// FIXME: solve custom sheetstyle issues in these...
+
 function getInlineBoardsHandler() {
   $res = getBoardsHandlerEngine();
 
