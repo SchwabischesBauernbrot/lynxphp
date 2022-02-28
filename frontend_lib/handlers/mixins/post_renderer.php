@@ -27,6 +27,7 @@ function renderPost($boardUri, $p, $options = false) {
     'topReply' => false,
     'noOmit'   => false,
     'inMixedBoards' => false,
+    'firstThread' => false,
   ), $options));
 
   //$isBO = perms_isBO($boardUri);
@@ -156,7 +157,17 @@ function renderPost($boardUri, $p, $options = false) {
   }
   if (!empty($p['flag'])) {
     $flag = addslashes(htmlspecialchars($p['flag']));
-    $postmeta .= ' <span class="flag flag-'.$p['flag_cc'].'" title="'.$p['flagName'].'" alt="'.$p['flagName'].'"><img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '"></span>';
+    if ($p['flag_cc']) {
+      // country flag
+      $postmeta .= ' <span class="flag flag-'.$p['flag_cc'].'" title="'.$p['flagName'].'"></span>';
+    } else {
+      // non-country flag
+      //$postmeta .= ' <span title="'.$p['flagName'].'">';
+      // FIXME: flag width and height
+      // 19x12 for IGA
+      // and 16x16 for Nuro+ https://endchan.wrongthink.net:8443/ausneets/flags/5e4b58dfe571bd1c7b890205
+      $postmeta .= ' <img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '" alt="'.$p['flagName'].'">';
+    }
   }
   // post-
   if (!empty($p['capcode'])) {
@@ -213,6 +224,8 @@ function renderPost($boardUri, $p, $options = false) {
   // tn_w, tn_h aren't enabled yet
   $files_html = '';
   foreach($p['files'] as $file) {
+    // filename, path, thumbnail_path, mime_type, type, size, w, h
+    // tn_w, tn_h
     //echo "<pre>file[", print_r($file, 1), "]</pre>\n";
     $ftmpl = $file_template;
     // disbale images until we can mod...
@@ -228,7 +241,11 @@ function renderPost($boardUri, $p, $options = false) {
     }
     $majorMimeType = getFileType($file);
     $fileSha256 = 'f' . uniqid();
-    $thumb   = getThumbnail($file, array('type' => $majorMimeType));
+    $thumb   = getThumbnail($file, array(
+      'type' => $majorMimeType, 'alt' => 'thumbnail of ' . $file['filename'],
+      // if a list of threads, any way to tell if this is the first?
+      // && $firstThread
+      'noLazyLoad' => $isOP));
     $avmedia = getAudioVideo($file, array('type' => $majorMimeType));
     $shortenSize = 10;
     if (!empty($file['tn_w'])) {
@@ -257,6 +274,7 @@ function renderPost($boardUri, $p, $options = false) {
       'majorMimeType' => $majorMimeType,
       'thumb' => $thumb,
       //'viewer' => getViewer($file, array('type' => $majorMimeType)),
+      // not currently used but we'll include it incase they want to do something different
       'avmedia' => $avmedia,
       'path' => $path,
       'tn_w' => empty($file['tn_w']) ? 0 : $file['tn_w'],
