@@ -40,7 +40,7 @@ function getNav2($navItems, $options = array()) {
   foreach($navItems as $data) {
     $urlTemplate = $data['destinations'];
     $label = $data['label'];
-    $alt = empty($data['alt']) ? '' : ' alt="' . $data['alt'] . '"';
+    $alt = empty($data['alt']) ? '' : ' aria-label="' . $data['alt'] . '"';
     if (is_array($urlTemplate)) {
       // always link to first one
       $url = replace_tags($urlTemplate[0], $replaces);
