@@ -10,7 +10,7 @@ function addToPostMedia(postScope, embedder) {
   containerElem.className="post-file embeddableMedia"
   containerElem.innerHTML = '<span class="post-file-info"></span>' +
   '<div class="post-file-src" data-type="image" attachment="false">' +
-    '<a href="' + embedder.imageHqUrl + '"><img class="file-thumb" src="' + embedder.imageSafeUrl + '" width=120 loading="lazy" preload="no"></a>' +
+    '<a href="' + embedder.imageHqUrl + '"><img class="file-thumb" src="' + embedder.imageSafeUrl + '" width=120 loading="lazy" preload="no" alt="youtube thumbnail"></a>' +
   '</div>'+
   '<span class="post-file-info"></span>'
   var linkElem = containerElem.querySelector('a')
@@ -201,9 +201,6 @@ class playlist {
       return
     }
     // load player api
-    var ytSrcElem = document.createElement('script')
-    ytSrcElem.src = "//www.youtube.com/player_api"
-    navElem.appendChild(ytSrcElem)
     /*
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
@@ -219,6 +216,15 @@ class playlist {
     var ref = this
     plStartElem.onclick = function() {
       // FIXME: close any open embeds
+
+      // set up api once
+      if (!navElem.ytapiLoaded) {
+        var ytSrcElem = document.createElement('script')
+        ytSrcElem.src = "//www.youtube.com/player_api"
+        navElem.appendChild(ytSrcElem)
+        navElem.ytapiLoaded = true
+      }
+
       ref.toggle()
     }
     //plStartElem.href = '#';
