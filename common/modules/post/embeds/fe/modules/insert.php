@@ -14,7 +14,9 @@ $io['safeCom'] = preg_replace('/(?:^|\s)https?:\/\/(:?www\.)?youtu\.be\/([a-zA-Z
 // could could slap an image on here...
 // JS can enhance this further
 $ytUrl = 'https://youtube.com/watch?v=';
+// FIXME: we could communicate with the YT API and get the title
+// though should be store in the db on the BE
 $io['safeCom'] = preg_replace('/\[youtube\]([^\[]+)\[\/youtube\]/i',
-  '<span class="youtube_wrapper"><a rel=nofollow target=_blank href="' . $ytUrl . '\1">' . $ytUrl . '\1</a></span>',
+  '<span class="youtube_wrapper"><a rel="nofollow noreferrer" target=_blank href="' . $ytUrl . '\1" title="YouTube Link">' . $ytUrl . '\1</a></span>',
   $io['safeCom']);
 ?>
