@@ -12,7 +12,7 @@ function getSignupForm($goto = false) {
 
   // force TLS
   // FIXME get named route
-  $secure_signup_link = 'https://' . BASE_HOST . BASE_HREF . 'signup';
+  $secure_signup_link = 'https://' . BASE_HOST . BASE_HREF . 'signup.php';
 
   // set up form
   $formFields = array(
