@@ -29,6 +29,12 @@ if (isset($board_settings['captcha_mode'])) {
   }
 
   if ($enable) {
+    $captchaErr = validate_captcha_field();
+    if ($captchaErr) {
+      $io['error'] = $captchaErr;
+      //return?
+    }
+    /*
     $challenge = $_POST['captcha'];
     //echo "challenge[$challenge]<br>\n";
     if (empty($challenge)) {
@@ -67,6 +73,7 @@ if (isset($board_settings['captcha_mode'])) {
     // success, remove it
     unset($captchas[$captcha_id]);
     $scratch->set('captchas', $captchas);
+    */
   }
 }
 
