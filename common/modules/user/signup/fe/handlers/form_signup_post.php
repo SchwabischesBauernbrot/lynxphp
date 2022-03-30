@@ -9,6 +9,12 @@ if (strlen($pass) < 16) {
   return wrapContent($tmpl . getSignupForm());
 }
 
+$captchaErr = validate_captcha_field();
+if ($captchaErr) {
+  $tmpl = "Error: Sign up error: CAPTCHA error: $captchaErr<br>\n";
+  return wrapContent($tmpl . getSignupForm());
+}
+
 include '../frontend_lib/lib/lib.sodium.php';
 $resp = getVerifiedChallengedSignature($user, $pass);
 if ($resp === false) {
@@ -27,7 +33,7 @@ if ($res === true) {
     // only needed if we ever check HTTP_REFERRER
     redirectTo(BASE_HREF . $_POST['goto']);
   } else {
-    redirectTo(BASE_HREF . 'control_panel');
+    redirectTo(BASE_HREF . 'control_panel.php');
   }
   return;
 }
