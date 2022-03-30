@@ -19,6 +19,7 @@ function getSignupForm($goto = false) {
     'username' => array('type' => 'text', 'label' => 'Username'),
     'password' => array('type' => 'password', 'label' => 'Password (Minimum 16 chars, we recommend using a pass phrase)'),
     'email' => array('type' => 'email', 'label' => 'Recovery Email (Optional, we suggest using a burner/temp one)'),
+    'captcha' => array( 'type' => 'captcha', 'label' => 'Captcha'),
   );
   // FIXME: pipeline
   $formOptions = array_merge(jsChanStyle(), array(
