@@ -68,6 +68,7 @@ require '../frontend_lib/lib/lib.http.php'; // comms lib
 require '../frontend_lib/lib/lib.backend.php'; // comms lib
 ldr_require('../frontend_lib/lib/lib.template.php'); // template functions
 ldr_require('../frontend_lib/lib/lib.handler.php'); // output functions
+require '../frontend_lib/lib/lib.captcha.php'; // load captcha infrastructure
 require '../frontend_lib/lib/lib.files.php'; // file upload functions
 require '../frontend_lib/lib/lib.form.php'; // form helper
 require '../frontend_lib/lib/lib.perms.php'; // permission helper
