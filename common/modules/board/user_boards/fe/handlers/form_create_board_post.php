@@ -16,6 +16,12 @@ if (!empty($res['data'])) {
 }
 */
 
+$captchaErr = validate_captcha_field();
+if ($captchaErr) {
+  $tmpl = "Error: Board creation error: CAPTCHA error: $captchaErr<br>\n";
+  return wrapContent($tmpl . getCreateBoardForm());
+}
+
 // FIXME:
 $result = backendCreateBoard();
 if ($result['data'] === 'ok') {
