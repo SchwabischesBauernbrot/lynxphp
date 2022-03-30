@@ -29,7 +29,7 @@ $res = $pkg->useResource('save_settings', array('logo' => json_encode($files)),
 if ($res['success']) {
   // maybe a js alert?
   echo "Success<br>\n";
-  redirectTo('/admin/settings');
+  redirectTo('/admin/settings.html');
 } else {
   wrapContent('Something went wrong...' . print_r($res, 1));
 }

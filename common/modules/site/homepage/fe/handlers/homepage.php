@@ -50,7 +50,7 @@ if (!empty($settings['site']['logo'])) {
 
 $tags = array(
   'siteName' => empty($settings['site']['siteName']) ? 'New PHPLynx Site' : $settings['site']['siteName'],
-  'slogan' => empty($settings['site']['slogan']) ? 'Go into <a href="admin/settings">Account > Admin interface > Settings</a> to set Name/Slogan' : $settings['site']['slogan'],
+  'slogan' => empty($settings['site']['slogan']) ? 'Go into <a href="admin/settings.html">Account > Admin interface > Settings</a> to set Name/Slogan' : $settings['site']['slogan'],
   'logoURL' => $logoURL,
   'logoAlt' => $logoAlt,
   'logoW' => $logoW,
