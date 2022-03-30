@@ -22,8 +22,8 @@ function getAccountPortalNav() {
   global $BASE_HREF;
   // FIXME get named route
   $navItems = array(
-    'Change username/password' => $BASE_HREF . 'account/change_userpass',
-    'Change recovery email' => $BASE_HREF . 'account/change_email',
+    'Change username/password' => $BASE_HREF . 'account/change_userpass.html',
+    'Change recovery email' => $BASE_HREF . 'account/change_email.html',
   );
   // FIXME: pipeline
   return getNav($navItems);
