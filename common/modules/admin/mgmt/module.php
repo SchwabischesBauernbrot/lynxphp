@@ -43,6 +43,17 @@ return array(
         'params' => 'postdata',
       ),
     ),
+    array(
+      'name' => 'deleteuser',
+      'params' => array(
+        'endpoint' => 'opt/admin/users/:id',
+        'method' => 'DELETE',
+        'unwrapData' => true,
+        'requireSession'=> true,
+        //'requires' => array('groups'),
+        //'params' => 'postdata',
+      ),
+    ),
   ),
 );
 ?>
