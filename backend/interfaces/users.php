@@ -91,6 +91,8 @@ function isUserPermitted($user_id, $permission, $target = false) {
 
 function deleteUser($userid) {
   global $db, $models;
+  // FIXME: sessions? usergroups? auth_challenges (on pubkey)?
+  // boards? I don't think we should...
   return $db->deleteById($models['user'], $userid);
 }
 
