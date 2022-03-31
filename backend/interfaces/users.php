@@ -89,6 +89,11 @@ function isUserPermitted($user_id, $permission, $target = false) {
   return $access;
 }
 
+function deleteUser($userid) {
+  global $db, $models;
+  return $db->deleteById($models['user'], $userid);
+}
+
 // I guess we moved these out?
 function verifyChallengedSignatureHandler() {
   if (!hasPostVars(array('chal', 'sig'))) {
