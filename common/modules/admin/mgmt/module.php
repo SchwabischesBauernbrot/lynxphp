@@ -54,6 +54,24 @@ return array(
         //'params' => 'postdata',
       ),
     ),
-  ),
+    array(
+      'name' => 'boards_list',
+      'params' => array(
+        'endpoint' => 'opt/admin/boards',
+        'unwrapData' => true,
+        'requireSession'=> true,
+      ),
+    ),
+    array(
+      'name' => 'boards_delete',
+      'params' => array(
+        'endpoint' => 'opt/admin/boards/:id',
+        'method' => 'DELETE',
+        'unwrapData' => true,
+        'requireSession'=> true,
+        //'requires' => array('groups'),
+        //'params' => 'postdata',
+      ),
+    ),  ),
 );
 ?>
