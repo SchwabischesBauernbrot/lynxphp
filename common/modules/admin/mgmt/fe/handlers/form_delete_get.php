@@ -26,9 +26,13 @@ $groups = $pkg->useResource('listgroups');
 
 $adminPortalHdr = renderAdminPortal();
 
+print_r($user);
+
 $tmpl = '<form action="' . $params['action'] . '" method="POST">';
 $tmpl .= '<input type=hidden name=userid value="' . $user['userid'] . '">';
-$tmpl .= 'Username: ' . $user['username'] . "<br>\n";
+$tmpl .= 'UserID: ' . $user['userid'] . "<br>\n";
+$tmpl .= 'Created: ' . $user['created_at'] . "<br>\n";
+$tmpl .= 'Public key: ' . $user['publickey'] . "<br>\n";
 $tmpl .= 'Groups: ' . $user['groupnames'] . "<br>\n";
 /*
 $tmpl .= 'Groups:<ul>';
