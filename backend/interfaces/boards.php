@@ -690,4 +690,10 @@ function getBoardPostCount($boardUri, $posts_model) {
   return $postCount;
 }
 
+function deleteBoard($boardid) {
+  global $db, $models;
+  // FIXME: posts? files?
+  return $db->deleteById($models['board'], $boardid);
+}
+
 ?>
