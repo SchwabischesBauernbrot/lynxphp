@@ -1,0 +1,31 @@
+<div class="catalog">
+  {{searchForm}}
+</div>
+<div class="catalog">
+  <!-- a href="admin/users/board">Add board</a><br -->
+  <table>
+    <tr>
+      <td>uri
+      <td>title
+      <td>posts
+      <td>created
+      <td>updated
+      <td>&nbsp;
+{{boards}}
+  </table>
+</div>
+<a href="admin.php">Back to Admin</a>
+<!-- loop -->
+
+<tr>
+<th>{{uri}}
+<th>{{title}}
+<td>{{posts}}
+<td>{{created_at}}
+<td>{{updated_at}}
+<td><a href="admin/boards/{{id}}/delete.html">X</a>
+
+<!-- end -->
+<!-- loop -->
+
+<!-- end -->
