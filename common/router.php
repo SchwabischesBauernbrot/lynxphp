@@ -552,6 +552,8 @@ class Router {
     foreach($methods as $cond => $func) {
       //echo "rule[$cond]<br>\n";
       if ($path === $cond) {
+        // kill warning
+        if (!isset($this->routeOptions[$method . '_' . $cond])) $this->routeOptions[$method . '_' . $cond] = false;
         return array(
           'match' => array(
             'cond' => $cond, 'params' => array(), 'func' => $func,
