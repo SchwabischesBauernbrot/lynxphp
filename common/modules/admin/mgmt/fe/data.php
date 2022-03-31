@@ -7,10 +7,15 @@ return array(
         'route'   => '/admin/users',
         'handler' => 'list',
       ),
+      // search
       array(
         'route'   => '/admin/users',
         'method'  => 'POST',
         'handler' => 'list',
+      ),
+      array(
+        'route'   => '/admin/boards',
+        'handler' => 'boards_list',
       ),
     ),
     'forms' => array(
@@ -28,6 +33,10 @@ return array(
       array(
         'route' => '/admin/users/:id/delete',
         'handler' => 'delete',
+      ),
+      array(
+        'route' => '/admin/boards/:id/delete',
+        'handler' => 'boards_delete',
       ),
     ),
     'modules' => array(
