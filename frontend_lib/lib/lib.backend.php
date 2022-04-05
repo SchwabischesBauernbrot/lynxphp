@@ -120,15 +120,18 @@ function expectJson($json, $endpoint = '', $options = array()) {
     exit(1);
     return false;
   }
-  // meta processing?
+  // meta processing
   if (!empty($obj['meta'])) {
     if (isset($obj['meta']['board'])) {
       global $boardData;
       $boardData = $obj['meta']['board'];
+      if (isset($obj['meta']['board']['settings'])) {
+        global $board_settings;
+        $board_settings = $obj['meta']['board']['settings'];
+      }
     }
-    if (isset($obj['meta']['board']['settings'])) {
-      global $board_settings;
-      $board_settings = $obj['meta']['board']['settings'];
+    if (isset($obj['meta']['setCookie'])) {
+      setcookie($obj['meta']['setCookie']['name'], $obj['meta']['setCookie']['value'], $obj['meta']['setCookie']['ttl'], '/');
     }
     if (DEV_MODE) {
       if ($obj['meta']['code'] === 404) {
@@ -297,6 +300,7 @@ function backendRegister($chal, $sig, $email = '') {
     return;
   }
   // session/ttl/upgradedAccount
+  // FIXME: meta.setCookie
   if (!empty($res['data']['session'])) {
     setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
     return true;
@@ -320,6 +324,7 @@ function backendLogin($user, $pass) {
     // FIXME: ttl?
     // looks like 1 hour, supposed to renew every minute...
     //if (isset($res['data']['ttl'])) {
+    // FIXME: meta.setCookie
       setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
     /*
     } else {
@@ -347,6 +352,7 @@ function backendVerify($chal, $sig, $user = '', $pass = '') {
   }
   // session/ttl/upgradedAccount
   if (!empty($res['data']['session'])) {
+    // FIXME: meta.setCookie
     setcookie('session', $res['data']['session'], $res['data']['ttl'], '/');
     //redirectTo('control_panel.php');
   }
