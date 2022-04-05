@@ -1032,7 +1032,7 @@ input:invalid, textarea:invalid {
 .nav-item {
   line-height: 3em;
   text-decoration: none;
-  float: left;
+  /* float: left; */
   padding-left: 10px;
   padding-right: 10px;
   text-align: center;
