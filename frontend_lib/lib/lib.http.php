@@ -46,11 +46,9 @@ function request($options = array()) {
 
   // workaround curlHelper compatibility (in at least consume_beRsrc)
   if ($headers === '') $headers = array();
-  //echo "headers[", gettype($headers), "][", print_r($headers, 1), "]<br>\n";
   if (count($headers)) {
     $header = $headers;
   }
-  //echo "http::request - url[$url] method[$method]\n";
   return curlHelper($url, $body, $header, $user, $pass, $method);
 }
 
@@ -72,7 +70,6 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   } else {
     $fields_string = $fields;
   }
-  //echo "curlHelper - fields[", gettype($fields_string), "] method[$method]<br>\n";
 
   if (!function_exists('curl_init')) {
     echo "PHP does not have the curl extension installed<br>\n";
@@ -187,7 +184,7 @@ function curl_log_report() {
     echo $l['trace'];
     echo '<details>';
     echo '  <summary>Response</summary>', "\n";
-    if (isset($l['result']) && $l['result'][0] === '[' || $l['result'][0] === '{') {
+    if (isset($l['result']) && ($l['result'][0] === '[' || $l['result'][0] === '{')) {
       echo '  <pre>', htmlspecialchars(json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT)), '</pre>', "\n";
     } else {
       if ($l['method'] === 'HEAD') {
@@ -211,7 +208,7 @@ function curl_log_report() {
         echo '</table>';
         //echo '  <pre>', htmlspecialchars(print_r($headers, 1)), '</pre>', "\n";
       } else {
-        echo '  <pre>', htmlspecialchars($l['result']), '</pre>', "\n";
+        echo '  [', $l['result'][0], ']<pre>', htmlspecialchars($l['result']), '</pre>', "\n";
       }
     }
     echo '</details>';
