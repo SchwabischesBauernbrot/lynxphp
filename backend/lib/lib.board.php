@@ -23,7 +23,10 @@ getBoardSettingForm($uri)
 // getBoardUri to updateBoard URI, should create an object...
 // and bitch if it's held too long...
 // needs to return ID
+// what's the difference between this and getBoard?
+// well getBoard doesn't include boardid which somethings use
 function getBoardByUri($boardUri) {
+  /*
   global $db, $models;
   $res = $db->find($models['board'], array('criteria'=>array(
       array('uri', '=', $boardUri),
@@ -40,6 +43,22 @@ function getBoardByUri($boardUri) {
       //echo "decoded[", print_r($row['json'], 1), "]<br>\n";
     }
   }
+  */
+  // definitely include the settings from json field
+  //$boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
+
+  $row = getBoardRaw($boardUri);
+  $json = json_decode($row['json'], true);
+  unset($row['json']);
+  $field = 'settings';
+  if (isset($json[$field])) {
+    $row[$field] = $json[$field];
+  } else {
+    // most are arrays
+    $row[$field] = array();
+  }
+
+  // don't worry about error handling
   return $row;
 }
 
