@@ -26,7 +26,8 @@ $post = array(
   'deleted' => 0,
 );
 
-// is board locked?
+// FIXME: is board locked?
+// is thread locked?
 global $pipelines;
 $reply_allowed_io = array(
   'p'       => $post,
@@ -38,29 +39,47 @@ if (!$reply_allowed_io['allowed']) {
   return sendResponse(array(), 200, 'Reply is not allowed');
 }
 
-// make sure threadId exists...
-$id = $db->insert($posts_model, array($post));
-$data = (int)$id;
-$issues = processFiles($boardUri, $_POST['files'], $threadid, $id);
+// FIXME: make sure threadId exists...
 
+$newpost_process_io = array(
+  'p'            => $post,
+  'boardUri'     => $boardUri,
+  'files'        => $_POST['files'],
+  'addToPostsDB' => true,
+  'processFilesDB' => true,
+  'bumpBoard' => true,
+  'bumpThread' => true,
+  'returnId' => true,
+);
+$pipelines[PIPELINE_NEWPOST_PROCESS]->execute($newpost_process_io);
 
-// bump board
-$urow = array('last_post' => (int)$now);
-$db->update($models['board'], $urow, array('criteria'=>array(
-  array('uri', '=', $boardUri),
-)));
+if ($newpost_process_io['addToPostsDB']) {
+  $post = $newpost_process_io['p']; // update post
 
-// bump thread
-$urow = array();
-$db->update($posts_model, $urow, array('criteria'=>array(
-  array('postid', '=', $threadid),
-)));
+  $id = $db->insert($posts_model, array($post));
+  $data = (int)$id;
+  $issues = processFiles($boardUri, $_POST['files'], $threadid, $id);
 
-if (count($issues)) {
-  return sendResponse(array(
-    'issues' => $issues,
-    'id' => $data
-  ));
+  // bump board
+  $urow = array('last_post' => (int)$now);
+  $db->update($models['board'], $urow, array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
+
+  // bump thread
+  $urow = array();
+  $db->update($posts_model, $urow, array('criteria'=>array(
+    array('postid', '=', $threadid),
+  )));
+
+  if (count($issues)) {
+    return sendResponse(array(
+      'issues' => $issues,
+      'id' => $data
+    ));
+  }
+
+  sendResponse($data);
+} else {
+  sendResponse($newpost_process_io['returnId']);
 }
-
-sendResponse($data);

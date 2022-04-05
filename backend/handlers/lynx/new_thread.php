@@ -8,10 +8,10 @@ if (!hasPostVars(array('boardUri', 'files'))) {
 }
 $user_id = (int)getUserID();
 $boardUri = $_POST['boardUri'];
-$posts_model = getPostsModel($boardUri);
-$id = $db->insert($posts_model, array(array(
+$threadid = 0;
+$post = array(
   // noFlag, email, password, captcha, spoiler, flag
-  'threadid' => 0,
+  'threadid' => $threadid,
   'resto' => 0,
   'name' => getOptionalPostField('name'),
   'sub'  => getOptionalPostField('subject'),
@@ -23,15 +23,37 @@ $id = $db->insert($posts_model, array(array(
   'capcode' => '',
   'country' => '',
   'deleted' => 0,
-)));
-processFiles($boardUri, $_POST['files'], $id, $id);
+);
 
-// bump board
-$inow = (int)$now;
-$urow = array('last_thread' => $inow, 'last_post' => $inow);
-$db->update($models['board'], $urow, array('criteria'=>array(
-  array('uri', '=', $boardUri),
-)));
+global $pipelines;
+$newpost_process_io = array(
+  'p'            => $post,
+  'files'        => $_POST['files'],
+  'boardUri'     => $boardUri,
+  'addToPostsDB' => true,
+  'processFilesDB' => true,
+  'bumpBoard' => true,
+  'bumpThread' => true,
+  'returnId' => true,
+);
+$pipelines[PIPELINE_NEWPOST_PROCESS]->execute($newpost_process_io);
 
-$data = (int)$id;
-sendResponse($data);
+if ($newpost_process_io['addToPostsDB']) {
+  $post = $newpost_process_io['p']; // update post
+
+  $posts_model = getPostsModel($boardUri);
+  $id = $db->insert($posts_model, array($post));
+  processFiles($boardUri, $_POST['files'], $id, $id);
+
+  // bump board
+  $inow = (int)$now;
+  $urow = array('last_thread' => $inow, 'last_post' => $inow);
+  $db->update($models['board'], $urow, array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
+
+  $data = (int)$id;
+  sendResponse($data);
+} else {
+  sendResponse($newpost_process_io['returnId']);
+}
