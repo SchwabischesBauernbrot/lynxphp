@@ -22,6 +22,8 @@ $row = wrapContentData();
 wrapContentHeader($row);
 echo "Please wait...";
 
+//print_r($_POST);
+
 $res = $pkg->useResource('save_settings', array('boardUri' => $boardUri),
   array('addPostFields' => $_POST)
 );
@@ -29,7 +31,7 @@ $res = $pkg->useResource('save_settings', array('boardUri' => $boardUri),
 // only place in the system where the boardUri changes
 $boardUri = $_POST['uri'];
 
-if ($res['success']) {
+if ($res['success'] && $res['success'] !== 'false') {
   // maybe a js alert?
   echo "Success<br>\n";
   //wrapContentFooter($row);
