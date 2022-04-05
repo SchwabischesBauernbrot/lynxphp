@@ -6,7 +6,7 @@
 // FIXME: refactor this out
 // or make it simpler on the router/middleware...
 // new name suggestion: boardExistsMiddleware ?
-function boardMiddleware($request) {
+function boardMiddleware($request, $options = false) {
   $boardUri = getQueryField('boardUri');
   if (!$boardUri) {
     sendResponse(array(), 400, 'No boardUri passed');
@@ -16,6 +16,16 @@ function boardMiddleware($request) {
   if (!$boardData) {
     sendResponse(array(), 404, 'Board does not exist');
     return;
+  }
+
+  extract(ensureOptions(array(
+    'getPageCount' => false,
+  ), $options));
+  if ($getPageCount) {
+    $posts_model = getPostsModel($boardUri);
+    $threadCount = getBoardThreadCount($boardUri, $posts_model);
+    global $tpp;
+    $boardData['pageCount'] = ceil($threadCount/$tpp);
   }
   return $boardData;
 }
