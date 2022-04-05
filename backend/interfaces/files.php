@@ -349,6 +349,7 @@ function make_audio_thumbnail_ffmpeg($filePath, $width, $height, $duration = 1) 
   return true;
 }
 
+// might be a big delay between upload and this call
 function processFiles($boardUri, $files_json, $threadid, $postid) {
   $issues = array();
   $files = json_decode($files_json, true);
@@ -424,7 +425,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       // FIXME: get sizes
     }
     if ($isAudio) {
-      // FIXME: wHat are we using?
+      // FIXME: What are we using?
     }
 
     // calculate thumbnail size
