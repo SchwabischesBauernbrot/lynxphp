@@ -50,7 +50,7 @@ EOB;
     // need $row
     $row = wrapContentData(array()); echo wrapContentGetHeadHTML($row, true); $sentHead = true;
     echo '<!-- lib.handler::sendBump [', $req_method, '][', $req_path, '] -->';
-    echo '<div style="height: 40px;"></div>', "\n"; flush();
+    echo '<div style="height: 50px;"></div>', "\n"; flush();
     $sentBump = true;
   }
 }
