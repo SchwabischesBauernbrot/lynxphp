@@ -10,6 +10,7 @@ function tagify($tag) {
 
 function replace_tags($template, $tags) {
   if (!is_string($template)) {
+    // we need to be able to inform what file...
     echo "lib.template::replace_tags - Template isn't an string\n";
     return $template;
   }
