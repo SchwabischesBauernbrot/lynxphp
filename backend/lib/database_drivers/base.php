@@ -10,6 +10,7 @@ interface database_driver_base {
   public function insert($rootModel, $recs);
   // options.criteria
   public function update($rootModel, $urow, $options);
+  // options.criteria
   public function delete($rootModel, $options);
   // options
   //   fields = if not set, give all fields, else expect an array
@@ -101,7 +102,7 @@ class database_driver_base_class {
           $one = $alias . $left;
         }
         $operand = $set[1];
-        if (strtoupper($operand) === 'IN') {
+        if (strtoupper($operand) === 'IN' || strtoupper($operand) === 'NOT IN') {
           // list operands
           if (!is_array($set[2])) {
             // auto promote to array or abort?
@@ -534,6 +535,7 @@ class database_driver_base_class {
     );
     return $this->update($rootModel, $row, $options);
   }
+  // could we take an array of IDs?
   public function deleteById($rootModel, $id, $options = false) {
     $tableName = modelToTableName($rootModel);
     $id = (int)$id;
