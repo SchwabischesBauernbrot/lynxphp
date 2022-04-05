@@ -15,6 +15,7 @@ function snippet($text, $size = 10, $tail='...') {
 // would be handy to have this in JS for dynamic content
 // js can't hook into the pipeline system, so it can't render the same
 // well JS can use the ajax endpoints to pull it
+// see preview stuff...
 function renderPost($boardUri, $p, $options = false) {
   global $pipelines;
 
@@ -23,11 +24,11 @@ function renderPost($boardUri, $p, $options = false) {
   // unpack options
   extract(ensureOptions(array(
     'checkable'  => false,
-    'postCount'  => false,
-    'topReply' => false,
+    'postCount'  => false, // for omit & pipeline (actions)
     'noOmit'   => false,
-    'inMixedBoards' => false,
-    'firstThread' => false,
+    //'topReply' => false, // related to noOmit
+    //'inMixedBoards' => false, // ?
+    'firstThread' => false, // for adjusting loading=lazy
   ), $options));
 
   //$isBO = perms_isBO($boardUri);
@@ -188,6 +189,9 @@ function renderPost($boardUri, $p, $options = false) {
     // file_count
     //echo "<pre>thread[", print_r($p, 1), "]</pre>\n";
 
+    // warning?
+    if ($postCount === false) $postCount = 0;
+
     // total - rpp
     $rOmitted = $postCount - 5;
     if ($rOmitted < 0) $rOmitted = 0;
@@ -197,7 +201,7 @@ function renderPost($boardUri, $p, $options = false) {
       $add_html = '';
       $threadUrl = '/' . $boardUri . '/thread/' . $threadId . '_inline.html';
       $expandUrl = $threadUrl;
-      if ($topReply) {
+      //if ($topReply) {
         //while we can, we shouldn't...
         //$expandUrl .= '#' . $topReply;
         // didn't work because the anchor is only set on the iframe
@@ -210,7 +214,7 @@ function renderPost($boardUri, $p, $options = false) {
         </style>
         ';
         */
-      }
+      //}
 
       $omit_tags = array(
         'replies_omitted' => $rOmitted ? $rOmitted : '',
@@ -223,70 +227,72 @@ function renderPost($boardUri, $p, $options = false) {
   }
   // tn_w, tn_h aren't enabled yet
   $files_html = '';
-  foreach($p['files'] as $file) {
-    // filename, path, thumbnail_path, mime_type, type, size, w, h
-    // tn_w, tn_h
-    //echo "<pre>file[", print_r($file, 1), "]</pre>\n";
-    $ftmpl = $file_template;
-    // disbale images until we can mod...
-    //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
+  if (isset($p['files']) && is_array($p['files'])) {
+    foreach($p['files'] as $file) {
+      // filename, path, thumbnail_path, mime_type, type, size, w, h
+      // tn_w, tn_h
+      //echo "<pre>file[", print_r($file, 1), "]</pre>\n";
+      $ftmpl = $file_template;
+      // disbale images until we can mod...
+      //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
 
-    // disbale images until we can mod...
-    $path = $file['path'];
-    $ext = pathinfo($file['filename'], PATHINFO_EXTENSION);
-    $noext = str_replace('.'.$ext, '', $file['filename']);
-    // if not an absolute URL
-    if (strpos($path, '://') === false) {
-      $path = BACKEND_PUBLIC_URL . $path;
-    }
-    $majorMimeType = getFileType($file);
-    $fileSha256 = 'f' . uniqid();
-    $thumb   = getThumbnail($file, array(
-      'type' => $majorMimeType, 'alt' => 'thumbnail of ' . $file['filename'],
-      // if a list of threads, any way to tell if this is the first?
-      // && $firstThread
-      'noLazyLoad' => $isOP));
-    $avmedia = getAudioVideo($file, array('type' => $majorMimeType));
-    $shortenSize = 10;
-    if (!empty($file['tn_w'])) {
-      //$shortenSize = max($shortenSize, (int)($file['tn_w'] / 8));
-    } else {
-      // we can make some estimate off the aspect ratio...
-      $w = getThumbnailWidth($file, array('type' => $majorMimeType));
-      //echo "w[$w]<Br>\n";
-      // 154 / 8 = 20190419-_DSF2773.j... ~20 chars
-      $shortenSize = max($shortenSize, (int)($w / 8) - 10);
-    }
-    $tn_w = empty($file['tn_w']) ? 0 : $file['tn_w'];
-    $tn_h = empty($file['tn_h']) ? 0 : $file['tn_h'];
-    $fTags = array(
-      'path' => $path,
-      'expander' => getExpander($thumb, $avmedia, array(
-        'classes' => array('postFile', $majorMimeType),
-        'tn_sz' => array($tn_w, $tn_h),
-        'sz' => array($file['w'], $file['h']),
-        'labelId' => $fileSha256,
-        'styleContentUrl' => $path,
-      )),
-      'fileid' => $fileSha256,
-      'filename' => $file['filename'],
-      'majorMimeType' => $majorMimeType,
-      'shortfilename' => snippet($noext, $shortenSize) . ' ' . $ext,
-      'size' => empty($file['size']) ? 'Unknown' : formatBytes($file['size']),
-      'width' => $file['w'],
-      'height' => $file['h'],
-      'majorMimeType' => $majorMimeType,
-      'thumb' => $thumb,
-      //'viewer' => getViewer($file, array('type' => $majorMimeType)),
-      // not currently used but we'll include it incase they want to do something different
-      'avmedia' => $avmedia,
-      'path' => $path,
-      'tn_w' => $tn_w,
-      'tn_h' => $tn_h,
-    );
+      // disbale images until we can mod...
+      $path = $file['path'];
+      $ext = pathinfo($file['filename'], PATHINFO_EXTENSION);
+      $noext = str_replace('.'.$ext, '', $file['filename']);
+      // if not an absolute URL
+      if (strpos($path, '://') === false) {
+        $path = BACKEND_PUBLIC_URL . $path;
+      }
+      $majorMimeType = getFileType($file);
+      $fileSha256 = 'f' . uniqid();
+      $thumb   = getThumbnail($file, array(
+        'type' => $majorMimeType, 'alt' => 'thumbnail of ' . $file['filename'],
+        // if a list of threads, any way to tell if this is the first?
+        // && $firstThread
+        'noLazyLoad' => $isOP));
+      $avmedia = getAudioVideo($file, array('type' => $majorMimeType));
+      $shortenSize = 10;
+      if (!empty($file['tn_w'])) {
+        //$shortenSize = max($shortenSize, (int)($file['tn_w'] / 8));
+      } else {
+        // we can make some estimate off the aspect ratio...
+        $w = getThumbnailWidth($file, array('type' => $majorMimeType));
+        //echo "w[$w]<Br>\n";
+        // 154 / 8 = 20190419-_DSF2773.j... ~20 chars
+        $shortenSize = max($shortenSize, (int)($w / 8) - 10);
+      }
+      $tn_w = empty($file['tn_w']) ? 0 : $file['tn_w'];
+      $tn_h = empty($file['tn_h']) ? 0 : $file['tn_h'];
+      $fTags = array(
+        'path' => $path,
+        'expander' => getExpander($thumb, $avmedia, array(
+          'classes' => array('postFile', $majorMimeType),
+          'tn_sz' => array($tn_w, $tn_h),
+          'sz' => array($file['w'], $file['h']),
+          'labelId' => $fileSha256,
+          'styleContentUrl' => $path,
+        )),
+        'fileid' => $fileSha256,
+        'filename' => $file['filename'],
+        'majorMimeType' => $majorMimeType,
+        'shortfilename' => snippet($noext, $shortenSize) . ' ' . $ext,
+        'size' => empty($file['size']) ? 'Unknown' : formatBytes($file['size']),
+        'width' => $file['w'],
+        'height' => $file['h'],
+        'majorMimeType' => $majorMimeType,
+        'thumb' => $thumb,
+        //'viewer' => getViewer($file, array('type' => $majorMimeType)),
+        // not currently used but we'll include it incase they want to do something different
+        'avmedia' => $avmedia,
+        'path' => $path,
+        'tn_w' => $tn_w,
+        'tn_h' => $tn_h,
+      );
 
-    $ftmpl = replace_tags($file_template, $fTags);
-    $files_html .= $ftmpl;
+      $ftmpl = replace_tags($file_template, $fTags);
+      $files_html .= $ftmpl;
+    }
   }
 
   $replies_html = '';
