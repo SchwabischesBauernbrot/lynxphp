@@ -26,6 +26,7 @@ function simpleForm($action, $formFields, $button) {
 }
 
 function generateForm($action, $fields, $values, $options = false) {
+  //echo "[", print_r($options, 1), "]<br>\n";
   global $pipelines;
   $labelwrap1 = '';
   $labelwrap2 = '';
@@ -33,41 +34,52 @@ function generateForm($action, $fields, $values, $options = false) {
   $wrapTag  = false;
   $labelTag = 'dt';
   $fieldTag = 'dd';
-  $labelClass  = '';
-  $wrapClass   = '';
-  $formClass   = '';
-  $formId      = '';
-  $postFormTag = '';
-  if (is_array($options)) {
-    if (isset($options['useSections'])) {
-      $listTag = false;
-      $wrapTag = 'section';
-      $labelTag = 'div';
-      $fieldTag = false;
+  extract(ensureOptions(array(
+    'useSections' => false,
+    'labelClass'  => '',
+    'labelwrapclass' => false,
+    'wrapClass'    => '',
+    'labelwrap'    => false,
+    'formClass'    => '',
+    'formId'       => '',
+    'postFormTag'  => '',
+    'buttonLabel'  => 'Update',
+    // do we need more than 2, should there be an array?
+    // display options?
+    'secondAction' => '',
+    'button2Label' => '',
+    'firstAction'  => false,
+    'actionName'   => '',
+  ), $options));
+
+  if ($useSections) {
+    $listTag = false;
+    $wrapTag = 'section';
+    $labelTag = 'div';
+    $fieldTag = false;
+  }
+  if ($labelClass) {
+    $labelClass = ' class="' . $labelClass . '"';
+  }
+  if ($wrapClass) {
+    $wrapClass = ' class="' . $wrapClass . '"';
+  }
+  if ($labelwrap) {
+    $labelwrap1 = '<' . $labelwrap;
+    if ($labelwrapclass) {
+      $labelwrap1 .= ' class="' . $labelwrapclass . '"';
     }
-    if (isset($options['labelClass'])) {
-      $labelClass = ' class="' . $options['labelClass'] . '"';
-    }
-    if (isset($options['wrapClass'])) {
-      $wrapClass = ' class="' . $options['wrapClass'] . '"';
-    }
-    if (isset($options['labelwrap'])) {
-      $labelwrap1 = '<' . $options['labelwrap'];
-      if (isset($options['labelwrapclass'])) {
-        $labelwrap1 .= ' class="' . $options['labelwrapclass'] . '"';
-      }
-      $labelwrap1 .= '>';
-      $labelwrap2 = '</' . $options['labelwrap'] . '>';
-    }
-    if (isset($options['formClass'])) {
-      $formClass = ' class="' . $options['formClass'] . '"';
-    }
-    if (isset($options['formId'])) {
-      $formId = ' id="' . $options['formId'] . '"';
-    }
-    if (isset($options['postFormTag'])) {
-      $postFormTag = $options['postFormTag'] . "\n";
-    }
+    $labelwrap1 .= '>';
+    $labelwrap2 = '</' . $labelwrap . '>';
+  }
+  if ($formClass) {
+    $formClass = ' class="' . $formClass . '"';
+  }
+  if ($formId) {
+    $formId = ' id="' . $formId . '"';
+  }
+  if ($postFormTag) {
+    $postFormTag = $postFormTag . "\n";
   }
   // FIXME: detect multidropfile/image
   $html = '<form' . $formClass . $formId . ' action="' . $action . '" method="post" enctype="multipart/form-data">' . "\n" . $postFormTag;
@@ -170,7 +182,7 @@ function generateForm($action, $fields, $values, $options = false) {
       case 'select':
         $html .= '<select name="' . $field . '">';
         foreach($details['options'] as $v => $l) {
-          $sel  = $v === $value ? 'selected ' : '';
+          $sel  = $v === $value ? ' selected' : '';
           $html .= '<option value="' . $v . '"' . $sel . '>' . $l;
         }
         $html .= '</select>';
@@ -252,15 +264,17 @@ function generateForm($action, $fields, $values, $options = false) {
       $html .= '</' . $wrapTag . '>' . "\n";
     }
   }
-  $buttonLabel = 'Update';
-  if (is_array($options)) {
-    if (isset($options['buttonLabel'])) $buttonLabel = $options['buttonLabel'];
-  }
   if ($listTag) {
     $html.= '</' . $listTag . '>';
   }
+  if ($actionName) {
+    $actionName = ' name="' . $actionName . '"';
+  }
+  $secondButton = $secondAction ? '<button type=submit' . $actionName . ' value="' . $secondAction . '">' . $button2Label . '</button>' : '';
+  $firstButton = $firstAction ? '<button type=submit' . $actionName . ' value="' . $firstAction . '">' . $buttonLabel . '</button>' : '<input type=submit value="' . $buttonLabel . '">';
   $html .= '
-    <input type=submit value="' . $buttonLabel . '">
+    ' . $firstButton . '
+    ' . $secondButton . '
   </form>';
   return $html;
 }
