@@ -13,7 +13,7 @@ function createSession($userid) {
   }
   $id = $db->insert($models['session'], array(array(
     'session' => $session,
-    'user_id' => $userid,
+    'user_id' => (int)$userid, // (postgres) requires it to be an int
     'expires' => $ttl,
     'ip'      => getip(),
   )));
@@ -66,8 +66,13 @@ function ensureSession($userid = 0) {
     // create a session...
     $ses = createSession($userid);
     if (!$ses) {
-      return sendResponse(array(), 500, 'Could not create session');
+      sendResponse2(array(), array(
+        'code' => 500,
+        'err' => 'Could not create session',
+      )); // returns true
+      return false; // have to return something falish
     }
+    // info any future calls we have one
     $_SERVER['HTTP_SID'] = $ses['session'];
     // normalize
     $sesRow = getSession();
@@ -80,7 +85,7 @@ function ensureSession($userid = 0) {
 // get user from session
 function getUserID() {
   $sesRow = getSession();
-  if (!$sesRow) return $sesRow;
+  if (!$sesRow) return $sesRow; // pass error through
   return $sesRow['user_id'];
 }
 
@@ -90,13 +95,19 @@ function loggedIn() {
   $userid = getUserID();
   if ($userid === 0) {
     // expired
-    sendResponse(array(), 401, 'No Session');
-    return;
+    sendResponse2(array(), array(
+      'code' => 401,
+      'err' => 'No Session',
+    )); // returns true
+    return false; // have to return something falish
   }
   if (!$userid) {
     // session does not exist
-    sendResponse(array(), 401, 'Invalid Session');
-    return;
+    sendResponse2(array(), array(
+      'code' => 401,
+      'err' => 'Invalid Session',
+    ));
+    return false; // have to return something falish
   }
   return $userid;
 }
