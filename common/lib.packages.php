@@ -266,6 +266,9 @@ class package {
       } else
       if (substr($endpoint, 0, 5) === 'lynx/') {
         $router = 'lynx';
+      } else
+      if (substr($endpoint, 0, 11) === 'doubleplus/') {
+        $router = 'doubleplus';
       }
       // requires the router name matches the route prefix
       $rsrc['endpoint'] = str_replace($router, '', $rsrc['endpoint']);
