@@ -83,53 +83,64 @@ $votes = $db->toArray($res);
 // might be better to do it in a worker
 // we could report error to admin
 
-if (count($votes) > 2) {
+$consensus = 2;
 
-  /*
-  // get post/files data
-  $qp = $db->findById($models['post_queue'], $queueid);
-  // queueid, post, json, created_at, updated_at, type, board_uri,
-  // files, thread_id
-  //print_r($qp);
-  // insert into board posts
-  $boardUri = $qp['board_uri']; // just incase we voted across boards
-  $post = json_decode($qp['post'], true);
+$sc = 0;
+if (count($votes) > $consensus) {
+  //print_r($votes);
+  foreach($votes as $v) {
+    $sc += $v['bet'];
+  }
+  $okToNuke = true;
+  if ($sc > ($consensus/2)) {
+    // passed
+    // get post/files data
+    $qp = $db->findById($models['post_queue'], $queueid);
+    // queueid, post, json, created_at, updated_at, type, board_uri,
+    // files, thread_id
+    //print_r($qp);
+    // insert into board posts
+    $boardUri = $qp['board_uri']; // just incase we voted across boards
+    $post = json_decode($qp['post'], true);
 
-  //echo "boardUri[$boardUri] post[$post]<br>\n";
-  $posts_model = getPostsModel($boardUri);
-  $id = 0;
-  if ($posts_model && $post) {
-    $id = $db->insert($posts_model, array($post));
+    //echo "boardUri[$boardUri] post[$post]<br>\n";
+    $posts_model = getPostsModel($boardUri);
+    $id = 0;
+    if ($posts_model && $post) {
+      $id = $db->insert($posts_model, array($post));
 
-    // handle files
-    processFiles($boardUri, $qp['files'], $qp['thread_id'] ? $qp['thread_id'] : $id, $id);
+      // handle files
+      processFiles($boardUri, $qp['files'], $qp['thread_id'] ? $qp['thread_id'] : $id, $id);
 
-    // bump board
-    global $now;
-    $inow = (int)$now;
-    $urow = array('last_thread' => $inow, 'last_post' => $inow);
-    $db->update($models['board'], $urow, array('criteria' => array(
-      'uri' => $boardUri,
-    )));
-
-    if ($qp['thread_id']) {
-      // bump thread
-      $urow = array();
-      $db->update($posts_model, $urow, array('criteria'=>array(
-        'postid' => $qp['thread_id'],
+      // bump board
+      global $now;
+      $inow = (int)$now;
+      $urow = array('last_thread' => $inow, 'last_post' => $inow);
+      $db->update($models['board'], $urow, array('criteria' => array(
+        'uri' => $boardUri,
       )));
-    }
 
-    if (1) {
-      // delete from queue
-      $db->deleteById($models['post_queue'], $queueid);
-      // delete all votes from db
-      $db->delete($models['post_queue_vote'], array(
-        'criteria' => array('post_queueid' => $queueid)
-      ));
+      // do we need to bump thread?
+      if ($qp['thread_id']) {
+        // bump thread
+        $urow = array();
+        $db->update($posts_model, $urow, array('criteria'=>array(
+          'postid' => $qp['thread_id'],
+        )));
+      }
+    } else {
+      // an honest attempt hasn't been made yet...
+      $okToNuke = false;
     }
   }
-  */
+  if ($okToNuke) {
+    // delete from queue
+    $db->deleteById($models['post_queue'], $queueid);
+    // delete all votes from db
+    $db->delete($models['post_queue_vote'], array(
+      'criteria' => array('queueid' => $queueid)
+    ));
+  }
 }
 
 sendResponse2(array(
@@ -138,6 +149,8 @@ sendResponse2(array(
   'queueid' => $queueid,
   'created' => $id,
   'boardUri' => $boardUri,
+  'sc'    => $sc,
+  'votes' => $votes,
 ));
 
 ?>
