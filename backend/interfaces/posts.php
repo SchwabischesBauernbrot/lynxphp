@@ -32,10 +32,10 @@ function postDBtoAPI(&$row) {
     return $f5 !== 'file_' && $f5 !== 'post_';
   }, ARRAY_FILTER_USE_BOTH);
 
-  $row['no'] = $row['postid'];
+  $row['no'] = empty($row['postid']) ? 0 : $row['postid'];
   unset($row['postid']);
 
-  $data = json_decode($row['json'], true);
+  $data = empty($row['json']) ? array() : json_decode($row['json'], true);
 
   // FIXME: pipeline
   if (empty($data['cyclic'])) {
