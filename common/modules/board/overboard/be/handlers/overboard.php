@@ -1,8 +1,9 @@
-    <?php
+<?php
 $params = $get();
 
 // we have to look at ALL threads
 $boards = listBoards();
+// if there are a ton of boards this will be really slow...
 $threadTimes = array();
 foreach($boards as $i => $b) {
   //echo "<pre>b[", print_r($b, 1), "]</pre>\n";
