@@ -9,7 +9,7 @@ if (!$boardUri) return;
 $values = $pkg->useResource('list', array('boardUri' => $boardUri));
 
 global $pipelines;
-$fields = $shared['fields']; // imported from fe/common.php
+$fields = $shared['fields']; // imported from shared.php
 
 // handle hooks for additional settings
 $pipelines[PIPELINE_BOARD_SETTING_GENERAL]->execute($fields);
