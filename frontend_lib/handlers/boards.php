@@ -549,6 +549,10 @@ function makePostHandler($request) {
     if ($result && is_array($result) && isset($result['data']) && is_numeric($result['data'])) {
       // success
       redirectTo($redir);
+    } else
+    if ($result && is_array($result) && isset($result['data']) && is_array($result['data']) && $result['data']['status'] === 'queued') {
+      // success (queued)
+      redirectTo($redir);
     } else {
       // valid json
       if ($result['data'] === 'Expired captcha.' || $result['data'] === 'Wrong captcha.') {
