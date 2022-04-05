@@ -77,16 +77,20 @@ $routeConfig = array(
   '4chan' => '4chan',
   'lynx'  => 'lynxchan_minimal',
   'opt'   => 'opt',
+  'doubleplus' => 'doubleplus',
 );
 
 function buildRouters($routeConfig) {
+  global $router;
+
   $routers = array();
   foreach($routeConfig as $n => &$f) {
-    $router = &$routers[$n];
-    $router = new BackendRouter;
+    $r = &$routers[$n];
+    $r = new BackendRouter;
     // we could put them all in one group
-    $router->import(include 'routes/' . $f . '.php');
-    unset($router);
+    $r->import(include 'routes/' . $f . '.php');
+    $router->all('/' . $n . '/*', $r);
+    unset($r);
   }
   unset($f); // break link
   return $routers;
@@ -104,9 +108,12 @@ include 'interfaces/files.php';
 include 'interfaces/sessions.php';
 include 'interfaces/settings.php';
 
+/*
 $router->all('/4chan/*', $routers['4chan']);
 $router->all('/lynx/*', $routers['lynx']);
 $router->all('/opt/*', $routers['opt']);
+$router->all('/doubleplus/*', $routers['doubleplus']);
+*/
 
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 $req_path   = getServerField('PATH_INFO');
@@ -181,6 +188,8 @@ function sendResponse2($data, $options = array()) {
   // on a 304 check
   //$filesize = strlen($output);
   echo $output;
+  // why true? we don't have a false condition
+  // and then we can't short return if desired for false
   return true;
 }
 
