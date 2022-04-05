@@ -11,8 +11,9 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'isThread'  => false,
     'threadNum' => 0,
     'noBoardHeaderTmpl' => false,
-    'threadClosed' => false,
-    'maxMessageLength' => false,
+    'threadClosed'      => false,
+    'maxMessageLength'  => false,
+    'boardSettings'     => false,
   ), $options));
 
   $templates = loadTemplates('mixins/board_header');
@@ -21,18 +22,32 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   $pageLink_tmpl     = $templates['loop1'];
   //$boardNavLink_tmpl  = $templates['loop2'];
 
-  $navItems = array(
-    '[Index]' => '{{uri}}/',
-    '[Catalog]' => '{{uri}}/catalog.html',
+  // would be nice to have the board settings by here
+  // so we can pass it in to control/hint the nav
+  if ($boardSettings === false) {
+    if (DEV_MODE) {
+      echo "No boardSettings passed to renderBoardPortalData<Br>\n";
+    }
+    $boardData = getBoard($boardUri);
+    $boardSettings = $boardData['settings'];
+    //print_r($boardSettings);
+  }
+  $nav_io = array(
+    'boardUri' => $boardUri,
+    'boardSettings' => $boardSettings,
+    'navItems' => array(
+      '[Index]' => $boardUri . '/',
+      '[Catalog]' => $boardUri . '/catalog.html',
+    ),
   );
-  $pipelines[PIPELINE_BOARD_NAV]->execute($navItems);
+  $pipelines[PIPELINE_BOARD_NAV]->execute($nav_io);
 
-  $nav_html = getNav($navItems, array(
+  $nav_html = getNav($nav_io['navItems'], array(
     'list' => false,
     // handle no pages...
     //'selected' => $pageCount ? $selected : NULL,
     'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
-    'replaces' => array('uri' => $boardUri),
+    //'replaces' => array('uri' => $boardUri),
     // do it in the template
     //'prelabel' => '[',
     //'postlabel' => ']',
@@ -184,6 +199,22 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
 // this isn't chainable
 // it doesn't return a str
 function getBoardPortal($boardUri, $boardData = false, $options = false) {
+  //echo "[", print_r($boardData, 1), "]";
+  //echo "options[", print_r($options, 1), "]";
+  // auto-optimize if we can
+  if (!isset($options['boardSettings'])) {
+    // I think we need to deprecate this one...
+    /*
+    if (isset($boardData['json']['settings'])) {
+      //echo "json fixing<br>\n";
+      $options['boardSettings'] = $boardData['json']['settings'];
+    } else
+    */
+    if (isset($boardData['settings'])) {
+      //echo "fixing<br>\n";
+      $options['boardSettings'] = $boardData['settings'];
+    }
+  }
   $row = renderBoardPortalData($boardUri, $boardData['pageCount'], $options);
   return array(
     'header' => renderBoardPortalHeaderEngine($row, $boardUri, $boardData),
