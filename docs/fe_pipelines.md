@@ -6,7 +6,10 @@ PIPELINE_BOARD_FOOTER_TMPL
   *tags
     tag => value
 PIPELINE_BOARD_NAV
-  *Label => url (or array of URLs, first one is linked)
+  boardUri
+  boardSettings
+  navItems
+    *Label => url (or array of URLs, first one is linked)
 PIPELINE_BOARD_STICKY_NAV*
   html string
 PIPELINE_BOARD_DETAILS_TMPL
