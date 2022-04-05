@@ -1,9 +1,6 @@
 <?php
 
-// FIXME: we need access to package
 $params = $getModule();
 
-// io is navItems
-$io['[Logs]'] = '{{uri}}/logs.html';
-
+$io['navItems']['[Logs]'] = $io['boardUri'] . '/logs.html';
 ?>
