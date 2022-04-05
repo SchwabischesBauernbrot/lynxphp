@@ -308,7 +308,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     $res = pg_query($this->conn, $sql);
     $err = pg_last_error($this->conn);
     if ($err) {
-      echo "pgsql::update - err[$err]<br>\n";
+      echo "pgsql::update - err[$err]<br>\nsql[$sql]<br>\n";
       return false;
     }
     if ($rootModel['name'] !== 'table_tracker') {
