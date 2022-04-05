@@ -1,3 +1,11 @@
+PIPELINE_NEWPOST_PROCESS - controls what happens to new posts
+  p (post)
+  addToPostsDB [bool]
+  processFilesDB [bool]
+  bumpBoard [bool]
+  bumpThread [bool]
+  returnId [mixed]
+
 PIPELINE_REPLY_ALLOWED
   p (post)
   *allowed [bool]
