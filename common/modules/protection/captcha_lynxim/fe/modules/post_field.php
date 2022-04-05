@@ -34,6 +34,4 @@ if (isset($board_settings['captcha_mode'])) {
   }
 }
 
-
-
 ?>
