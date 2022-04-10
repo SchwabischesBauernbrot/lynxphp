@@ -65,7 +65,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   }
 
   // but even if the method is POST, we want to make sure this is a string...
-  if (is_array($fields) && $method === 'AUTO') {
+  if (is_array($fields) && ($method === 'AUTO' || $method === 'POST')) {
     $list = [];
     foreach($fields as $key=>$value) { $list[] = $key . '=' . urlencode($value); }
     $fields_string = join('&', $list);
@@ -110,6 +110,8 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     if (!$hasFields) {
       curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
       $method = 'GET'; // for logging
+    } else {
+      //echo "fields[$fields_string]<br>\n";
     }
   } else
   if ($method ===' PUT') {
