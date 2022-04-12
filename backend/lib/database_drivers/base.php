@@ -5,6 +5,7 @@ interface database_driver_base {
   // easy
   public function autoupdate($model);
   public function build_where($criteria);
+  // FIXME: no snake case?
   public function make_constant($value);
   public function make_direct($value);
   public function insert($rootModel, $recs);
