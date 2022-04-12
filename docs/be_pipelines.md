@@ -10,6 +10,14 @@ PIPELINE_REPLY_ALLOWED
   p (post)
   *allowed [bool]
 
+PIPELINE_PORTALS_DATA - pass BE data to FE to use in various portals (index:::sendResponse2)
+  data [mixed]
+  mtime [int]
+  err [string]
+  meta [object]
+  portals [array of strings]
+  *out.PORTAL [object]
+
 WorkQueue pipelines:
 PIPELINE_FILE
   boardUri
@@ -29,8 +37,13 @@ PIPELINE_FILE
   filedeleted
   spoiler
 
-Banners/logs started to mock this out;
+Banners/logs started to mock this out:
   PIPELINE_BOARD_DATA
+
+Queueing started to mock these out:
+  PIPELINE_BOARD_QUERY_MODEL <- shied away because smaller cachable queries maybe prefered
+  PIPELINE_BOARD_PAGE_DATA
+  PIPELINE_BOARD_CATALOG_DATA
 
 Defined but not used
   PIPELINE_POST_DATA
