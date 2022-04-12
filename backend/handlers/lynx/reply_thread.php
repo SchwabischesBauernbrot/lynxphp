@@ -11,12 +11,14 @@ $posts_model = getPostsModel($boardUri);
 $threadid = (int)$_POST['threadId'];
 
 $post = array(
-  // noFlag, email, password, captcha, spoiler, flag
+  // captcha
+  // noFlag, email, password (we have this...), spoiler, flag
   'threadid' => $threadid,
   'resto' => 0,
   'name' => getOptionalPostField('name'),
   'sub'  => getOptionalPostField('subject'),
   'com'  => getOptionalPostField('message'),
+  // FIXME: hash this...
   'password' => getOptionalPostField('password'),
   'sticky' => 0,
   'closed' => 0,
@@ -24,6 +26,7 @@ $post = array(
   'capcode' => '',
   'country' => '',
   'deleted' => 0,
+  'ip' => getip(),
 );
 
 // FIXME: is board locked?

@@ -23,6 +23,7 @@ $post = array(
   'capcode' => '',
   'country' => '',
   'deleted' => 0,
+  'ip' => getip(),
 );
 
 global $pipelines;
