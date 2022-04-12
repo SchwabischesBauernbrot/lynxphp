@@ -132,6 +132,7 @@ function getPostsModel($boardUri) {
       //'country_name' => array('type'=>'string', 'length'=>128),
       'sub' => array('type'=>'str', 'length'=>128),
       'com' => array('type'=>'text'),
+      'ip' => array('type'=>'str'),
       'password' => array('type'=>'str'),
     )
   );
