@@ -371,14 +371,25 @@ class backend_package {
   function addModule($pipeline_name, $file = false) {
     $bsn = new pipeline_module($this->pkg->name. '_' . $pipeline_name);
     if ($file === false) $file = $pipeline_name;
-    $path = strtolower($this->pkg->dir) . 'be/modules/' . strtolower($file) . '.php';
     $pkg = &$this->pkg;
+    $module_path = strtolower($pkg->dir);
+    $path = $module_path . 'be/modules/' . strtolower($file) . '.php';
     $this->modules[] = $file;
-    $bsn->attach($pipeline_name, function(&$io) use ($pipeline_name, $path, $pkg) {
+    $bsn->attach($pipeline_name, function(&$io) use ($pipeline_name, $path, $pkg, $module_path) {
       $getModule = function() use ($pipeline_name) {
         //echo "Set up module for [$pipeline_name]<br>\n";
         return array();
       };
+      if (is_readable($module_path . 'be/common.php')) {
+        // ref isn't defined...
+        //$ref->common =
+        include $module_path . 'be/common.php';
+      } else {
+        if (file_exists($module_path . 'be/common.php')) {
+          echo "perms? [$module_path]be/common.php<br>\n";
+        }
+      }
+
       /*
       if (!file_exists($path)) {
         echo "This module [$pipeline_name], [$path] is not found<br>\n";
