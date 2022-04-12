@@ -100,7 +100,9 @@ function renderPost($boardUri, $p, $options = false) {
   $links_io = array(
     'boardUri' => $boardUri,
     'p' => $p,
-    'links' => array(),
+    'links' => array(
+      //array('label' => '[Reply]', 'link' => '/' . $boardUri . '/thread/' . $threadId. '.html#postform')
+    ),
   );
   $pipelines[PIPELINE_POST_LINKS]->execute($links_io);
   $post_link_html_parts = array();
@@ -109,7 +111,7 @@ function renderPost($boardUri, $p, $options = false) {
       $post_link_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
     }
   }
-  $post_links_html = join('<br>' . "\n", $post_link_html_parts);
+  $post_links_html = join(' ' . "\n", $post_link_html_parts);
 
   // os disk cache will handle caching
   $templates = loadTemplates('mixins/post_detail');
