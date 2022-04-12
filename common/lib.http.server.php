@@ -85,6 +85,7 @@ function getip() {
   $ip = getServerField('HTTP_X_FORWARDED_FOR', $ip);
   if (strpos($ip, ',') !== false) {
     $parts = explode(',', $ip);
+    // first is supposed to be real ip
     $ip = array_shift($parts);
   }
   return $ip;
