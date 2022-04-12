@@ -47,7 +47,7 @@ function consume_beRsrc($options, $params = '') {
     $headers['sid'] = $_COOKIE['session'];
   }
   // when shouldn't we send this?
-  if (!empty($options['sendIP'])) $headers['HTTP_X_FORWARDED_FOR'] = getip();
+  if (!empty($options['sendIP'])) $headers['X-FORWARDED-FOR'] = getip();
   if (!count($headers)) $headers = '';
 
   /*
@@ -100,9 +100,14 @@ function consume_beRsrc($options, $params = '') {
 // - array = decoded data
 // - string = decoded data
 function expectJson($json, $endpoint = '', $options = array()) {
+  extract(ensureOptions(array(
+    'inWrapContent' => false,
+    'method' => 'AUTO',
+  ), $options));
+
   $obj = json_decode($json, true);
   if ($obj === NULL) {
-    if (!empty($options['inWrapContent'])) {
+    if (!empty($inWrapContent)) {
       echo 'Backend error (consume_beRsrc): ' .  $endpoint . ': ' . $json, "\n";
     } else {
       http_response_code(500);
@@ -111,7 +116,7 @@ function expectJson($json, $endpoint = '', $options = array()) {
     return false;
   }
   if (!empty($obj['err']) && $obj['err'] === 'BACKEND_KEY') {
-    if (!empty($options['inWrapContent'])) {
+    if (!empty($inWrapContent)) {
       echo 'Backend configuration error: ' .  $obj['message'], "\n";
     } else {
       http_response_code(500);
@@ -122,6 +127,11 @@ function expectJson($json, $endpoint = '', $options = array()) {
   }
   // meta processing
   if (!empty($obj['meta'])) {
+    if (isset($obj['meta']['portals'])) {
+      // a wiring harness would be better than a global
+      global $portalData;
+      $portalData = $obj['meta']['portals'];
+    }
     if (isset($obj['meta']['board'])) {
       global $boardData;
       $boardData = $obj['meta']['board'];
@@ -146,7 +156,7 @@ function expectJson($json, $endpoint = '', $options = array()) {
         return $obj;
       } else
       if (DEV_MODE) {
-        echo "<pre>Got a 401 [$json] for [", $endpoint, ']via[', isset($options['method']) ? $options['method'] : 'AUTO' ,"]</pre>\n";
+        echo "<pre>Got a 401 [$json] for [", $endpoint, ']via[', ($method ? $method : 'AUTO') ,"]</pre>\n";
       } else {
         // FIXME get named route
         global $BASE_HREF;
@@ -217,8 +227,15 @@ function getBoard($boardUri) {
   return $boardData['data'];
 }
 
-function backendGetBoardThreadListing($boardUri, $pageNum = 1) {
-  $threadListing = getExpectJson('opt/boards/' . $boardUri . '/' . $pageNum);
+function addPortalsToUrl($q, $url) {
+  // some portal BE stuff will need IP and probably SID
+  // so we're have to send those for all requests
+  // isn't the end of the world but meh...
+  // if (!empty($options['sendIP'])) $headers['HTTP_X_FORWARDED_FOR'] = getip();
+  return $url . '?portals=' . join(',', $q['portals']);
+}
+function backendGetBoardThreadListing($q, $boardUri, $pageNum = 1) {
+  $threadListing = getExpectJson(addPortalsToUrl($q, 'opt/boards/' . $boardUri . '/' . $pageNum));
   //echo "type[", gettype($threadListing), "][$threadListing]\n";
   if (!$threadListing) return;
   if (isset($threadListing['data']['board']['settings'])) {
@@ -228,8 +245,16 @@ function backendGetBoardThreadListing($boardUri, $pageNum = 1) {
   return $threadListing['data'];
 }
 
+// calls that eventually call getboardportal needs a optional flag
+// so we can pull things we need to pull
+// maybe a cb system (split control/request plane and process/response plane)
+// we could define in the route potentially usage
 function getBoardPage($boardUri, $page = 1) {
   $page1 = getExpectJson('4chan/' . $boardUri . '/' . $page . '.json');
+  if (isset($result['data']['board']['settings'])) {
+    global $board_settings;
+    $board_settings = $result['data']['board']['settings'];
+  }
   return $page1;
 }
 
