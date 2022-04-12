@@ -17,6 +17,7 @@ class FrontendRouter extends Router {
     return parent::import($routes, $module, $dir);
   }
   // should extractTokens be a separate function?
+  // not even used?
   function extractParams($route) {
     //echo "route[$route]<br>\n";
     $parts = explode('/', $route);
@@ -43,6 +44,7 @@ class FrontendRouter extends Router {
       'tokens' => $tokens,
     );
   }
+  // called by getRouteData
   function getMethodRouteData($method, $options = false) {
     extract(ensureOptions(array(
       'skipLoggedIn' => false,
@@ -51,6 +53,7 @@ class FrontendRouter extends Router {
     //echo "skipLoggedIn[$skipLoggedIn]\n";
     //echo "skipDontGen[$skipDontGen]\n";
     $res = array();
+    // for all routes in this method
     foreach($this->methods[$method] as $r => $f) {
       $rOpts = array();
       if (isset($this->routeOptions[$method . '_' . $r])) {
@@ -71,6 +74,7 @@ class FrontendRouter extends Router {
     }
     return $res;
   }
+  // generate.php calls this
   function getRouteData($options = false) {
     extract(ensureOptions(array(
       'method' => 'ALL',
