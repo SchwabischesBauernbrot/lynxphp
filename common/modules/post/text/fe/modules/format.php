@@ -113,6 +113,7 @@ $replaces = array(
     if ($addBoard) {
       $board = $targetUri . '&sol;';
     }
+    // &sol; is /
     $str = '<a class="quote"
       href="' . $targetUri . '/thread/' . $matches[3] . '.html#' . $matches[2] . '">&gt;&gt;&sol;' .
       $board . $matches[2] . '/</a>' . $matches[4];
@@ -129,11 +130,13 @@ $replaces = array(
   '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/(\d+)\/?(\s*)/m' => function ($matches) {
     global $btLookups;
     $threadId = $btLookups[$matches[1]][$matches[2]];
+    // quote by threadId/postId
     return '<a class="quote"
       href="' . $matches[1] . '/thread/' . $threadId . '#' . $matches[2] . '">&gt;&gt;&gt;/' .
       $matches[1] . '/' . $matches[2] . '</a>' . $matches[3];
   },
   '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/?(\s+)/m' => function ($matches) {
+    // board reference
     return '<a class="quote"
       href="' . $matches[1] . '">&gt;&gt;&gt;/' .
       $matches[1] . '/</a>' . $matches[2];
@@ -142,9 +145,10 @@ $replaces = array(
   '/' . preg_quote('&gt;&gt;') . '(\d+)\/?(\s+)/m' => function ($matches) use ($io) {
     global $btLookups;
     $threadId = isset($btLookups[$io['boardUri']][$matches[1]]) ? $btLookups[$io['boardUri']][$matches[1]] : '';
+    // quote by postid
     return '<a class="quote"
-      href="' . $io['boardUri'] . '/thread/' . $threadId . '#' . $matches[1] . '">&gt;&gt;/' .
-      $matches[1] . '/</a>' . $matches[2];
+      href="' . $io['boardUri'] . '/thread/' . $threadId . '#' . $matches[1] . '">&gt;&gt;' .
+      $matches[1] . '</a>' . $matches[2];
   },
   // >>/malform/35
   '/' . preg_quote('&gt;&gt;') . '\/?(\w+)\/(\d+)\/?(\s*)/m' => function ($matches) {
