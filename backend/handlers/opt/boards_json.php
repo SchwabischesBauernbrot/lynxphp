@@ -28,6 +28,7 @@ foreach($boards as $b) {
   $b['threads'] = getBoardThreadCount($b['uri'], $posts_model); // 1 query
   $b['posts'] = getBoardPostCount($b['uri'], $posts_model); // 1 query
 
+  // we can't use last_post because we're pulling the full thread here...
   if ($b['threads']) {
     //$posts_model = getPostsModel($b['uri']);
     $newestThreadRes = $db->find($posts_model, array('criteria'=>array(
