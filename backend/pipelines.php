@@ -17,7 +17,11 @@
 // should this be wrapped in a function?
 // depends on how much memory/cputime this takes...
 $backEndPipelines = array(
+  'PIPELINE_BOARD_QUERY_MODEL',
   'PIPELINE_BOARD_DATA',
+  'PIPELINE_BOARD_PAGE_DATA',
+  'PIPELINE_BOARD_CATALOG_DATA',
+  'PIPELINE_PORTALS_DATA',
   'PIPELINE_POST_DATA',
   'PIPELINE_USER_DATA',
   'PIPELINE_POST',
