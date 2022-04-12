@@ -20,7 +20,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   $tmpl = $templates['header'];
   $page_wrapper_tmpl = $templates['loop0'];
   $pageLink_tmpl     = $templates['loop1'];
-  //$boardNavLink_tmpl  = $templates['loop2'];
+  $boardNavLink_tmpl  = $templates['loop2'];
 
   // would be nice to have the board settings by here
   // so we can pass it in to control/hint the nav
@@ -36,8 +36,8 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'boardUri' => $boardUri,
     'boardSettings' => $boardSettings,
     'navItems' => array(
-      '[Index]' => $boardUri . '/',
-      '[Catalog]' => $boardUri . '/catalog.html',
+      'Index' => $boardUri . '/',
+      'Catalog' => $boardUri . '/catalog.html',
     ),
   );
   $pipelines[PIPELINE_BOARD_NAV]->execute($nav_io);
@@ -49,6 +49,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
     //'replaces' => array('uri' => $boardUri),
     // do it in the template
+    'template' => $boardNavLink_tmpl, // url / label
     //'prelabel' => '[',
     //'postlabel' => ']',
   ));
