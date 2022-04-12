@@ -1,7 +1,11 @@
 <?php
 
 function boardDBtoAPI(&$row) {
-  global $db, $models;
+  //global $db, $models;
+
+  global $pipelines;
+  $pipelines[PIPELINE_BOARD_DATA]->execute($row);
+
   unset($row['boardid']);
   //if ($row['json']) $row['json'] = json_decode($row['json'], true);
   unset($row['json']);
@@ -73,8 +77,14 @@ function listBoards($options = false) {
 
 // get single board
 function getBoardRaw($boardUri) {
-  global $db, $models;
-  $res = $db->find($models['board'], array('criteria'=>array(
+  global $db, $models, $pipelines;
+
+  // put a pipeline here to reduce the number of queries
+  // big queries or more singular cacheable queries?
+  $io_board_model = $models['board']; // copy
+  $pipelines[PIPELINE_BOARD_QUERY_MODEL]->execute($io_board_model);
+
+  $res = $db->find($io_board_model, array('criteria'=>array(
     array('uri', '=', $boardUri),
   )));
   $row = $db->get_row($res);
@@ -94,7 +104,7 @@ function getBoardRaw($boardUri) {
   return $row;
 }
 
-function boardRowFilter(&$row, $json, $options = false) {
+function boardRowFilter(&$row, $json = false, $options = false) {
   boardDBtoAPI($row);
   if ($json) {
     if (isset($options['jsonFields'])) {
@@ -121,6 +131,19 @@ function getBoard($boardUri, $options = false) {
   }
   boardRowFilter($row, $json, $options);
   return $row;
+}
+
+function getBoardWithBoardid($boardUri, $options = false) {
+  $row = getBoardRaw($boardUri);
+  // postgres is false, mysql is null
+  if (!$row) return false;
+  $json = false;
+  if ($options !== false) {
+    $json = json_decode($row['json'], true);
+  }
+  $boardData = $row;
+  boardRowFilter($boardData, $json, $options);
+  return array($row, $boardData);
 }
 
 // scatter/gather
