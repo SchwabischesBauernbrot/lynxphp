@@ -37,6 +37,8 @@ if (!empty($res['final'])) {
 
   wrapContent(renderPost($boardUri, $res['final'], array(
     'checkable' => false,
+    // this is sometimes undefined? yes lynxbridge caused this
+    // we just need to update the backend
     'postCount' => $res['postCount'],
   )), $wrapOptions);
 } else {
