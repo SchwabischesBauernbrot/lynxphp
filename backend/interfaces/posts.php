@@ -2,7 +2,7 @@
 
 function postDBtoAPI(&$row) {
   global $db, $models;
-  if ($row['deleted'] && $row['deleted'] !== 'f') {
+  if ($db->isTrue($row['deleted'])) {
     // non-OPs are automatically hidden...
     $nrow = array(
       'postid' => $row['postid'],
