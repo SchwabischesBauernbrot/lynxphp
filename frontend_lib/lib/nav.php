@@ -18,10 +18,15 @@ function getNav2($navItems, $options = array()) {
     'baseClasses' => array(),
     // label => id
     'ids' => array(),
+    // {{tags}}: url, label, classes, id
+    'template' => false,
   ), $options));
 
   // backwards compat
   if ($list === false) $type = 'none';
+  if ($template) {
+    $type = 'none';
+  }
 
   $nav_html = '';
   // maybe a look up is better?
@@ -84,9 +89,22 @@ function getNav2($navItems, $options = array()) {
       $classes['bold'] = 'bold';
     }
     $id = isset($ids[$label]) ? ' id="' . $ids[$label] . '"' : '';
-    $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
-    $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $alt . '>';
-    $nav_html .= $prelabel . $label . $postlabel . '</a>' . "\n";
+
+    if ($template) {
+      $class = count($classes) ? ' ' . join(' ', $classes) : '';
+      $tags = array(
+        'id'  => $id,
+        'url' => $url,
+        'alt' => $alt,
+        'label'   => $prelabel . $label . $postlabel,
+        'classes' => $class,
+      );
+      $nav_html .= replace_tags($template, $tags);
+    } else {
+      $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
+      $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $alt . '>';
+      $nav_html .= $prelabel . $label . $postlabel . '</a>' . "\n";
+    }
   }
   switch($type) {
     case 'none':
@@ -111,7 +129,7 @@ function getNav($navItems, $options = array()) {
       'destinations' => $urlTemplate,
     );
   }
-  $nav_html= getNav2($newFormat, $options);
+  $nav_html = getNav2($newFormat, $options);
   return $nav_html;
 }
 
