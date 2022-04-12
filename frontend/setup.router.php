@@ -154,6 +154,7 @@ $frontendRouterData = array(
   */
   'boards' => array(
     'file'   => 'boards',
+    'portals' => array('board'),
     'routes' => array(
       'list' => array(
         'route'  => '/boards.html',
