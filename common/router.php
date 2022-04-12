@@ -35,9 +35,6 @@ class Router {
     $this->headersSent = false;
   }
 
-  // FIXME: we need a file version for all
-  // that only import the routes we need on demand
-
   // used for attaching subrouters
   // usually star(/*) routes
   function all($cond, $router) {
@@ -57,12 +54,17 @@ class Router {
     */
   }
 
+  // only import the routes we need on demand
+  // could have a file per method
+  // though we need a function that list them all
 
   // we should know the method if we're using this route
   // and the method should be in the correct case
   // no need for defaults
-  // I'd like to standardize around a file
+
+  // we need a file version for all
   // but func is just more flexible
+
   // context can be set up in a func before the include
   // used by frontend packages
   function addMethodRoute($method, $cond, $func, $options = false) {
@@ -105,12 +107,14 @@ class Router {
   // also cleaning off .html or .json can be useful
   // providing db, models, tpp
   function import($routes, $module = 'unknown', $dir = 'handlers') {
+    // foreach group
     foreach($routes as $group => $groupData) {
       $adjDir = $dir; // reset
       if (isset($groupData['dir'])) {
         $adjDir = $dir . '/' . $groupData['dir'];
       }
-      // groupData: file, routes
+      // groupData: file, routes, portal
+      // foreach route in group
       foreach($groupData['routes'] as $routeData) {
         // routeData: func, options, loggedin(, method, route)
         $method = empty($routeData['method']) ? 'GET' : $routeData['method'];
@@ -125,8 +129,12 @@ class Router {
         if (isset($this->methods[$method][$route])) {
           echo "router::import - Warning, route already defined<br>\n";
         }
-
-        $this->methods[$method][$route] = function($request) use ($routeData, $groupData, $adjDir) {
+        $methodRoute = $method . '_' . $route;
+        // create a function that loads and calls the route func from the group file
+        // capture state
+        $this->methods[$method][$route] = function($request) use ($routeData, $groupData, $adjDir, $methodRoute) {
+          //echo "request[", print_r($request, 1), "]<br>\n";
+          //echo gettrace();
           if (isset($routeData['file'])) {
             include $adjDir . '/' . $routeData['file'] . '.php';
             return;
@@ -136,6 +144,12 @@ class Router {
             include $adjDir . '/' . $file . '.php';
             $this->included[$file] = true;
           }
+          // inject portal data
+          $request['portals'] = isset($groupData['portals']) ? $groupData['portals'] : array();
+          // future conduit for passing more information...
+          // probably should unset cacheSettings
+          // module, name, address
+          $request['routeOptions'] = $this->routeOptions[$methodRoute];
           if ($routeData['func']) {
             $func = $routeData['func'];
             $func($request);
@@ -143,7 +157,6 @@ class Router {
             echo "router::import - No function defined<br>\n";
           }
         };
-        $methodRoute = $method . '_' . $route;
         // trade some cpu for memory
         if (isset($routeData['route'])) unset($routeData['route']);
         if (isset($routeData['method'])) unset($routeData['method']);
@@ -175,6 +188,11 @@ class Router {
         } else {
           $this->routeOptions[$methodRoute]['address'] = $routeData['func'] . '@' . $groupData['file'];
         }
+        /*
+        if (isset($groupData['portal'])) {
+          $this->routeOptions[$methodRoute]['portal'] = $groupData['portal'];
+        }
+        */
       }
     }
     //echo "done import<br>\n";
@@ -197,6 +215,7 @@ class Router {
       $method . '_routes' => array_keys($this->methods[$method]),
     );
   }
+  // maybe should be a handler we set
   function isTooBig() {
     $this->max_length = min(convertPHPSizeToBytes(ini_get('post_max_size')), convertPHPSizeToBytes(ini_get('upload_max_filesize')));
     // nginx always sets CONTENT_LENGTH, apache only passes when browser sets it
@@ -494,8 +513,19 @@ class Router {
     return true; // render content
   }
 
-  // call handler func
-  function callHandler($res) {
+  // match: func, params
+  // alternatively we could take $res
+  function callHandlerFunc($match, $request) {
+    $request['params'] = $match['params'];
+    //$request['routeOptions'] = $this->routeOptions[$key];
+    $func = $match['func'];
+    // if we pushed a response handler
+    // we could attach additional layout stuff and processing
+    $func($request);
+  }
+
+  // call cachable handler func
+  function callCachableHandler($res) {
     $match = $res['match'];
     $request = $res['request'];
     $isHead = $res['isHead'];
@@ -503,15 +533,14 @@ class Router {
     $params = $match['params'];
     // if (not cache) && (not head)
     // could just pass route
-    if ($this->isUncached($request['method'] . '_' . $match['cond'], $params, $res['routeOptions'])) {
+    $key = $request['method'] . '_' . $match['cond'];
+    // do we need to do work or not
+    if ($this->isUncached($key, $params, $res['routeOptions'])) {
       if ($isHead) {
         //header('connection: close');
         return;
       }
-      // move match into request
-      $request['params'] = $params;
-      $func = $match['func'];
-      $func($request);
+      $this->callHandlerFunc($match, $request);
     }
   }
 
@@ -665,7 +694,7 @@ class Router {
       }
       //echo "key[", $method . '_' . $match['cond'], "]<br>\n";
       //echo "<pre>[", print_r($this->routeOptions, 1), "]</pre>\n";
-      $routeOptions = $this->routeOptions[$method . '_' . $match['cond']];
+      $routeOptions = isset($this->routeOptions[$method . '_' . $match['cond']]) ? $this->routeOptions[$method . '_' . $match['cond']] : array();
       return array(
         'match' => $match,
         'isHead' => $isHead,
@@ -705,17 +734,16 @@ class Router {
   }
 
   // primary function of the router
+  // FIXME: option to release all other methods (maybe set in the route definition itself)
   function exec($method, $path) {
     $res = $this->findRoute($method, $path);
     if ($res === false) return false; // 404 passthru
     if ($this->headersSent) {
-      $request = $res['request'];
-      // move match into request
-      $request['params'] = $res['match']['params'];
-      $func = $res['match']['func'];
-      $func($request);
+      // definitely not a 304
+      $this->callHandlerFunc($res['match'], $res['request']);
     } else {
-      $this->callHandler($res);
+      // potentially handle 304s
+      $this->callCachableHandler($res);
     }
     return true;
   }
