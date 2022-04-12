@@ -1,7 +1,7 @@
 <?php
 
 function renderUserPortalHeader() {
-  $test = substr($_SERVER['REQUEST_URI'], 1);
+  $test = substr($_SERVER['REQUEST_URI'], 1); // strip off first slash character
   $portalOptions = array(
     'headerPipeline' => PIPELINE_USER_HEADER_TMPL,
     'navPipeline'    => PIPELINE_USER_NAV,
