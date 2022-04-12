@@ -167,6 +167,41 @@ function sendResponse2($data, $options = array()) {
   foreach($meta as $k => $v) {
     $resp['meta'][$k] = $v;
   }
+  // probably not the best place for this
+  // since request is gone
+  // and we want to inject into the query
+  // actually the query matters less
+  if (isset($_GET['portals'])) {
+    //$resp['meta']['portals'] = array();
+    global $pipelines;
+    $io = array(
+      // would be nicer if we had request...
+      'data'    => $data,
+      'mtime'   => $mtime,
+      'err'     => $err,
+      'meta'    => $meta,
+      'portals' => explode(',', $_GET['portals']),
+      'out' => array(),
+    );
+    $pipelines[PIPELINE_PORTALS_DATA]->execute($io);
+    if ($io['out']) {
+      //$resp['meta']['portals'] = $io['out'];
+      // strict filter
+      foreach($io['portals'] as $p) {
+        $resp['meta']['portals'][$p] = isset($io['out'][$p]) ? $io['out'][$p] : '';
+      }
+    }
+    /*
+    $resp['meta']['portals'] = array();
+    foreach($portals as $p) {
+      $io = array(
+        'portal' => $p,
+      );
+      //$pipelines[]->execute($resp['meta']['portals'][$p]);
+    }
+    */
+  }
+
   // should we only set this if there's actually data?
   // how to tell an array()/false versus no data?
   $resp['data'] = $data;
@@ -229,6 +264,8 @@ function wrapContent($error) {
 }
 
 //echo "method[$req_method]<br>\n";
+
+//print_r($_SERVER);
 
 $res = $router->exec($req_method, $req_path);
 if (!$res) {
