@@ -1,5 +1,23 @@
 <?php
 
+// a wiring harness that takes things to the backend
+// while providing a bridge from the router
+/*
+class query_thread {
+  function __constructor($request) {
+    $this->portals = $request['portals'];
+  }
+}
+// could just be an array...
+*/
+function request2QueryThread($request) {
+  return array(
+    'portals' => $request['portals'],
+  );
+}
+// additional functions to automatically handle the header/footer of portals
+// probably hooked from the results
+
 /*
 function secondsToTime($inputSeconds) {
   global $now;
@@ -411,13 +429,17 @@ function getBoardFileRedirect($request) {
 
 function getBoardThreadListingHandler($request) {
   $boardUri = $request['params']['uri'];
-  getBoardThreadListing($boardUri);
+  // transform req => q
+  $q = request2QueryThread($request);
+  //echo "<pre>", print_r($request['portals'], 1), "</pre>\n";
+  getBoardThreadListing($q, $boardUri);
 }
 
 function getBoardThreadListingPageHandler($request) {
   $boardUri = $request['params']['uri'];
   $page = $request['params']['page'] ? $request['params']['page'] : 1;
-  getBoardThreadListing($boardUri, $page);
+  $q = request2QueryThread($request);
+  getBoardThreadListing($q, $boardUri, $page);
 }
 
 function getBoardCatalogHandler($request) {
@@ -569,9 +591,16 @@ function makePostHandler($request) {
 }
 
 // /:uri/
-function getBoardThreadListing($boardUri, $pagenum = 1) {
+function getBoardThreadListing($q, $boardUri, $pagenum = 1) {
   //echo "pagenum[$pagenum]<br>\n";
-  $boardThreads = backendGetBoardThreadListing($boardUri, $pagenum);
+
+  // this does the backend call
+  // if we know what portal we're using
+  // well ofc we fucking do...
+  // but yea, we could pass an option to do something?
+  // pass a parameter to the backend that says baord portal
+  // and then things can hook on it
+  $boardThreads = backendGetBoardThreadListing($q, $boardUri, $pagenum);
   if (!$boardThreads) {
     wrapContent("There is a problem with the backend [$boardUri]");
     return;
