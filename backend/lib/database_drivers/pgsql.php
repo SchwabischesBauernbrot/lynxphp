@@ -358,7 +358,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   //              array(field, comparison, field/constant)
   public function find($rootModel, $options = false, $fields = '*') {
     $sql = $this->makeSelectQuery($rootModel, $options, $fields);
-    //echo "<pre>sql[$sql]</pre>\n";
+    //echo "<pre>pgsql::find sql[$sql]</pre>\n";
     $res = pg_query($this->conn, $sql);
     //$err = pg_result_error($res);
     $err = pg_last_error($this->conn);
