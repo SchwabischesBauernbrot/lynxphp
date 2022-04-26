@@ -537,6 +537,16 @@ class frontend_package {
       }
     });
     */
+
+    /*
+    shared.php
+    fe/common.php
+    maybe the file should handle these includes themselves for performance reasons
+    not all need this
+    and I don't see any benefit instrumenting this
+    we can just wrap it just in case
+    */
+
     $ref = &$this;
     // this function isn't called unless the pipeline is executed
     $bsn->attach($pipeline_name, function(&$io, $options = false) use ($pipeline_name, $path, $pkg, &$ref, $module_path) {
@@ -600,6 +610,7 @@ class frontend_package {
       //echo "no routes for [$method]<Br>\n";
       return;
     }
+    $ref = &$this;
     $pkg = &$this->pkg;
     // only build the routes we need
     foreach($this->handlers[$method] as $cond => $row) {
@@ -612,16 +623,27 @@ class frontend_package {
         echo "handler[$path] does not exist<br>\n";
       };
       if (file_exists($path)) {
-        $func = function($request) use ($path, $pkg, $row, $module_path) {
-          if (is_readable($module_path . 'shared.php')) {
-            $shared = include $module_path . 'shared.php';
-          }
-          if (is_readable($module_path . 'fe/common.php')) {
-            $common = include $module_path . 'fe/common.php';
-          } else {
-            if (file_exists($module_path . 'fe/common.php')) {
-              echo "lulwat [$module_path]fe/common.php<br>\n";
+        $func = function($request) use ($path, $pkg, $row, $module_path, $ref) {
+          if (!$ref->ranOnce) {
+            if (is_readable($module_path . 'shared.php')) {
+              $ref->shared = include $module_path . 'shared.php';
             }
+            if (is_readable($module_path . 'fe/common.php')) {
+              $ref->common = include $module_path . 'fe/common.php';
+            } else {
+              if (file_exists($module_path . 'fe/common.php')) {
+                echo "lulwat [$module_path]fe/common.php<br>\n";
+              }
+            }
+            $ref->ranOnce = true;
+          }
+          // unpack them
+          if (isset($ref->common)) {
+            $common = $ref->common;
+          }
+          //$shared = false;
+          if (isset($ref->shared)) {
+            $shared = $ref->shared;
           }
           // lastMod function?
           // well just deep memiozation could work...
