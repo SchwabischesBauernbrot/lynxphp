@@ -38,7 +38,8 @@ foreach($shared['fields'] as $f => $t) {
 // FIXME: move all posts/files if uri changes....
 
 //echo "row[", gettype($row), "][", print_r($row, 1), "]<br>\n";
-$ok = $db->update($models['board'], $row, array('criteria'=>array('uri'=>$boardUri)));
+$ok = saveBoardSettings($boardUri, $row['json']['settings']);
+//$ok = $db->update($models['board'], $row, array('criteria'=>array('uri'=>$boardUri)));
 
 sendResponse(array(
   'success' => $ok ? 'true' : 'false',
