@@ -452,6 +452,34 @@ function getBoardCatalogHandler($request) {
   renderBoardCatalog($boardUri);
 }
 
+function getBlockBypass($boardUri, $row) {
+  // regenerate post form...
+  // how did $row get threadId = 1
+  // FIXME: need a shorthand for files
+
+  $formfields = array(
+    'post'   => array('type' => 'hidden'),
+    'captcha'    => array('type' => 'captcha', 'label' => 'Bypass CAPTCHA'),
+  );
+  //
+
+  /*
+  $postform = renderPostFormHTML($boardUri, array(
+    'reply' => $row['threadId'],
+    'formId' => 'bottom_postform',
+    'showClose' => false,
+    'values' => $row,
+  ));
+  */
+  $values = array('post' => json_encode($row));
+  $formOptions = array();
+  $bypassForm = generateForm('/bypass', $formfields, $values, $formOptions);
+
+  //echo "<pre>", htmlspecialchars(print_r($postform, 1)), "</pre>\n";
+  // 'Thread #' . $row['thread'] . '<br>'. "\n"
+  wrapContent('blockBypass was invalid, please try again: <br>' . "\n" . $bypassForm);
+}
+
 function retryCaptcha($boardUri, $row) {
   // regenerate post form...
   // how did $row get threadId = 1
@@ -580,6 +608,10 @@ function makePostHandler($request) {
       if ($result['data'] === 'Expired captcha.' || $result['data'] === 'Wrong captcha.') {
         //print_r($row);
         retryCaptcha($boardUri, $row);
+      } else
+      if ($result['data']['status'] === 'bypassable') {
+        //wrapContent('Block Bypass Expired');
+        getBlockBypass($boardUri, $row);
       } else
       if ($result['data'] === 'Thread not found.') {
         wrapContent('Thread ' . $_POST['thread'] . ' not found' . "\n");
