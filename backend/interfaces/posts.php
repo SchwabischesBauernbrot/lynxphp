@@ -1,30 +1,10 @@
 <?php
 
+// thread or reply...
+
 function postDBtoAPI(&$row) {
   global $db, $models;
-  if ($db->isTrue($row['deleted'])) {
-    // non-OPs are automatically hidden...
-    $nrow = array(
-      'postid' => $row['postid'],
-      'no' => $row['postid'],
-      'threadid' => $row['threadid'],
-      'deleted' => 1,
-      'com' => 'Thread OP has been deleted but this placeholder is kept, so replies can be read',
-      'sub' => '',
-      'name' => '',
-      // no reasons to hide these...
-      'created_at' => $row['created_at'],
-      'updated_at' => $row['updated_at'],
-      'files' => array(),
-      // catalog uses this
-      //'reply_count' => $row['reply_count'],
-      //'file_count' => $row['file_count'],
-    );
-    if (isset($row['reply_count'])) $nrow['reply_count'] = $row['reply_count'];
-    if (isset($row['file_count'])) $nrow['file_count'] = $row['file_count'];
-    $row = $nrow;
-    return;
-  }
+
 
   // filter out any file_ or post_ field
   $row = array_filter($row, function($v, $k) {
@@ -34,16 +14,9 @@ function postDBtoAPI(&$row) {
 
   $row['no'] = empty($row['postid']) ? 0 : $row['postid'];
   unset($row['postid']);
+  //unset($row['ip']);
 
   $data = empty($row['json']) ? array() : json_decode($row['json'], true);
-
-  // FIXME: pipeline
-  if (empty($data['cyclic'])) {
-    // is this even needed
-    unset($row['cyclic']);
-  } else {
-    $row['cyclic'] = 1;
-  }
 
   unset($row['json']);
   // ensure frontend doesn't have to worry about database differences
@@ -95,7 +68,11 @@ function getPost($boardUri, $postNo, $posts_model) {
   if (!isset($posts[$row['postid']])) {
     //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
     $posts[$row['postid']] = $row;
-    postDBtoAPI($posts[$row['postid']]);
+    if ($row['threadid'] === $row['postid']) {
+      threadDBtoAPI($posts[$row['postid']]);
+    } else {
+      postDBtoAPI($posts[$row['postid']]);
+    }
     //echo "<pre>4chan", print_r($row, 1), "</pre>\n";
     $posts[$row['postid']]['files'] = array();
   }
@@ -136,6 +113,59 @@ function getPost($boardUri, $postNo, $posts_model) {
   $posts = array_values($posts);
   $post = count($posts) ? $posts[0] : array();
   return $post;
+}
+
+// board,permissions checks must be done by here
+//
+function createPost($boardUri, $post, $files, $privPost, $options = false) {
+  global $db, $models, $now;
+
+  // thread (0) or reply (!0)
+  $threadid = $post['threadid'];
+  // do not insert the tags field
+  unset($post['tags']);
+
+  // handle post
+  $posts_model = getPostsModel($boardUri);
+  $id = $db->insert($posts_model, array($post));
+
+  // handle priv
+  //echo "boardUri[$boardUri]<br>\n";
+  $posts_priv_model = getPrivatePostsModel($boardUri);
+  $privPost['post_id'] = $id; // update postid
+  //print_r($privPost);
+  $db->insert($posts_priv_model, array($privPost));
+
+  // handle files
+  $issues = processFiles($boardUri, $files, $threadid ? $threadid : $id, $id);
+
+  // bump board
+  $inow = (int)$now;
+  $urow = array('last_post' => $inow);
+  if (!$threadid) {
+    // new thread
+    $urow['last_thread'] = $inow;
+  }
+  $db->update($models['board'], $urow, array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
+
+  if ($threadid) {
+    // bump thread
+    $urow = array();
+    $db->update($posts_model, $urow, array('criteria'=>array(
+      array('postid', '=', $threadid),
+    )));
+  }
+
+  if ($issues) {
+    return array(
+      'issues' => $issues,
+      'id' => (int)$id,
+    );
+  }
+
+  return $id;
 }
 
 // option.deleteReplies:bool
