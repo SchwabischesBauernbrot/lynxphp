@@ -8,7 +8,8 @@ if (!$user_id) {
   // well if you anon you don't get EXTRA permissions
   return; // already sends something...
 }
-$access = isUserPermitted($user_id, $request['params']['perm'], $request['target']);
+// where is isUserPermitted located? interface/users
+$access = isUserPermitted($user_id, $request['target'], $request['params']['perm']);
 sendResponse(array(
   'access' => $access,
   'user_id' => $user_id,
