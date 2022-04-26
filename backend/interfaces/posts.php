@@ -172,9 +172,11 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
 function deletePost($boardUri, $postid, $options = false, $post = false) {
   global $db, $now, $models;
 
+  //echo "deletePost[$boardUri]<br>\n";
+
   // ensure post
   $posts_model = getPostsModel($boardUri);
-  if ($posts_model === false) {
+  if ($posts_model !== false) {
     $post = $db->findById($posts_model, $postid);
   }
 
