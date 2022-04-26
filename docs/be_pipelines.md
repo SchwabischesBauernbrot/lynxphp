@@ -6,6 +6,16 @@ PIPELINE_NEWPOST_PROCESS - controls what happens to new posts
   bumpThread [bool]
   returnId [mixed]
 
+PIPELINE_POSTTAG_REGISTER
+  *tags [array of tag objects] (has a key)
+
+PIPELINE_NEWPOST_TAG
+  boardUri
+  p [post object]
+  priv [private post object]
+  files [array of files]
+  *tags [array of tag key strings]
+
 PIPELINE_REPLY_ALLOWED
   p (post)
   *allowed [bool]
@@ -47,6 +57,8 @@ Queueing started to mock these out:
 
 Defined but not used
   PIPELINE_POST_DATA
+  PIPELINE_THREAD_DATA
+  PIPELINE_REPLY_DATA
   PIPELINE_USER_DATA
   PIPELINE_POST
 
