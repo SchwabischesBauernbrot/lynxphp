@@ -1,11 +1,20 @@
 <?php
 
-// FIXME: pass in template...
-
 // old navItems format:
 //   label => urlTemplate(s)
 // new items format:
 // [] => array(label, alt, destinations)
+// destinations can be an array if multiple URLs point to the same content
+
+// label is design and we can now do that in the template
+// problems with template
+// - speed because of tags (pre, url, mid, label, after)
+// - mixing non-template options like pre/post label?
+// - classes maybe set in the template, they might not be...
+//   - can use multiple types of tags (cpu)
+//   - can add oc tags (complexity/makes the template ugly)
+
+// default template: <a class="{{classes}}" {{id}} href="{{url}}" {{alt}}>{{label}}</a>\n
 function getNav2($navItems, $options = array()) {
   extract(ensureOptions(array(
     'type' => 'list', // none, list
@@ -13,6 +22,11 @@ function getNav2($navItems, $options = array()) {
     'selected' => '',
     'selectedURL' => false,
     'replaces' => array(),
+    // template makes more sense, because we can pass through the wishes
+    // of the template designers and the coders shouldn't be inserting
+    // post/pre stuff
+    //'prelink' => '',
+    //'postlink' => '',
     'prelabel' => '',
     'postlabel'  => '',
     'baseClasses' => array(),
@@ -102,6 +116,7 @@ function getNav2($navItems, $options = array()) {
       $nav_html .= replace_tags($template, $tags);
     } else {
       $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
+      // $prelink . $postlink
       $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $alt . '>';
       $nav_html .= $prelabel . $label . $postlabel . '</a>' . "\n";
     }
