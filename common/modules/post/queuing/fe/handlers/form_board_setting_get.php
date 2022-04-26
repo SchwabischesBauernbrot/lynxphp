@@ -6,37 +6,31 @@ $params = $getHandler();
 $boardUri = boardOwnerMiddleware($request);
 if (!$boardUri) return;
 
-$values = $pkg->useResource('list', array('boardUri' => $boardUri));
+// well we need a list of post_tags and their values...
+$data = $pkg->useResource('get_settings', array('boardUri' => $boardUri));
 
-global $pipelines;
-$fields = $shared['fields']; // imported from fe/common.php
+$values = $data['values'];
 
-// handle hooks for additional settings
-//$pipelines[PIPELINE_BOARD_SETTING_QUEUEING]->execute($fields);
-
-// fields will keep the settings_ prefix
-// so we need to flatten our settings
-if (isset($values['settings']) && is_array($values['settings'])) {
-  foreach($values['settings'] as $k => $v) {
-    $values['settings_' . $k] = $v;
-  }
+$fields = array();
+foreach($data['tags'] as $k => $t) {
+  $fields[$k] = array(
+    // description?
+    'label' => $t['description'],
+    'type'  => 'select',
+    'options' => array(
+      '' => 'netural',
+      // com or mod?
+      'com' => 'add to community queue',
+      'mod' => 'add to moderator queue',
+      '-' => 'remove any queueing',
+    ),
+  );
 }
-unset($values['settings']);
 
-/*
-foreach($fields as $fn => $f) {
-  if (substr($fn, 0, 9) === 'settings_') {
-    //$k = substr($fn, 9);
-    //echo "k[$k]<br>\n";
-    if (isset($values['json'][$fn])) {
-      $values[$fn] = $values['json'][$fn];
-    }
-  }
-}
-*/
+$formHtml = generateForm($params['action'], $fields, $values);
 
-$html = generateForm($params['action'], $fields, $values);
+$portal = getBoardSettingsPortal($boardUri);
 
-wrapContent('Board Settings'. $html);
+wrapContent($portal['header'] . 'Queueing Settings'. $formHtml . $portal['footer']);
 
 ?>
