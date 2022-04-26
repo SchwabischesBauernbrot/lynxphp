@@ -71,4 +71,26 @@ if (isset($overboardData['threads'])) {
     $threads_html .= $threadftr_template;
   }
 }
-wrapContent($threads_html);
+
+if (0) {
+  $boardData = array(
+    'pageCount' => 1,
+    'title' => 'All Boards',
+    'description' => 'posts across the site',
+    'settings' => array(),
+  );
+  $pagenum = 1; // FIXME:
+
+  $boardPortal = getBoardPortal('overboard', $boardData, array(
+    'pagenum' => $pagenum,
+    'threadClosed' => true, // turn off post form
+  ));
+  // need to turn off over-catalog? over-logs? over banner?
+} else {
+  $boardPortal = array(
+    'header' => '',
+    'footer' => '',
+  );
+}
+
+wrapContent($boardPortal['header'] . $threads_html . $boardPortal['footer']);
