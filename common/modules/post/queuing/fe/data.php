@@ -38,25 +38,21 @@ $fePkgs = array(
       */
     ),
     'forms' => array(
-      /*
       array(
         'route' => '/:uri/settings/queueing',
         'handler' => 'board_setting',
       ),
-      */
       array(
         'route' => '/:uri/moderate',
         'handler' => 'community_moderate',
       ),
     ),
     'modules' => array(
-      /*
       // add [Banner] to board naviagtion
       array(
         'pipeline' => 'PIPELINE_BOARD_SETTING_NAV',
         'module' => 'setting_nav',
       ),
-      */
       // allow BOs to control this
       array(
         'pipeline' => 'PIPELINE_BOARD_SETTING_GENERAL',
