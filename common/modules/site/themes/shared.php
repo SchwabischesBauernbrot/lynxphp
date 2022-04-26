@@ -1,8 +1,19 @@
 <?php
 
+//
+// fe and be
+//
+
+function getDefaultTheme() {
+  // FIXME: pull from admin settings?
+  return 'yotsuba-b';
+}
+
 return array(
   // filename => Human readable name
   'themes' => array(
+    // how is default set and managed?
+    // we delete default and look at the next in the list
     'default' => 'Default',
     'yotsuba-b' => 'Yotsuba-B',
     'yotsuba' => 'Yotsuba',
