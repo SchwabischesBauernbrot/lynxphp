@@ -10,6 +10,7 @@ $fePkgs = array(
         'method'  => 'GET',
         'route'   => '/user/settings/theme.php',
         'handler' => 'css',
+        // set content-type?
         /*
         'cacheSettings' => array(
           'files' => array(
