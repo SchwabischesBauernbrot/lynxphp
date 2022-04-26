@@ -2,8 +2,18 @@
 
 $params = $getModule();
 
+// io has siteSettings, userSettings and head_html
+// params has options (which is empty)
+
+$sheet = '/user/settings/theme.php'; // dynamic
+
+// demo doesn't need the user's theme, its setting it itself
+if (strpos($_SERVER['REQUEST_URI'], '/themedemo/') !== false) {
+  $sheet = 'css/themes/' . $io['userSettings']['current_theme'] . '.css';
+}
+
 // this can have it's own cache without affecting the php or static
-$io['head_html'] .= '<link id="theme" rel="stylesheet" href="/user/settings/theme.php">';
+$io['head_html'] .= '<link id="theme" rel="stylesheet" href="' . $sheet . '">';
 
 /*
 $userSettings = $io['userSettings'];
