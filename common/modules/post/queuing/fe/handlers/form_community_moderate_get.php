@@ -23,6 +23,7 @@ if (empty($boardData)) {
 $boardPortal = getBoardPortal($boardUri, $boardData);
 
 if (!$qp) {
+  // all sorts of errors end up here
   $templates = moduleLoadTemplates('empty', __DIR__);
   return wrapContent($boardPortal['header'] . $templates['header']  . $boardPortal['footer']);
 }
