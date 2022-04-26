@@ -277,6 +277,15 @@ EOB;
     'jsenable' => $enableJs ? '' : '<!-- ',
     'jsenable2' => $enableJs ? '' : ' -->',
   );
+  $header_io = array(
+    'headers' => array(
+      'content-type' => 'text/html',
+    )
+  );
+  $pipelines[PIPELINE_HEADERS]->execute($header_io);
+  foreach($header_io['headers'] as $k => $v) {
+    header($k . ': ' . $v);
+  }
 
   // we could place the open body tag here...
   echo replace_tags($templates['header'], $tags);
@@ -353,19 +362,48 @@ function wrapContentFooter($row) {
     $scripts_html .= '<script src="' . $p . '"></script>' . "\n";
   }
 
-  $io = array(
+  $footerNavItems = array(
+    /*
+    array('label' => 'news',  'destinations' => 'news.html',  'alt' => 'Settings'),
+    array('label' => 'rules', 'destinations' => 'rules.html', 'alt' => 'rules'),
+    array('label' => 'faq',   'destinations' => 'faq.html',   'alt' => 'frequently asked questions'),
+    */
+  );
+  $footerNav_io = array(
+    'navItems' => $footerNavItems,
+  );
+  $pipelines[PIPELINE_SITE_FOOTER_NAV]->execute($footerNav_io);
+  $footerNav_html = getNav2($footerNav_io['navItems'], array(
+    'type' => 'none', 'baseClasses' => array('footer-nav-item'),
+    //'ids' => array('' => 'settings'),
+    'selected' => 'none of those', // has to be set for settings not to be highlighted
+    'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
+    // FIXME: pull from template
+    'template' => '- <a class="{{classes}}" {{id}} href="{{url}}" {{alt}}>{{label}}</a>' . "\n",
+  ));
+
+  // kind of lame because modules shouldn't need to know about templates...
+  // but made they need to inside HTML?
+  $footer_io = array(
+    'siteSettings' => $row['siteSettings'],
+    'userSettings' => $row['userSettings'],
+    'footer_html' => '',
+  );
+  $pipelines[PIPELINE_SITE_FOOTER_FOOTER]->execute($footer_io);
+
+  $end_io = array(
     'siteSettings' => $row['siteSettings'],
     'userSettings' => $row['userSettings'],
     'end_html' => '',
   );
-  $pipelines[PIPELINE_SITE_END_HTML]->execute($io);
+  $pipelines[PIPELINE_SITE_END_HTML]->execute($end_io);
   $tags = array(
     'jsenable' => $enableJs ? '' : '<!-- ',
     'jsenable2' => $enableJs ? '' : ' -->',
     'footer_header' => '',
-    'footer_nav' => '',
-    'footer_footer' => '',
-    'end' => $scripts_html . $io['end_html'],
+    'footer_nav' => $footerNav_html,
+    'footer_footer' => $footer_io['footer_html'],
+    'end' => $scripts_html . $end_io['end_html'],
   );
   $footer = loadTemplates('footer');
   if ($closeHeader) {
