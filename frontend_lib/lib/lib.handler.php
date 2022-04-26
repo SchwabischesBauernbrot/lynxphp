@@ -299,6 +299,8 @@ EOB;
   );
   $pipelines[PIPELINE_HEADERS]->execute($header_io);
   foreach($header_io['headers'] as $k => $v) {
+    // don't need to set the default content-type
+    if ($k === 'content-type' && $v === 'text/html') continue;
     header($k . ': ' . $v);
   }
 
