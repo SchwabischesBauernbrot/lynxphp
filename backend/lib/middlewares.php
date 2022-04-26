@@ -42,12 +42,16 @@ function boardOwnerMiddleware($request) {
     return;
   }
   $ownedBoards = userBoards($user_id);
-  $ok = false;
-  // this will not have boardid
-  foreach($ownedBoards as $board) {
-    if ($board === $boardUri) {
-      $ok = true;
-      break;
+
+  $ok = isUserPermitted($user_id, 'b/' . $boardUri);
+
+  if (!$ok) {
+    // this will not have boardid
+    foreach($ownedBoards as $board) {
+      if ($board === $boardUri) {
+        $ok = true;
+        break;
+      }
     }
   }
   if (!$ok) {
