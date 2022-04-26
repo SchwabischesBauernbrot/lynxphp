@@ -7,7 +7,7 @@ $edPkBin = verifyChallengedSignatureHandler();
 if (!$edPkBin) {
   return;
 }
-global $db, $models;
+global $db, $models, $now;
 
 // process account upgrades, remove code later
 $upgradedAccount = false;
@@ -44,6 +44,9 @@ if (!$db->num_rows($res)) {
 $row = $db->get_row($res);
 $db->free($res);
 $id = $row['userid'];
-loginResponseMaker($id, $upgradedAccount);
 
+$row['last_login'] = (int)$now;
+$db->updateById($models['user'], $id, $row);
+
+loginResponseMaker($id, $upgradedAccount);
 ?>
