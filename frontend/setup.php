@@ -82,6 +82,8 @@ require '../frontend_lib/lib/middlewares.php';
 // mixins
 // it would be nice to scope these somehow...
 require '../frontend_lib/handlers/mixins/board_portal.php';
+// maybe only include if SID is set?
+require '../frontend_lib/handlers/mixins/board_settings_portal.php';
 require '../frontend_lib/handlers/mixins/admin_portal.php';
 require '../frontend_lib/handlers/mixins/global_portal.php';
 require '../frontend_lib/handlers/mixins/user_portal.php';
