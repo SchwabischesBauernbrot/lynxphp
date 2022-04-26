@@ -1,7 +1,5 @@
 <?php
 
-
-
 function logRequest($ip) {
   global $db, $models, $now;
 
