@@ -13,10 +13,14 @@ return array(
           // anything we don't need to query on
           'board_uri' => array('type' => 'str'), // which community scope
           'thread_id' => array('type' => 'int'), // 0 for new thread
-          'post'      => array('type' => 'text'),
-          'files'     => array('type' => 'text'),
+          //'post'      => array('type' => 'text'),
+          //'priv'      => array('type' => 'text'),
+          //'files'     => array('type' => 'text'),
+          'ip'        => array('type' => 'str'),
           // moderator / community
-          'type'    => array('type' => 'str'),
+          'type'      => array('type' => 'str'),
+          // post, files, priv
+          'data'      => array('type' => 'text'),
         ),
       ),
       array(
@@ -31,11 +35,9 @@ return array(
       ),
     ),
     'modules' => array(
-      /*
-      // is this needed?
-      // well we could inject this data into some other endpoints...
-      array('pipeline' => PIPELINE_BOARD_DATA, 'module' => 'boardData'),
-      */
+      // provide data to anything that uses the boards portal
+      array('pipeline' => PIPELINE_PORTALS_DATA, 'module' => 'portals_data'),
+      // handle queuing process based on queueing setting
       array('pipeline' => PIPELINE_NEWPOST_PROCESS, 'module' => 'newpost_process'),
     ),
   ),
