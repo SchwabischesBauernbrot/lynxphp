@@ -223,19 +223,33 @@ function wrapContentHeader($row) {
   $boards_html = <<<EOB
 EOB;
 
-  // FIXME: select the right page...
+  // build the board expander
+  $board_expander_html = getExpander('Boards', 'borads.html', array(
+    'type' => 'iframe',
+    'detailsId' => 'boardsNav',
+    'divId' => 'boardsSubpage',
+    'summaryClass' => 'nav-item',
+    'iframeId' => 'boardsSubpageFrame',
+    'iframeName' => 'boardFrame',
+    'target' => 'boardFrame',
+    'iframeTitle' => 'boards list subframe',
+    'iframeBorder' => false,
+    'aLabel' => 'Please click to load all the html for full board list',
+  ));
 
   $leftNavItems = array(
-    //'Home' => '.',
-    //'Boards' => 'boards.html',
-    //'Help' => 'help.html',
+    array('label' => 'Home', 'destinations' => '.'),
+    array(//'label' => 'Boards', 'destinations' => 'boards.html',
+          'html_override' => $board_expander_html),
+    //array('label' => 'Help', 'destinations' => 'help.html'),
   );
+
   $leftNav_io = array(
     'navItems' => $leftNavItems,
   );
   $pipelines[PIPELINE_SITE_LEFTNAV]->execute($leftNav_io);
 
-  $leftNav_html = getNav($leftNav_io['navItems'], array(
+  $leftNav_html = getNav2($leftNav_io['navItems'], array(
     'type' => 'none', 'baseClasses' => array('nav-item'),
     //'selected' => 'none of those',
     'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
