@@ -29,7 +29,7 @@ $res = $pkg->useResource('vote_pending_post', array('boardUri' => $boardUri),
 // only place in the system where the boardUri changes
 //$boardUri = $_POST['uri'];
 
-if ($res['success'] && $res['success'] !== 'false') {
+if ($res && $res['success'] && $res['success'] !== 'false') {
   // maybe a js alert?
   echo "Success<br>\n";
   //wrapContentFooter($row);
