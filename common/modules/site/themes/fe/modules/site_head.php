@@ -2,6 +2,10 @@
 
 $params = $getModule();
 
+// this can have it's own cache without affecting the php or static
+$io['head_html'] .= '<link id="theme" rel="stylesheet" href="/user/settings/theme.php">';
+
+/*
 $userSettings = $io['userSettings'];
 
 $allThemes = $shared['themes'];
@@ -43,6 +47,6 @@ foreach($themes as $theme) {
 }
 */
 
-$io['head_html'] .= $themesHtml;
+//$io['head_html'] .= $themesHtml;
 
 ?>
