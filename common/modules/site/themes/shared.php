@@ -30,6 +30,7 @@ return array(
     'snerx' => 'SnerxWerx',
     'seafoam-dark' => 'Seafoam Dark',
     'seafoam-light' => 'Seafoam Light',
+    'sovl' => 'Sovl',
   ),
 );
 
