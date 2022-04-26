@@ -38,6 +38,7 @@ function getNav2($navItems, $options = array()) {
 
   // backwards compat
   if ($list === false) $type = 'none';
+  // control the style in the template
   if ($template) {
     $type = 'none';
   }
@@ -57,24 +58,26 @@ function getNav2($navItems, $options = array()) {
     */
   }
   foreach($navItems as $data) {
-    $urlTemplate = $data['destinations'];
-    $label = $data['label'];
-    $alt = empty($data['alt']) ? '' : ' aria-label="' . $data['alt'] . '"';
-    if (is_array($urlTemplate)) {
-      // always link to first one
-      $url = replace_tags($urlTemplate[0], $replaces);
-      if ($selectedURL !== false) {
-        // maybe like pageURLs?
-        $checkUrl = array();
-        foreach($urlTemplate as $tmpl) {
-          $checkUrl[] = replace_tags($tmpl, $replaces);
+    if (empty($data['html_override'])) {
+      $urlTemplate = $data['destinations'];
+      $label = $data['label'];
+      $alt = empty($data['alt']) ? '' : ' aria-label="' . $data['alt'] . '"';
+      if (is_array($urlTemplate)) {
+        // always link to first one
+        $url = replace_tags($urlTemplate[0], $replaces);
+        if ($selectedURL !== false) {
+          // maybe like pageURLs?
+          $checkUrl = array();
+          foreach($urlTemplate as $tmpl) {
+            $checkUrl[] = replace_tags($tmpl, $replaces);
+          }
+        //} else {
+          //$checkUrl = $url;
         }
-      //} else {
-        //$checkUrl = $url;
+      } else {
+        $url = replace_tags($urlTemplate, $replaces);
+        $checkUrl = $url;
       }
-    } else {
-      $url = replace_tags($urlTemplate, $replaces);
-      $checkUrl = $url;
     }
     switch($type) {
       case 'none':
@@ -116,9 +119,14 @@ function getNav2($navItems, $options = array()) {
       $nav_html .= replace_tags($template, $tags);
     } else {
       $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
-      // $prelink . $postlink
-      $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $alt . '>';
-      $nav_html .= $prelabel . $label . $postlabel . '</a>' . "\n";
+
+      if (!empty($data['html_override'])) {
+        $nav_html .= $data['html_override'];
+      } else {
+        // $prelink . $postlink
+        $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $alt . '>';
+        $nav_html .= $prelabel . $label . $postlabel . '</a>' . "\n";
+      }
     }
   }
   switch($type) {
