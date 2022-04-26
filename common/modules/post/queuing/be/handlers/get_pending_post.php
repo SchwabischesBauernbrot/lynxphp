@@ -13,54 +13,30 @@ if (isset($boardData['json']['settings']['queueing_mode']) &&
   return sendResponse(array(), 200, array('board' => $boardData));
 }
 
-// generate identity
-
-$id = getIdentity();
-//$ip = getip();
-global $db, $models;
-
-//echo "id[$id]<br>\n";
-
-// get a list of our votes
-$res = $db->find($models['post_queue_vote'], array(
-  'criteria' => array(
-    //'ip' => $ip,
-    'id' => $id,
-  ),
-), 'queueid');
-$votes = $db->toArray($res);
-$nqis = array();
-foreach($votes as $v) {
-  $nqis[] = $v['queueid'];
+$ip = getip();
+if ($ip === '::1' || $ip === '127.0.0.1') {
+  return sendResponse2(false, array(
+    'code' => 400, 'meta' => array('ip' => $ip, 'server' => $_SERVER), 'err' => 'invalid ip',
+  ));
+  return sendResponse(array(), 400, array('ip' => $ip));
 }
-// then cancel out queueid
-//print_r($votes);
 
-$crit = array('board_uri' => $boardData['uri']);
-if (count($nqis)) {
-  // remove any we've already voted on
-  $crit[] = array('queueid', 'not in', $nqis);
-}
-// find a random post
-$res = $db->find($models['post_queue'], array(
-  'criteria' => $crit,
-  'order' => 'random()',
-  'limit' => 1,
-));
-$qps = $db->toArray($res);
+$votes = getYourVotes();
+$qp = getYourNextQueue($boardData['uri'], $votes);
 
-if (!count($qps)) {
+if (!$qp) {
   sendResponse2(null, array(
     'meta' => array('board' => $boardData, 'votes' => $votes)
   ));
   return;
 }
-$qp = $qps[0];
+
+$data = json_decode($qp['data'], true);
 
 // type, name, size, hash
-$in_files = json_decode($qp['files'], true);
-//print_r($in_files);
-unset($qp['files']);
+$in_files = $data['files'];
+
+//unset($qp['files']);
 $post_files = array();
 foreach($in_files as $f) {
   $m6 = substr($f['type'], 0, 6);
@@ -83,7 +59,7 @@ foreach($in_files as $f) {
   );
 }
 
-$post = json_decode($qp['post'], true);
+$post = $data['post'];
 postDBtoAPI($post);
 $qp['post'] = $post;
 // simulate post date
@@ -113,6 +89,7 @@ if (isset($sesRow['created']) && (int)$sesRow['created'] === (int)$now) {
 $sesRow['json'] = json_decode($sesRow['json'], true);
 $sesRow['json']['queueid'] = $qp['queueid'];
 //print_r($sesRow['json']);
+global $db, $models;
 $ok = $db->updateById($models['session'], $sesRow['sessionid'], array('json' => $sesRow['json']));
 //echo "ok[$ok]<br>\n";
 
