@@ -272,7 +272,7 @@ class Router {
           if (is_array($val)) {
             echo "router::getMaxMitme error - params[$param] val[", print_r($val, 1), "] file[$file]\n";
           } else {
-           $val = str_replace('.html', '', $val);
+            $val = str_replace('.html', '', $val);
           }
           $file = str_replace('{{route.'. $param . '}}', $val, $file);
         }
