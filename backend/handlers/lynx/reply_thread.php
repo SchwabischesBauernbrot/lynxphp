@@ -26,8 +26,14 @@ $post = array(
   'capcode' => '',
   'country' => '',
   'deleted' => 0,
+);
+$privPost = array(
   'ip' => getip(),
 );
+$files = $_POST['files'];
+
+// tag post
+$post['tags'] = tagPost($boardUri, $post, $files, $privPost);
 
 // FIXME: is board locked?
 // is thread locked?
@@ -45,9 +51,10 @@ if (!$reply_allowed_io['allowed']) {
 // FIXME: make sure threadId exists...
 
 $newpost_process_io = array(
-  'p'            => $post,
   'boardUri'     => $boardUri,
-  'files'        => $_POST['files'],
+  'p'            => $post,
+  'priv'         => $privPost,
+  'files'        => $files,
   'addToPostsDB' => true,
   'processFilesDB' => true,
   'bumpBoard' => true,
@@ -58,9 +65,18 @@ $pipelines[PIPELINE_NEWPOST_PROCESS]->execute($newpost_process_io);
 
 if ($newpost_process_io['addToPostsDB']) {
   $post = $newpost_process_io['p']; // update post
+  $privPost = $newpost_process_io['priv']; // update privPost
+  $files = $newpost_process_io['files']; // update files
 
+  // can be an array (issues,id) if file errors
+  $data = createPost($boardUri, $post, $files, $privPost);
+
+  /*
   $id = $db->insert($posts_model, array($post));
   $data = (int)$id;
+  $posts_priv_model = getPrivatePostsModel($boardUri);
+  $privPost['postid'] = $id; // update postid
+  $db->insert($posts_priv_model, array($privPost));
   $issues = processFiles($boardUri, $_POST['files'], $threadid, $id);
 
   // bump board
@@ -75,12 +91,13 @@ if ($newpost_process_io['addToPostsDB']) {
     array('postid', '=', $threadid),
   )));
 
-  if (count($issues)) {
+  if (is_array($issues)) {
     return sendResponse(array(
       'issues' => $issues,
       'id' => $data
     ));
   }
+  */
 
   sendResponse($data);
 } else {
