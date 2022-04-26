@@ -132,6 +132,7 @@ function registerPackageGroup($group) {
   return $loaded;
 }
 
+// FE and BE call this
 function registerPackages() {
   global $packages;
   $packages = array();
