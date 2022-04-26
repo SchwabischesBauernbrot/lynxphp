@@ -4,6 +4,6 @@
 $params = $getModule();
 
 // io is navItems
-$io['navItems']['post queueing'] = '{{uri}}/settings/queueing.html';
+$io['navItems']['Post queueing'] = '{{uri}}/settings/queueing.html';
 
 ?>
