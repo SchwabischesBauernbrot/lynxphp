@@ -39,7 +39,22 @@ switch($action) {
     global $db;
     foreach($posts as $r) {
       // FIXME: call once per r['board']
+      //print_r($r);
+      $board = $r['board'];
       $posts_model = getPostsModel($r['board']);
+      // no all _s are .s
+      if (!$posts_model && strpos($r['board'], '_')!==false) {
+        $board = str_replace('_', '.', $r['board']);
+	//echo "test[$newUri]<br>\n";
+        $posts_model = getPostsModel($board);
+      }
+      //echo "test[", gettype($posts_model), "]<br>\n";
+      if (!$posts_model) {
+        //echo "No post [", $r['postid'], "]<br>\n";
+        // is this key enough?
+        $issues[$r['board']] = 'board not found';
+        continue;
+      }
       $post = $db->findById($posts_model, $r['postid']);
       if (!$post) {
         //echo "No post [", $r['postid'], "]<br>\n";
@@ -49,7 +64,7 @@ switch($action) {
       }
       if ($hasDeleteAccess[$r['board']] || ($post['password'] && $post['password'] === $password)) {
         // try to delete it
-        if (!deletePost($r['board'], $r['postid'], false, $post)) {
+        if (!deletePost($board, $r['postid'], false, $post)) {
           // FIXME: log error?
           $issues[$r['board'].'_'.$r['postid']] = 'deletion failed';
           continue;
