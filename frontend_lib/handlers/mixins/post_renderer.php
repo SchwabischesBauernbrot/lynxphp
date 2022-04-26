@@ -16,6 +16,12 @@ function snippet($text, $size = 10, $tail='...') {
 // js can't hook into the pipeline system, so it can't render the same
 // well JS can use the ajax endpoints to pull it
 // see preview stuff...
+
+// no is optional...
+// - we need to turn off actions
+// - turn off "no" and "0"
+// - remove "[Reply]"
+// but we'll need OC tags on templates... or sections...
 function renderPost($boardUri, $p, $options = false) {
   global $pipelines;
 
@@ -48,6 +54,9 @@ function renderPost($boardUri, $p, $options = false) {
     'global' => array(),
     'admin'  => array(),
   );
+  if (!$p['no']) {
+    $post_actions['all'] = array(); // remove report
+  }
 
   /*
   if ($postCount !== false) {
