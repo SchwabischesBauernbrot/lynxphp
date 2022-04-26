@@ -34,6 +34,7 @@ $fePkgs = array(
         'cacheSettings' => array(
           'files' => array(
             //'../common/modules/site/themes/fe/shared.php',
+            // route.theme is set from :theme
             'css/themes/{{route.theme}}.css', // wrapContent
             'templates/thread_listing.tmpl', // demo/boards
             'templates/header.tmpl', // wrapContent
