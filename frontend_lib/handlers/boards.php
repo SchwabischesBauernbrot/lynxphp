@@ -327,6 +327,11 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   // so it can fast out efficiently
   // also should wrapContent be split into header/footer for efficiency? yes
   // and we need keying too, something like ESI
+
+  // need to set boardSettings here for DEMO
+  // but how do we normally get this? boardData['settings']
+  // getBoardPortal promotes it internally
+
   $boardData['pageCount'] = $boardThreads['pageCount'];
   $boardPortal = getBoardPortal($boardUri, $boardData, array(
     'pagenum' => $pagenum, 'noBoardHeaderTmpl' => $noBoardHeaderTmpl));
@@ -447,11 +452,6 @@ function getBoardCatalogHandler($request) {
   renderBoardCatalog($boardUri);
 }
 
-function getBoardSettingsHandler($request) {
-  $boardUri = $request['params']['uri'];
-  getBoardSettings($boardUri);
-}
-
 function retryCaptcha($boardUri, $row) {
   // regenerate post form...
   // how did $row get threadId = 1
@@ -565,7 +565,7 @@ function makePostHandler($request) {
     // invalid json
     wrapContent('Post Error: <pre>' . $json . '</pre>');
   } else {
-    //echo "<pre>", $endpoint, print_r($result, 1), "</pre>\n";
+    //echo "<pre>", $endpoint, '[', print_r($result, 1), "]</pre>\n";
     //echo "redir[$redir]<br>\n";
     //return;
     if ($result && is_array($result) && isset($result['data']) && is_numeric($result['data'])) {
@@ -726,25 +726,6 @@ function renderBoardCatalog($boardUri) {
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
   $tmpl = replace_tags($tmpl, $p['tags']);
   wrapContent($boardHeader . $tmpl);
-}
-
-function getBoardSettings($boardUri) {
-  global $pipelines;
-  $templates = loadTemplates('board_settings');
-  $tmpl = $templates['header'];
-
-  $io = array(
-    'navItems' => array(),
-    'boardUri' => $boardUri,
-  );
-  $pipelines[PIPELINE_BOARD_SETTING_NAV]->execute($io);
-  $nav_html = getNav($io['navItems'], array(
-    'replaces' => array('uri' => $boardUri),
-  ));
-
-  $tmpl = str_replace('{{nav}}', $nav_html, $tmpl);
-  //$pipelines['boardSettingTmpl']->execute($tmpl);
-  wrapContent($tmpl);
 }
 
 ?>
