@@ -1,5 +1,68 @@
 <?php
 
+// definitely an OP
+
+function threadDBtoAPI(&$row) {
+  global $db, $models;
+  if ($db->isTrue($row['deleted'])) {
+    // non-OPs are automatically hidden...
+    $nrow = array(
+      'postid' => $row['postid'],
+      'no' => $row['postid'],
+      // threadid isn't set sometimes?
+      'threadid' => $row['postid'],
+      'deleted' => 1,
+      'com' => 'Thread OP has been deleted but this placeholder is kept, so replies can be read',
+      'sub' => '',
+      'name' => '',
+      // no reasons to hide these...
+      'created_at' => $row['created_at'],
+      'updated_at' => $row['updated_at'],
+      'files' => array(),
+      // catalog uses this
+      //'reply_count' => $row['reply_count'],
+      //'file_count' => $row['file_count'],
+    );
+    if (isset($row['reply_count'])) $nrow['reply_count'] = $row['reply_count'];
+    if (isset($row['file_count'])) $nrow['file_count'] = $row['file_count'];
+    $row = $nrow;
+    return;
+  }
+
+  // filter out any file_ or post_ field
+  $row = array_filter($row, function($v, $k) {
+    $f5 = substr($k, 0, 5);
+    return $f5 !== 'file_' && $f5 !== 'post_';
+  }, ARRAY_FILTER_USE_BOTH);
+
+  $row['no'] = empty($row['postid']) ? 0 : $row['postid'];
+  unset($row['postid']);
+  //unset($row['ip']);
+
+  $data = empty($row['json']) ? array() : json_decode($row['json'], true);
+
+  // FIXME: pipeline
+  if (empty($data['cyclic'])) {
+    // is this even needed
+    unset($row['cyclic']);
+  } else {
+    $row['cyclic'] = 1;
+  }
+
+  unset($row['json']);
+  // ensure frontend doesn't have to worry about database differences
+  $bools = array('deleted', 'sticky', 'closed');
+  foreach($bools as $f) {
+    // follow 4chan spec
+    if ($db->isTrue($row[$f])) {
+      $row[$f] = 1;
+    } else {
+      unset($row[$f]);
+    }
+  }
+  // decode user_id
+}
+
 function getThread($boardUri, $threadNum, $options = false) {
   // unpack options
   extract(ensureOptions(array(
@@ -56,7 +119,7 @@ function getThread($boardUri, $threadNum, $options = false) {
       if (!isset($posts[$row['postid']])) {
         //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
         $posts[$row['postid']] = $row;
-        postDBtoAPI($posts[$row['postid']]);
+        threadDBtoAPI($posts[$row['postid']]);
         //echo "<pre>4chan", print_r($row, 1), "</pre>\n";
         $posts[$row['postid']]['files'] = array();
       }
