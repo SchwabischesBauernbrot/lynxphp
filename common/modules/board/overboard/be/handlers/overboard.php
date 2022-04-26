@@ -53,9 +53,19 @@ foreach($threads as $i => $t) {
 }
 */
 
+//print_r($threads);
+
 // now load in the posts
 foreach($threads as $i => $t) {
+  /*
+  if (!isset($t['boardUri']) {
+    echo "Threads missing boardUri\n";
+  }
+  if (!isset($models[$t['boardUri']])) {
+    continue;
+  }
   $model = $models[$t['boardUri']];
+  */
   // there's tpp but it's like 10...
   $threads[$i]['posts'] = getThread($t['boardUri'], $t['no'], array(
     //'posts_model' => $model['post'],
