@@ -5,16 +5,18 @@ $params = $getModule();
 $show = false;
 
 // see if any of $io['boardSettings']['post_queueing'] are set to com
-foreach($io['boardSettings']['post_queueing'] as $t => $action) {
-  if ($action === 'com' || $action === 'mod') {
-    if ($action === 'com') {
-      $show = true;
-    } else {
-      // mod
-      // or if you're logged in as a mod...
-      $show = true;
+if (isset($io['boardSettings']['post_queueing'])) {
+  foreach($io['boardSettings']['post_queueing'] as $t => $action) {
+    if ($action === 'com' || $action === 'mod') {
+      if ($action === 'com') {
+        $show = true;
+      } else {
+        // mod
+        // or if you're logged in as a mod...
+        $show = true;
+      }
+      break;
     }
-    break;
   }
 }
 
