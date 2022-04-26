@@ -36,6 +36,7 @@ $user_model = array(
     'password'  => array('type' => 'str'),
     'email'     => array('type' => 'str'),
     'publickey' => array('type' => 'str'),
+    'last_login' => array('type' => 'int'),
   )
 );
 
