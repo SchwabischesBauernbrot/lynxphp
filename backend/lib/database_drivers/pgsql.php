@@ -28,6 +28,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   function __construct() {
     parent::__construct();
     // datetime would have been nice to have to make database easier to work with
+    // why don't we have datetime?
     $this->modelToSQL = array(
       'str'     => 'VARCHAR NOT NULL DEFAULT \'\',',
       'string'  => 'VARCHAR NOT NULL DEFAULT \'\,',
