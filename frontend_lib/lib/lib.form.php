@@ -147,7 +147,8 @@ function generateForm($action, $fields, $values, $options = false) {
     }
     switch($details['type']) {
       case 'hidden':
-        $html .= '<input type=hidden name="'.$field.'" value="' . $value . '">';
+        // using single quotes so you can pass JSON encoded data easily
+        $html .= '<input type=hidden name="'.$field.'" value=\'' . $value . '\'>';
       break;
       /*
       case 'title':
