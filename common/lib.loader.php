@@ -1,7 +1,7 @@
 <?php
 
 //
-// loader functions
+// module loading functions
 //
 
 $module_base = 'common/modules/';
@@ -139,7 +139,7 @@ function registerPackages() {
 
   // data
   $groups = array(
-    'base/base', 'base/user', 'base/site', 'base/thread',
+    'base/base', 'base/board', 'base/user', 'base/site', 'base/thread',
     'board', 'thread', 'post', 'user', 'admin', 'global', 'site', 'protection');
   foreach($groups as $group) {
     registerPackageGroup($group);
