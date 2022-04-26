@@ -146,6 +146,14 @@ function getBoardWithBoardid($boardUri, $options = false) {
   return array($row, $boardData);
 }
 
+function saveBoardSettings($boardUri, $settings) {
+  global $db, $models;
+  // true / false if success
+  $row['json']['settings'] = $settings;
+  return $db->update($models['board'], $row, array('criteria' => array('uri' => $boardUri)));
+}
+
+
 // scatter/gather
 function getBoards($boardUris) {
   global $db, $models;
@@ -302,16 +310,21 @@ function boardPage($boardUri, $posts_model, $page = 1) {
   */
   //echo "count [", $db->num_rows($res), "]<br>\n";
   if (get_class($db) === 'pgsql_driver') {
+    // +sticky isn't working
+    // +and deleted OPs with replies aren't either
+    // order of non-sticky, replies aren't bumping...
     $sql = 'select '.join(',', array_map(function ($f) { return 'f.' . $f . ' as file_' . $f; }, $filesFields)).', ranked_post.*
-              from
-              (
+              from'.
+              // ranking post for threads
+              '(
                 select t1.*, t1.json as thread_json, tf.*, t1.created_at as thread_created_at, p.postid as replyid, t.postid as thread_postid, rank() OVER (PARTITION BY p.threadid ORDER BY p.created_at DESC) AS "rank",
                   '.join(',', array_map(function ($f) { return 'p.' . $f . ' as post_' . $f; }, $postFields)).',
                   '.join(',', array_map(function ($f) { return 'tf.' . $f . ' as threadfile_' . $f; }, $filesFields)).'
-                from (
-                  select p1.*, count(jt1.postid) as cnt
+                from ('.
+                  // get a list of viable threads
+                  'select p1.*, count(jt1.postid) as cnt
                       from '.$postTable.' as p1
-                        left join '.$postTable.' as jt1 on (jt1.postid=p1.threadid and jt1.deleted = \'0\')
+                        left join '.$postTable.' as jt1 on (jt1.threadid=p1.postid and jt1.deleted = \'0\')
                       where p1.threadid = \'0\'
                       group by p1.postid
                       having  (p1.deleted=\'0\' or (p1.deleted=\'1\' and count(jt1.postid)>0))
@@ -320,11 +333,11 @@ function boardPage($boardUri, $posts_model, $page = 1) {
                   left join '.$postTable.' as t on (t1.postid = t.postid)
                   left join '.$filesTable.' tf on (tf.postid = t.postid)
                   left join '.$postTable.' as p on (t1.postid = p.threadid)
-                order by sticky desc, t.updated_at desc, p.created_at desc
+                order by t.updated_at desc, p.created_at desc
               ) as ranked_post
               left join '.$filesTable.' f on f.postid = ranked_post.replyid
             where rank <= ' . $lastXreplies . '
-            order by ranked_post.thread_postid desc, ranked_post.replyid asc
+            order by sticky desc, ranked_post.thread_postid desc, ranked_post.replyid asc
             limit ' . $tpp . ($limitPage ? ' OFFSET ' . ($limitPage * $tpp) : '');
     //echo "sql[$sql]<br>\n";
     $res = pg_query($db->conn, $sql);
@@ -347,7 +360,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
         $threads[$row['thread_postid']]['postid'] = $row['thread_postid'];
         $threads[$row['thread_postid']]['json']   = $row['thread_json'];
         $threads[$row['thread_postid']]['created_at'] = $row['thread_created_at'];
-        postDBtoAPI($threads[$row['thread_postid']]);
+        threadDBtoAPI($threads[$row['thread_postid']]);
         $threads[$row['thread_postid']]['posts'] = array();
         $threads[$row['thread_postid']]['files'] = array();
         //echo "<pre>", print_r($threads[$row['thread_postid']], 1), "</pre>\n";
@@ -480,7 +493,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
         'posts' => array($row)
       );
       // filter OP
-      postDBtoAPI($threads[$row['postid']]['posts'][0]);
+      threadDBtoAPI($threads[$row['postid']]['posts'][0]);
       $threads[$row['postid']]['posts'][0]['files'] = array();
     }
 
@@ -653,7 +666,7 @@ function boardCatalog($boardUri) {
     if (!isset($threads[$page][$row['postid']])) {
       // add thread
       $threads[$page][$row['postid']] = $row;
-      postDBtoAPI($threads[$page][$row['postid']], $post_files_model);
+      threadDBtoAPI($threads[$page][$row['postid']], $post_files_model);
       $threads[$page][$row['postid']]['file_count'] = $row['file_count']; // preserve file_count
       $threads[$page][$row['postid']]['files'] = array();
     }
