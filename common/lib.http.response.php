@@ -8,6 +8,8 @@
 
 // FIXME: rename make public
 // FIXME: change prototype
+// mtime === 0 => doesn't set lastmod
+// mtime === now => don't cache
 function _doHeaders($mtime, $options = false) {
   // no need for headers when generating pages
   if (IN_GENERATE) return;
@@ -29,11 +31,14 @@ function _doHeaders($mtime, $options = false) {
     header('Content-Length: ' . $fileSize);
   }
   //header('X-Debug-mtime: ' . $mtime);
+
+  // looks like cloudflare is stripping our custom etag...
   //if ($etag) header('X-Debug-etag: ' . $etag);
 
   // don't cache this
   if ($mtime === $now) {
     // don't cache
+    //header('X-Debug-mtimeIsNow: ' . $now);
     header('Expires: ' . gmdate('D M d H:i:s Y', 1)); // old
     header('Cache-Control: no-store, must-revalidate, post-check=1, pre-check=2');
     // this breaks /opt/test/thread/82/lock?prettyPrint=1
@@ -105,6 +110,10 @@ function cachePageContentsForever($mtime = 0) {
 // FIXME: redo these parameters
 // really an incoming request thing but drives responses
 // we always set headers here
+// FIXME: allow expires param
+
+// mtime === 0 => doesn't set lastmod
+// mtime === now => set lastmod
 function checkCacheHeaders($mtime, $options = false) {
   //header('X-Debug-checkCacheHeaders-mtime: ' . $mtime);
   extract(ensureOptions(array(
@@ -112,6 +121,14 @@ function checkCacheHeaders($mtime, $options = false) {
     'fileSize' => 0,
     'etag' => false,
   ), $options));
+
+  if ($etag !== false) {
+    $sendEtag = $etag;
+    // are we in the W/"" format?
+    if ($etag[0] !== 'W') {
+      $sendEtag = 'W/"' . $etag . '"';
+    }
+  }
 
   $headers = getallheaders();
 
@@ -127,20 +144,32 @@ function checkCacheHeaders($mtime, $options = false) {
   }
 
   // 304 processing
-  if (0) {
-    header('X-Debug-checkCacheHeaders-cc: ' . $headers['Cache-Control']);
-    header('X-Debug-checkCacheHeaders-in: ' . $headers['If-None-Match']);
-    header('X-Debug-checkCacheHeaders-im: ' . $headers['If-Modified-Since']);
-  }
-  if ((!isset($headers['Cache-Control']) || (isset($headers['Cache-Control']) && $headers['Cache-Control'] !== 'no-cache'))
-      && (
-        ($etag && !empty($headers['If-None-Match'])
+  $allowCacheCheck = !isset($headers['Cache-Control']) || (isset($headers['Cache-Control']) && $headers['Cache-Control'] !== 'no-cache');
+  $etagPass = $etag && !empty($headers['If-None-Match'])
               // do we need a string search instead of a compare?
-           && strpos($headers['If-None-Match'], $etag) !== false) ||
-        ($lastmod && !empty($headers['If-Modified-Since'])
-           && $lastmod == $headers['If-Modified-Since']))
-      ) {
+           && strpos($headers['If-None-Match'], $etag) !== false;
+  $mtimePass = $lastmod && !empty($headers['If-Modified-Since'])
+           && $lastmod == $headers['If-Modified-Since'];
+  if (0) {
+    //header('X-Debug-checkCacheHeaders-cc: ' . $headers['Cache-Control']);
+    header('X-Debug-checkCacheHeaders-acc: ' . ($allowCacheCheck ? 'allowed' : 'blocked'));
+    //header('X-Debug-checkCacheHeaders-in: ' . isset($headers['If-None-Match']) ? $headers['If-None-Match'] : '');
+    //header('X-Debug-checkCacheHeaders-im: ' . isset($headers['If-Modified-Since']) ? $headers['If-Modified-Since'] : '');
+    if ($etag) {
+      header('X-Debug-checkCacheHeaders-ep: ' . ($etagPass ? 'accepted' : 'unmatched'));
+      header('X-Debug-checkCacheHeaders-server: ' . $etag);
+      header('X-Debug-checkCacheHeaders-browser: ' . isset($headers['If-None-Match']) ? $headers['If-None-Match'] : '');
+    }
+    if ($lastmod) {
+      header('X-Debug-checkCacheHeaders-me: ' . ($mtimePass ? 'accepted' : 'unmatched'));
+    }
+  }
+  // CF will hide these
+  if ($allowCacheCheck && ($etagPass || $mtimePass)) {
     header('HTTP/1.1 304 Not Modified');
+    header('X-Debug-checkCacheHeaders-HIT: 304');
+    // weird chrome can't make etag match here
+    // shift-reload gives one but this always give another formating of a string
     _doHeaders($mtime, array('contentType' => $contentType, 'lastMod' => $lastmod, 'etag' => $etag));
     // maybe just exit?
     return true;
