@@ -4,6 +4,25 @@ return array(
   'version' => 1,
   'resources' => array(
     array(
+      'name' => 'get_settings',
+      'params' => array(
+        'endpoint' => 'doubleplus/boards/:boardUri/settings/post_queue',
+        'requireSession' => true,
+        'unwrapData' => true,
+        'requires' => array('boardUri'),
+      ),
+    ),
+    array(
+      'name' => 'save_settings',
+      'params' => array(
+        'endpoint' => 'doubleplus/boards/:boardUri/settings/post_queue',
+        'method' => 'POST',
+        'requireSession' => true,
+        'unwrapData' => true,
+        'requires' => array('boardUri'),
+      ),
+    ),
+    array(
       'name' => 'get_pending_post',
       'params' => array(
         'endpoint' => 'doubleplus/post_queue',
