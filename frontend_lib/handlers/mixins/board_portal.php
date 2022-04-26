@@ -11,6 +11,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'isThread'  => false,
     'threadNum' => 0,
     'noBoardHeaderTmpl' => false,
+    // turns off post_form:
     'threadClosed'      => false,
     'maxMessageLength'  => false,
     'boardSettings'     => false,
@@ -24,16 +25,21 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
 
   // would be nice to have the board settings by here
   // so we can pass it in to control/hint the nav
+  // we need boardSettings for pipelines (mainly nav)
   if ($boardSettings === false) {
     if (DEV_MODE) {
       echo "No boardSettings passed to renderBoardPortalData<Br>\n";
     }
     $boardData = getBoard($boardUri);
-    $boardSettings = $boardData['settings'];
+    if (isset($boardData['settings'])) {
+      $boardSettings = $boardData['settings'];
+    }
     //print_r($boardSettings);
   }
   $nav_io = array(
     'boardUri' => $boardUri,
+    // would be help to know what settings are used
+    // settings_queueing_mode is used
     'boardSettings' => $boardSettings,
     'navItems' => array(
       'Index' => $boardUri . '/',
@@ -57,6 +63,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   $boardNav = '';
   if (!$isThread) {
 
+    // do pages
     $pages_html = '';
     // FIXME: wire this up
     for($p = 1; $p <= $pageCount; $p++) {
@@ -75,6 +82,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
       $pages_html .= replace_tags($pageLink_tmpl, $pgTags);
     }
 
+    // pop them into page_wrapper_tmpl
     $boardNav = replace_tags($page_wrapper_tmpl, array(
       'pages' => $pages_html,
       'boardNav' => $nav_html,
