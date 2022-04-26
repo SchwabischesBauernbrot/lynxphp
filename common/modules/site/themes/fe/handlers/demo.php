@@ -102,7 +102,7 @@ $pageData = array(
         'com' => 'Quickly empower backward-compatible process improvements through client-focused applications. Dynamically extend collaborative results and next-generation platforms. Intrinsicly redefine holistic vortals before enabled technologies. Globally innovate resource sucking leadership via 24/7 "outside the box" thinking. Objectively brand team building methodologies through world-class "outside the box" thinking.',
         'files' => array(
           array(
-            'path' => 'https://www.placecage.com/200/300',
+            'path' => 'https://placekitten.com/200/300',
             'filename' => 'noimageset.png',
             'w' => 200,
             'h' => 300,
@@ -110,7 +110,7 @@ $pageData = array(
             'size' => 123456,
           ),
           array(
-            'path' => 'https://www.placecage.com/g/300/200',
+            'path' => 'https://placekitten.com/300/200',
             'filename' => 'noimageset.png',
             'w' => 300,
             'h' => 200,
@@ -118,7 +118,7 @@ $pageData = array(
             'size' => 123456,
           ),
           array(
-            'path' => 'https://www.placecage.com/c/256/256',
+            'path' => 'https://placekitten.com/256/256',
             'filename' => 'noimageset.png',
             'w' => 256,
             'h' => 256,
@@ -126,7 +126,7 @@ $pageData = array(
             'size' => 123456,
           ),
           array(
-            'path' => 'https://www.placecage.com/gif/200/300',
+            'path' => 'https://placekitten.com/200/300',
             'filename' => 'noimageset.png',
             'w' => 200,
             'h' => 300,
