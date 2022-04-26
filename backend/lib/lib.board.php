@@ -92,7 +92,7 @@ function boardDealer($connections, $boardUri) {
   return $connections[$v % count($connections)];
 }
 
-$getPostsModel = array();
+//$getPostsModel = array();
 function getPostsModel($boardUri) {
   global $db, $models, $getPostsModel;
 
@@ -132,12 +132,44 @@ function getPostsModel($boardUri) {
       //'country_name' => array('type'=>'string', 'length'=>128),
       'sub' => array('type'=>'str', 'length'=>128),
       'com' => array('type'=>'text'),
-      'ip' => array('type'=>'str'),
       'password' => array('type'=>'str'),
     )
   );
   $db->autoupdate($public_post_model);
   return $public_post_model;
+}
+
+function getPrivatePostsModel($boardUri) {
+  global $db, $models;
+
+  // FIXME: just implement a cache here...
+  /*
+  if (!empty($getPostsModel[$boardUri])) {
+    echo "getPostsModel called for [$boardUri] last call[", print_r($getPostsModel, 1), "] trace[", gettrace(), "]<br>\n";
+  } else {
+    $getPostsModel[$boardUri] = gettrace();
+  }
+  */
+
+  $cnt = $db->count($models['board'], array('criteria'=>array(
+      array('uri', '=', $boardUri),
+  )));
+  if (!$cnt) {
+    //echo "getPostsModel no such [$boardUri]<br>\n";
+    return false;
+  }
+
+  $private_post_model = array(
+    'name' => 'board_' . $boardUri . '_private_post',
+    //'indexes' => array('boardUri'),
+    'fields' => array(
+      // can just be postid...
+      'post_id' => array('type'=>'integer'),
+      'ip' => array('type'=>'str'),
+    )
+  );
+  $db->autoupdate($private_post_model);
+  return $private_post_model;
 }
 
 $getPostFilesModel = array();
