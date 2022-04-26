@@ -10,7 +10,8 @@ $themes = array_keys($allThemes);
 global $packages, $now;
 // FIXME: fileSize would be good to know per theme
 // can put a timer around this...
-$userSettings = $packages['user_setting']->useResource('settings');
+$result = $packages['user_setting']->useResource('settings');
+$userSettings = $result['settings'];
 
 // normalize $theme
 
@@ -22,7 +23,6 @@ $theme = $userSettings['current_theme'];
 // manually handle the caching...
 
 // loggedin, session (settings)
-//print_r($userSettings);
 // fileSize / eTag
 // since this is theme only, we might be able to rely on etag
 // this does seem to sometimes cut down on bytes transferred
