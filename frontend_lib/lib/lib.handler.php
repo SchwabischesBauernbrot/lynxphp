@@ -37,6 +37,7 @@ function sendBump($req_method, $req_path) {
          strpos($req_path, '/preview/') !== false ||
          strpos($req_path, '/refresh') !== false ||
          $req_path === '/logout' ||
+         $req_path === '/user/settings/theme.php' ||
          $req_path === '/logout.php'
       ) && strpos($req_path, '/.youtube') === false) {
     // make sure first lines of output are see-able
