@@ -155,6 +155,8 @@ $boardThreads = array(
   'board' => array(
     'title' => 'random',
     'description' => 'this is an imaginary board for purposes of demostration',
+    // needs to be set to avoid asking for the backend for boardSettings for NAV
+    'settings' => array(),
   )
 );
 
