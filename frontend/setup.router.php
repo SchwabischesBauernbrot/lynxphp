@@ -297,18 +297,24 @@ $frontendRouterData = array(
           ),
         ),
       ),
-      'settings' => array(
-        // need to pass :uri into the script somehow...
-        // also how will the non-router version know?
-        'route'  => '/:uri/board_settings.php',
-        'func'   => 'getBoardSettingsHandler',
-      ),
       // needs to go last
       'fileRedirect' => array(
         'route'  => '/:uri',
         'func'   => 'getBoardFileRedirect',
         // in static mode, webserver should do this automatically
         'dontGen' => true,
+      ),
+    ),
+  ),
+  'board_settings' => array(
+    'file'   => 'board_settings',
+    'portals' => array('board_settings'),
+    'routes' => array(
+      'settings' => array(
+        // need to pass :uri into the script somehow...
+        // also how will the non-router version know?
+        'route'  => '/:uri/board_settings.php',
+        'func'   => 'getBoardSettingsHandler',
       ),
     ),
   ),
