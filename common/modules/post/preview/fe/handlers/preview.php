@@ -14,6 +14,7 @@ $id = (int)str_replace('.json', '', $id);
 // request JSON version
 $result = $pkg->useResource('preview', array('board' => $boardUri, 'id' => $id . '.json'));
 
+// this is an official lynxchan endpoint
 //echo "<pre>", htmlspecialchars(print_r($result, 1)), "</pre>\n";
 $res = json_decode($result, true);
 //echo "<pre>", htmlspecialchars(print_r($res, 1)), "</pre>\n";
