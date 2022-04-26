@@ -56,7 +56,7 @@ function userInGroup($user_id, $group) {
 
 // allow threadNum to be 0
 // p/boardUri/threadNum/postId
-function isUserPermitted($user_id, $permission, $target = false) {
+function isUserPermitted($user_id, $target = false, $permission = '') {
   // is user a admin or global?
   $isAdmin  = userInGroup($user_id, 'admin');
   $isGlobal = userInGroup($user_id, 'global');
@@ -74,12 +74,13 @@ function isUserPermitted($user_id, $permission, $target = false) {
       // BOs can do anything...
       $access = isBO($boardUri, $user_id);
       if (!$access) {
-        // password match post password?
+        // board vols?
       }
     } else
     if ($parts[0] === 'p') {
       $boardUri = $parts[1];
       $access = isBO($boardUri, $user_id);
+      // board vols?
       if (!$access) {
         // password match post password?
       }
