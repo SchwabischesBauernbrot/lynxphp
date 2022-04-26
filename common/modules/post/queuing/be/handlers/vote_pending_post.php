@@ -40,6 +40,7 @@ global $db, $models;
 
 // do we already have a vote for this recorded?
 $id = getIdentity();
+$ip = getip();
 $res = $db->find($models['post_queue_vote'], array(
   'criteria' => array(
     'queueid' => $queueid,
@@ -50,7 +51,6 @@ $res = $db->find($models['post_queue_vote'], array(
 ), 'voteid');
 $votes = $db->toArray($res);
 
-$ip = getip();
 $ok = false;
 if (count($votes)) {
   // delete all of them
@@ -86,52 +86,17 @@ $votes = $db->toArray($res);
 $consensus = 2;
 
 $sc = 0;
-if (count($votes) > $consensus) {
+if (count($votes) >= $consensus) {
   //print_r($votes);
-  foreach($votes as $v) {
+  foreach($votes as $i=>$v) {
     $sc += $v['bet'];
+    unset($votes[$i]['ip']); // don't leak ip
   }
   $okToNuke = true;
-  if ($sc > ($consensus/2)) {
-    // passed
-    // get post/files data
-    $qp = $db->findById($models['post_queue'], $queueid);
-    // queueid, post, json, created_at, updated_at, type, board_uri,
-    // files, thread_id
-    //print_r($qp);
-    // insert into board posts
-    $boardUri = $qp['board_uri']; // just incase we voted across boards
-    $post = json_decode($qp['post'], true);
-
-    //echo "boardUri[$boardUri] post[$post]<br>\n";
-    $posts_model = getPostsModel($boardUri);
-    $id = 0;
-    if ($posts_model && $post) {
-      $id = $db->insert($posts_model, array($post));
-
-      // handle files
-      processFiles($boardUri, $qp['files'], $qp['thread_id'] ? $qp['thread_id'] : $id, $id);
-
-      // bump board
-      global $now;
-      $inow = (int)$now;
-      $urow = array('last_thread' => $inow, 'last_post' => $inow);
-      $db->update($models['board'], $urow, array('criteria' => array(
-        'uri' => $boardUri,
-      )));
-
-      // do we need to bump thread?
-      if ($qp['thread_id']) {
-        // bump thread
-        $urow = array();
-        $db->update($posts_model, $urow, array('criteria'=>array(
-          'postid' => $qp['thread_id'],
-        )));
-      }
-    } else {
-      // an honest attempt hasn't been made yet...
-      $okToNuke = false;
-    }
+  // approved to post
+  //echo "score[$sc] > [", ($consensus / 2), "]<br>\n";
+  if ($sc > ($consensus / 2)) {
+    $okToNuke = post_dequeue($queueid);
   }
   if ($okToNuke) {
     // delete from queue
@@ -144,13 +109,13 @@ if (count($votes) > $consensus) {
 }
 
 sendResponse2(array(
-  'success' => $ok ? 'true' : 'false',
-  'vote' => $action,
-  'queueid' => $queueid,
-  'created' => $id,
+  'success'  => $ok ? 'true' : 'false',
+  'vote'     => $action,
+  'queueid'  => $queueid,
+  'created'  => $id,
   'boardUri' => $boardUri,
-  'sc'    => $sc,
-  'votes' => $votes,
+  'score'    => $sc,
+  'votes'    => $votes,
 ));
 
 ?>
