@@ -47,6 +47,7 @@ function consume_beRsrc($options, $params = '') {
     $headers['sid'] = $_COOKIE['session'];
   }
   // when shouldn't we send this?
+  // having it for sessions would be good for scoping
   if (!empty($options['sendIP'])) $headers['X-FORWARDED-FOR'] = getip();
   if (!count($headers)) $headers = '';
 
@@ -184,35 +185,6 @@ function postExpectJson($endpoint, $postData) {
   return expectJson($json, $endpoint);
 }
 */
-
-function getBoards($params = false) {
-  //$boards = getExpectJson('4chan/boards.json');
-  /*
-  $qstr = '';
-  if ($params) {
-    $qstr = '?';
-    foreach($params as $k => $v) {
-      $qstr .= $k . '=' . $v . '&';
-    }
-  }
-  $boards = getExpectJson('opt/boards.json'.$qstr);
-  */
-  $qs = array();
-  if ($params) {
-    foreach($params as $k => $v) {
-      $qs[] = $k . '=' . urlencode($v);
-    }
-  }
-  //echo "qs[", join('&', $qs), "]<br>\n";
-  $boards = consume_beRsrc(array(
-    'endpoint'    => 'opt/boards.json',
-    'querystring' => $qs,
-    'sendSession' => true,
-    'expectJson'  => true,
-    //'unwrapData'  => true,
-  ));
-  return $boards;
-}
 
 function getBoard($boardUri) {
   $boardData = getExpectJson('opt/' . $boardUri . '.json');
