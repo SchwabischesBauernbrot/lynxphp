@@ -20,7 +20,8 @@ if (!$sesRow) {
   // we just need to make a new session
   // but that needs to happen in the get
   return sendResponse2(array('success' => 'false'), array(
-    'code' => 401,
+    // can't use 401, it's not a log in issue
+    'code' => 400,
     'err'  => 'bad session',
     // could put this in data too I suppose
     'meta' => array('vote' => $action),
