@@ -48,9 +48,17 @@ function recurse_chown_chgrp($basepath, $uid, $gid) {
   @chgrp($basepath, $gid);
 }
 
+function isBackend() {
+  global $db;
+  return $db ? true : false;
+}
+
 function registerPackage($pkg_path) {
+  //echo "pkg_path[$pkg_path]<br>\n";
   global $module_base;
   $full_pkg_path = '../' . $module_base . $pkg_path . '/';
+
+  // FIXME: could reduce diskio if we had a $pkg_path lock
 
   $pkg = false;
   if (is_readable($full_pkg_path . 'module.php')) {
@@ -65,7 +73,44 @@ function registerPackage($pkg_path) {
       echo "[$full_pkg_path] module.php did not return correct data, make sure name and version are set<br>\n";
       return $pkg;
     }
+    global $packages;
+    // handle already loaded
+    if (isset($packages[$data['name']])) {
+      //echo "already loaded[", $data['name'], "]<bR>\n";
+      // really no harm here if two objects made, just wastes memory
+      // and causes confusion
+      return $packages[$data['name']];
+    }
     $pkg = new package($data['name'], $data['version'], substr($full_pkg_path, 0, -1));
+
+    if (!empty($data['dependencies'])) {
+      //echo "<pre>has depends [", print_r($data['dependencies'], 1), "]</pre>\n";
+
+      // FIXME: now what if this module is disabled
+      // well right we only disable on the frontend...
+      // because all backendRoutes are basically inert unless called
+      // so everything on the backend will be attached and executing
+      // even if the frontend does nothing with it
+
+      // probably should be doing this inside buildBackendRoutes
+      // but buildBackendRoutes can't access dependencies
+      $pkg->dependencies = $data['dependencies'];
+      foreach($data['dependencies'] as $depPkgName) {
+        // front or back?
+        if (isBackend()) {
+          // make sure we have it
+
+          // we still need this for js.php I think
+          $depPkg = registerPackage($depPkgName);
+          $depPkg->buildBackendRoutes();
+          // register package with $packages global
+          $packages[$depPkg->name] = $depPkg;
+        } else {
+          // do nothing for now
+        }
+      }
+    }
+
     // not all module.php will have resources
     if (!empty($data['resources'])) {
       foreach($data['resources'] as $rsrcHdr) {
