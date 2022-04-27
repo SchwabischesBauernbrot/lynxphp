@@ -51,7 +51,7 @@ EOB;
     // need $row
     $row = wrapContentData(array()); echo wrapContentGetHeadHTML($row, true); $sentHead = true;
     echo '<!-- lib.handler::sendBump [', $req_method, '][', $req_path, '] -->';
-    echo '<div style="height: 50px;"></div>', "\n"; flush();
+    echo '<div style="height: 50px;" id="bump"></div>', "\n"; flush();
     $sentBump = true;
   }
 }
@@ -65,14 +65,20 @@ function wrapContentData($options = false) {
   extract(ensureOptions(array(
      // only should be used when we know we're opening a ton of requests in parallel
     'noWork'      => false,
-    'settings'    => false,
+    //'settings'    => false,
     // close the div and main tags
     'closeHeader' => true,
     'canonical'   => false,
   ), $options));
 
+  //echo "settings[", print_r($settings, 1), "]<bR>\n";
+
   $enableJs = true;
+
+  /*
+  // this now gets called early for head/bump
   if (empty($settings)) {
+    echo "settings is empty[", gettrace(), "]<bR>\n";
     // this can cause an infinite loop if backend has an error...
     // FIXME: caching
     //echo "packages[", print_r(array_keys($packages), 1), "]<br>\n";
@@ -104,16 +110,18 @@ function wrapContentData($options = false) {
     $siteSettings = $settings['site'];
     $userSettings = $settings['user'];
   }
+  */
   if (DISABLE_WORK) {
     $noWork = true;
   }
 
   return array(
     // this currently drives the title tag
-    'siteSettings' => $siteSettings,
+    // title always empty anyways...
+    //'siteSettings' => $siteSettings,
     // FIXME: I don't think this is even used
     // but we have a unified call, so there's no cost atm
-    'userSettings' => $userSettings,
+    //'userSettings' => $userSettings,
     'enableJs' => $enableJs,
     'doWork' => !$noWork,
     'closeHeader' => $closeHeader,
@@ -142,11 +150,11 @@ function wrapContentData($options = false) {
 function wrapContentGetHeadHTML($row, $fullHead = false) {
   global $pipelines;
 
-  $siteSettings = $row['siteSettings'];
-  $userSettings = $row['userSettings'];
+  //$siteSettings = $row['siteSettings'];
+  //$userSettings = $row['userSettings'];
   $io = array(
-    'siteSettings' => $siteSettings,
-    'userSettings' => $userSettings,
+    //'siteSettings' => $siteSettings,
+    //'userSettings' => $userSettings,
     'head_html' => '',
   );
   $pipelines[PIPELINE_SITE_HEAD]->execute($io);
@@ -185,8 +193,8 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
 function wrapContentHeader($row) {
   global $pipelines;
 
-  $siteSettings = $row['siteSettings'];
-  $userSettings = $row['userSettings'];
+  //$siteSettings = $row['siteSettings'];
+  //$userSettings = $row['userSettings'];
   $enableJs = $row['enableJs'];
 
   /*
@@ -399,25 +407,32 @@ function wrapContentFooter($row) {
     'template' => '- <a class="{{classes}}" {{id}} href="{{url}}" {{alt}}>{{label}}</a>' . "\n",
   ));
 
+  $header_io = array(
+    //'siteSettings' => $row['siteSettings'],
+    //'userSettings' => $row['userSettings'],
+    'header_html' => '',
+  );
+  $pipelines[PIPELINE_SITE_FOOTER_HEADER]->execute($header_io);
+
   // kind of lame because modules shouldn't need to know about templates...
   // but made they need to inside HTML?
   $footer_io = array(
-    'siteSettings' => $row['siteSettings'],
-    'userSettings' => $row['userSettings'],
+    //'siteSettings' => $row['siteSettings'],
+    //'userSettings' => $row['userSettings'],
     'footer_html' => '',
   );
   $pipelines[PIPELINE_SITE_FOOTER_FOOTER]->execute($footer_io);
 
   $end_io = array(
-    'siteSettings' => $row['siteSettings'],
-    'userSettings' => $row['userSettings'],
+    //'siteSettings' => $row['siteSettings'],
+    //'userSettings' => $row['userSettings'],
     'end_html' => '',
   );
   $pipelines[PIPELINE_SITE_END_HTML]->execute($end_io);
   $tags = array(
     'jsenable' => $enableJs ? '' : '<!-- ',
     'jsenable2' => $enableJs ? '' : ' -->',
-    'footer_header' => '',
+    'footer_header' => $header_io['header_html'],
     'footer_nav' => $footerNav_html,
     'footer_footer' => $footer_io['footer_html'],
     'end' => $scripts_html . $end_io['end_html'],
@@ -482,7 +497,7 @@ function wrapContentFooter($row) {
 
 function wrapContent($content, $options = false) {
   extract(ensureOptions(array(
-    'header' => true
+    'header' => true,
   ), $options));
   $row = wrapContentData($options);
   if ($header) {
