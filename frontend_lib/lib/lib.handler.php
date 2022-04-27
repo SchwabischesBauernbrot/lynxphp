@@ -8,6 +8,7 @@ function redirectTo($url, $options = false) {
     //global $BASE_HREF;
     //echo '<base href="', $BASE_HREF, '">';
     echo '<meta http-equiv="refresh" content="0; url=', $url,'">';
+    //echo gettrace(), $url;
     echo '</head>';
   }
   /*
@@ -34,6 +35,7 @@ function sendBump($req_method, $req_path) {
          ($req_path === '/forms/login.php' && $req_method === 'POST') ||
          strpos($req_path, 'user/settings/themedemo/') !== false ||
          strpos($req_path, '_inline.html') !== false ||
+         strpos($req_path, 'moderate.html') !== false ||
          strpos($req_path, '/preview/') !== false ||
          strpos($req_path, '/refresh') !== false ||
          $req_path === '/logout' ||
