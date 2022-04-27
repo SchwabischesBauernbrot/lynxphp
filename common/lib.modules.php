@@ -55,7 +55,7 @@ class module_registry {
   */
 
   /**
-   * register a sinlgeton with master server
+   * register a singleton with master server
    *
    * @param string name a unique key for object that you're registering
    * @param object object child object to associate with master
@@ -220,6 +220,13 @@ class module_registry {
     $this->resolve_all();
     // FIXME: prereq/prempt handling
     $this->compile_modules = $this->registry;
+  }
+
+  function debug() {
+    if (!$this->compiled) {
+      $this->compile();
+    }
+    print_r(array_keys($this->compile_modules));
   }
 
   function execute(&$param) {
