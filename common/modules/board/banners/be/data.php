@@ -27,6 +27,9 @@ $bePkgs = array(
       //array('pipeline' => PIPELINE_BOARD_PAGE_DATA, 'module' => 'board_page_data'),
       //array('pipeline' => PIPELINE_BOARD_CATALOG_DATA, 'module' => 'board_catalog_data'),
       //array('pipeline' => PIPELINE_BOARD_QUERY_MODEL, 'module' => 'board_query'),
+
+      // provide data to anything that uses the boards portal
+      array('pipeline' => PIPELINE_PORTALS_DATA, 'module' => 'portal_data'),
     ),
   ),
 );
