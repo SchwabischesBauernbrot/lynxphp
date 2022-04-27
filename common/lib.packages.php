@@ -40,6 +40,8 @@ class package {
     $this->frontend_packages = array();
     $this->backend_packages = array();
     $this->common = array(); // optional common data
+    $this->backendRoutesAdded = false;
+    $this->dependencies = array();
   }
 
   // should we make a frontend_package/backend_package
@@ -47,11 +49,18 @@ class package {
   // only one fe/ directory but that array can have multiple for on/off
   // it's not ib/mb support
   // FIXME: rename this... they'll be in a fe/be context and we need to emphasize the pkg part
+  // these just register the object, not the data...
   function makeFrontend() {
     return new frontend_package($this);
   }
   function makeBackend() {
     return new backend_package($this);
+  }
+  function registerFrontendPackage($fe_pkg) {
+    $this->frontend_packages[] = $fe_pkg;
+  }
+  function registerBackendPackage($be_pkg) {
+    $this->backend_packages[] = $be_pkg;
   }
   // FIXME: These names were meant for client side only, make more universal
   /**
@@ -190,15 +199,27 @@ class package {
     $result = consume_beRsrc($rsrc, $params);
     return $result;
   }
+
   // hotpath
   function buildBackendRoutes() {
-    global $routers, $pipelines;
-    // we install models...
-    /*
-    if (file_exists($this->dir . 'models.php')) {
-      include $this->dir . 'models.php';
+    //echo "buildBackendRoutes - registering ", $this->name, "<br>\n";
+    if ($this->backendRoutesAdded) {
+      // already processed...
+      return;
     }
-    */
+
+    if (count($this->dependencies)) {
+      //echo "need to load:<br>\n";
+      //print_r($this->dependencies);
+      global $packages;
+      foreach($this->dependencies as $pkg_path) {
+        $depPkg = registerPackage($pkg_path);
+        $depPkg->buildBackendRoutes();
+        $packages[$depPkg->name] = $depPkg;
+      }
+    }
+
+    global $routers, $pipelines;
 
     // activate backend hooks
     if (file_exists($this->dir . 'be/data.php')) {
@@ -218,8 +239,20 @@ class package {
             $bePkg->addModel($m);
           }
         }
+        if (isset($pData['pipelines']) && is_array($pData['pipelines'])) {
+          foreach($pData['pipelines'] as $m) {
+            $bePkg->addPipeline($m);
+          }
+        }
         if (isset($pData['modules']) && is_array($pData['modules'])) {
           foreach($pData['modules'] as $m) {
+            if (!isset($pipelines[$m['pipeline']])) {
+              // need to load dependency
+              // yea we won't know where the pipeline lives yet...
+
+              // might just need to lowercase pipeline tbh...
+              // maybe do it in the attach phase?
+            }
             if (isset($pipelines[$m['pipeline']])) {
               // we could use constants in the data arrays
               // but then we need to separate pipelines to their own file
@@ -227,24 +260,17 @@ class package {
               $bePkg->addModule($m['pipeline'], $m['module']);
             } else {
               // pipeline isn't defined, likely modules admin interface
-              echo "<pre>[", $this->dir . 'be/data.php', "]pipeline is not defiend in module [", print_r($m, 1), "]</pre>\n";
+              // or dependency isn't loaded yet...
+
+              // we can't attach if it doesn't exist I think
+              //echo "deps[", print_r($this->dependencies, 1), "]<bR>\n";
+              echo "<pre>[", $this->dir . 'be/data.php', "]pipeline[", $m['pipeline'], "] is not defined in module[", $m['module'], "] complete entry:[", print_r($m, 1), "]</pre>\n" . gettrace();
               echo "<pre>Missing[", $m['pipeline'], "] [", print_r($pipelines, 1), "]</pre>\n";
             }
           }
         }
-        if (isset($pData['pipelines']) && is_array($pData['pipelines'])) {
-          foreach($pData['pipelines'] as $m) {
-            $bePkg->addPipeline($m);
-          }
-        }
       }
     }
-    /*
-    else
-    if (file_exists($this->dir . 'be/index.php')) {
-      include $this->dir . 'be/index.php';
-    }
-    */
 
     // delay loading of this unless the route is actually called
     /*
@@ -285,6 +311,7 @@ class package {
         //echo "Unknown router[$router]<br>\n";
       }
     }
+    $this->backendRoutesAdded = true;
   }
   // hotpath
   // if router is omitted, we only set up modules/pipelines
@@ -334,12 +361,6 @@ class package {
         $fe_pkg->buildRoutes($router, $method);
       }
     }
-  }
-  function registerFrontendPackage($fe_pkg) {
-    $this->frontend_packages[] = $fe_pkg;
-  }
-  function registerBackendPackage($be_pkg) {
-    $this->backend_packages[] = $be_pkg;
   }
   function exec($label, $params) {
   }
@@ -402,7 +423,9 @@ class backend_package {
     return $bsn;
   }
   function addPipeline($pipeline) {
-    echo "lib.packages.php:::backend_package::addPipeline - Write me<br>\n";
+    // has to be a string...
+    //echo "backend_package::addPipeline [", $pipeline['name'], "]<br>\n";
+    definePipeline($pipeline['name']);
   }
   // FIXME: addScheduledTask
   function toString() {

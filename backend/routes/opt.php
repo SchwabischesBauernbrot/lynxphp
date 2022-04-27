@@ -37,10 +37,6 @@ return array(
         'route' => '/:board/catalog.json',
         'file'  => 'board_catalog',
       ),
-      'boardsJson' => array(
-        'route' => '/boards.json',
-        'file'  => 'boards_json',
-      ),
       'myBoards' => array(
         'route' => '/myBoards',
         'file'  => 'my_boards',

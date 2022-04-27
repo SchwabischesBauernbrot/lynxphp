@@ -156,34 +156,6 @@ $frontendRouterData = array(
     'file'   => 'boards',
     'portals' => array('board'),
     'routes' => array(
-      'list' => array(
-        'route'  => '/boards.html',
-        'func'   => 'getBoardsHandler',
-        'options' => array(
-          'cacheSettings' => array(
-            'files' => array(
-              // theme is also would affect this caching
-              'templates/header.tmpl', // wrapContent
-              'templates/footer.tmpl', // wrapContent
-            ),
-          ),
-        ),
-      ),
-      'inline_list' => array(
-        'route'  => '/boards_inline.html',
-        'func'   => 'getInlineBoardsHandler',
-        /*
-        'options' => array(
-          'cacheSettings' => array(
-            'files' => array(
-              // theme is also would affect this caching
-              'templates/header.tmpl', // wrapContent
-              'templates/footer.tmpl', // wrapContent
-            ),
-          ),
-        ),
-        */
-      ),
       'inline_loader_list' => array(
         'route'  => '/boards_cacheable.html',
         'func'   => 'getInlineBoardsLoaderHandler',
@@ -203,11 +175,6 @@ $frontendRouterData = array(
             ),
           ),
         ),
-      ),
-      'filter' => array(
-        'method' => 'POST',
-        'route'  => '/boards.php',
-        'func'   => 'getBoardsHandler',
       ),
       'view' => array(
         'route'  => '/:uri/',

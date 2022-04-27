@@ -8,8 +8,17 @@
 
 $pipelines = array();
 function definePipeline($constant, $str = false) {
+  // I don't think we should output anything
+  // let the php warnings handle this
+  /*
+  if (defined($constant)) {
+    echo "Already defined [$constant] <br>\n" . gettrace();
+    return;
+  }
+  */
   global $pipelines;
   if ($str === false) $str = strtolower($constant);
+  //echo "Defining [$constant] as [$str]<br>\n";
   define($constant, $str);
   $pipelines[$str] = new pipeline_registry;
 }
