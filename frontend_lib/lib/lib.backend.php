@@ -103,6 +103,7 @@ function expectJson($json, $endpoint = '', $options = array()) {
   extract(ensureOptions(array(
     'inWrapContent' => false,
     'method' => 'AUTO',
+    'redirect' => true,
   ), $options));
 
   $obj = json_decode($json, true);
@@ -159,8 +160,12 @@ function expectJson($json, $endpoint = '', $options = array()) {
         echo "<pre>Got a 401 [$json] for [", $endpoint, ']via[', ($method ? $method : 'AUTO') ,"]</pre>\n";
       } else {
         // FIXME get named route
-        global $BASE_HREF;
-        return redirectTo($BASE_HREF . 'forms/login.html');
+        if ($redirect) {
+          global $BASE_HREF;
+          return redirectTo($BASE_HREF . 'forms/login.html');
+        } else {
+          // can't get perms
+        }
       }
     }
   }
@@ -403,11 +408,11 @@ function backendCreateBoard() {
   return expectJson($json, 'lynx/createBoard');
 }
 
-function backendLynxAccount() {
+function backendLynxAccount($redirect = true) {
   $json = backendAuthedGet('lynx/account');
   // means not logged in...
   if (!$json) return false;
-  return expectJson($json, 'lynx/account');
+  return expectJson($json, 'lynx/account', array('redirect' => $redirect));
 }
 
 function backendOptMyBoards() {
