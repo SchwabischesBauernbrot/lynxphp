@@ -50,7 +50,8 @@ function perms_getBoards() {
     $getAccount = false;
   }
   if ($getAccount) {
-    $account = backendLynxAccount();
+    // you can have a session and not be logged in
+    $account = backendLynxAccount(false);
     //echo '<pre>account[', print_r($account, 1), "</pre>\n";
     if ($account) {
       $user['account'] = $account;
@@ -70,6 +71,8 @@ function perms_getBoards() {
 function perms_isBO($boardUri) {
   // handles 401 badly...
   if (!isLoggedIn()) return false;
+  // post_renderer calls this
+  //echo gettrace();
 
   $myBoards = perms_getBoards();
 
