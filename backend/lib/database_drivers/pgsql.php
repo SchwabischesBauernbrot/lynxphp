@@ -423,6 +423,9 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     if ($val === '') $val = 'CURRENT_TIMESTAMP';
     return 'cast(extract(epoch from ' . $val . ') as integer)';
   }
+  public function randOrder() {
+    return 'random()';
+  }
   /*
   public function unixtimeTs($val = '') {
     if ($val === '') $val = 'CURRENT_TIMESTAMP';

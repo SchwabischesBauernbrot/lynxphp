@@ -30,6 +30,7 @@ interface database_driver_base {
   public function get_row($res);
   public function toArray($res);
   public function groupAgg($field);
+  public function randOrder();
 }
 
 class database_driver_base_class {

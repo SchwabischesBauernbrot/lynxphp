@@ -374,6 +374,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function unixtime($val = '') {
     return 'UNIX_TIMESTAMP(' . $val . ')';
   }
+  public function randOrder() {
+    return 'rand()';
+  }
   /*
   public function unixtimeTs($val = '') {
     return 'FROM_TIMESTAMP(' . $val . ')';
