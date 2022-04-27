@@ -54,7 +54,7 @@ function getYourQueue($boardUri, $votes = false) {
   // find a random post
   $res = $db->find($models['post_queue'], array(
     'criteria' => $crit,
-    'order' => 'random()',
+    'order' => $db->randOrder(),
     'limit' => 1,
   ));
   $qps = $db->toArray($res);
