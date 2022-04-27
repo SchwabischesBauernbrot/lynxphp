@@ -52,6 +52,8 @@ foreach($pkg->frontend_packages as $fe_pkg) {
     if (count($scripts)) {
       //echo "checking[", getcwd(), '/', $dir . $j['file'], "][", realpath(getcwd() . '/' . $dir . $j['file']), "]<br>\n";
       // data.php js.file needs to match script in js_add_script
+      // also the _GET['scripts']
+      //echo "file[", basename($j['file']), "] scripts[", print_r($scripts, 1), "]<br>\n";
       if (!in_array(basename($j['file']), $scripts)) {
         continue;
       }
@@ -76,6 +78,7 @@ if (checkCacheHeaders($max, array('contentType' => 'text/javascript', 'fileSize'
 
 // generate content
 foreach($paths as $p) {
+  echo "// $p\n";
   readfile($p);
 }
 
