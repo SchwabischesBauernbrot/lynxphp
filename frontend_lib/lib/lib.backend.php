@@ -147,7 +147,9 @@ function expectJson($json, $endpoint = '', $options = array()) {
     }
     if (DEV_MODE) {
       if ($obj['meta']['code'] === 404) {
-        echo "<pre>BE gave 404 [", print_r($obj['data'], 1), "]</pre>\n";
+        if (DEV_MODE) {
+          echo "<pre>BE gave 404 [", print_r($obj['data'], 1), "]</pre>\n";
+        }
         return false;
       }
     }
@@ -246,6 +248,10 @@ function getBoardCatalog($boardUri) {
 
 function getBoardThread($boardUri, $threadNum) {
   $result = getExpectJson('opt/' . $boardUri . '/thread/' . $threadNum . '.json');
+  if ($result === false) {
+    // 404
+    return $result;
+  }
   if (isset($result['data']['settings'])) {
     global $board_settings;
     $board_settings = $result['data']['settings'];
