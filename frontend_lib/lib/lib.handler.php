@@ -70,6 +70,7 @@ function wrapContentData($options = false) {
     //'settings'    => false,
     // close the div and main tags
     'closeHeader' => true,
+    // wth passes this in?
     'canonical'   => false,
   ), $options));
 
