@@ -11,8 +11,8 @@ return array(
         //'unwrapData' => true,
         'expectJson' => true,
         'sendSession' => true,
-        //'requires' => array('boardUri'),
-        //'params' => 'querystring',
+        // we do have to inform where to put them
+        'params' => 'querystring',
       ),
     ),
   ),
