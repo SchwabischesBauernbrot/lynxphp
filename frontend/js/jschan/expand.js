@@ -93,11 +93,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
       if (this.dataset.attachment == 'true') {
         return;
       }
+      const fileAnchor = this.querySelector('a.jsonly')
+      //console.log('fileAnchor', fileAnchor)
+
+      // handle if subsystem is off
+      if (!fileAnchor) return
+
       e.preventDefault();
       //console.log('this', this.children)
       //const fileAnchor = this.children[0];
-      const fileAnchor = this.querySelector('a.jsonly')
-      //console.log('fileAnchor', fileAnchor)
 
       const fileHref = fileAnchor.href;
       const type = this.dataset.type;
