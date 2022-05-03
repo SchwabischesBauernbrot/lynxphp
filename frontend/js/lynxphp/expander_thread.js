@@ -1,5 +1,5 @@
-function hookExpander(summaryElem, url) {
-  //console.log('setting up expander', summaryElem, 'for', url)
+function hookThreadExpander(summaryElem, url) {
+  console.log('setting up expander', summaryElem, 'for', url)
   summaryElem.notLoaded = true
   summaryElem.onclick = function() {
     if (this.hasAttribute('open')) {
@@ -22,7 +22,7 @@ function hookExpander(summaryElem, url) {
 
 // boards
 if (typeof(boardsNav) !== 'undefined') {
-  hookExpander(boardsNav, 'boards_inline.html')
+  hookThreadExpander(boardsNav, 'boards_inline.html')
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -40,14 +40,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
           //console.log('trying again')
           const linkElem = iframe.contentDocument.getElementById('link')
           if (linkElem) {
-            hookExpander(summaryElem, linkElem.href)
+            hookThreadExpander(summaryElem, linkElem.href)
           } else {
             console.warn('failed to hook', summaryElem)
           }
         }, 1000)
       } else {
         //console.log('linkElem', linkElem)
-        hookExpander(summaryElem, linkElem.href)
+        hookThreadExpander(summaryElem, linkElem.href)
       }
     }
   }
