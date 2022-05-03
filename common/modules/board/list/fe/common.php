@@ -53,9 +53,7 @@ function relativeColor($relativeTo) {
   return sprintf('%02x%02x%02x', $r * 255, $g * 255, $b * 255);
 }
 
-function getBoardsHandlerEngine($res) {
-  global $now;
-
+function getBoardsParams() {
   $pageNum = 1;
   $params = array(
     'search' => '',
@@ -82,7 +80,14 @@ function getBoardsHandlerEngine($res) {
   $params['page'] = $pageNum;
   $params['direction'] = $reverse_list ? 'desc' : 'asc';
 
-  //print_r($params);
+  return $params;
+}
+
+function getBoardsHandlerEngine($res, $params) {
+  global $now;
+
+  $pageNum = $params['page'];
+  $reverse_list = $params['direction'] === 'desc';
 
   $boards = $res['data']['boards'];
   // FIXME: not very cacheable like this...
