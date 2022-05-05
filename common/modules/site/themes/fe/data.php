@@ -2,9 +2,8 @@
 
 $fePkgs = array(
   array(
-    'dependencies' => array(
-      'user_mgmt',
-    ),
+    // what was this for?
+    //'dependencies' => array('user/mgmt'),
     'handlers' => array(
       array(
         'method'  => 'GET',
