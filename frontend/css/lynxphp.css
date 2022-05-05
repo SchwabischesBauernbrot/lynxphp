@@ -18,3 +18,50 @@
   height: 1px;
   width: 1px;
 }
+
+/**/
+/* NAV bar stuff */
+/**/
+#trigger {
+  bottom: 0px;
+  right: 0px;
+  display: none;
+}
+
+#minimize {
+  float: right;
+  padding-right: 5px;
+}
+
+#userbar {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /*
+  height: 40px;
+  line-height: 40px;
+  */
+}
+
+/* has some overlap */
+.fixed-common {
+  /* background-color: #D6DAF0; */
+  height: 40px;
+  line-height: 40px;
+  position: fixed;
+}
+
+#trigger {
+  width: auto;
+  top: auto;
+  left: auto;
+  bottom: 0px;
+  right: 0px;
+  display: none;
+}
+
+#maximize {
+  padding-left: 5px;
+  padding-right: 5px;
+}
