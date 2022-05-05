@@ -15,9 +15,12 @@
 //   - can add oc tags (complexity/makes the template ugly)
 
 // default template: <a class="{{classes}}" {{id}} href="{{url}}" {{alt}}>{{label}}</a>\n
+// are we a utility that builds lists of links
+// or join htmls?
+// well one goal is to have some defined
 function getNav2($navItems, $options = array()) {
   extract(ensureOptions(array(
-    'type' => 'list', // none, list
+    'type' => 'list', // none, list, nav
     'list' => true,
     'selected' => '',
     'selectedURL' => false,
@@ -30,10 +33,14 @@ function getNav2($navItems, $options = array()) {
     'prelabel' => '',
     'postlabel'  => '',
     'baseClasses' => array(),
+    // or we could just let something outside of this handle it...
+    'listClass' => false,
+    'targets' => false, // can be a string or array of specific targets
     // label => id
     'ids' => array(),
     // {{tags}}: url, label, classes, id
     'template' => false,
+    'selected_template' => false,
   ), $options));
 
   // backwards compat
@@ -45,11 +52,18 @@ function getNav2($navItems, $options = array()) {
 
   $nav_html = '';
   // maybe a look up is better?
+  $listClassAdd = '';
+  if ($listClass) {
+    $listClassAdd = ' class="' . $listClass. '"';
+  }
   switch($type) {
     case 'none':
     break;
+    case 'nav':
+      $nav_html = '<nav' . $listClassAdd . '>';
+    break;
     case 'list':
-      $nav_html = '<ul>';
+      $nav_html = '<ul' . $listClassAdd . '>';
     break;
     /*
     case 'nav':
@@ -57,10 +71,11 @@ function getNav2($navItems, $options = array()) {
     break;
     */
   }
+  // maybe target option?
   foreach($navItems as $data) {
+    $label = empty($data['label']) ? '' : $data['label'];
     if (empty($data['html_override'])) {
       $urlTemplate = $data['destinations'];
-      $label = $data['label'];
       $alt = empty($data['alt']) ? '' : ' aria-label="' . $data['alt'] . '"';
       if (is_array($urlTemplate)) {
         // always link to first one
@@ -88,26 +103,38 @@ function getNav2($navItems, $options = array()) {
       break;
     }
     $classes = $baseClasses;
+    // is it selected?
+    $itemSelected = false;
     if ($selectedURL !== false) {
       if (is_array($checkUrl)) {
         if (in_array($selectedURL, $checkUrl)) {
-          $classes['bold'] = 'bold';
+          $itemSelected = true;
         }
       } else {
         if ($selectedURL === $url) {
-          $classes['bold'] = 'bold';
+          $itemSelected = true;
         } else
         if ($selectedURL === '' && $url === '.') {
-          $classes['bold'] = 'bold';
+          $itemSelected = true;
         }
       }
     }
     if ($selected === $label) {
-      $classes['bold'] = 'bold';
+      $itemSelected = true;
+    }
+    //
+    $use_template = $template;
+    if ($itemSelected) {
+      if ($selected_template) {
+        $use_template = $selected_template;
+      } else {
+        // default mode...
+        $classes['bold'] = 'bold';
+      }
     }
     $id = isset($ids[$label]) ? ' id="' . $ids[$label] . '"' : '';
 
-    if ($template) {
+    if ($use_template) {
       $class = count($classes) ? ' ' . join(' ', $classes) : '';
       $tags = array(
         'id'  => $id,
@@ -116,7 +143,7 @@ function getNav2($navItems, $options = array()) {
         'label'   => $prelabel . $label . $postlabel,
         'classes' => $class,
       );
-      $nav_html .= replace_tags($template, $tags);
+      $nav_html .= replace_tags($use_template, $tags);
     } else {
       $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
 
@@ -124,13 +151,26 @@ function getNav2($navItems, $options = array()) {
         $nav_html .= $data['html_override'];
       } else {
         // $prelink . $postlink
-        $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $alt . '>';
+        $linkAdd = '';
+        if ($targets) {
+          if (is_array($targets)) {
+            if (DEV_MODE) {
+              echo "getnav2 - targets are an array - write me!<br>\n";
+            }
+          } else {
+            $linkAdd .= ' target=_top';
+          }
+        }
+        $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $linkAdd . $alt . '>';
         $nav_html .= $prelabel . $label . $postlabel . '</a>' . "\n";
       }
     }
   }
   switch($type) {
     case 'none':
+    break;
+    case 'nav':
+      $nav_html .= '</nav>';
     break;
     case 'list':
       $nav_html .= '</ul>';
