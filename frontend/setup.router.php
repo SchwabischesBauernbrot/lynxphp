@@ -247,6 +247,7 @@ $frontendRouterData = array(
         'route'  => '/:uri/post',
         'func'   => 'makePostHandler',
       ),
+      /*
       'catalog' => array(
         'route'  => '/:uri/catalog.html',
         'func'   => 'getBoardCatalogHandler',
@@ -264,6 +265,7 @@ $frontendRouterData = array(
           ),
         ),
       ),
+      */
       // needs to go last
       'fileRedirect' => array(
         'route'  => '/:uri',
@@ -273,6 +275,7 @@ $frontendRouterData = array(
       ),
     ),
   ),
+  /*
   'board_settings' => array(
     'file'   => 'board_settings',
     'portals' => array('board_settings'),
@@ -285,5 +288,6 @@ $frontendRouterData = array(
       ),
     ),
   ),
+  */
 );
 $router->import($frontendRouterData);
