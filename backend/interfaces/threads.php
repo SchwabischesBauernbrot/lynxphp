@@ -2,15 +2,15 @@
 
 // definitely an OP
 
-function threadDBtoAPI(&$row) {
-  global $db, $models;
+function threadDBtoAPI(&$row, $boardUri) {
+  global $db, $models, $pipelines;
   if ($db->isTrue($row['deleted'])) {
     // non-OPs are automatically hidden...
     $nrow = array(
       'postid' => $row['postid'],
       'no' => $row['postid'],
       // threadid isn't set sometimes?
-      'threadid' => $row['postid'],
+      'threadid' => 0, // threads don't have this set
       'deleted' => 1,
       'com' => 'Thread OP has been deleted but this placeholder is kept, so replies can be read',
       'sub' => '',
@@ -25,7 +25,12 @@ function threadDBtoAPI(&$row) {
     );
     if (isset($row['reply_count'])) $nrow['reply_count'] = $row['reply_count'];
     if (isset($row['file_count'])) $nrow['file_count'] = $row['file_count'];
-    $row = $nrow;
+    $io = array(
+      'boardUri' => $boardUri,
+      'thread' => $nrow,
+    );
+    $pipelines[PIPELINE_THREAD_DATA]->execute($io);
+    $row = $io['thread'];
     return;
   }
 
@@ -42,6 +47,13 @@ function threadDBtoAPI(&$row) {
   $data = empty($row['json']) ? array() : json_decode($row['json'], true);
 
   // FIXME: pipeline
+  $io = array(
+    'boardUri' => $boardUri,
+    'thread' => $row,
+  );
+  $pipelines[PIPELINE_THREAD_DATA]->execute($io);
+  $row = $io['thread'];
+
   if (empty($data['cyclic'])) {
     // is this even needed
     unset($row['cyclic']);
@@ -119,7 +131,7 @@ function getThread($boardUri, $threadNum, $options = false) {
       if (!isset($posts[$row['postid']])) {
         //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
         $posts[$row['postid']] = $row;
-        threadDBtoAPI($posts[$row['postid']]);
+        threadDBtoAPI($posts[$row['postid']], $boardUri);
         //echo "<pre>4chan", print_r($row, 1), "</pre>\n";
         $posts[$row['postid']]['files'] = array();
       }
