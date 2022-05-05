@@ -107,6 +107,8 @@ function registerPackage($pkg_path) {
           $packages[$depPkg->name] = $depPkg;
         } else {
           // do nothing for now
+
+          // we do need to do make sure pipelines are established
         }
       }
     }
