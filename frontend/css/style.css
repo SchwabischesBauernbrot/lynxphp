@@ -97,10 +97,14 @@ pre {
   background: var(--navbar-color);
   box-shadow: 0 0 3px 1px var(--darken);
   border-bottom: 1px solid var(--post-outline-color);
+  /* disabled by odili on 22/5/4 */
+  /* so we can preserve theme colors */
+  /* 
   position: fixed;
+  top: 0;
+  */
   width: 100%;
   z-index: 2;
-  top: 0;
 }
 
 .replies {
