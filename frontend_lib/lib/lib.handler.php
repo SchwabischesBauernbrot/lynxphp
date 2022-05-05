@@ -26,6 +26,7 @@ function redirectTo($url, $options = false) {
 $sentBump = false;
 $sentHead = false;
 function sendBump($req_method, $req_path) {
+  /*
   global $sentBump, $sentHead;
   if (
       !(
@@ -56,6 +57,7 @@ EOB;
     echo '<div style="height: 50px;" id="bump"></div>', "\n"; flush();
     $sentBump = true;
   }
+  */
 }
 
 function wrapContentData($options = false) {
@@ -150,6 +152,8 @@ function wrapContentData($options = false) {
 // used for _inline.html pages
 //
 // why don't we fastout?
+
+// closes HEAD tag but doesn't open it...
 function wrapContentGetHeadHTML($row, $fullHead = false) {
   global $pipelines;
 
@@ -184,7 +188,9 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
   if (!empty($row['canonical'])) {
     $head_html .= '<link rel="canonical" href="' . $row['canonical'] . '" />';
   }
-  $head_html .= '</head>' . $term;
+  if ($fullHead) {
+    $head_html .= '</head>' . $term;
+  }
 
   // we don't get css/style, css/lynxphp or css/expand
   // beacuse we don't parse the html of header
@@ -317,6 +323,7 @@ EOB;
 
   // we could place the open body tag here...
   echo replace_tags($templates['header'], $tags);
+  /*
   global $sentBump;
   if (!$sentBump) {
     // can't use sendBump() with out method and path
@@ -324,6 +331,7 @@ EOB;
     echo '<div style="height: 40px;"></div>', "\n"; flush();
     $sentBump = true;
   }
+  */
 }
 
 function wrapContentFooter($row) {
