@@ -1,27 +1,28 @@
 <?php
 
-function getBoardSettingsHandler($request) {
-  $boardUri = $request['params']['uri'];
-  getBoardSettings($boardUri);
-}
+// FIXME: we need access to package
+$params = $getHandler();
 
-function getBoardSettings($boardUri) {
-  global $pipelines;
-  $templates = loadTemplates('board_settings');
-  $tmpl = $templates['header'];
+// do we own this board?
+//$boardUri = $request['params']['uri'];
+$boardUri = boardOwnerMiddleware($request);
+if (!$boardUri) return;
 
-  $io = array(
-    'navItems' => array(),
-    'boardUri' => $boardUri,
-  );
-  $pipelines[PIPELINE_BOARD_SETTING_NAV]->execute($io);
-  $nav_html = getNav($io['navItems'], array(
-    'replaces' => array('uri' => $boardUri),
-  ));
+global $pipelines;
+$templates = loadTemplates('board_settings');
+$tmpl = $templates['header'];
 
-  $tmpl = str_replace('{{nav}}', $nav_html, $tmpl);
-  //$pipelines['boardSettingTmpl']->execute($tmpl);
-  wrapContent($tmpl);
-}
+$io = array(
+  'navItems' => array(),
+  'boardUri' => $boardUri,
+);
+$pipelines[PIPELINE_BOARD_SETTING_NAV]->execute($io);
+$nav_html = getNav($io['navItems'], array(
+  'replaces' => array('uri' => $boardUri),
+));
+
+$tmpl = str_replace('{{nav}}', $nav_html, $tmpl);
+//$pipelines['boardSettingTmpl']->execute($tmpl);
+wrapContent($tmpl);
 
 ?>
