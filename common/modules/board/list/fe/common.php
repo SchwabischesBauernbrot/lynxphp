@@ -229,6 +229,8 @@ function renderBoardsTemplate($res, $templates, $params) {
   $tags = array(
     'overboard' => '',
     'fields' => '',
+    // infinitynow/bridge hack
+    'activityLabel' => AUTH_DIRECT ? 'Posts Per Hour' : 'Latest Activity',
     'search' => $params['search'],
     'popularitySelected' => $params['sort'] === 'popularity' ? ' selected' : '',
     'latestSelected' => $params['sort'] === 'activity' ? ' selected' : '',
