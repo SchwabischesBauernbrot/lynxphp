@@ -167,8 +167,9 @@ function renderBoardSettingsPortalFooterEngine($row, $boardUri, $boardData) {
   global $pipelines;
   return '';
 
-  $templates = loadTemplates('board_settings');
-  $tmpl = $templates['header'];
+  //$templates = loadTemplates('board_settings');
+  //$tmpl = $templates['header'];
+  $tmpl = $row['tmpl'];
   $threadstats_tmpl = $templates['loop0'];
   $postForm_tmpl = $templates['loop1'];
 
