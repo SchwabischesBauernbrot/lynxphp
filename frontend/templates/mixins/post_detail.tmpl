@@ -6,20 +6,19 @@
     <!-- span class="post-links" -->
     <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}" title="Externally link to this specific post">No.</a>
     <a class="no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#postform" title="Reply in this thread">{{no}}</a>
-    <span class="post-quoters">
-    </span>
+    <span class="post-quoters"></span>
     <!-- endchan put these before... -->
     {{postlinks}}
+    <!-- reply is the primary interaction, with "share" being 2nd -->
     [<a href="/{{uri}}/thread/{{threadNum}}.html#{{no}}_postform" title="Reply to this post">Reply</a>]
-    <!-- reply is the primary interaction with share 2nd -->
+    <span class="replies mt-5 ml-5">{{replies}}</span>
     <!--
     we can use css to compress minimize options
     or summary/details
     -->
-    <span class="replies mt-5 ml-5">{{replies}}</span>
     <details style="display: inline;">
       <summary>Actions</summary>
-      <div style="position: absolute; z-index: 1; background-color: {{backgroundColorCSS}}; padding: 5px;">
+      <div style="position: relative; top: 0; z-index: 1; background-color: {{backgroundColorCSS}}; padding: 5px;">
       {{actions}}
       </div>
     </details>
