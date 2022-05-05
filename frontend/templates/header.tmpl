@@ -1,6 +1,5 @@
 <!-- we'll leave the open body tag here so designers can mess with it -->
 <body>
-<a name="top"></a>
 <!-- span class="jsonly">JS is enabled</span>
 <span class="nojsonly-block">JS is disabled</span -->
   <nav class="navbar" id="navbar">
@@ -27,5 +26,9 @@
     <!-- a class="nav-item" href="ip" title="This IP is what our server sees, we're showing you so you can be aware and protect it">IP: ip</a -->
     {{rightNav}}
   </nav>
+  <!-- div style="height: 50px"></div -->
+<!-- scroll only below the nav: simulate fixed nav -->
+<div style="overflow-y: auto; width: 100%; height: calc(100% - 50px);" id="scroller">
+  <a name="top"></a>
   <main>
   <div class="container">
