@@ -102,13 +102,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
     // need the extra nextSibling because of the whitespace
     // FIXME: make this smarter
     let hoveredPost;
-    if (anchor && jsonPath.split('/')[1] === anchor.nextSibling.nextSibling.dataset.board) {
+    if (anchor && jsonPath.split('/')[1] === anchor.dataset.board) {
       hoveredPost = anchor.nextSibling.nextSibling;
     } else {
       //let hovercache = localStorage.getItem(`hovercache-${jsonPath}`);
       const htmlParts = jsonPath.replace('.json', '.html').replace('/thread/', '/preview/').replace('/opt', '').split('/')
       htmlParts.pop()
       const htmlPath = htmlParts.join('/') + '/' + hash
+      const boardUri = htmlParts[1]
       const id = htmlPath.replace('.html', '').split('/')[3]
 
       let hoverHTMLcache = localStorage.getItem(`hoverhtmlcache-${htmlPath}`);
@@ -147,9 +148,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
         //need this event so handlers like post hiding still apply to hover introduced posts
 
         //console.log('postid', id)
+        // we need to know the board and postId for yous
         const newPostEvent = new CustomEvent('addPost', {
            detail: {
             //json: postJson,
+            json: {
+              board: boardUri,
+              // FIXME: for yous
+              quotes: [],
+              backlinks: [],
+            },
             post: hoveredPost,
             postId: id,
             hover: true
