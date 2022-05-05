@@ -19,9 +19,15 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
 
   $templates = loadTemplates('mixins/board_header');
   $tmpl = $templates['header'];
-  $page_wrapper_tmpl = $templates['loop0'];
-  $pageLink_tmpl     = $templates['loop1'];
-  $boardNavLink_tmpl  = $templates['loop2'];
+  $page_wrapper_tmpl    = $templates['loop0'];
+  $pageLink_tmpl        = $templates['loop1'];
+  $pageLinkCurrent_tmpl = $templates['loop2'];
+  $boardNavLink_tmpl    = $templates['loop3'];
+  $boardNavCurrent_tmpl = $templates['loop4'];
+  $boardNavPrevLink_tmpl = $templates['loop5'];
+  $boardNavPrevCurrentLink_tmpl = $templates['loop6'];
+  $boardNavNextLink_tmpl = $templates['loop7'];
+  $boardNavNextCurrentLink_tmpl = $templates['loop8'];
 
   // would be nice to have the board settings by here
   // so we can pass it in to control/hint the nav
@@ -42,20 +48,23 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     // settings_queueing_mode is used
     'boardSettings' => $boardSettings,
     'navItems' => array(
-      'Index' => $boardUri . '/',
-      'Catalog' => $boardUri . '/catalog.html',
+      array('label' => 'Index' , 'destinations' => $boardUri . '/'),
+      array('label' => 'Catalog' , 'destinations' => $boardUri . '/catalog.html'),
+      //'Index' => $boardUri . '/',
+      //'Catalog' => $boardUri . '/catalog.html',
     ),
   );
   $pipelines[PIPELINE_BOARD_NAV]->execute($nav_io);
 
-  $nav_html = getNav($nav_io['navItems'], array(
+  $nav_html = getNav2($nav_io['navItems'], array(
     'list' => false,
     // handle no pages...
     //'selected' => $pageCount ? $selected : NULL,
     'selectedURL' => substr($_SERVER['REQUEST_URI'], 1),
     //'replaces' => array('uri' => $boardUri),
     // do it in the template
-    'template' => $boardNavLink_tmpl, // url / label
+    'template' => $boardNavLink_tmpl, // url, label, classes, id
+    'selected_template' => $boardNavCurrent_tmpl,
     //'prelabel' => '[',
     //'postlabel' => ']',
   ));
@@ -65,21 +74,41 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
 
     // do pages
     $pages_html = '';
-    // FIXME: wire this up
+    $pgTags = array('uri' => $boardUri);
+    if ($pagenum == 1 || !$pagenum) {
+      // current prev
+      $pages_html .= replace_tags($boardNavPrevCurrentLink_tmpl, $pgTags);
+    } else {
+      // link prev
+      $pgTags['pagenum'] = $pagenum - 1;
+      $pages_html .= replace_tags($boardNavPrevLink_tmpl, $pgTags);
+    }
     for($p = 1; $p <= $pageCount; $p++) {
-      $pgTags = array(
-        'uri'     => $boardUri,
-        'class'   => $pagenum == $p ? 'bold' : '',
-        'pagenum' => $p,
-      );
-      /*
-      $tmp = $pageLink_tmpl;
-      $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-      // bold
-      $tmp = str_replace('{{class}}', $pagenum == $p ? 'bold' : '', $tmp);
-      $tmp = str_replace('{{pagenum}}', $p, $tmp);
-      */
-      $pages_html .= replace_tags($pageLink_tmpl, $pgTags);
+      if ($pagenum == $p) {
+        // current
+        $pgTags = array(
+          'uri'     => $boardUri,
+          'pagenum' => $p,
+        );
+        $pages_html .= replace_tags($pageLinkCurrent_tmpl, $pgTags);
+      } else {
+        $pgTags = array(
+          'uri'     => $boardUri,
+          'class'   => $pagenum == $p ? 'bold' : '',
+          'pagenum' => $p,
+        );
+        $pages_html .= replace_tags($pageLink_tmpl, $pgTags);
+      }
+    }
+
+    $pgTags = array('uri' => $boardUri);
+    if ($pagenum == $pageCount || !$pagenum) {
+      // current next
+      $pages_html .= replace_tags($boardNavNextCurrentLink_tmpl, $pgTags);
+    } else {
+      // link prev
+      $pgTags['pagenum'] = $pagenum + 1;
+      $pages_html .= replace_tags($boardNavNextLink_tmpl, $pgTags);
     }
 
     // pop them into page_wrapper_tmpl
@@ -236,6 +265,13 @@ function getBoardPortal($boardUri, $boardData = false, $options = false) {
 function renderBoardPortalHeader($boardUri, $boardData = false, $options = false) {
   if ($boardData === false) {
     // FIXME: look up board data on-demand
+  } else {
+    if (!isset($options['boardSettings'])) {
+      if (isset($boardData['settings'])) {
+        //echo "fixing<br>\n";
+        $options['boardSettings'] = $boardData['settings'];
+      }
+    }
   }
   $row = renderBoardPortalData($boardUri, $boardData['pageCount'], $options);
   return renderBoardPortalHeaderEngine($row, $boardUri, $boardData);
