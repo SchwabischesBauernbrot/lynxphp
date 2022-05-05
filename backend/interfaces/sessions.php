@@ -112,4 +112,13 @@ function loggedIn() {
   return $userid;
 }
 
+function getIdentity() {
+  $userid = getUserID(); // are we logged in?
+  if ($userid) return 'user_' .  $userid;
+  $sid = getServerField('HTTP_SID');
+  // it doesn't matter if it's valid or expired
+  // we just need something to track by
+  return 'session_' . $sid;
+}
+
 ?>
