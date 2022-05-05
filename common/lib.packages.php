@@ -41,6 +41,13 @@ class package {
     $this->backend_packages = array();
     $this->common = array(); // optional common data
     $this->backendRoutesAdded = false;
+    $this->frontendPackagesLoaded = false;
+    // backend and frontend deps are likely to be different...
+    // but we may need to do it in module.php before we get to data...
+    // why? we don't...
+    // FIXME: there is also optional dependencies
+    // and we don't load the dep or the pipelines
+    // if they aren't enable or don't exist
     $this->dependencies = array();
   }
 
@@ -84,6 +91,7 @@ class package {
    */
   function addResource($label, $rsrcArr) {
     $label = strtolower($label); // must be lowercase since it's a filename
+    // what's this about?
     if (!isset($rsrcArr['handlerFile'])) {
       $rsrcArr['handlerFile'] = $this->dir . 'be/handlers/'. $label . '.php';
     }
@@ -147,7 +155,7 @@ class package {
           foreach($params as $k=>$v) {
             // should we urlencode k too?
             if (is_string($v) || is_bool($v) || is_numeric($v)) {
-              $rsrc['querystring'][] = $k . '=' . urlencode($v);
+              $rsrc['querystring'][$k] = urlencode($v);
             } else {
               echo "<pre>lib.package:::package::useResource($label) - What do I do with [$k] of type [",gettype($v),"]=[", print_r($v, 1),"]</pre>\n";
             }
@@ -235,8 +243,8 @@ class package {
       foreach($bePkgs as $pName => $pData) {
         $bePkg = $this->makeBackend();
         if (isset($pData['models']) && is_array($pData['models'])) {
-          foreach($pData['models'] as $m) {
-            $bePkg->addModel($m);
+          foreach($pData['models'] as $k => $m) {
+            $bePkg->addModel($m, $k);
           }
         }
         if (isset($pData['pipelines']) && is_array($pData['pipelines'])) {
@@ -318,6 +326,7 @@ class package {
   // FIXME: an option to only load a list of these resources...
   // like js only needs the js only
   function frontendPrepare($router = false, $method = 'GET', $options = false) {
+    if ($this->frontendPackagesLoaded) return; // already processed
     //echo "buildFrontendRoutes<br>\n";
     $ensuredOptions = ensureOptions(array(
       'loadHandlers'  => true,
@@ -361,6 +370,7 @@ class package {
         $fe_pkg->buildRoutes($router, $method);
       }
     }
+    $this->frontendPackagesLoaded = true;
   }
   function exec($label, $params) {
   }
@@ -373,8 +383,10 @@ class backend_package {
     $this->models = array();
     $this->modules = array();
   }
-  function addModel($model) {
+  function addModel($model, $potentialName) {
     global $db, $models;
+    // each of these are required to be unique
+    // we should change the format...
     $name = $model['name'];
     $this->models[] = $name;
     // FIXME: move this into an activate module step
@@ -467,10 +479,23 @@ class frontend_package {
   function unpack($pData, $ensuredOptions) {
     // unpacks load*, router, method
     extract($ensuredOptions);
+
+    // no is_array because if they mess up the format
+    // let php handle it, we don't need to
+    global $packages;
+    if (isset($pData['dependencies'])) {
+      foreach($pData['dependencies'] as $depPkgName) {
+        //echo "depPkgName[$depPkgName] dir[", $this->pkg->dir, "]<br>\n";
+        $depPkg = registerPackage($depPkgName); // load
+        $depPkg->frontendPrepare($router, $method, $ensuredOptions);
+        $packages[$depPkg->name] = $depPkg; // register package global
+      }
+    }
+
     // we could split this into multiple functions...
     // maybe all this should be moved into fe_pkg
     if ($router) {
-      if ($loadHandlers && isset($pData['handlers']) && is_array($pData['handlers'])) {
+      if ($loadHandlers && isset($pData['handlers'])) {
         foreach($pData['handlers'] as $h) {
           // FIXME: skip adding the methods we don't need...
           //$this->addHandler('GET', '/:uri/banners', 'public_list');
@@ -485,7 +510,7 @@ class frontend_package {
           $this->addHandler($m, $h['route'], $h['handler'], $options);
         }
       }
-      if ($loadForms && isset($pData['forms']) && is_array($pData['forms'])) {
+      if ($loadForms && isset($pData['forms'])) {
         foreach($pData['forms'] as $f) {
           // FIXME: skip adding the methods we don't need...
           $this->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
@@ -498,16 +523,16 @@ class frontend_package {
       $this->js = $pData['js'];
       // unpack it into pipelines if we're on this page?
     }
-    if ($loadModules && isset($pData['modules']) && is_array($pData['modules'])) {
+    if ($loadModules && isset($pData['modules'])) {
       foreach($pData['modules'] as $m) {
         if (!defined($m['pipeline'])) {
-          echo "Pipeline [", $m['pipeline'], "] is not defined, found in [", $this->dir, "]<br>\n";
+          echo "Pipeline [", $m['pipeline'], "] is not defined, found in [", $this->pkg->dir, "]<br>\n";
         } else {
           $this->addModule(constant($m['pipeline']), $m['module']);
         }
       }
     }
-    if ($loadPipelines && isset($pData['pipelines']) && is_array($pData['pipelines'])) {
+    if ($loadPipelines && isset($pData['pipelines'])) {
       foreach($pData['pipelines'] as $m) {
         $this->addPipeline($m);
       }
