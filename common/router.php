@@ -391,7 +391,7 @@ class Router {
         // check the interesting header
 
         // etag
-        $etag = empty($headers['ETag']) ? false : $headers['ETag'];
+        $etag = empty($headers['etag']) ? false : $headers['etag'];
         if ($checkEtag) {
           if ($etag) {
             $compoundEtags[] = $etag;
