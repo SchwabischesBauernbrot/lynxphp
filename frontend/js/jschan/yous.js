@@ -11,9 +11,10 @@ const toggleAllYous = (state) => savedYous.forEach(y => toggleOne(y, state));
 
 // hide/show quotes
 const toggleQuotes = (quotes, state) => {
-  quotes.forEach(q => {
+  for(let i = 0; i < quotes.length; i++) {
+    var q = quotes[i]
     q.classList[state?'add':'remove']('you');
-  });
+  }
 }
 
 const toggleOne = (you, state) => {
@@ -32,9 +33,15 @@ const toggleOne = (you, state) => {
     */
     const postInfo = post.querySelector('.post-info');
     if (postInfo) {
-      var elem = document.createElement('span')
-      elem.innerText = '(you)'
-      postInfo.appendChild(elem)
+      // detect if we're already there or not...
+      var detect = postInfo.querySelector('span.you')
+      if (!detect) {
+        var elem = document.createElement('span')
+        // class adds the text if you add this...
+        elem.className = 'you'
+        //elem.innerText = '(you)'
+        postInfo.appendChild(elem)
+      }
     }
   }
   const quotes = document.querySelectorAll(`.quote[href^="${board}/"][href$="#${postId}"]`);
