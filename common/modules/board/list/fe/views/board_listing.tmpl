@@ -1,4 +1,5 @@
 <h1 class="board-title">Board List</h1>
+<!-- or try the <a href="overboard.php">overboard</a> -->
 {{overboard}}
 <div class="flexcenter mv-10">
   <form class="form-post" action="{{action}}" method="POST">
@@ -24,8 +25,7 @@
     <input type="submit" value="Filter">
   </form>
 </div>
-<h4 class="board-description">
-Local Boards</h4>
+<h4 class="board-description">Boards</h4>
 <div class="table-container flex-center mv-10 text-center">
 <table class="boardtable w900">
   <tr>
@@ -35,6 +35,7 @@ Local Boards</h4>
     <!-- th>PPH</th>
     <th>Users</th -->
     <th>Posts</th>
+    <th>Actions
     <th>Last Activity
 {{boards}}
 <!-- loop -->
@@ -49,6 +50,13 @@ Local Boards</h4>
     <!-- td>pph</td>
     <td>users</td -->
     <td>{{posts}}</td>
+    <td>
+      <details style="display: inline;">
+        <summary>...</summary>
+        <div style="position: relative; z-index: 1; background-color: var(--post-color); padding: 5px;">
+        {{actions}}
+        </div>
+      </details>
     <td style="background-color: #{{lastActivityColor}}"><nobr>{{last_post}}</nobr></td>
 <!-- end -->
 </table>
