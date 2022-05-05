@@ -20,7 +20,8 @@ function parseHeaders($response) {
     if (!$h) continue;
     if (strpos($h, ': ') !== false) {
       list($k, $v) = explode(': ', $h);
-      $headers[$k] = $v;
+      // normalize keys
+      $headers[strtolower($k)] = $v;
     } else {
       echo "h[$h] has no :\n";
     }
@@ -52,7 +53,12 @@ function request($options = array()) {
   return curlHelper($url, $body, $header, $user, $pass, $method);
 }
 
+//open handle
+$ch = curl_init();
+
+
 function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='AUTO') {
+  global $ch;
   if (DEV_MODE) {
     $start = microtime(true);
   }
@@ -70,8 +76,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   //if (is_array($fields) && ($method === 'AUTO' || $method === 'POST')) {
   $hasFields = (is_array($fields) ? count($fields) : $fields) ? true : false;
 
-  //open handle
-  $ch = curl_init();
+  curl_reset($ch); // php 5.5+
 
   //set the url, number of POST vars, POST data
   curl_setopt($ch, CURLOPT_URL, $url);
@@ -142,7 +147,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   }
 
   //close handle
-  curl_close($ch);
+  //curl_close($ch);
 
   return $result;
 }
