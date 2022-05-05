@@ -1,8 +1,14 @@
-/*
+YTready = false
+YTreadyQ = []
 function onYouTubeIframeAPIReady() {
-  console.log('iframeapiready')
+  //console.log('iframeapiready', YTreadyQ.length)
+  // fire all pending function in queue
+  for(var i in YTreadyQ) {
+    YTreadyQ[i]()
+  }
+  YTreadyQ = []
+  YTready = true
 }
-*/
 
 function addToPostMedia(postScope, embedder) {
   var postFiles = postScope.querySelector('.post-files')
@@ -67,10 +73,18 @@ class playlist {
     }
     this.changeTrack()
   }
+  getNavElem() {
+    var navElem = document.querySelector('span.userbar-icons-right')
+    if (!navElem) {
+      // if logged out use the old style
+      navElem = document.querySelector('nav.stickynav')
+    }
+    return navElem
+  }
   changeTrack() {
     // we autoplay
     this.playing = true
-    var navElem = document.querySelector('nav.stickynav')
+    var navElem = this.getNavElem()
     if (!navElem) {
       console.warn('disabling playlist player because stickynav not found')
       return
@@ -85,6 +99,12 @@ class playlist {
       viewerElem.parentNode.removeChild(viewerElem)
     }
 
+    var mediaFloater = document.querySelector('.mediaFloater')
+    if (!mediaFloater) {
+      console.warn('no .mediaFloater')
+      return
+    }
+
     /*
     viewerElem = document.createElement('iframe')
     viewerElem.className = 'playlistViewer'
@@ -93,6 +113,7 @@ class playlist {
 
     viewerElem.src = this.tracks[this.position]
     */
+    // calls toElem to return iframeElem
     viewerElem = this.tracks[this.position].toElem(() => {
       this.nextTrack()
     })
@@ -106,7 +127,8 @@ class playlist {
     */
     //navElem.appendChild(viewerElem)
     //viewerElem.style.float = 'left'
-    navElem.insertBefore(viewerElem, navElem.childNodes[0])
+    //navElem.insertBefore(viewerElem, navElem.childNodes[0])
+    mediaFloater.appendChild(viewerElem)
     //}
   }
   stop() {
@@ -125,7 +147,7 @@ class playlist {
   toggle() {
     if (this.playing) {
       this.stop()
-      var navElem = document.querySelector('nav.stickynav')
+      var navElem = this.getNavElem()
       if (!navElem) {
         console.warn('disabling playlist player because stickynav not found')
         return
@@ -138,7 +160,7 @@ class playlist {
     }
   }
   openViewer() {
-    var navElem = document.querySelector('nav.stickynav')
+    var navElem = this.getNavElem()
     if (!navElem) {
       console.warn('disabling playlist player because stickynav not found')
       return
@@ -147,11 +169,24 @@ class playlist {
     if (hasViewer) {
       return
     }
+
+    var newFloatElem = document.createElement('div')
+    // FIXME: needs a close handle
+    newFloatElem.className = "mediaFloater"
+    newFloatElem.style.position = "fixed"
+    //newFloatElem.style.width = '300px'
+    //newFloatElem.style.height = '150px'
+    newFloatElem.style.bottom = '46px'
+    newFloatElem.style.right = 5
+    newFloatElem.style.zIndex = 2
+    //newFloatElem.innerText = 'bob'
+    document.body.appendChild(newFloatElem)
+
+    //var spaceElem = document.createElement('div')
+    //newFloatElem.insertBefore(spaceElem, navElem.childNodes[0])
+
+    // add new nav buttons
     var ref = this
-
-    var spaceElem = document.createElement('div')
-    navElem.insertBefore(spaceElem, navElem.childNodes[0])
-
     var prevTrackElem = document.createElement('a')
     prevTrackElem.className = 'nav-item prevTrack'
     prevTrackElem.innerHTML = '[&#9664;&#9664;]'
@@ -190,7 +225,7 @@ class playlist {
     */
   }
   enableUI() {
-    var navElem = document.querySelector('nav.stickynav')
+    var navElem = this.getNavElem()
     if (!navElem) {
       console.warn('disabling playlist player because stickynav not found')
       return
@@ -213,6 +248,8 @@ class playlist {
     plStartElem.className = 'nav-item playlist'
     plStartElem.innerHTML = '[&#9654;]'
     plStartElem.style.cursor = 'hand'
+
+    //console.log('loading..')
     var ref = this
     plStartElem.onclick = function() {
       // FIXME: close any open embeds
@@ -222,10 +259,15 @@ class playlist {
         var ytSrcElem = document.createElement('script')
         ytSrcElem.src = "//www.youtube.com/player_api"
         navElem.appendChild(ytSrcElem)
-        navElem.ytapiLoaded = true
-      }
+        navElem.ytapiLoaded = true // script added (not loaded yet...)
 
-      ref.toggle()
+        // load iframe when the API is loaded
+        YTreadyQ.push(function() {
+          ref.toggle()
+        })
+      } else {
+        ref.toggle()
+      }
     }
     //plStartElem.href = '#';
     navElem.appendChild(plStartElem)
@@ -267,16 +309,25 @@ if (!isCatalog) { //dont show embed buttons in catalog
               toElem: function(nextTrack) {
                 var iframeElem = document.createElement('iframe')
                 iframeElem.frameBorder = 0
+                iframeElem.allow = "autoplay" // newer chrome needs this to autoplay
                 iframeElem.src = 'https://www.youtube.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&enablejsapi=1'
-                var res = this
                 if (nextTrack) {
                   this.player = new YT.Player(iframeElem, { events: {
                     onReady: function(event) {
                       //console.log('ytapi ready')
+                      //event.target.playVideo()
+                    },
+                    onError: function(e) {
+                      console.error('err', e)
                     },
                     onStateChange: function(event) {
                       //console.log('ytapi state change', event)
-
+                      // -1 ? loaded?
+                      if (event.data === -1) {
+                        // allow="autoplay"
+                        console.warn('not autoplaying')
+                        //event.target.playVideo()
+                      }
                       // event.data = 1 playing/resume
                       // 2 pause
                       // 3 scrub
@@ -285,7 +336,7 @@ if (!isCatalog) { //dont show embed buttons in catalog
                         nextTrack()
                       }
                     }
-                  } });
+                  }, playerVars: { autoplay: 1 } });
                 }
                 return iframeElem
               }
