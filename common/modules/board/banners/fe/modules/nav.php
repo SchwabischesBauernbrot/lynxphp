@@ -1,8 +1,7 @@
 <?php
 
-// FIXME: we need access to package
 $params = $getModule();
 
-$io['navItems']['Banners'] = $io['boardUri'] . '/banners.html';
+$io['navItems'][] = array('label' => 'Banners', 'destinations' => $io['boardUri'] . '/banners.html');
 
 ?>
