@@ -2,8 +2,31 @@
 
 // abstraction layer for accessing user info
 
+// this doesn't mean their session is valid though
+// more like seems to be loggedin...
+// only used inside this function...
 function isLoggedIn() {
   return isset($_COOKIE['session']);
+}
+
+function loggedIn() {
+  // cache for this page load
+  global $loggedIn;
+  if ($loggedIn) {
+    //echo "cache[$loggedIn]<br>\n";
+    return $loggedIn === 'true';
+  }
+  if (!isLoggedIn()) return false;
+  // have session
+  $res = checkSession();
+  if ($res && isset($res['meta']) && $res['meta']['code'] == 401) {
+  //if ($res && isset($res['data']) && is_array($res['data']) && !count($res['data'])) {
+    //echo "setting false<br>\n";
+    $loggedIn = 'false';
+    return false;
+  }
+  //echo "logged[" , gettype($res), print_r($res, 1), "]<br>\n";
+  return true;
 }
 
 /*
@@ -28,7 +51,11 @@ function getUserData() {
 function perms_getBoards() {
   // handles 401 badly...
   if (!isLoggedIn()) return false;
-
+  global $loggedIn;
+  if ($loggedIn) {
+    // don't bother checking if we already know we're logged out
+    if ($loggedIn === 'false') return false;
+  }
   static $accountCache = array();
   global $scratch, $now;
   $key = 'user_session' . $_COOKIE['session'];
@@ -75,7 +102,7 @@ function perms_isBO($boardUri) {
   //echo gettrace();
 
   $myBoards = perms_getBoards();
-
+  if ($myBoards === false) return false;
   return in_array($boardUri, $myBoards);
 }
 
