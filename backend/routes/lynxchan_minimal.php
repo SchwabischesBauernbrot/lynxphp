@@ -8,11 +8,7 @@ return array(
   'lynxchan_minimal' => array(
     'dir'  => 'lynx',
     'routes' => array(
-      'createBoard' => array(
-        'method' => 'POST',
-        'route'  => '/createBoard',
-        'file'   => 'create_board',
-      ),
+      // createBoard was moved into board/user_boards
       'files' => array(
         'method' => 'POST',
         'route'  => '/files',
