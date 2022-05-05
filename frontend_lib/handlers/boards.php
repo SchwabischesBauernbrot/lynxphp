@@ -344,6 +344,20 @@ function makePostHandler($request) {
     //echo "redir[$redir]<br>\n";
     //return;
     if ($result && is_array($result) && isset($result['data']) && is_numeric($result['data'])) {
+      // now we have a post id, we should set the you
+      $slug = $boardUri . '-' . $result['data'];
+      echo <<< EOB
+<script>
+var storedArray = JSON.parse(localStorage.getItem('yous'))
+storedArray.push('$slug')
+localStorage.setItem('yous', JSON.stringify(storedArray))
+</script>
+EOB;
+/*
+// backup for window.myPostId
+// used to set hash...
+//setLocalStorage('myPostId', json.postId);
+*/
       // success
       redirectTo($redir);
     } else
