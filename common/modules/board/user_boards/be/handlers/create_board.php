@@ -27,9 +27,11 @@ $boardUri = strtolower($_POST['boardUri']);
 $allowedChars = array('-', '.');
 for($p = 0; $p < strlen($boardUri); $p++) {
   if (preg_match('/^[a-z0-9]$/', $boardUri[$p])) {
+    // allowed
     continue;
   }
   if (!in_array($boardUri[$p], $allowedChars)) {
+    // not allowed
     return sendResponse(array(), 400, 'boardUri has invalid characters: [' . $boardUri[$p] . ']'. $boardUri);
   }
 }
