@@ -45,12 +45,6 @@ EOB;
   */
 }
 
-// probably shoudl be moved into a lib or inlined...
-function preprocessPost(&$p) {
-  global $pipelines;
-  $pipelines[PIPELINE_POST_PREPROCESS]->execute($p);
-}
-
 // refactored out so theme demo can use this
 function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOptions = '') {
   $pageData = $boardThreads['page1'];
@@ -60,12 +54,14 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   $templates = loadTemplates('thread_listing');
   //echo join(',', array_keys($templates));
 
-  $page_tmpl = $templates['loop0'];
-  $boardnav_html = $templates['loop1'];
-  $file_template = $templates['loop2'];
-  $threadHdr_tmpl = $templates['loop3'];
-  $threadFtr_tmpl = $templates['loop4'];
-  $thread_tmpl = $templates['loop5'];
+  // header is used
+  // see board_portal
+  $page_tmpl = $templates['loop0']; // not used
+  $boardnav_html = $templates['loop1']; // stomp (replacement is used in header)
+  $file_template = $templates['loop2']; // not used
+  $threadHdr_tmpl = $templates['loop3']; // used
+  $threadFtr_tmpl = $templates['loop4']; // used
+  $thread_tmpl = $templates['loop5']; // not used
 
   extract(ensureOptions(array(
     'noBoardHeaderTmpl' => false,
@@ -123,7 +119,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
       $topReply = isset($posts[1]) ? $posts[1]['no'] : false;
       $threads_html .= renderPost($boardUri, $post, array(
         'checkable' => true, 'postCount' => $thread['thread_reply_count'],
-        'topReply' => $topReply,
+        'topReply' => $topReply, 'where' => $boardUri . '/'
       ));
       //if ($i === count($posts) - 1) $threads_html .= $threadFtr_tmpl;
     }
