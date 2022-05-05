@@ -35,25 +35,19 @@ function renderPost($boardUri, $p, $options = false) {
     //'topReply' => false, // related to noOmit
     //'inMixedBoards' => false, // ?
     'firstThread' => false, // for adjusting loading=lazy
+    'where' => '',
   ), $options));
 
   //$isBO = perms_isBO($boardUri);
   $threadId = $p['threadid'] ? $p['threadid'] : $p['no'];
   $isOP = $threadId === $p['no'];
 
-  $post_actions = array(
-    'all'    => array(
-      // FIXME: post/actions should provide this
-      array('link' => '/' . $boardUri . '/report/' . $p['no'], 'label' => 'report'),
-      // hide
-      // filter ID/name
-      // moderate
-    ),
-    'user'   => array(),
-    'bo'     => array(),
-    'global' => array(),
-    'admin'  => array(),
-  );
+  $post_actions = action_getLevels();
+  // FIXME: post/actions should provide this
+  $post_actions['all'][] = array('link' => '/' . $boardUri . '/report/' . $p['no'], 'label' => 'report');
+  // hide
+  // filter ID/name
+  // moderate
   if (!$p['no']) {
     $post_actions['all'] = array(); // remove report
   }
@@ -83,26 +77,30 @@ function renderPost($boardUri, $p, $options = false) {
   $pipelines[PIPELINE_POST_ACTIONS]->execute($action_io);
   // remap output over the top of the input
   $post_actions = $action_io['actions'];
-
+  //print_r($post_actions);
   //
 
+  /*
   $post_actions_html_parts = array();
   if (count($post_actions['all'])) {
     foreach($post_actions['all'] as &$a) {
-      /*
-      $post_actions_html_parts[] = '<a href="dynamic.php?boardUri=' . urlencode($boardUri) .
-        '&action=' . urlencode($a). '&id=' . $p['no']. '">' . $l . '</a>';
-      */
+      //$post_actions_html_parts[] = '<a href="dynamic.php?boardUri=' . urlencode($boardUri) .
+      //  '&action=' . urlencode($a). '&id=' . $p['no']. '">' . $l . '</a>';
       $post_actions_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
     }
+    unset($a);
   }
   if (count($post_actions['bo']) && perms_isBO($boardUri)) {
     foreach($post_actions['bo'] as &$a) {
       $post_actions_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
     }
+    unset($a);
   }
-  unset($a);
   $post_actions_html = join('<br>' . "\n", $post_actions_html_parts);
+  */
+  // how do we set where?
+  $post_actions_html = action_getHtml($post_actions, array(
+    'boardUri' => $boardUri, 'where' => $where));
 
   // should we have pre and post links around the no #123 part?
   $post_links_html = '';
