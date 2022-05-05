@@ -31,7 +31,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     // why don't we have datetime?
     $this->modelToSQL = array(
       'str'     => 'VARCHAR NOT NULL DEFAULT \'\',',
-      'string'  => 'VARCHAR NOT NULL DEFAULT \'\,',
+      'string'  => 'VARCHAR NOT NULL DEFAULT \'\',',
       'int'     => 'BIGINT DEFAULT 0 NOT NULL,',
       'integer' => 'BIGINT DEFAULT 0 NOT NULL,',
       'boolean' => 'Boolean DEFAULT false,',
@@ -42,8 +42,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       //'bigtext' => 'TEXT NOT NULL,',
     );
     $this->changeModelToSQL = array(
-      'str'     => array('TYPE VARCHAR', 'SET NOT NULL DEFAULT \'\''),
-      'string'  => array('TYPE VARCHAR', 'SET NOT NULL DEFAULT \'\''),
+      'str'     => array('TYPE VARCHAR', 'SET NOT NULL', 'SET DEFAULT \'\''),
+      'string'  => array('TYPE VARCHAR', 'SET NOT NULL', 'SET DEFAULT \'\''),
       // Using EXTRACT(EPOCH FROM {{field}})
       'int'     => array('DROP DEFAULT', 'TYPE BIGINT', 'SET NOT NULL', 'SET DEFAULT 0'),
       'integer' => array('DROP DEFAULT', 'TYPE BIGINT', 'SET NOT NULL', 'SET DEFAULT 0'),
