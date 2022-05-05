@@ -35,10 +35,32 @@ function getControlPanel() {
 
   $boards_html = '';
   if (isset($account['ownedBoards']) && is_array($account['ownedBoards'])) {
+    global $pipelines;
     foreach($account['ownedBoards'] as $board) {
       $tmp = $board_html;
+
+      $boardUri = $board;
+      $board_actions = action_getLevels();
+      // we need to unify these defaults...
+      $board_actions['all'][] = array('link' => '/' . $boardUri . '/', 'label' => 'View');
+      $board_actions['bo'][] = array('link' => '/' . $boardUri . '/board_settings.php', 'label' => 'Settings');
+
+      $action_io = array(
+        'boardUri' => $boardUri,
+        'b' => array(),
+        'actions'  => $board_actions,
+      );
+      $pipelines[PIPELINE_BOARD_ACTIONS]->execute($action_io);
+      // remap output over the top of the input
+      $board_actions = $action_io['actions'];
+      // FIXME: expander?
+      $board_actions_html = action_getHtml($board_actions, array(
+        'boardUri' => $boardUri, 'where' => 'boards', 'join' => " | \n",
+      ));
+
       // ['uri'] lynxchan just lists the names, if you need this use an /opt
       $tmp = str_replace('{{uri}}', $board, $tmp);
+      $tmp = str_replace('{{actions}}', $board_actions_html, $tmp);
       $boards_html .= $tmp;
     }
   }
