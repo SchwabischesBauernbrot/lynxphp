@@ -2,5 +2,5 @@
 
 $params = $getModule();
 
-$io['navItems']['Logs'] = $io['boardUri'] . '/logs.html';
+$io['navItems'][] = array('label' => 'Logs', 'destinations' => $io['boardUri'] . '/logs.html');
 ?>
