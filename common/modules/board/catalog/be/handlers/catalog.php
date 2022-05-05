@@ -2,7 +2,8 @@
 
 // https://a.4cdn.org/po/catalog.json
 global $tpp;
-$boardUri = $request['params']['board'];
+
+$boardUri = $request['params']['boardUri'];
 $page = boardCatalog($boardUri);
 if (!is_array($page)) {
   // boardCatalog handles this
