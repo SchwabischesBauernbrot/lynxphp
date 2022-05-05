@@ -39,7 +39,9 @@ if ($show) {
   }
   // just always show it for now
   $boardUri = $io['boardUri'];
-  $io['navItems']['Moderate' . $count_html] = $boardUri . '/moderate.html';
+  $label = 'Moderate';
+  if ($count_html) $label .= ' ' . $count_html;
+  $io['navItems'][] = array('label' => $label, 'destinations' => $boardUri . '/moderate.html');
 }
 
 ?>
