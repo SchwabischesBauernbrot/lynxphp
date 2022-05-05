@@ -12,6 +12,7 @@
 <!-- could bring postform template into here though it maybe better as being compossible -->
 {{postform}}
 <br>
+<!-- need to hidden if js is enable -->
 <nav class="stickynav">
   {{sticknav}}
   <a class="nav-item" href="{{url}}#bottom">[&#9660;]</a>
@@ -25,8 +26,31 @@
   <span class="boardNav">{{boardNav}}</span>
 <!-- end -->
 <!-- loop -->
-    <a class="{{class}}" href="{{uri}}/page/{{pagenum}}"> [{{pagenum}}]</a>
+    <!-- page link -->
+    <a href="{{uri}}/page/{{pagenum}}">[{{pagenum}}]</a>
 <!-- end -->
 <!-- loop -->
+    <!-- on page -->
+    <span class="bold">[{{pagenum}}]</span>
+<!-- end -->
+<!-- loop -->
+    <!-- nav link -->
     [<a class="boardNav{{classes}}" href="{{url}}"{{id}}{{alt}}>{{label}}</a>]
+<!-- end -->
+<!-- loop -->
+    <!-- on nav -->
+    [{{label}}]
+<!-- end -->
+<!-- loop -->
+    <!-- prev link -->
+    <a href="{{uri}}/page/{{pagenum}}">Prev</a>
+<!-- end -->
+<!-- loop -->
+    Prev
+<!-- end -->
+<!-- loop -->
+    <a href="{{uri}}/page/{{pagenum}}">Next</a>
+<!-- end -->
+<!-- loop -->
+    Next
 <!-- end -->
