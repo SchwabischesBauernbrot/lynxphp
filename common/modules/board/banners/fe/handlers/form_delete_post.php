@@ -14,7 +14,8 @@ $result = $pkg->useResource('del', array(
 ));
 if ($result === true) {
   // success
-  redirectTo(BASE_HREF . $boardUri . '/settings/banners');
+  global $BASE_HREF;
+  redirectTo($BASE_HREF . $boardUri . '/settings/banners');
 } else {
   wrapContent('Something went wrong... Error: ' . print_r($result, 1));
 }
