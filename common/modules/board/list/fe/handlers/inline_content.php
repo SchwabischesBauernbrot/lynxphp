@@ -4,7 +4,11 @@ $params = $getHandler();
 
 $data = $pkg->useResource('list');
 
-$res = getBoardsHandlerEngine($data);
+$templates = moduleLoadTemplates('inline_boards', __DIR__);
+$params = getBoardsParams();
+$res = renderBoardsTemplate($data, $templates, $params);
+
+//$res = getBoardsHandlerEngine($data);
 
 $row = wrapContentData(array());
 //wrapContent($res['content'], array('settings' => $res['settings']));
@@ -19,6 +23,7 @@ echo <<<EOB
 </head>
 <body id="top">
 EOB;
+// maybe auto-size the height based on the number of boards...
 echo $res['content'];
 
 ?>
