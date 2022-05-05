@@ -59,7 +59,17 @@ function consume_beRsrc($options, $params = '') {
   */
   $querystring = '';
   if (!empty($options['querystring'])) {
-    $querystring = '?' . join('&', $options['querystring']);
+    //print_r($options['querystring']);
+    // endpoint shouldn't have a querystring yet
+    if (is_array($options['querystring'])) {
+      $strs = array();
+      foreach($options['querystring'] as $k => $v) {
+        $strs[] = $k . '=' . $v;
+      }
+      $querystring = '?' . join('&', $strs);
+    } else {
+      $querystring = '?' . $options['querystring'];
+    }
   }
   //echo "querystring[$querystring]<br>\n";
 
@@ -182,7 +192,14 @@ function expectJson($json, $endpoint = '', $options = array()) {
 
 function getExpectJson($endpoint) {
   //$json = curlHelper(BACKEND_BASE_URL . $endpoint);
-  $json = request(array('url' => BACKEND_BASE_URL . $endpoint));
+
+  // we're always passing SID if we have it now...
+  // even if the route doesn't need it...
+  $headers = array();
+  if (isset($_COOKIE['session'])) {
+    $headers = array('sid' => $_COOKIE['session']);
+  }
+  $json = request(array('url' => BACKEND_BASE_URL . $endpoint, 'headers' => $headers));
   return expectJson($json, $endpoint);
 }
 
@@ -413,6 +430,11 @@ function backendGetPerm($perm, $target = false) {
   }
   $res = consume_beRsrc($options);
   return $res;
+}
+
+function preprocessPost(&$p) {
+  global $pipelines;
+  $pipelines[PIPELINE_POST_PREPROCESS]->execute($p);
 }
 
 ?>
