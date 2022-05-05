@@ -83,8 +83,8 @@ function getBoardsParams() {
   return $params;
 }
 
-function getBoardsHandlerEngine($res, $params) {
-  global $now;
+function renderBoardsTemplate($res, $templates, $params) {
+  global $now, $pipelines;
 
   $pageNum = $params['page'];
   $reverse_list = $params['direction'] === 'desc';
@@ -102,7 +102,6 @@ function getBoardsHandlerEngine($res, $params) {
 
   // notice common hack at the end
   // this function was not made for common location...
-  $templates = moduleLoadTemplates('board_listing', __DIR__ . '/common');
   $overboard_template = $templates['loop0'];
   $board_template     = $templates['loop1'];
   $page_tmpl     = $templates['loop2'];
@@ -167,15 +166,31 @@ function getBoardsHandlerEngine($res, $params) {
 
       $color = relativeColor($b['last']['updated_at']);
     }
+    $boardUri = $b['uri'];
 
+    $board_actions = action_getLevels();
+    $board_actions['all'][] = array('link' => '/' . $boardUri . '/', 'label' => 'View');
+
+    $action_io = array(
+      'boardUri' => $boardUri,
+      'b' => $b,
+      'actions'  => $board_actions,
+    );
+    $pipelines[PIPELINE_BOARD_ACTIONS]->execute($action_io);
+    // remap output over the top of the input
+    $board_actions = $action_io['actions'];
+    $board_actions_html = action_getHtml($board_actions, array(
+      'boardUri' => $boardUri, 'where' => 'boards'
+    ));
     $tags = array(
-      'uri' => $b['uri'],
+      'uri' => $boardUri,
       'title' => htmlspecialchars($b['title']),
       'description' => htmlspecialchars($b['description']),
       'threads' => $b['threads'],
       'posts' => $b['posts'],
       'lastActivityColor' => $color,
       'last_post' => $last,
+      'actions' => $board_actions_html,
     );
     $boards_html .= replace_tags($board_template, $tags) . "\n";
   }
@@ -230,6 +245,11 @@ function getBoardsHandlerEngine($res, $params) {
     'content' => $content,
     'settings' => $settings,
   );
+}
+
+function getBoardsHandlerEngine($res) {
+  $templates = moduleLoadTemplates('board_listing', __DIR__ . '/common');
+  return renderBoardsTemplate($res, $templates);
 }
 
 // FIXME: solve custom sheetstyle issues in these...
