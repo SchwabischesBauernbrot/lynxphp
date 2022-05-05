@@ -1,11 +1,15 @@
 let notificationsEnabled = localStorage.getItem('notifications') == 'true';
 let notificationYousOnly = localStorage.getItem('notification-yous-only') == 'true';
-let yousEnabled = localStorage.getItem('yous-setting') == 'true';
+//let yousEnabled = localStorage.getItem('yous-setting') == 'true';
+// enable it for now
+let yousEnabled = true
 let savedYous = new Set(JSON.parse(localStorage.getItem('yous')));
 let yousList;
 
+// hide/show them all
 const toggleAllYous = (state) => savedYous.forEach(y => toggleOne(y, state));
 
+// hide/show quotes
 const toggleQuotes = (quotes, state) => {
   quotes.forEach(q => {
     q.classList[state?'add':'remove']('you');
@@ -14,15 +18,27 @@ const toggleQuotes = (quotes, state) => {
 
 const toggleOne = (you, state) => {
   const [board, postId] = you.split('-');
+  //console.log('yous::toggleOne -', board, postId, state)
   const post = document.querySelector(`[data-board="${board}"][data-post-id="${postId}"]`);
   if (post) {
     const postName = post.querySelector('.post-name');
     if (postName) {
       postName.classList[state?'add':'remove']('you');
     }
+    /*
+    const replies = post.querySelector('.replies');
+    if (replies) {
+    }
+    */
+    const postInfo = post.querySelector('.post-info');
+    if (postInfo) {
+      var elem = document.createElement('span')
+      elem.innerText = '(you)'
+      postInfo.appendChild(elem)
+    }
   }
-  const quotes = document.querySelectorAll(`.quote[href^="/${board}/"][href$="#${postId}"]`);
-  if (quotes) {
+  const quotes = document.querySelectorAll(`.quote[href^="${board}/"][href$="#${postId}"]`);
+  if (quotes && quotes.length) {
     toggleQuotes(quotes, state);
   }
 }
@@ -33,6 +49,7 @@ if (yousEnabled) {
 
 const handleNewYous = (e) => {
   const postYou = `${e.detail.json.board}-${e.detail.postId}`;
+  // is this event actually our post
   const isYou = window.myPostId == e.detail.postId
   if (isYou) {
     //save you
@@ -84,8 +101,14 @@ window.addEventListener('updatePostMessage', handleNewYous, false);
 
 window.addEventListener('settingsReady', () => {
 
+  // load current values into settings
+  /*
   yousList = document.getElementById('youslist-setting');
   yousList.value = [...savedYous];
+  */
+
+  // wire up clear button
+  /*
   const yousListClearButton = document.getElementById('youslist-clear');
   const clearYousList = () => {
     if (yousEnabled) {
@@ -97,7 +120,10 @@ window.addEventListener('settingsReady', () => {
     console.log('cleared yous');
   }
   yousListClearButton.addEventListener('click', clearYousList, false);
+  */
 
+  // setting
+  /*
   const yousSetting = document.getElementById('yous-setting');
   const toggleYousSetting = () => {
     yousEnabled = !yousEnabled;
@@ -137,5 +163,6 @@ window.addEventListener('settingsReady', () => {
   }
   notificationSetting.checked = notificationsEnabled;
   notificationSetting.addEventListener('change', toggleNotifications, false);
+  */
 
 });
