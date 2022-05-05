@@ -28,7 +28,8 @@ $result = $pkg->useResource('add', array(
 
 if (isset($result['id'])) {
   // success
-  redirectTo(BASE_HREF . $boardUri . '/settings/banners.html');
+  global $BASE_HREF;
+  redirectTo($BASE_HREF . $boardUri . '/settings/banners.html');
 } else {
   wrapContent('Something went wrong...');
 }
