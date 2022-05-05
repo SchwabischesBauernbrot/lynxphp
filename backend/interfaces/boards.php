@@ -360,7 +360,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
         $threads[$row['thread_postid']]['postid'] = $row['thread_postid'];
         $threads[$row['thread_postid']]['json']   = $row['thread_json'];
         $threads[$row['thread_postid']]['created_at'] = $row['thread_created_at'];
-        threadDBtoAPI($threads[$row['thread_postid']]);
+        threadDBtoAPI($threads[$row['thread_postid']], $boardUri);
         $threads[$row['thread_postid']]['posts'] = array();
         $threads[$row['thread_postid']]['files'] = array();
         //echo "<pre>", print_r($threads[$row['thread_postid']], 1), "</pre>\n";
@@ -493,7 +493,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
         'posts' => array($row)
       );
       // filter OP
-      threadDBtoAPI($threads[$row['postid']]['posts'][0]);
+      threadDBtoAPI($threads[$row['postid']]['posts'][0], $boardUri);
       $threads[$row['postid']]['posts'][0]['files'] = array();
     }
 
@@ -547,8 +547,16 @@ function boardPage($boardUri, $posts_model, $page = 1) {
   return $threads;
 }
 
-function boardCatalog($boardUri) {
+function boardCatalog($boardUri, $options = false) {
   global $db, $tpp;
+
+  extract(ensureOptions(array(
+    'posts_model' => false,
+    'post_files_model' => false,
+    'files'  => true,
+    'filter' => true,
+  ), $options));
+
   $posts_model = getPostsModel($boardUri);
   if ($posts_model === false) {
     // this board does not exist
@@ -666,7 +674,7 @@ function boardCatalog($boardUri) {
     if (!isset($threads[$page][$row['postid']])) {
       // add thread
       $threads[$page][$row['postid']] = $row;
-      threadDBtoAPI($threads[$page][$row['postid']], $post_files_model);
+      threadDBtoAPI($threads[$page][$row['postid']], $boardUri);
       $threads[$page][$row['postid']]['file_count'] = $row['file_count']; // preserve file_count
       $threads[$page][$row['postid']]['files'] = array();
     }
