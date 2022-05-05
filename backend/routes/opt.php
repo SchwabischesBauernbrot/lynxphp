@@ -32,11 +32,6 @@ return array(
         'route' => '/:board/thread/:thread',
         'file'  => 'board_thread',
       ),
-      // https://a.4cdn.org/po/catalog.json
-      'boardCatalog' => array(
-        'route' => '/:board/catalog.json',
-        'file'  => 'board_catalog',
-      ),
       'myBoards' => array(
         'route' => '/myBoards',
         'file'  => 'my_boards',
