@@ -3,6 +3,10 @@
 $fePkgs = array(
   array(
     'handlers' => array(
+      array(
+        'route'   => '/:uri/board_settings.php',
+        'handler' => 'landing',
+      ),
       /*
       array(
         'method'  => 'GET',
