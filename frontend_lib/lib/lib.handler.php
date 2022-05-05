@@ -241,24 +241,28 @@ function wrapContentHeader($row) {
   $boards_html = <<<EOB
 EOB;
 
-  // build the board expander
-  $board_expander_html = getExpander('Boards', 'borads.html', array(
-    'type' => 'iframe',
-    'detailsId' => 'boardsNav',
-    'divId' => 'boardsSubpage',
-    'summaryClass' => 'nav-item',
-    'iframeId' => 'boardsSubpageFrame',
-    'iframeName' => 'boardFrame',
-    'target' => 'boardFrame',
-    'iframeTitle' => 'boards list subframe',
-    'iframeBorder' => false,
-    'aLabel' => 'Please click to load all the html for full board list',
-  ));
+  $boardsItem = array('label' => 'Boards', 'destinations' => 'boards.html');
+
+  if (0) {
+    // build the board expander
+    $board_expander_html = getExpander('Boards', 'borads.html', array(
+      'type' => 'iframe',
+      'detailsId' => 'boardsNav',
+      'divId' => 'boardsSubpage',
+      'summaryClass' => 'nav-item',
+      'iframeId' => 'boardsSubpageFrame',
+      'iframeName' => 'boardFrame',
+      'target' => 'boardFrame',
+      'iframeTitle' => 'boards list subframe',
+      'iframeBorder' => false,
+      'aLabel' => 'Please click to load all the html for full board list',
+    ));
+    $boardsItem = array('html_override' => $board_expander_html);
+  }
 
   $leftNavItems = array(
     array('label' => 'Home', 'destinations' => '.'),
-    array(//'label' => 'Boards', 'destinations' => 'boards.html',
-          'html_override' => $board_expander_html),
+    $boardsItem,
     //array('label' => 'Help', 'destinations' => 'help.html'),
   );
 
@@ -369,6 +373,8 @@ function wrapContentFooter($row) {
       'js/jschan/counter.js',
       // expand media
       'js/jschan/expand.js',
+      // yous
+      'js/jschan/yous.js',
       // lynxphp
       'js/lynxphp/embed.js',
       'js/lynxphp/refresh.js',
