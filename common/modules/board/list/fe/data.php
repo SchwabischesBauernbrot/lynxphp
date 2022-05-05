@@ -62,6 +62,9 @@ $fePkgs = array(
       ),
       */
     ),
+    'pipelines' => array(
+      array('name' => 'PIPELINE_BOARD_ACTIONS',)
+    ),
   ),
 );
 return $fePkgs;
