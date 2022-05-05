@@ -72,6 +72,7 @@ require '../frontend_lib/lib/lib.captcha.php'; // load captcha infrastructure
 require '../frontend_lib/lib/lib.files.php'; // file upload functions
 require '../frontend_lib/lib/lib.form.php'; // form helper
 require '../frontend_lib/lib/lib.perms.php'; // permission helper
+require '../frontend_lib/lib/lib.actions.php'; // UI helper
 // structures
 require '../frontend_lib/lib/nav.php'; // nav structure
 require '../frontend_lib/lib/expand.php'; // maybe more of a lib...
