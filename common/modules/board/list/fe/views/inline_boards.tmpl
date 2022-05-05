@@ -1,0 +1,55 @@
+<div class="flexcenter mv-10">
+  <form class="form-post" action="{{action}}" method="POST">
+    <!-- hide nsfw, languages, filter out abandoned boards -->
+    <div class="row">
+      <span class="label">Search</span>
+      <input type="text" name="search" placeholder="Uri or tags" value="{{search}}">
+      <span class="label">Sort</span>
+      <select name="sort">
+        <option value="popularity"{{popularitySelected}}>Popularity</option>
+        <option value="activity"{{latestSelected}}>Latest Activity</option>
+      </select>
+      <span class="label">Order</span>
+      <select name="direction">
+        <option value="desc"{{descSelected}}>Descending</option>
+        <option value="asc"{{ascSelected}}>Ascending</option>
+      </select>
+      <input type="submit" value="Filter">
+    </div>
+  </form>
+</div>
+<div class="table-container flex-center mv-10 text-center">
+<table class="boardtable w900">
+  <tr>
+    <th>Board</th>
+    <th>Description</th>
+    {{fields}}
+    <!-- th>PPH</th>
+    <th>Users</th -->
+    <th>Posts</th>
+    <th>Last Activity
+{{boards}}
+<!-- loop -->
+  <h4 class="board-description">or try the <a href="overboard.php">overboard</a></h4>
+<!-- end -->
+<!-- loop -->
+  <tr>
+    <td>
+      <span class="left"></span><a href="{{uri}}/"><nobr>/{{uri}}/</nobr> - <nobr>{{title}}</nobr></a>
+    </td>
+    <td>{{description}}</td>
+    <!-- td>pph</td>
+    <td>users</td -->
+    <td>{{posts}}</td>
+    <td style="background-color: #{{lastActivityColor}}"><nobr>{{last_post}}</nobr></td>
+<!-- end -->
+</table>
+</div>
+
+<div class="pages text-center mt-5 mv-0">
+Page:
+{{pages}}
+<!-- loop -->
+  <a class="{{bold}}" href="boards.html?{{qs}}">[{{page}}]</a>
+<!-- end -->
+</div>
