@@ -172,8 +172,17 @@ function getThumbnail($file, $options = false) {
     }
   }
 
+  if (strpos($thumb, '://') === false) {
+    $thumb = BACKEND_PUBLIC_URL . $thumb;
+  }
+  if ($file['type'] === 'file') {
+    $thumb = 'images/imagelessthread.png';
+    $file['tn_w'] = 209;
+    $file['tn_h'] = 64;
+    $type = 'img';
+  }
   if ($type !== 'img') {
-    // no thumbnail yet for video/audio
+    // thumbnail maybe processing still
     $thumb = 'images/awaiting_thumbnail.png';
     $file['tn_w'] = 209;
     $file['tn_h'] = 64;
@@ -215,9 +224,6 @@ function getThumbnail($file, $options = false) {
   $w = (int)$w;
   $h = (int)$h;
 
-  if (strpos($thumb, '://') === false) {
-    $thumb = BACKEND_PUBLIC_URL . $thumb;
-  }
   $loading = $noLazyLoad ? '' : 'loading="lazy"';
   return '<img class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" ' . $loading . ' alt="' . $alt . '" />';
 }
