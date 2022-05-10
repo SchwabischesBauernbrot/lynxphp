@@ -3,6 +3,12 @@ function removeModal() {
   modalClasses.forEach(c => document.getElementsByClassName(c)[0].remove());
 }
 
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
 function doModal(data, postcallback) {
   try {
     const modalHtml = modal({ modal: data });
@@ -82,9 +88,19 @@ class formHandler {
     this.files = [];
     this.fileInput = form.querySelector('input[type="file"]');
     if (this.fileInput) {
+      //console.log('fileInput', this.fileInput)
       this.fileRequired = this.fileInput.required;
-      this.fileLabel = this.fileInput.previousSibling;
-      this.fileUploadList = this.fileInput.nextSibling;
+      // input should be inside the label?
+      this.fileLabel = this.fileInput.parentNode;
+      if (!this.fileLabel) {
+        console.warn('fileLabel is missing')
+      }
+      this.fileUploadList = this.fileLabel.parentNode.querySelector('.upload-list');
+      if (!this.fileUploadList) {
+        console.warn('fileUploadList is missing')
+      }
+      //console.log('fileLabel', this.fileLabel)
+      //console.log('fileUploadList', this.fileUploadList)
       //
       //this.multipleFiles = this.fileLabel.parentNode.previousSibling.firstChild.textContent.endsWith('s[]');
       this.multipleFiles = this.fileLabel
@@ -123,21 +139,31 @@ class formHandler {
     }
   }
 
+  // only submits one file
   formSubmit(e) {
     const xhr = new XMLHttpRequest();
-    let postData;
+    // inject captcha if we have it
     const captchaResponse = recaptchaResponse;
+    // setup postData based on type of form
+    let postData;
     if (this.enctype === 'multipart/form-data') {
+      // lib.form always uses this
       this.fileInput && (this.fileInput.disabled = true);
       postData = new FormData(this.form);
       if (captchaResponse) {
         postData.append('captcha', captchaResponse);
       }
+      // the input is in the named keys of this list more thanonce
+      // but the count seems sane
+      // we can map if there's only one file field
+      // what do we do if there's more than one?
+      //console.log('form', this.form.elements)
       this.fileInput && (this.fileInput.disabled = false);
       if (this.files && this.files.length > 0) {
+        //console.log('fileInput', this.fileInput, this.fileInput.name)
         //add files to file input element
         for (let i = 0; i < this.files.length; i++) {
-          postData.append('file', this.files[i]);
+          postData.append(this.fileInput.name, this.files[i]);
         }
       }
     } else {
@@ -157,6 +183,7 @@ class formHandler {
         postData.set('captcha', captchaResponse);
       }
     }
+    // ban filter
     if (this.banned
       || this.minimal
       || (postData instanceof URLSearchParams && postData.get('edit') === '1')) {
@@ -166,6 +193,7 @@ class formHandler {
     }
     this.submit.disabled = true;
     this.submit.value = 'Processing...';
+    // enable extra file handling
     if (this.files && this.files.length > 0) {
       //show progress on file uploads
       xhr.onloadstart = () => {
@@ -199,9 +227,12 @@ class formHandler {
             json = JSON.parse(xhr.responseText);
           } catch (e) {
             //wasnt json response
+            console.log('not json', e)
           }
         }
+        console.log('response status code', xhr.status)
         if (xhr.status == 200) {
+          console.log('json', json)
           if (!json) {
             // interesting constraint...
             let action = this.form.getAttribute('action')
@@ -210,7 +241,8 @@ class formHandler {
             }
             if (xhr.responseURL
               && xhr.responseURL !== action) {
-              window.location = xhr.responseURL;
+              console.debug('redirect to', xhr.responseURL)
+              //window.location = xhr.responseURL;
               return;
             } else if (xhr.responseText) {
               //
@@ -222,9 +254,15 @@ class formHandler {
             //console.log('no responseText, loading html', xhr.response)
             //document.innerHTML = xhr.response
           } else {
+            // has json
             if (json.postId) {
+              // yous.js use this
+              // something to coordinate with addPost events
+              // forms set window.location.hash
+              // you uses to detect if it's ours or not
               window.myPostId = json.postId;
             }
+            // add to yous
             if (json.redirect) {
               const redirectBoard = json.redirect.split('/')[1];
               const redirectPostId = json.redirect.split('#')[1];
@@ -237,10 +275,15 @@ class formHandler {
             } else if (socket && socket.connected) {
               window.location.hash = json.postId
             } else {
+              // success
+              // assumes redirect...
               if (!isThread) {
-                return window.location = json.redirect;
+                console.debug('redirect to', json.redirect)
+                return //window.location = json.redirect;
               }
+              // used to set hash
               setLocalStorage('myPostId', json.postId);
+              // live.js
               forceUpdate();
             }
           }
@@ -323,15 +366,17 @@ class formHandler {
       this.fileInput.removeAttribute('required');
     }
     this.files.push(file);
-    console.log('got file', file.name);
+    //console.log('got file', file.name);
 
+    var ref = this
     function doStuff(fileBuffer) {
       window.crypto.subtle.digest('SHA-256', fileBuffer).then(function(fileDigest) {
         fileHash = Array.from(new Uint8Array(fileDigest))
-          .map(c => c.toString(16).padStart(2, '0'))
-          .join('');
-        console.log('file hash', fileHash);
-        doItem(fileHash)
+        var fileHashStr = ''
+        for(var i in fileHash) {
+          fileHashStr += pad(fileHash[i].toString(16), 2)
+        }
+        doItem(fileHashStr)
       })
     }
 
@@ -361,33 +406,35 @@ class formHandler {
     }
 
     function doItem(fileHash) {
+      //console.log('this', ref)
       const item = {
-        spoilers: this.fileUploadList.dataset.spoilers === 'true',
+        spoilers: ref.fileUploadList.dataset.spoilers === 'true',
         name: file.name,
         hash: fileHash,
       }
+      // set temp thumbnail
       switch (file.type.split('/')[0]) {
         case 'image':
           item.url = URL.createObjectURL(file);
           break;
         case 'audio':
-          item.url = '/file/audio.png'
+          item.url = 'images/img/audio.png'
           break;
         case 'video':
-          item.url = '/file/video.png'
+          item.url = 'images/img/video.png'
           break;
         default:
-          item.url = '/file/attachment.png'
+          item.url = 'images/img/attachment.png'
           break;
       }
       const uploadItemHtml = uploaditem({ uploaditem: item });
-      this.fileUploadList.insertAdjacentHTML('beforeend', uploadItemHtml);
-      const fileElem = this.fileUploadList.lastChild;
+      ref.fileUploadList.insertAdjacentHTML('beforeend', uploadItemHtml);
+      const fileElem = ref.fileUploadList.lastChild;
       const lastClose = fileElem.querySelector('.close');
       lastClose.addEventListener('click', () => {
-        this.removeFile(fileElem, file.name, file.size);
+        ref.removeFile(fileElem, file.name, file.size);
       })
-      this.fileUploadList.style.display = 'unset';
+      ref.fileUploadList.style.display = 'unset';
     }
   }
 
@@ -490,13 +537,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 });
 
-window.addEventListener('settingsReady', () => {
-
+//window.addEventListener('settingsReady', () => {
   const forms = document.getElementsByTagName('form');
+  //console.log('forms start', forms)
   for(let i = 0; i < forms.length; i++) {
     if (forms[i].method === 'post' /*&& forms[i].encoding === 'multipart/form-data'*/) {
       new formHandler(forms[i]);
     }
   }
 
-})
+//})
