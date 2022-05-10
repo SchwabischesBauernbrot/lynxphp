@@ -29,10 +29,11 @@ krsort($res);
 $res = array_slice($res, 0, 10);
 
 // FIXME: not very cacheable like this...
+// why not?
 $settings = getSettings();
-$logo = $settings['site']['logo'];
+$logo = empty($settings['site']['logo']) ? '' : $settings['site']['logo'];
 //echo "logo[$logo]<br>\n";
-$size = getimagesize($settings['site']['logo']);
+$size = $logo ? getimagesize($settings['site']['logo'] : array(0, 0);
 
 $settings['site']['logo'] = array(
   'url' => $logo,
