@@ -45,6 +45,7 @@ function processFiles($filter_fields = false) {
             echo "multifile - file error[", print_r($res, 1), "]<br>\n";
             return;
           }
+          // type, name, size, hash
           $files[$field][] = $res['data'];
         }
       } else {
