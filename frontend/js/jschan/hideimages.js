@@ -91,7 +91,16 @@ const handleHiddenImages = (e) => {
   }
   //add the hide toggle link and event listener
   if (!e.detail.hover) {
-    e.detail.post.querySelector('.hide-image').addEventListener('click', toggleHandler, false);
+    if (e.detail.post) {
+      var hideImageElem = e.detail.post.querySelector('.hide-image')
+      if (hideImageElem) {
+        hideImageElem.addEventListener('click', toggleHandler, false);
+      } else {
+        console.warn('no .hide-image on', e.detail.post)
+      }
+    } else {
+      console.warn('no post property', e.detail)
+    }
   }
 }
 
