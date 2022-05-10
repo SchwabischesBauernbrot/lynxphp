@@ -222,7 +222,7 @@ function wrapContentHeader($row) {
   global $sentHead;
   if (!$sentHead) {
     $head_html = wrapContentGetHeadHTML($row, true);
-    echo $head_html;
+    echo '<!DOCTYPE HTML>', "\n", '<html>', $head_html;
   }
 
   $templates = loadTemplates('header');
@@ -375,6 +375,9 @@ function wrapContentFooter($row) {
       'js/jschan/expand.js',
       // yous
       'js/jschan/yous.js',
+      'js/jschan/forms.js',
+      // upload item template
+      'js/uploaditem.js',
       // lynxphp
       'js/lynxphp/embed.js',
       'js/lynxphp/refresh.js',
