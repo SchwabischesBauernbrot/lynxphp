@@ -238,8 +238,8 @@ function generateForm($action, $fields, $values, $options = false) {
           $html .= '<input type=hidden name="'. $field. '_already_uploaded" value=\'' . $value . '\'>';
         }
         $html .= '<span class="col">
-                    <input id="file" type="file" name="' . $field . '[]" multiple>
                     <label class="jsonly postform-style filelabel" for="file">
+                      <input id="file" type="file" name="' . $field . '[]" multiple>
                       Select/Drop/Paste files
                     </label>
                     <div class="upload-list" data-spoilers="true"></div>
