@@ -252,9 +252,15 @@ function makePostHandler($request) {
   //echo '<pre>_FILES: ', print_r($_FILES, 1), "</pre>\n";
 
   $res = processFiles();
+  if ($res && count($res['errors'])) {
+    // actually have to have something set thi
+  }
   //echo '<pre>res: ', print_r($res, 1), "</pre>\n";
+  // it's not always files? getting file... form.js causes this...
   $files = isset($res['handles']['files']) ? $res['handles']['files'] : array();
   //echo '<pre>files: ', print_r($files, 1), "</pre>\n";
+
+  // should we take count of _FILES and compare to count of files?
 
   $endpoint = 'lynx/newThread';
   global $BASE_HREF;
