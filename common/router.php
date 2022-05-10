@@ -374,12 +374,15 @@ class Router {
       // hope for the best
       $checkMtime = true;
       $checkEtag = true;
-      // ask backend
+      // ask backend when it was last-modified/etag
       foreach($cacheSettings['backend'] as $be) {
         //echo "checking[", print_r($be, 1), "] [", print_r($params, 1), "]\n";
         // interpolate
         $endpoint = str_replace(array_keys($params), array_values($params), $be['route']);
         // maybe log this? I could see it being helpful
+        // isn't this pointless without an etag or last-modified
+        // no, because it can set those without being asked
+        // we don't need to save bw here because we're same byte cost as a 304
         $result = request(array(
           //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
           'url' => BACKEND_BASE_URL . $endpoint,
