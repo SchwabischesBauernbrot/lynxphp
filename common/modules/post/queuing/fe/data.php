@@ -3,6 +3,11 @@
 $fePkgs = array(
   array(
     'handlers' => array(
+      array(
+        'method'  => 'GET',
+        'route'   => '/admin/queue',
+        'handler' => 'admin_queue',
+      ),
       /*
       // these aren't cacheable period.
       array(
@@ -62,6 +67,11 @@ $fePkgs = array(
       array(
         'pipeline' => 'PIPELINE_BOARD_NAV',
         'module' => 'nav',
+      ),
+      // add queues to admin navigation
+      array(
+        'pipeline' => 'PIPELINE_ADMIN_NAV',
+        'module' => 'nav_admin',
       ),
     ),
   ),
