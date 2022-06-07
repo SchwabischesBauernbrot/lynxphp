@@ -33,7 +33,7 @@ $res = array_slice($res, 0, 10);
 $settings = getSettings();
 $logo = empty($settings['site']['logo']) ? '' : $settings['site']['logo'];
 //echo "logo[$logo]<br>\n";
-$size = $logo ? getimagesize($settings['site']['logo'] : array(0, 0);
+$size = $logo ? getimagesize($settings['site']['logo']) : array(0, 0);
 
 $settings['site']['logo'] = array(
   'url' => $logo,
