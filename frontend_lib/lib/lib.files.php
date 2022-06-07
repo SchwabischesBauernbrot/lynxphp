@@ -176,7 +176,7 @@ function getThumbnail($file, $options = false) {
   if (strpos($thumb, '://') === false) {
     $thumb = BACKEND_PUBLIC_URL . $thumb;
   }
-  if ($file['type'] === 'file') {
+  if (!empty($file['type']) && $file['type'] === 'file') {
     $thumb = 'images/imagelessthread.png';
     $file['tn_w'] = 209;
     $file['tn_h'] = 64;
