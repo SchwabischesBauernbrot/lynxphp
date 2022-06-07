@@ -21,7 +21,7 @@ if (file_exists('css/themes/' . $theme . '.css')) {
 } else {
   cachePageContentsForever(); */
 //}
-echo '<div style="height: 40px;"></div>', "\n";
+//echo '<div style="height: 40px;"></div>', "\n";
 
 /*
 $templates = moduleLoadTemplates('demo', __DIR__);
@@ -162,15 +162,21 @@ $boardThreads = array(
 
 if (!function_exists('secondsToTime')) {
   // this smells bad...
+  // why can't we use ldr thingy here?
   include '../frontend_lib/handlers/boards.php';
   // prevent generation's fe router from including this group again
   global $router;
   $router->included['boards'] = true;
 }
 
+// using the options wiring is just better than a global...
+//global $g_settings;
+//$g_settings['user']['current_theme'] = $theme;
+
 getBoardThreadListingRender($boardUri, $boardThreads, 1, array(
   'noBoardHeaderTmpl' => true,
   // stop settings http request
+  /*
   'settings' => array(
     'user' => array(
       'current_theme' => $theme
@@ -178,6 +184,8 @@ getBoardThreadListingRender($boardUri, $boardThreads, 1, array(
     'site' => array(
     ),
   ),
+  */
+  'overrideTheme' => $theme,
   'noWork' => true,
 ));
 
