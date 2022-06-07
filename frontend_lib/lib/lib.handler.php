@@ -72,6 +72,9 @@ function wrapContentData($options = false) {
     //'settings'    => false,
     // close the div and main tags
     'closeHeader' => true,
+    // find a way to make this more extensible
+    // maybe a more generic name
+    'overrideTheme' => '',
     // wth passes this in?
     'canonical'   => false,
   ), $options));
@@ -124,13 +127,16 @@ function wrapContentData($options = false) {
     // this currently drives the title tag
     // title always empty anyways...
     //'siteSettings' => $siteSettings,
+
     // FIXME: I don't think this is even used
+    // it was used for themes in the pipeline
     // but we have a unified call, so there's no cost atm
     //'userSettings' => $userSettings,
     'enableJs' => $enableJs,
     'doWork' => !$noWork,
     'closeHeader' => $closeHeader,
     'canonical' => $canonical,
+    'overrideTheme' => $overrideTheme,
     //'mtime' => $mtime,
   );
 }
@@ -159,11 +165,32 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
 
   //$siteSettings = $row['siteSettings'];
   //$userSettings = $row['userSettings'];
+  // we need userSettings to drive the pipeline for themes...
+  // but if we can offload to another request if we don't need it...
+  // maybe optionally pass it if we have it
   $io = array(
     //'siteSettings' => $siteSettings,
     //'userSettings' => $userSettings,
+    'overrideTheme' => $row['overrideTheme'],
     'head_html' => '',
   );
+  // we're just going to use overrideTheme for now
+  /*
+  // optionally pass it if we have it
+  if (isset($row['userSettings'])) $io['userSettings'] = $row['userSettings'];
+
+  if (empty($io['userSettings'])) {
+    //echo "settings is empty[", gettrace(), "]<bR>\n";
+
+    // do we have this as a global?
+    global $g_settings;
+    if ($g_settings) {
+      // if so upgrade it
+      $io['userSettings'] = $g_settings['user'];
+    }
+  }
+  */
+
   $pipelines[PIPELINE_SITE_HEAD]->execute($io);
 
   $term = DEV_MODE ? "\n" : '';
@@ -375,7 +402,9 @@ function wrapContentFooter($row) {
       'js/jschan/expand.js',
       // yous
       'js/jschan/yous.js',
-      'js/jschan/forms.js',
+      // broken because it doesn't handle the output of new posts
+      // queues, refused, success, error...
+      //'js/jschan/forms.js',
       // upload item template
       'js/uploaditem.js',
       // lynxphp
@@ -431,7 +460,9 @@ function wrapContentFooter($row) {
     //'siteSettings' => $row['siteSettings'],
     //'userSettings' => $row['userSettings'],
     'header_html' => '',
+    'overrideTheme' => $row['overrideTheme'],
   );
+  // userbar hooks here
   $pipelines[PIPELINE_SITE_FOOTER_HEADER]->execute($header_io);
 
   // kind of lame because modules shouldn't need to know about templates...
@@ -440,6 +471,7 @@ function wrapContentFooter($row) {
     //'siteSettings' => $row['siteSettings'],
     //'userSettings' => $row['userSettings'],
     'footer_html' => '',
+    'overrideTheme' => $row['overrideTheme'],
   );
   $pipelines[PIPELINE_SITE_FOOTER_FOOTER]->execute($footer_io);
 
@@ -447,6 +479,7 @@ function wrapContentFooter($row) {
     //'siteSettings' => $row['siteSettings'],
     //'userSettings' => $row['userSettings'],
     'end_html' => '',
+    'overrideTheme' => $row['overrideTheme'],
   );
   $pipelines[PIPELINE_SITE_END_HTML]->execute($end_io);
   $tags = array(
@@ -508,8 +541,8 @@ function wrapContentFooter($row) {
   }
   if (DEV_MODE) {
     echo "<h4>input</h4>";
-    if (count($_GET)) echo "GET", print_r($_GET, 1), "<br>\n";
-    if (count($_POST)) echo "POST", print_r($_POST, 1), "<br>\n";
+    if (count($_GET)) echo "GET <pre>", print_r($_GET, 1), "</pre><br>\n";
+    if (count($_POST)) echo "POST <pre>", print_r($_POST, 1), "</pre><br>\n";
     //if (count($_REQUEST)) echo "POST", print_r($_REQUEST, 1), "<br>\n";
     //echo "SERVER", print_r($_SERVER, 1), "<br>\n";
   }
