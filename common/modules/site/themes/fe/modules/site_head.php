@@ -9,7 +9,44 @@ $sheet = '/user/settings/theme.php'; // dynamic
 
 // demo doesn't need the user's theme, its setting it itself
 if (strpos($_SERVER['REQUEST_URI'], '/themedemo/') !== false) {
-  $sheet = 'css/themes/' . $io['userSettings']['current_theme'] . '.css';
+  // oh we don't care what the user has selected in this mode...
+  /*
+  if (!isset($io['userSettings']['current_theme'])) {
+    // them we need to get the user setting
+
+    // FIXME: caching
+    //echo "packages[", print_r(array_keys($packages), 1), "]<br>\n";
+    // this can cause an infinite loop if backend has an error...
+    global $packages;
+    $settings = $packages['base_settings']->useResource('settings', false, array('inWrapContent' => true));
+    print_r($settings);
+    global $g_settings;
+    $g_settings = $settings;
+    //} else {
+
+    // how do I get the mtime from a resource
+    // what's the mtime of this?
+    // router?
+    // then we'll need the key, routeParams and routeOptions
+    // we should be able to extract it from the router after the call
+    //
+    // index sets the header, so we have to inform when we set up the route
+    //   calling this to manage
+  }
+  */
+  $theme = '';
+  if (isset($io['overrideTheme'])) {
+    $theme = $io['overrideTheme'];
+  }
+  if (isset($io['userSettings']['current_theme'])) {
+    $theme = $io['userSettings']['current_theme'];
+  }
+  if ($theme) {
+    $sheet = 'css/themes/' . $theme . '.css';
+  } else {
+    $io['head_html'] .= 'no theme in userSettings or overrideTheme in io [' . print_r($io, 1) . ']';
+    return;
+  }
 }
 
 // this can have it's own cache without affecting the php or static
