@@ -45,6 +45,16 @@ return array(
         'params' => 'querystring',
       ),
     ),
+    array(
+      'name' => 'queue_list',
+      'params' => array(
+        'endpoint' => 'opt/admin/queues',
+        'unwrapData' => true,
+        'requireSession'=> true,
+        //'requires' => array('boardUri'),
+        //'params' => 'querystring',
+      ),
+    ),
   ),
 );
 ?>
