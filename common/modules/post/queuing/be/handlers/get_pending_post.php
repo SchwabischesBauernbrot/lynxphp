@@ -38,6 +38,7 @@ $in_files = $data['files'];
 
 //unset($qp['files']);
 $post_files = array();
+// simulate thumbnail sizes...
 foreach($in_files as $f) {
   $m6 = substr($f['type'], 0, 6);
   $isImage = $m6 === 'image/';
