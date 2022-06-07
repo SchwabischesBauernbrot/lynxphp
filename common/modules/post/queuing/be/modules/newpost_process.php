@@ -2,6 +2,12 @@
 
 $module = $getModule();
 
+if (!$io['addToPostsDB']) {
+  // we're already not adding this post to the db for some reason
+  // so no need to queue it
+  return;
+}
+
 $boardUri = $io['boardUri'];
 $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
 
@@ -14,6 +20,8 @@ if (!isset($boardData['settings']['queueing_mode'])) {
 $tags = $io['p']['tags'];
 
 // FIXME: move into newpost_tag pipeline
+
+// add/remove queue_* tags
 foreach($boardData['settings']['post_queueing'] as $t => $mode) {
   if ($mode && in_array($t, $tags)) {
     if ($mode === 'com') {
