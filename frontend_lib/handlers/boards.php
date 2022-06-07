@@ -370,6 +370,9 @@ EOB;
     if ($result && is_array($result) && isset($result['data']) && is_array($result['data']) && $result['data']['status'] === 'queued') {
       // success (queued)
       redirectTo($redir);
+    } else
+    if ($result && is_array($result) && isset($result['data']) && is_array($result['data']) && $result['data']['status'] === 'refused') {
+      wrapContent('Post Refused');
     } else {
       // valid json
       if ($result['data'] === 'Expired captcha.' || $result['data'] === 'Wrong captcha.') {
