@@ -56,7 +56,9 @@ if (!file_exists('../common') || !is_dir('../common')) {
   echo "Your common directory can not be found<br>\n";
   exit(1);
 }
-include '../common/post_vars.php';
+require '../common/lib.loader.php';
+ldr_require('../common/common.php'); // for gettrace
+ldr_require('../common/lib.http.server.php'); // for backend/config (getServerField)
 
 // assuming ran by php/webserver
 if (function_exists('posix_getpwuid')) {
@@ -102,7 +104,7 @@ if (file_exists('backend') && is_dir('backend')) {
 // backend detection
 include 'config.php';
 echo "Backend configured URL: ", BACKEND_BASE_URL, "<br>\n";
-include 'lib/lib.http.php';
+include '../frontend_lib/lib/lib.http.php';
 $json = curlHelper(BACKEND_BASE_URL);
 $result = json_decode($json, true);
 if ($result === false) {
