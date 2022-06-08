@@ -17,7 +17,8 @@ $result = $pkg->useResource('add', array(
 if (isset($result['success'])) {
   // success
   global $BASE_HREF;
-  redirectTo($BASE_HREF . '/admin/strings');
+  // why is BASE_HREF empty?
+  redirectTo($BASE_HREF . 'admin/strings');
 } else {
   wrapContent('Something went wrong...' . print_r($result, 1));
 }
