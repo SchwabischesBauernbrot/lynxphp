@@ -4,6 +4,9 @@ $params = $getHandler();
 
 $data = $pkg->useResource('queue_list');
 
+// votes? list of IDs that voted
+// logs?
+
 $str = '';
 
 $str .= 'posts: ' . count($data['queue_posts']) . "<br>\n";
@@ -33,6 +36,6 @@ foreach($data['boards'] as $b => $s) {
 }
 $str .= '</table>';
 
-wrapContent($str);
+wrapContent(renderAdminPortal() . $str);
 
 ?>
