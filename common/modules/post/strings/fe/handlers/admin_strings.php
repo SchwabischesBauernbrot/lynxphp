@@ -15,6 +15,6 @@ foreach($data['strings'] as $s) {
 }
 $str .= '</table>';
 
-wrapContent($str);
+wrapContent(renderAdminPortal() . $str);
 
 ?>
