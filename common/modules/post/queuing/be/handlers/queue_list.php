@@ -5,6 +5,9 @@ global $db, $models;
 $res = $db->find($models['post_queue']);
 $qposts = $db->toArray($res);
 
+$post_files = array();
+// FIXME: simulate thumbnail sizes...
+
 foreach($qposts as $i => $qp) {
   $data = json_decode($qp['data'], true);
   $post = $data['post'];
