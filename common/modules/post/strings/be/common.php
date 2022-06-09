@@ -8,7 +8,7 @@ function post_strings_getCount($text) {
 
   $cnt = 0;
   while($s = $db->get_row($res)) {
-    if (strpos($s['string'], $text) !== false) {
+    if (strpos($text, $s['string']) !== false) {
       // contains $s['string']
       $cnt++;
     }
@@ -23,7 +23,7 @@ function post_strings_getAction($text) {
 
   $action = 0;
   while($s = $db->get_row($res)) {
-    if (strpos($s['string'], $text) !== false) {
+    if (strpos($text, $s['string']) !== false) {
       // contains $s['string']
       // maybe we go over all of them?
       $action = $s['action'];
