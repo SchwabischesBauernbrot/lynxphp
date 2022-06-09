@@ -55,6 +55,17 @@ return array(
         //'params' => 'querystring',
       ),
     ),
+    array(
+      'name' => 'admin_del',
+      'params' => array(
+        'endpoint' => 'opt/admin/queues/:queueid',
+        'method' => 'DELETE',
+        'requireSession' => true,
+        'unwrapData' => true,
+        'requires' => array('queueid'),
+        //'params' => 'params',
+      ),
+    ),
   ),
 );
 ?>
