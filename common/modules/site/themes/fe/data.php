@@ -63,6 +63,11 @@ $fePkgs = array(
         'pipeline' => 'PIPELINE_SITE_HEAD',
         'module' => 'site_head',
       ),
+      // head tag
+      array(
+        'pipeline' => 'PIPELINE_ADMIN_SETTING_GENERAL',
+        'module' => 'admin_settings',
+      ),
     ),
   ),
 );
