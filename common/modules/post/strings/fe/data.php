@@ -37,18 +37,16 @@ $fePkgs = array(
       ),
       */
     ),
+    'dependencies' => array('post/queuing'),
     'modules' => array(
-      /*
-      // add [Banner] to board naviagtion
-      array(
-        'pipeline' => 'PIPELINE_BOARD_NAV',
-        'module' => 'nav',
-      ),
-      */
       // add queue to admin navigation
       array(
         'pipeline' => 'PIPELINE_ADMIN_NAV',
         'module' => 'nav_admin',
+      ),
+      array(
+        'pipeline' => 'PIPELINE_FE_ADMIN_QUEUE_ROW',
+        'module' => 'admin_queue',
       ),
     ),
   ),
