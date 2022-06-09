@@ -48,7 +48,7 @@ class package {
     // FIXME: there is also optional dependencies
     // and we don't load the dep or the pipelines
     // if they aren't enable or don't exist
-    $this->dependencies = array();
+    $this->dependencies = array(); // set in module.php
   }
 
   // should we make a frontend_package/backend_package
@@ -226,6 +226,7 @@ class package {
         $depPkg->buildBackendRoutes();
         $packages[$depPkg->name] = $depPkg;
       }
+      //echo "loaded<br>\n";
     }
 
     global $routers, $pipelines;
@@ -250,6 +251,7 @@ class package {
         }
         if (isset($pData['pipelines']) && is_array($pData['pipelines'])) {
           foreach($pData['pipelines'] as $m) {
+            //echo "ESTABLISHING [", $m['name'], "]<br>\n";
             $bePkg->addPipeline($m);
           }
         }
@@ -409,18 +411,26 @@ class backend_package {
     $module_path = strtolower($pkg->dir);
     $path = $module_path . 'be/modules/' . strtolower($file) . '.php';
     $this->modules[] = $file;
-    $bsn->attach($pipeline_name, function(&$io) use ($pipeline_name, $path, $pkg, $module_path) {
+    $ref = &$this;
+    $bsn->attach($pipeline_name, function(&$io) use ($pipeline_name, $path, $pkg, $module_path, &$ref) {
       $getModule = function() use ($pipeline_name) {
         //echo "Set up module for [$pipeline_name]<br>\n";
         return array();
       };
-      if (is_readable($module_path . 'be/common.php')) {
-        // ref isn't defined...
-        //$ref->common =
-        include $module_path . 'be/common.php';
-      } else {
-        if (file_exists($module_path . 'be/common.php')) {
-          echo "perms? [$module_path]be/common.php<br>\n";
+
+      if (!$ref->ranOnce) {
+        if (is_readable($module_path . 'be/common.php')) {
+          // ref isn't defined...
+          //$ref->common =
+          $ref->common = include $module_path . 'be/common.php';
+        } else {
+          if (file_exists($module_path . 'be/common.php')) {
+            echo "perms? [$module_path]be/common.php<br>\n";
+          }
+        }
+        $ref->ranOnce = true;
+        if (isset($ref->common)) {
+          $common = $ref->common;
         }
       }
 
@@ -535,6 +545,7 @@ class frontend_package {
     }
     if ($loadPipelines && isset($pData['pipelines'])) {
       foreach($pData['pipelines'] as $m) {
+        // name has to be a string
         $this->addPipeline($m);
       }
     }
@@ -650,6 +661,7 @@ class frontend_package {
   }
 
   function addPipeline($pipeline) {
+    // name has to be a string
     definePipeline($pipeline['name']);
   }
 
