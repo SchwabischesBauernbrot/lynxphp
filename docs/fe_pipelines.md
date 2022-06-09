@@ -115,3 +115,7 @@ Defined but not used
 
 Module specific ones:
 PIPELINE_BOARD_ACTIONS
+PIPELINE_FE_ADMIN_QUEUE_ROW
+  *addFields
+    label
+    ffield
