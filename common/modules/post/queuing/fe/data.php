@@ -51,6 +51,10 @@ $fePkgs = array(
         'route' => '/:uri/moderate',
         'handler' => 'community_moderate',
       ),
+      array(
+        'route' => '/admin/queue/:id/delete',
+        'handler' => 'admin_delete',
+      ),
     ),
     'modules' => array(
       // add [Banner] to board naviagtion
@@ -73,6 +77,9 @@ $fePkgs = array(
         'pipeline' => 'PIPELINE_ADMIN_NAV',
         'module' => 'nav_admin',
       ),
+    ),
+    'pipelines' => array(
+      array('name' => 'PIPELINE_FE_ADMIN_QUEUE_ROW'),
     ),
   ),
 );
