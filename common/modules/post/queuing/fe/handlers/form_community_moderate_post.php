@@ -9,7 +9,7 @@ $boardUri = $request['params']['uri'];
 /*
 // handle hooks for additionl settings
 global $pipelines;
-$pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
+$pipelines[]->execute($fields);
 */
 
 // just pass all the _POST data to save_settings...
