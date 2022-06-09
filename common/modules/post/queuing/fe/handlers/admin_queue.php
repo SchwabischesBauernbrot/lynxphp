@@ -17,6 +17,8 @@ $str = '';
 
 $str .= 'posts: ' . count($data['queue_posts']) . "<br>\n";
 
+// FIXME: add a link to clear all with (updated) strings?
+
 global $pipelines;
 
 $io = array(
