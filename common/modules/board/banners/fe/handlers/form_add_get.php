@@ -10,7 +10,7 @@ $templates = moduleLoadTemplates('banner_detail', __DIR__);
 $tmpl = $templates['header'];
 
 // wrap form
-$tmpl = '<form method="POST" action="' . $boardUri . '/settings/banners/add" enctype="multipart/form-data">' . $tmpl . '
+$tmpl = '<form method="POST" action="' . $boardUri . '/settings/banners/add.php" enctype="multipart/form-data">' . $tmpl . '
   <input type=submit>
 </form>';
 // pop up fields...
