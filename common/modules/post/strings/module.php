@@ -1,7 +1,8 @@
 <?php
 return array(
-  'name' => 'module_subname',
+  'name' => 'post_strings',
   'version' => 1,
+  'dependencies' => array('post/queuing'),
   'resources' => array(
     array(
       'name' => 'string_list',
