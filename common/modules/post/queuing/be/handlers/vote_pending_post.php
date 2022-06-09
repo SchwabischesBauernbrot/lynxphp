@@ -100,12 +100,7 @@ if (count($votes) >= $consensus) {
     $okToNuke = post_dequeue($queueid);
   }
   if ($okToNuke) {
-    // delete from queue
-    $db->deleteById($models['post_queue'], $queueid);
-    // delete all votes from db
-    $db->delete($models['post_queue_vote'], array(
-      'criteria' => array('queueid' => $queueid)
-    ));
+    post_queue_delete($queueid);
   }
 }
 
