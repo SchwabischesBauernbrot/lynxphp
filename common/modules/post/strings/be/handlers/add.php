@@ -8,7 +8,7 @@ $rows = array();
 $posts = json_decode($_POST['strings'], true);
 if (is_array($posts)) {
   foreach($posts as $s) {
-    $rows[] = array('string' => $s, 'action' => $action);
+    $rows[] = array('string' => trim($s), 'action' => $action);
   }
 }
 
