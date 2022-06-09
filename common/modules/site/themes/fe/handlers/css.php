@@ -4,7 +4,7 @@ $params = $getHandler();
 
 $allThemes = $shared['themes'];
 
-unset($allThemes['default']); // erase default as a possible final option
+//unset($allThemes['default']); // erase default as a possible final option
 $themes = array_keys($allThemes);
 
 global $packages, $now;
