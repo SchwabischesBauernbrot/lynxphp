@@ -385,6 +385,7 @@ class backend_package {
     $this->pkg->registerBackendPackage($this);
     $this->models = array();
     $this->modules = array();
+    $this->ranOnce = false;
   }
   function addModel($model, $potentialName) {
     global $db, $models;
