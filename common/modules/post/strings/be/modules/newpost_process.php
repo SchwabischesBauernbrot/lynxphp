@@ -11,27 +11,15 @@ if (!$io['addToPostsDB']) {
 $boardUri = $io['boardUri'];
 $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
 
-global $db, $models;
-$res = $db->find($models['post_string']);
-$strings = $db->toArray($res);
+$action = post_strings_getAction($io['p']['com']);
 
-$ok = true;
-$action = 0;
-foreach($strings as $s) {
-  if (strpos($s['string'], $io['p']['com']) !== false) {
-    // contains $s['string']
-    $ok = false;
-    // maybe we go over all of them?
-    $action = $s['action'];
-    break;
-  }
-}
-
-if (!$ok) {
+if ($action !== 0) {
   $io['addToPostsDB'] = false;
   $io['returnId'] = array(
     'status' => 'refused',
   );
+  // FIXME: we need to log the IP and the post
+  // rotate the posts...
 }
 
 ?>
