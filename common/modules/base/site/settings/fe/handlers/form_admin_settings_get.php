@@ -11,6 +11,8 @@ $fields = $common['fields']; // imported from fe/common.php
 // handle hooks for additionl settings
 $pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
 
+//echo "<pre>", print_r($fields, 1), "</pre>\n";
+
 $html = generateForm($params['action'], $fields, $values);
 
 wrapContent(renderAdminPortal() . 'Settings'. $html);
