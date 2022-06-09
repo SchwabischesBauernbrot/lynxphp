@@ -1,5 +1,7 @@
 <?php
 
+// queuing/be
+
 // shared code for the backend
 
 function getYourVotes() {
@@ -72,6 +74,16 @@ function post_queue($boardUri, $ip, $thread_id, $data, $type) {
     'data'  => json_encode($data),
   )));
   return $id;
+}
+
+function post_queue_delete($queueid) {
+  global $db, $models;
+  // delete from queue
+  $db->deleteById($models['post_queue'], $queueid);
+  // delete all votes from db
+  $db->delete($models['post_queue_vote'], array(
+    'criteria' => array('queueid' => $queueid)
+  ));
 }
 
 // queue -> post
