@@ -40,6 +40,9 @@ return array(
       // handle queuing process based on queueing setting
       array('pipeline' => PIPELINE_NEWPOST_PROCESS, 'module' => 'newpost_process'),
     ),
+    'pipelines' => array(
+      array('name' => 'PIPELINE_BE_ADMIN_QUEUE_DATA'),
+    ),
   ),
 );
 
