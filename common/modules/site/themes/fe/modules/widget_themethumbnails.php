@@ -84,7 +84,7 @@ foreach($details['options'] as $v => $l) {
   }
   // ?v=' . $mtime . '
   */
-  if ($v === 0) $v = getDefaultTheme();
+  if ($v === 0) $v = theme_getDefault();
   $io['html'] .= '
 <li class="dummie-themes-li">
   <div class="thumbnail-container" title="' . $l . '">
