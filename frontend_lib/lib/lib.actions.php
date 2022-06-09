@@ -39,6 +39,7 @@ function action_getLinkHTML($a, $options) {
   return '<a href="' . $link . '">' . $a['label'] . '</a>';
 }
 
+// used for multiple levels of access
 function action_getHtml($actions, $options = false) {
   // unpack options
   extract(ensureOptions(array(
@@ -74,6 +75,14 @@ function action_getHtml($actions, $options = false) {
 
   return join($join, $actions_html_parts);
 }
+
+/*
+  $htmlLinks = array();
+  foreach($dataActions as $a) {
+    $htmlLinks[] = action_getLinkHTML($a, array('where' => false));
+  }
+  $str .= '<td>' . join('<br>' > "\n", $htmlLinks);
+*/
 
 // we should move the expander in here
 // so we can hide if no actions
