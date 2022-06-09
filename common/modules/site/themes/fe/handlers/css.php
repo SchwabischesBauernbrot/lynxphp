@@ -17,7 +17,9 @@ $userSettings = $result['settings'];
 
 // FIXME: set default theme in siteSettings
 // translate default to first theme...
-if (empty($userSettings['current_theme']) || $userSettings['current_theme'] === 'default') $userSettings['current_theme'] = $themes[0];
+if (empty($userSettings['current_theme']) || $userSettings['current_theme'] === 'default') {
+  $userSettings['current_theme'] = theme_getDefault();
+}
 $theme = $userSettings['current_theme'];
 
 // manually handle the caching...
