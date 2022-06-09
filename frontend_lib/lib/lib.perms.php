@@ -106,4 +106,19 @@ function perms_isBO($boardUri) {
   return in_array($boardUri, $myBoards);
 }
 
+function perms_inGroups($groups) {
+  // handles 401 badly...
+  if (!isLoggedIn()) return false;
+  // post_renderer calls this
+  //echo gettrace();
+  $user = getUserData();
+  if ($user === false) return false;
+  $usergroups = $user['account']['groups'];
+  foreach($groups as $g) {
+    if (!in_array($g, $usergroups)) return false;
+  }
+  return true;
+}
+
+
 ?>
