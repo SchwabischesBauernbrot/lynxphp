@@ -48,7 +48,7 @@ return array(
     array(
       'name' => 'queue_list',
       'params' => array(
-        'endpoint' => 'opt/admin/queues',
+        'endpoint' => 'doubleplus/admin/queues',
         'unwrapData' => true,
         'requireSession'=> true,
         //'requires' => array('boardUri'),
@@ -58,7 +58,7 @@ return array(
     array(
       'name' => 'admin_del',
       'params' => array(
-        'endpoint' => 'opt/admin/queues/:queueid',
+        'endpoint' => 'doubleplus/admin/queues/:queueid',
         'method' => 'DELETE',
         'requireSession' => true,
         'unwrapData' => true,
@@ -66,6 +66,42 @@ return array(
         //'params' => 'params',
       ),
     ),
+    array(
+      'name' => 'admin_del',
+      'params' => array(
+        'endpoint' => 'doubleplus/admin/queues/:queueid',
+        'method' => 'DELETE',
+        'requireSession' => true,
+        'unwrapData' => true,
+        'requires' => array('queueid'),
+        //'params' => 'params',
+      ),
+    ),
+    array(
+      'name' => 'admin_dels',
+      'params' => array(
+        'endpoint' => 'doubleplus/admin/queues',
+        'method' => 'DELETE',
+        'requireSession' => true,
+        'unwrapData' => true,
+        'requires' => array('ids'),
+        // querystring or postdata
+        'params' => 'querystring',
+      ),
+    ),
+    /*
+    array(
+      'name' => 'admin_del_strings',
+      'params' => array(
+        'endpoint' => 'doubleplus/admin/queues/strings',
+        'method' => 'DELETE',
+        'requireSession' => true,
+        'unwrapData' => true,
+        //'requires' => array('queueid'),
+        //'params' => 'params',
+      ),
+    ),
+    */
   ),
 );
 ?>
