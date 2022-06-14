@@ -74,6 +74,7 @@ function getQueryField($field) {
   return empty($_GET[$field]) ? '' : $_GET[$field];
 }
 
+// is it optional if I don't want the PHP warning?
 function getOptionalPostField($field) {
   return empty($_POST[$field]) ? '' : $_POST[$field];
 }
