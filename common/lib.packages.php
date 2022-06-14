@@ -102,6 +102,11 @@ class package {
     if ($rsrcArr['endpoint'][0] === '/') {
       echo "Resource[$label]'s endpoint should NOT start with a slash<br>\n";
     }
+    if (empty($rsrcArr['params']) && !empty($rsrcArr['requires']) && strpos($rsrcArr['endpoint'], '/:') === false) {
+      echo "lib.package:::package::useResource($label) - Unset parameter type for required fields... in [", $this->dir, "]<br>\n";
+      //print_r($rsrcArr['requires']);
+      //print_r($rsrcArr['params']);
+    }
     //echo "Adding [$label] to [", $this->name, "]<br>\n";
     $this->resources[$label] = $rsrcArr;
   }
@@ -121,13 +126,14 @@ class package {
         }
       }
       if (count($missing)) {
-        echo "<pre>lib.package:::package::useResource - Cannot call [$label] because ", join(', ', $missing), " are missing from parameters: ", print_r($params, 1), "</pre>\n";
+        echo "<pre>lib.package:::package::useResource($label) - Cannot call [$label] because ", join(', ', $missing), " are missing from parameters: ", print_r($params, 1), "</pre>\n";
         return;
       }
     }
     // handle $params mapping
     //echo "<pre>params[", print_r($rsrc, 1), "]</pre>\n";
     if (isset($rsrc['params'])) {
+      // mixed
       if (is_array($rsrc['params'])) {
         //echo "<pre>params[", print_r($rsrc['params'], 1), "]</pre>\n";
         if (!isset($rsrc['params']['querystring'])) $rsrc['params']['querystring'] = array();
@@ -145,7 +151,7 @@ class package {
           } else if (isset($fd[$k])) {
             $rsrc['formData'][$k] = $v;
           } else {
-            echo "lib.package:::package::useResource - Don't know what to do with $k in $label<br>\n";
+            echo "lib.package:::package::useResource($label) - Don't know what to do with $k in $label<br>\n";
           }
         }
       } else
@@ -156,6 +162,10 @@ class package {
             // should we urlencode k too?
             if (is_string($v) || is_bool($v) || is_numeric($v)) {
               $rsrc['querystring'][$k] = urlencode($v);
+            } else if (is_array($v)) {
+              // we just assume it's a list of strings
+              // php will bitch if not...
+              $rsrc['querystring'][$k] = urlencode(join(',', $v));
             } else {
               echo "<pre>lib.package:::package::useResource($label) - What do I do with [$k] of type [",gettype($v),"]=[", print_r($v, 1),"]</pre>\n";
             }
@@ -173,9 +183,16 @@ class package {
           }
         }
       } else {
-        echo "lib.package:::package::useResource - Unknown parameter type[", $params['params'], "]<br>\n";
+        echo "lib.package:::package::useResource($label) - Unknown parameter type[", $params['params'], "]<br>\n";
+      }
+    } else {
+      if (!empty($rsrc['requires'])) {
+        // we didn't set them as GET or POST etc...
+        // we should warn when we're set up, not being called
+        //echo "lib.package:::package::useResource($label) - Unset parameter type for required fields... in [", $this->dir, "]<br>\n";
       }
     }
+
     // does endpoint has params?
     if (strpos($rsrc['endpoint'], '/:') !== false) {
       $parts = explode('/:', $rsrc['endpoint']);
