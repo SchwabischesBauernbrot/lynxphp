@@ -78,12 +78,25 @@ function post_queue($boardUri, $ip, $thread_id, $data, $type) {
 
 function post_queue_delete($queueid) {
   global $db, $models;
-  // delete from queue
-  $db->deleteById($models['post_queue'], $queueid);
-  // delete all votes from db
-  $db->delete($models['post_queue_vote'], array(
-    'criteria' => array('queueid' => $queueid)
-  ));
+  if (is_array($queueid)) {
+    // multiple
+
+    // delete from queue
+    $db->deleteByIds($models['post_queue'], $queueid);
+    // delete all votes from db
+    $db->delete($models['post_queue_vote'], array(
+      'criteria' => array(array('queueid', 'in', $queueid))
+    ));
+
+  } else {
+    // single
+    // delete from queue
+    $db->deleteById($models['post_queue'], $queueid);
+    // delete all votes from db
+    $db->delete($models['post_queue_vote'], array(
+      'criteria' => array('queueid' => $queueid)
+    ));
+  }
 }
 
 // queue -> post
