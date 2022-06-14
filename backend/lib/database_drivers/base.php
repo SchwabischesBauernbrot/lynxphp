@@ -15,8 +15,10 @@ interface database_driver_base {
   public function delete($rootModel, $options);
   // options
   //   fields = if not set, give all fields, else expect an array
-  //   criteria = if set, an array
+  //   criteria = if set, available formats:
   //              array(field, comparison, field/constant)
+  //              or
+  //              field => field/constant
   public function find($rootModel, $options = false);
   public function count($rootModel, $options = false);
   // options doesn't look to be used...
@@ -25,6 +27,7 @@ interface database_driver_base {
   public function updateById($rootModel, $id, $row, $options = false);
   // options.criteria
   public function deleteById($rootModel, $id, $options = false);
+  public function deleteByIds($rootModel, $ids, $options = false);
   // result functions
   public function num_rows($res);
   public function get_row($res);
@@ -66,6 +69,7 @@ class database_driver_base_class {
     foreach($criteria as $k => $set) {
       //echo "k[$k] [", print_r($set, 1), "]<bR>\n";
       if (is_numeric($k)) {
+        // array(field, comparison, field/constant) version
         if (!is_array($set)) {
           echo '<pre>base:::database_driver_base_class::build_where - [', $defAlias, '] Criteria[', print_r($criteria, 1), "]</pre>\n";
           exit(1);
@@ -75,13 +79,14 @@ class database_driver_base_class {
           $left = $set[0][0];
         } else {
           if (is_string($set)) {
-            if (strtolower($set) === 'or') {
+            $upperSet = strtoupper($set);
+            if ($upperSet === 'OR') {
               //echo "Changing mode<br>\n";
               $mode = 'or';
               $c++;
               continue;
             }
-            if (strtolower($set) === 'and') {
+            if ($upperSet === 'AND') {
               //echo "Changing mode<br>\n";
               $mode = 'and';
               $c++;
@@ -104,7 +109,8 @@ class database_driver_base_class {
           $one = $alias . $left;
         }
         $operand = $set[1];
-        if (strtoupper($operand) === 'IN' || strtoupper($operand) === 'NOT IN') {
+        $upperOperand = strtoupper($operand);
+        if ($upperOperand === 'IN' || $upperOperand === 'NOT IN') {
           // list operands
           if (!is_array($set[2])) {
             // auto promote to array or abort?
@@ -547,6 +553,14 @@ class database_driver_base_class {
       )
     );
     return $this->delete($rootModel, $options);
+  }
+  // you can override and optimize this...
+  public function deleteByIds($rootModel, $ids, $options = false) {
+    $results = array();
+    foreach($ids as $id) {
+      $results[$id] = $this->deleteById($rootModel, $id, $options);
+    }
+    return $results;
   }
   public function toArray($res) {
     $arr = array();
