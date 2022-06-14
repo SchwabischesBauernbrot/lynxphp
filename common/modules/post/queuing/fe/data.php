@@ -4,7 +4,6 @@ $fePkgs = array(
   array(
     'handlers' => array(
       array(
-        'method'  => 'GET',
         'route'   => '/admin/queue',
         'handler' => 'admin_queue',
       ),
@@ -43,6 +42,7 @@ $fePkgs = array(
       */
     ),
     'forms' => array(
+      // these aren't cacheable period.
       array(
         'route' => '/:uri/settings/queueing',
         'handler' => 'board_setting',
@@ -55,18 +55,25 @@ $fePkgs = array(
         'route' => '/admin/queue/:id/delete',
         'handler' => 'admin_delete',
       ),
+      array(
+        'route'   => '/admin/queue/strings',
+        'handler' => 'admin_strings',
+      ),
     ),
     'modules' => array(
-      // add [Banner] to board naviagtion
+      // add post queuing to boards settings
       array(
         'pipeline' => 'PIPELINE_BOARD_SETTING_NAV',
         'module' => 'setting_nav',
       ),
+      // code is disabled
+      /*
       // allow BOs to control this
       array(
         'pipeline' => 'PIPELINE_BOARD_SETTING_GENERAL',
         'module' => 'board_settings',
       ),
+      */
       // add [Moderate] to board naviagtion
       array(
         'pipeline' => 'PIPELINE_BOARD_NAV',
