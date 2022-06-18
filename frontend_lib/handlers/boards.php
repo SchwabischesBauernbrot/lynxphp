@@ -119,7 +119,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
       $topReply = isset($posts[1]) ? $posts[1]['no'] : false;
       $threads_html .= renderPost($boardUri, $post, array(
         'checkable' => true, 'postCount' => $thread['thread_reply_count'],
-        'topReply' => $topReply, 'where' => $boardUri . '/'
+        'topReply' => $topReply, 'where' => $boardUri . '/', 'boardSettings' => $boardData['settings'],
       ));
       //if ($i === count($posts) - 1) $threads_html .= $threadFtr_tmpl;
     }
