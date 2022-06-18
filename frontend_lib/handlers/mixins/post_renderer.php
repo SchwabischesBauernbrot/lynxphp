@@ -36,6 +36,7 @@ function renderPost($boardUri, $p, $options = false) {
     //'inMixedBoards' => false, // ?
     'firstThread' => false, // for adjusting loading=lazy
     'where' => '',
+    'boardSettings' => false,
   ), $options));
 
   //$isBO = perms_isBO($boardUri);
@@ -60,6 +61,17 @@ function renderPost($boardUri, $p, $options = false) {
   }
   */
 
+  if ($boardSettings === false) {
+    if (DEV_MODE) {
+      echo "No boardSettings passed to renderBoardSettingsPortalData<Br>\n";
+    }
+    $boardData = getBoard($boardUri);
+    if (isset($boardData['settings'])) {
+      $boardSettings = $boardData['settings'];
+    }
+    //print_r($boardSettings);
+  }
+
   global $pipelines;
   // pretext processing...
   $action_io = array(
@@ -67,6 +79,7 @@ function renderPost($boardUri, $p, $options = false) {
     'p' => $p,
     'actions'  => $post_actions,
     // FIXME: pass post count...
+    'boardSettings' => $boardSettings,
   );
   if ($postCount !== false) {
     $action_io['postCount'] = $postCount;
@@ -124,6 +137,7 @@ function renderPost($boardUri, $p, $options = false) {
   $templates = loadTemplates('mixins/post_detail');
   $checkable_template = $templates['loop0'];
   $posticons_template = $templates['loop1'];
+  // icon, title
   $icon_template      = $templates['loop2'];
   $file_template      = $templates['loop3'];
   $replies_template   = $templates['loop4'];
@@ -322,6 +336,13 @@ function renderPost($boardUri, $p, $options = false) {
 
   $links_html = '';
   // are we a BO? is this our post?
+  $io = array(
+    'uri' => $boardUri,
+    'p' => $p,
+    'html' => '',
+  );
+  $pipelines[PIPELINE_POST_ROW_APPEND]->execute($io);
+  $links_html = $io['html'];
 
   $tags = array(
     'op'        => $isOP ? 'op': '',
