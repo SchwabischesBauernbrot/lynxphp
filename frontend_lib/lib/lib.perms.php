@@ -18,7 +18,7 @@ function loggedIn() {
   }
   if (!isLoggedIn()) return false;
   // have session
-  $res = checkSession();
+  $res = checkSession(); // this actually goes out and validates session
   if ($res && isset($res['meta']) && $res['meta']['code'] == 401) {
   //if ($res && isset($res['data']) && is_array($res['data']) && !count($res['data'])) {
     //echo "setting false<br>\n";
@@ -26,6 +26,7 @@ function loggedIn() {
     return false;
   }
   //echo "logged[" , gettype($res), print_r($res, 1), "]<br>\n";
+  $loggedIn = 'true';
   return true;
 }
 
