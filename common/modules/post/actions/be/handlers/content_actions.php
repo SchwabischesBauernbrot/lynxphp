@@ -45,7 +45,7 @@ switch($action) {
       // no all _s are .s
       if (!$posts_model && strpos($r['board'], '_')!==false) {
         $board = str_replace('_', '.', $r['board']);
-	//echo "test[$newUri]<br>\n";
+        //echo "test[$newUri]<br>\n";
         $posts_model = getPostsModel($board);
       }
       //echo "test[", gettype($posts_model), "]<br>\n";
