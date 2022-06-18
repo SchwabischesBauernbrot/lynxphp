@@ -18,6 +18,25 @@ function postDBtoAPI(&$row) {
 
   $data = empty($row['json']) ? array() : json_decode($row['json'], true);
 
+  $publicFields = array();
+  global $pipelines;
+  $public_fields_io = array(
+    'fields' => $publicFields,
+  );
+  $pipelines[PIPELINE_BE_POST_EXPOSE_DATA_FIELD]->execute($public_fields_io);
+  $publicFields = $public_fields_io['fields'];
+
+  $exposedFields = array();
+  foreach($publicFields as $f) {
+    $exposedFields[$f] = $data[$f];
+  }
+
+  $public_fields_io = array(
+    'fields' => $exposedFields,
+  );
+  $pipelines[PIPELINE_BE_POST_FILTER_DATA_FIELD]->execute($public_fields_io);
+  $row['exposedFields'] = $public_fields_io['fields'];
+
   unset($row['json']);
   // ensure frontend doesn't have to worry about database differences
   $bools = array('deleted', 'sticky', 'closed');
