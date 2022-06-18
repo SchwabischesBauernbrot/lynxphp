@@ -41,7 +41,7 @@ foreach($boardData['posts'] as $post) {
   $tmp = $post_template;
   $posts_html .= renderPost($boardUri, $post, array(
     'checkable' => true, 'postCount' => $cnt,
-    'noOmit' => true,
+    'noOmit' => true, 'boardSettings' => $boardData['settings'],
   ));
   $files += count($post['files']);
 }
