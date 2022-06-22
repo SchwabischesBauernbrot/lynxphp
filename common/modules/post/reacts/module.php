@@ -7,6 +7,7 @@ return array(
       'name' => 'list',
       'params' => array(
         'endpoint' => 'doubleplus/:boardUri/reacts',
+        'sendSession' => true,
         'unwrapData' => true,
         'requires' => array('boardUri'),
         //'params' => 'querystring',
