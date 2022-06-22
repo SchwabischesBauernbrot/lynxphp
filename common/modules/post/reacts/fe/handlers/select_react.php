@@ -24,16 +24,23 @@ $str .= '<input type="submit" value="Search">';
 $str .= '</form>';
 
 $boardReacts = $pkg->useResource('list', array('boardUri' => $uri));
-$str .= 'Board specific Reacts: ';
-foreach($boardReacts as $r) {
-  if (!$r['hide_default'] && !$r['lock_default']) {
-    // text
-    $e = $r['text'];
-    $str .= '<span title="' . $r['name'] . '"><a href="' . $link . '/' . $e .'">' . $e . '</a></span> ';
-  }
-}
-$str .= '<br>' . "\n";
 
+// FIXME: filter here
+// then count...
+
+if (count($boardReacts)) {
+  $str .= 'Board specific Reacts: ';
+  foreach($boardReacts as $r) {
+    if (!$r['hide_default'] && !$r['lock_default']) {
+      // text
+      $e = $r['text'];
+      $str .= '<span title="' . $r['name'] . '"><a href="' . $link . '/' . $e .'">' . $e . '</a></span> ';
+    }
+  }
+  $str .= '<br>' . "\n";
+}
+
+// FIXME: make sure mode isn't custom only
 $str .= 'Select React: ';
 foreach($reacts as $e => $r) {
   // name, slug, group, emoji_version, unicode_version, skin_tone_support
