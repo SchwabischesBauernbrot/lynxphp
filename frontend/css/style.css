@@ -1,12 +1,16 @@
 body {
   font-family: arial, helvetica, sans-serif;
-  font-size: 10pt;
+  font-size: 12px;
   color: var(--font-color);
   background: linear-gradient(var(--background-top) 3em, var(--background-rest) 230px);
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  margin: 0;
+}
+
+h2 {
   margin: 0;
 }
 
@@ -99,7 +103,7 @@ pre {
   border-bottom: 1px solid var(--post-outline-color);
   /* disabled by odili on 22/5/4 */
   /* so we can preserve theme colors */
-  /* 
+  /*
   position: fixed;
   top: 0;
   */
@@ -229,7 +233,7 @@ pre {
 
 .pages, #livetext, #threadstats {
   box-sizing: border-box;
-  padding: 10px;
+  padding: 5px;
   width: -moz-max-content;
   width: max-content;
   max-width: 100%;
@@ -489,7 +493,7 @@ a:hover {
 
 table {
   background: var(--background-rest);
-  border: 1px solid var(--box-border-color);
+  border: 0;
   border-spacing: 0;
   /* disable 11/5/21 so admin screens are wider */
   /* width: 700px; */
@@ -575,7 +579,7 @@ td pre {
 }
 .post-container, #float .post-container, .stickynav, .pages, .toggle-summary, .catalog-tile, #livetext, #threadstats {
   background: var(--post-color);
-  border-width: 1px;
+  border-width: 0 1px 1px 0;
   border-style: solid;
   border-color: var(--post-outline-color);
 }
@@ -886,6 +890,9 @@ input:invalid, textarea:invalid {
   padding: .5em;
   max-width: 100%;
   min-width: 30em;
+  /* endchan spacing */
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 
 /* aceofdiamonds edit for thread date & time */
@@ -1034,7 +1041,7 @@ input:invalid, textarea:invalid {
 }
 
 .nav-item {
-  line-height: 3em;
+  line-height: 1em;
   text-decoration: none;
   /* float: left; */
   padding-left: 10px;
