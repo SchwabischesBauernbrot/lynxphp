@@ -1,6 +1,7 @@
 <?php
 
 // thread or reply...
+// should be thread AND reply, right?
 
 function postDBtoAPI(&$row) {
   global $db, $models;
