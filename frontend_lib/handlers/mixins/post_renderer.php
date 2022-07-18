@@ -63,7 +63,8 @@ function renderPost($boardUri, $p, $options = false) {
 
   if ($boardSettings === false) {
     if (DEV_MODE) {
-      echo "No boardSettings passed to renderBoardSettingsPortalData<Br>\n";
+      //echo "No boardSettings passed to renderPost [", gettrace(), "]<Br>\n";
+      echo "No boardSettings passed to renderPost<Br>\n";
     }
     $boardData = getBoard($boardUri);
     if (isset($boardData['settings'])) {
