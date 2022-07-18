@@ -1,5 +1,7 @@
 <?php
 
+// fe
+
 include '../frontend_lib/handlers/boards.php'; // preprocessPost
 
 $templates = loadTemplates('thread_listing');
@@ -54,6 +56,7 @@ $content = replace_tags($templates['header'], $tags);
 
 $threads_html = '';
 if (isset($overboardData['threads'])) {
+  global $boards_settings;
   foreach($overboardData['threads'] as $thread) {
     if (!isset($thread['posts'])) continue;
     //echo "<pre>thread[", print_r($thread, 1), "]</pre>\n";
@@ -65,7 +68,7 @@ if (isset($overboardData['threads'])) {
     foreach($posts as $i => $post) {
       $threads_html .= renderPost($bUri, $post, array(
         'checkable' => true, 'postCount' => $thread['thread_reply_count'],
-        'inMixedBoards' => true
+        'inMixedBoards' => true, 'boardSettings' => $boards_settings[$bUri],
       ));
     }
     $threads_html .= $threadftr_template;
