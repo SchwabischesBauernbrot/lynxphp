@@ -143,12 +143,24 @@ function expectJson($json, $endpoint = '', $options = array()) {
       global $portalData;
       $portalData = $obj['meta']['portals'];
     }
+    // singular
     if (isset($obj['meta']['board'])) {
       global $boardData;
       $boardData = $obj['meta']['board'];
       if (isset($obj['meta']['board']['settings'])) {
-        global $board_settings;
+        global $board_settings, $boards_settings;
         $board_settings = $obj['meta']['board']['settings'];
+        $uri = $obj['meta']['board']['uri'];
+        $boards_settings[$uri] = $obj['meta']['board']['settings'];
+      }
+    }
+    // multiple for overboards like pages
+    if (isset($obj['meta']['boardSettings'])) {
+      global $boards_settings;
+      //$boards_settings = $obj['meta']['boardSettings'];
+      // merge don't replace
+      foreach($obj['meta']['boardSettings'] as $b => $s) {
+        $boards_settings[$b] = $s;
       }
     }
     if (isset($obj['meta']['setCookie'])) {
