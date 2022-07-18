@@ -1,4 +1,7 @@
 <?php
+
+// be
+
 $params = $get();
 
 // we have to look at ALL threads
@@ -55,6 +58,17 @@ foreach($threads as $i => $t) {
 
 //print_r($threads);
 
+$boardSettings = array();
+foreach($threads as $i => $t) {
+  $uri = $t['boardUri'];
+  if (!isset($boardSettings[$uri])) {
+    // anything we need to filter out?
+    // do we just want/need the settings field?
+    $boardData = getBoard($uri, array('jsonFields' => 'settings'));
+    $boardSettings[$uri] = $boardData['settings'];
+  }
+}
+
 // now load in the posts
 foreach($threads as $i => $t) {
   /*
@@ -66,6 +80,7 @@ foreach($threads as $i => $t) {
   }
   $model = $models[$t['boardUri']];
   */
+
   // there's tpp but it's like 10...
   $threads[$i]['posts'] = getThread($t['boardUri'], $t['no'], array(
     //'posts_model' => $model['post'],
@@ -78,6 +93,10 @@ foreach($threads as $i => $t) {
 
 sendResponse2(array(
   'threads' => $threads,
+), array(
+  'meta'=> array(
+    'boardSettings' => $boardSettings,
+  ),
 ));
 
 ?>
