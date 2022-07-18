@@ -1,0 +1,26 @@
+
+body {
+  font-size: 10pt;
+}
+
+h2 {
+  /* 0.83em */
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+table {
+  border: 1px solid var(--box-border-color);
+}
+
+.pages {
+  padding: 10px;
+}
+
+.nav-item {
+  line-height: 3em;
+}
+
+.post-container, #float .post-container, .stickynav, .pages, .toggle-summary, .catalog-tile, #livetext, #threadstats {
+  border-width: 1px;
+}
