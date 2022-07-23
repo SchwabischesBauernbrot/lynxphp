@@ -1,5 +1,5 @@
 <?php
-
+// be
 $params = $get();
 
 $boards = listBoards(array('publicOnly' => true));
