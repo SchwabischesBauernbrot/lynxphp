@@ -22,6 +22,11 @@
 /**/
 /* NAV bar stuff */
 /**/
+.nav-item {
+  font-size: 1.33em;
+  line-height: 1.5em;
+}
+
 #trigger {
   bottom: 0px;
   right: 0px;
