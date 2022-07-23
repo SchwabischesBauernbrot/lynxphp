@@ -66,10 +66,22 @@ function updateBoard($boardUri,$row) {
   global $db, $models;
   if ($row['json']) $row['json'] = json_encode($row['json']);
   // feels really dangerous...
+  // well the timestamps are breaking postgres
   return $db->update($models['board'], $row, array('criteria'=>array(
     array('uri', '=', $boardUri),
   )));
 }
+
+function updateBoardJson($boardUri, $json) {
+  global $db, $models;
+  if (!$json) return; // never stomp all the data
+  $row = array('json' => json_encode($json));
+  // feels really dangerous...
+  return $db->update($models['board'], $row, array('criteria'=>array(
+    array('uri', '=', $boardUri),
+  )));
+}
+
 
 $rateLimitsTTL['type'] = 0;
 function checkLimit($type, $ip = '') {
