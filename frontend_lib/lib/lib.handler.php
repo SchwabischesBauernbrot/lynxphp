@@ -100,6 +100,7 @@ function wrapContentData($options = false) {
     'noWork'      => false,
     //'settings'    => false,
     // close the div and main tags
+    // why would you want this off?
     'closeHeader' => true,
     // find a way to make this more extensible
     // maybe a more generic name
