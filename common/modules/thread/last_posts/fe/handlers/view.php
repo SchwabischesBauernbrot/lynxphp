@@ -38,10 +38,13 @@ $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
 
 $posts_html = '';
 $files = 0;
+global $boards_settings;
 foreach($boardData['posts'] as $post) {
   //echo "<pre>", print_r($post, 1), "</pre>\n";
   $tmp = $post_template;
-  $posts_html .= renderPost($boardUri, $post, array('checkable' => true));
+  $posts_html .= renderPost($boardUri, $post, array(
+    'checkable' => true, 'boardSettings' => $boards_settings[$boardUri],
+  ));
   $files += count($post['files']);
 }
 
@@ -76,6 +79,7 @@ $boardPortal = getBoardPortal($boardUri, $boardData, array(
   'isThread' => true,
   'threadNum' => $threadNum,
   'threadClosed' => $closed,
+  'boardSettings' => $boards_settings[$boardUri],
 ));
 
 // this will include all scripts, not just this one...
