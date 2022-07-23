@@ -1,5 +1,7 @@
 <?php
 
+// queueing/be
+
 $module = $getModule();
 
 if (!$io['addToPostsDB']) {
@@ -22,22 +24,24 @@ $tags = $io['p']['tags'];
 // FIXME: move into newpost_tag pipeline
 
 // add/remove queue_* tags
-foreach($boardData['settings']['post_queueing'] as $t => $mode) {
-  if ($mode && in_array($t, $tags)) {
-    if ($mode === 'com') {
-      // add this tag
-      $io['p']['tags']['queue_com'] = true;
-    } else
-    if ($mode === 'mod') {
-      // add this tag
-      $io['p']['tags']['queue_mod'] = true;
-    } else {
-      // remove all these tags
-      $io['p']['tags']['queue_com'] = false;
-      $io['p']['tags']['queue_mod'] = false;
+if (isset($boardData['settings']['post_queueing'])) {
+  foreach($boardData['settings']['post_queueing'] as $t => $mode) {
+    if ($mode && in_array($t, $tags)) {
+      if ($mode === 'com') {
+        // add this tag
+        $io['p']['tags']['queue_com'] = true;
+      } else
+      if ($mode === 'mod') {
+        // add this tag
+        $io['p']['tags']['queue_mod'] = true;
+      } else {
+        // remove all these tags
+        $io['p']['tags']['queue_com'] = false;
+        $io['p']['tags']['queue_mod'] = false;
+      }
     }
   }
-}
+} // otherwise no queueing...
 
 function queueIt($boardUri, $io, $type) {
   $threadid = $io['p']['threadid'];
@@ -52,7 +56,7 @@ function queueIt($boardUri, $io, $type) {
 }
 
 // FIXME: maybe explain what tags triggered the queueing?
-if ($io['p']['tags']['queue_com']) {
+if (!empty($io['p']['tags']['queue_com'])) {
   $io['addToPostsDB'] = false;
   // queue is defaulting com...
   $id = queueIt($boardUri, $io, 'com');
@@ -61,7 +65,7 @@ if ($io['p']['tags']['queue_com']) {
     'as' => $id,
   );
 } else
-if ($io['p']['tags']['queue_mod']) {
+if (!empty($io['p']['tags']['queue_mod'])) {
   $io['addToPostsDB'] = false;
   // queue is defaulting com...
   $id = queueIt($boardUri, $io, 'mod');
