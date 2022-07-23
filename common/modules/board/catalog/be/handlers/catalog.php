@@ -29,7 +29,7 @@ for($i = 1; $i <= $pages; $i++) {
     'threads' => $page[$i],
   );
 }
-
+global $now;
 $io = array(
   'out' => array(
     'pages' => $res,
