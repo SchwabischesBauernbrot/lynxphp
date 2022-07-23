@@ -47,7 +47,8 @@ if (is_array($boards)) {
       'id' => $b['boardid'],
       'uri' => $b['uri'],
       'title' => $b['title'],
-      'posts' => $b['posts'],
+      // this might be not set...
+      'posts' => empty($b['posts']) ? array() : $b['posts'],
       'created_at' => date('Y-m-d H:i:s', $b['created_at']),
       'updated_at' => date('Y-m-d H:i:s', $b['updated_at']),
     );
