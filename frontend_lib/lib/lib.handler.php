@@ -21,7 +21,8 @@ function redirectTo($url, $options = false) {
 //http://www.mlynn.org/2010/06/mobile-device-detection-and-redirection-with-php/ ?
 function checkmobile() {
   if (isset($_SERVER['HTTP_X_WAP_PROFILE'])) return 1;
-  if (preg_match('/wap\.|\.wap/i',$_SERVER['HTTP_ACCEPT'])) return 1;
+  // not set on apache?
+  if (isset($_SERVER['HTTP_ACCEPT']) && preg_match('/wap\.|\.wap/i', $_SERVER['HTTP_ACCEPT'])) return 1;
   if (isset($_SERVER['HTTP_X_SKYFIRE_PHONE'])) return 1;
   if (isset($_SERVER['HTTP_USER_AGENT'])) {
     // Quick Array to kill out matches in the user agent
