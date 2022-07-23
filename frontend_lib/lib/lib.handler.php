@@ -441,7 +441,8 @@ function wrapContentFooter($row) {
       'js/jschan/yous.js',
       // broken because it doesn't handle the output of new posts
       // queues, refused, success, error...
-      'js/jschan/forms.js',
+      // breaks post actions (can't handle array checkboxes)
+      //'js/jschan/forms.js',
       // upload item template
       'js/uploaditem.js',
       // lynxphp
