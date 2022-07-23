@@ -84,8 +84,11 @@ switch($action) {
     // so create reports for these posts...
     $userid = getUserID();
     $ip = getip();
-    foreach($posts as $r) {
+    foreach($posts as $i => $r) {
       // lock? group by board?
+      if (!$r['postid']) {
+        $issues[$r['board'] . '_' . $i] = 'post not given';
+      }
       $data = getBoardByUri($r['board']);
 
       // make sure we don't already have this post in an open report
@@ -132,7 +135,7 @@ switch($action) {
 
         $data['json']['reports'][] = $report;
         $added++;
-        updateBoard($r['board'], $data);
+        updateBoardJson($r['board'], $data['json']);
       }
     }
     // FIXME: global report
