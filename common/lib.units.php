@@ -2,6 +2,7 @@
 
 // used by router
 // https://stackoverflow.com/a/22500394
+// converts ini_set xY to integer
 function convertPHPSizeToBytes($sSize) {
   $sSuffix = strtoupper(substr($sSize, -1));
   if (!in_array($sSuffix, array('P','T','G','M','K'))) {
@@ -28,7 +29,18 @@ function convertPHPSizeToBytes($sSize) {
   return (int)$iValue;
 }
 
-// used by setup
+// https://stackoverflow.com/a/19570313
+// not sure if even used... better code? than above though...
+// requires newer php though...
+function asBytes($ini_v) {
+  $ini_v = trim($ini_v);
+  $s = [ 't' => 1<<40, 'g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10 ];
+  return intval($ini_v) * ($s[strtolower(substr($ini_v,-1))] ?: 1);
+}
+
+// used by setup & post_form
+// returns a string as "xx.xx YB"
+// rename numberAbbrev
 function formatBytes($bytes, $precision = 2) {
   $units = array('B', 'KB', 'MB', 'GB', 'TB');
 
@@ -41,4 +53,21 @@ function formatBytes($bytes, $precision = 2) {
   $bytes /= (1 << (10 * $pow));
 
   return round($bytes, $precision) . ' ' . $units[$pow];
+}
+
+// https://stackoverflow.com/a/49122313
+// returns a string as "x,xxx Y"
+function number_abbr($number) {
+  $abbrevs = [12 => 'T', 9 => 'B', 6 => 'M', 3 => 'K', 0 => ''];
+
+  foreach ($abbrevs as $exponent => $abbrev) {
+    if (abs($number) >= pow(10, $exponent)) {
+      $display = $number / pow(10, $exponent);
+      $decimals = ($exponent >= 3 && round($display) < 100) ? 1 : 0;
+      $number = number_format($display, $decimals).$abbrev;
+      break;
+    }
+  }
+
+  return $number;
 }
