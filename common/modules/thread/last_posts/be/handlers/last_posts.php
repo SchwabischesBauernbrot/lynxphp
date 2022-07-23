@@ -5,7 +5,7 @@
 // need a pipeline for that..
 
 global $tpp;
-$boardUri = $request['params']['board'];
+$boardUri = $request['params']['boardUri'];
 $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
 if (!$boardData) {
   return sendResponse2(array(), array(
@@ -18,4 +18,12 @@ $threadNum = (int)str_replace('.json', '', $request['params']['thread']);
 $boardData['threadCount'] = getBoardThreadCount($boardUri, $posts_model);
 $boardData['pageCount'] = ceil($boardData['threadCount']/$tpp);
 $boardData['posts'] = getThread($boardUri, $threadNum, array('posts_model' => $posts_model));
-sendResponse2($boardData);
+$boardSettings[$boardUri] = $boardData['settings'];
+
+// probably don't need to pass the meta but it's good form...
+unset($boardData['settings']); // well lets not duplicate
+sendResponse2($boardData, array(
+  'meta'=> array(
+    'boardSettings' => $boardSettings,
+  ),
+));
