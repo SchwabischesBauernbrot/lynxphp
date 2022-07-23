@@ -280,4 +280,38 @@ function generateForm($action, $fields, $values, $options = false) {
   return $html;
 }
 
+// form_admin_settings_post is a good candidate for this
+function collectFormValues($fields, $options = false) {
+  // maybe we scan ahead for any image fields
+  // and run $res = processFiles(); once
+  $values = array();
+  foreach($fields as $field => $details) {
+    if (!isset($details['label']) && $details['type'] !== 'hidden') {
+      echo "Skipping [$field], no label<br>\n";
+      continue;
+    }
+    switch($details['type']) {
+      /*
+      case 'image':
+      $values[$field] = array();
+      if (!empty($res['handles']['logo'])) {
+        $values[$field] = $res['handles']['logo'][0];
+      }
+      break;
+      */
+      case 'checkbox':
+        // if not present, then make it an unchecked...
+        $values[$field] = empty($_POST[$field]) ? false : true;
+      break;
+      default:
+        // FIXME: func util for this
+        if (!empty($_POST[$field])) {
+          $values[$field] = $_POST[$field];
+        }
+      break;
+    }
+  }
+  return $values;
+}
+
 ?>
