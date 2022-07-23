@@ -65,7 +65,8 @@ foreach($threads as $i => $t) {
     // anything we need to filter out?
     // do we just want/need the settings field?
     $boardData = getBoard($uri, array('jsonFields' => 'settings'));
-    $boardSettings[$uri] = $boardData['settings'];
+    // settings isn't always set?
+    $boardSettings[$uri] = empty($boardData['settings']) ? array() : $boardData['settings'];
   }
 }
 
