@@ -1,5 +1,5 @@
 <?php
-
+// fe
 $params = $getHandler();
 
 $homepage = $pkg->useResource('homepage');
@@ -56,6 +56,11 @@ $tags = array(
   'logoW' => $logoW,
   'logoH' => $logoH,
   'boards' => $boards_html,
+  // FIXME: make these take less bandwidth
+  'showSiteName' => empty($settings['site']['showSiteName']) ? ' style="display: none"' : '',
+  'showWelcome' => empty($settings['site']['showWelcome']) ? ' style="display: none"' : '',
+  'showSlogan' => empty($settings['site']['showSlogan']) ? ' style="display: none"' : '',
+  'showLogo' => empty($settings['site']['showLogo']) ? 'none' : 'block',
 );
 
 $content = replace_tags($templates['header'], $tags);
