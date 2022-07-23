@@ -3,6 +3,8 @@ $params = $get();
 
 $board = getQueryField('boardUri');
 
+//echo "board[$board]<br>\n";
+
 global $db;
 
 if (!$board) {
@@ -38,7 +40,13 @@ if (!$board) {
 }
 
 $posts_model = getPostsModel($board);
-$data = getBoardByUri($board);
+//$data = getBoardByUri($board);
+$row = getBoardRaw($board);
+//echo "<pre>", print_r($row, 1), "</pre>";
+$json = json_decode($row['json'], true);
+$data = array('json' => $json);
+
+//echo "<pre>", print_r($data, 1), "</pre>";
 
 $lynxReports = array();
 if (isset($data['json']['reports']) && is_array($data['json']['reports'])) {
@@ -60,6 +68,7 @@ if (isset($data['json']['reports']) && is_array($data['json']['reports'])) {
   }
 }
 
+// weird CF was agrgressively caching this...
 sendResponse(array(
   'reports' => $lynxReports,
 ));
