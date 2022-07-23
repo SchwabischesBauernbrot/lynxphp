@@ -487,7 +487,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
   while($row = $db->get_row($res)) {
     $orow = $row;
     // do we have this thread?
-    if (!isset($threads[$row['postid']])) {
+    if (empty($threads[$row['postid']])) {
       $threads[$row['postid']] = array(
         // add op to posts
         'posts' => array($row)
@@ -542,6 +542,8 @@ function boardPage($boardUri, $posts_model, $page = 1) {
       unset($threads[$tk]);
     }
     */
+    // FIXME: this is wrong...
+    $threads[$tk]['thread_reply_count'] = count($threads[$tk]['posts']);
   }
   $threads = array_values($threads);
   return $threads;
