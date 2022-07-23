@@ -29,7 +29,7 @@ function postDBtoAPI(&$row) {
 
   $exposedFields = array();
   foreach($publicFields as $f) {
-    $exposedFields[$f] = $data[$f];
+    $exposedFields[$f] = empty($data[$f]) ? '' : $data[$f];
   }
 
   $public_fields_io = array(
