@@ -9,7 +9,7 @@ return array(
         'endpoint' => 'opt/:boardUri/thread/:thread/last50',
         'unwrapData' => true,
         'requires' => array('boardUri', 'thread'),
-        //'params' => 'querystring',
+        //'params' => 'params',
       ),
     ),
   ),
