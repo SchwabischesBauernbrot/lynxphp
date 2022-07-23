@@ -1,45 +1,12 @@
 <?php
 
-// moved into setup.php
-/*
-function formatBytes($bytes, $precision = 2) {
-  $units = array('B', 'KB', 'MB', 'GB', 'TB');
+// require lib.units.php
 
-  $bytes = max($bytes, 0);
-  $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-  $pow = min($pow, count($units) - 1);
+// would be great for the form to filled to the size of the container it's in
+// that way the templates/css can control the presentation of the form
 
-  // Uncomment one of the following alternatives
-  //$bytes /= pow(1024, $pow);
-  $bytes /= (1 << (10 * $pow));
-
-  return round($bytes, $precision) . ' ' . $units[$pow];
-}
-*/
-
-// https://stackoverflow.com/a/19570313
-function asBytes($ini_v) {
-  $ini_v = trim($ini_v);
-  $s = [ 'g'=> 1<<30, 'm' => 1<<20, 'k' => 1<<10 ];
-  return intval($ini_v) * ($s[strtolower(substr($ini_v,-1))] ?: 1);
-}
-
-// https://stackoverflow.com/a/49122313
-function number_abbr($number) {
-  $abbrevs = [12 => 'T', 9 => 'B', 6 => 'M', 3 => 'K', 0 => ''];
-
-  foreach ($abbrevs as $exponent => $abbrev) {
-    if (abs($number) >= pow(10, $exponent)) {
-      $display = $number / pow(10, $exponent);
-      $decimals = ($exponent >= 3 && round($display) < 100) ? 1 : 0;
-      $number = number_format($display, $decimals).$abbrev;
-      break;
-    }
-  }
-
-  return $number;
-}
-
+// what about controlling the size of the textarea?
+// and how it expands?
 function renderPostFormHTML($boardUri, $options = false) {
   $type = 'Thread';
   $tagThread = '';
@@ -69,7 +36,12 @@ function renderPostFormHTML($boardUri, $options = false) {
   */
 
   // FIXME: we need to be able to override webserver...
+  // but still capped by the php.ini setting
+  // if capped, we should say so
   $maxfiles = convertPHPSizeToBytes(ini_get('max_file_uploads'));
+
+  // router has a max_length
+  /// but lib.http.server has something too
   global $max_length;
   $maxfilesize = $max_length;
 
@@ -87,7 +59,7 @@ function renderPostFormHTML($boardUri, $options = false) {
     'message'  => array('type' => 'textarea',      'label' => 'Message',
       'postlabel' => '<span class="messageCounter"></span>', 'autocomplete' => 'off'),
     'files'    => array('type' => 'multidropfile', 'label' => 'Files',
-      'postlabel' => 'Max ' . $maxfiles . ' files</small><small>' . number_abbr($maxfilesize) . ' total'),
+      'postlabel' => 'Max ' . $maxfiles . ' files</small><small>' . formatBytes($maxfilesize) . ' total'),
   );
   if ($maxMessageLength) {
     $formfields['message']['maxLength'] = $maxMessageLength;
@@ -128,6 +100,10 @@ function renderPostFormHTML($boardUri, $options = false) {
 // renderPostFormHTML goes to boardUri/post
 // action tag is used to create the anchor link to open form
 // so this function create a link with a collapsed form...
+
+// this template just seems to slap the ,form-wrapper on it...
+// makes it's collapsable (without details/summary)
+// but the js makes it float..
 function renderPostForm($boardUri, $url, $options = false) {
   global $pipelines;
 
