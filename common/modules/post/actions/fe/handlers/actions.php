@@ -55,11 +55,20 @@ switch($action) {
     // is reason required?
     $postFields = array();
     $threadNum = getOptionalPostField('thread') ? getOptionalPostField('thread') : 'ThreadNum';
+    print_r($_POST);
     if (is_array($_POST['checkedposts'])) {
       foreach($_POST['checkedposts'] as $postNum) {
+        if (!$postNum) {
+          wrapContent('Error: missing postNum [' . print_r($_POST['checkedposts'], 1) . ']');
+          return;
+        }
         $postFields[$boardUri . '-' . $threadNum . '-' . $postNum] = true;
       }
     } else {
+      if (!$_POST['checkedposts']) {
+        wrapContent('Error: empty checkedposts [' . print_r($_POST, 1) . ']');
+        return;
+      }
       $postFields[$boardUri . '-' . $threadNum . '-' . $_POST['checkedposts']] = true;
     }
     //echo "<pre>", print_r($postFields, 1), "</pre>\n";
