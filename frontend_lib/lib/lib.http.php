@@ -216,7 +216,7 @@ function curl_log_report() {
     $ttl += $l['took'];
   }
   echo '</ol>';
-  echo count($curlLog), ' requests took ', $ttl, 'ms<br>', "\n";
+  echo count($curlLog), ' requests took ', number_format($ttl), 'ms<br>', "\n";
 }
 
 ?>
