@@ -410,7 +410,7 @@ class formHandler {
     }
 
     function doItem(fileHash) {
-      console.log('doItem', fileHash)
+      //console.log('doItem', fileHash)
       const item = {
         spoilers: ref.fileUploadList.dataset.spoilers === 'true',
         name: file.name,
@@ -449,7 +449,6 @@ class formHandler {
     }
     if (this.files && this.files.length === 0) {
       this.fileUploadList.textContent = '';
-      console.log('hidding fileUploadList')
       this.fileUploadList.style.display = 'none';
       this.fileLabelText.nodeValue = `Select/Drop/Paste file${this.multipleFiles ? 's' : ''}`;
     } else {
