@@ -230,6 +230,7 @@ function sendResponse2($data, $options = array()) {
   return true;
 }
 
+// FIXME: this is a valid function, we should handle ttl stuff
 function sendRawResponse($mixed, $code = 200, $err = '') {
   if ($code !== 200) http_response_code($code);
   if (getQueryField('prettyPrint')) {
