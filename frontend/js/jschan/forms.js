@@ -10,6 +10,7 @@ function pad(n, width, z) {
 }
 
 function doModal(data, postcallback) {
+  //console.log('doModal', data)
   try {
     const modalHtml = modal({ modal: data });
     let checkInterval;
@@ -77,6 +78,7 @@ class formHandler {
 
   constructor(form) {
     this.form = form;
+    console.log('forms.js - enhancing', form)
     this.enctype = this.form.getAttribute('enctype');
     this.messageBox = form.querySelector('#message');
     this.captchaField = form.querySelector('.captchafield') || form.querySelector('.g-recaptcha') || form.querySelector('.h-captcha');
@@ -84,6 +86,8 @@ class formHandler {
     if (this.submit) {
       this.originalSubmitText = this.submit.value;
     }
+    // what's minimal view?
+    // has something do with a nojs block bypass in jschan
     this.minimal = this.form.elements.minimal;
     this.files = [];
     this.fileInput = form.querySelector('input[type="file"]');
@@ -406,7 +410,7 @@ class formHandler {
     }
 
     function doItem(fileHash) {
-      //console.log('this', ref)
+      console.log('doItem', fileHash)
       const item = {
         spoilers: ref.fileUploadList.dataset.spoilers === 'true',
         name: file.name,
@@ -445,6 +449,7 @@ class formHandler {
     }
     if (this.files && this.files.length === 0) {
       this.fileUploadList.textContent = '';
+      console.log('hidding fileUploadList')
       this.fileUploadList.style.display = 'none';
       this.fileLabelText.nodeValue = `Select/Drop/Paste file${this.multipleFiles ? 's' : ''}`;
     } else {
@@ -522,11 +527,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const myPostId = localStorage.getItem('myPostId');
   if (myPostId) {
+    console.log('jumping to', myPostId)
     window.location.hash = myPostId;
     localStorage.removeItem('myPostId');
   }
 
   window.addEventListener('addPost', (e) => {
+    console.log('adding post', e.detail)
     if (e.detail.hover) {
       return; //dont need to handle hovered posts for this
     }
@@ -538,12 +545,13 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 //window.addEventListener('settingsReady', () => {
-  const forms = document.getElementsByTagName('form');
-  //console.log('forms start', forms)
+  // we don't want all forms....
+  //const forms = document.getElementsByTagName('form');
+  const forms = document.querySelectorAll('form.enable_formjs');
   for(let i = 0; i < forms.length; i++) {
-    if (forms[i].method === 'post' /*&& forms[i].encoding === 'multipart/form-data'*/) {
+    //if (forms[i].method === 'post' /*&& forms[i].encoding === 'multipart/form-data'*/) {
       new formHandler(forms[i]);
-    }
+    //}
   }
 
 //})
