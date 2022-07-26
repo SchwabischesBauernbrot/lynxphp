@@ -29,6 +29,8 @@ if ($posts_model === false) {
 $post_files_model = getPostFilesModel($boardUri);
 */
 
+$boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
+
 $post = getPost($boardUri, $id, false);
 /*
 $posts = array_filter($posts, function($p) use ($id) {
@@ -41,6 +43,7 @@ $post = count($posts) ? $posts[0] : array();
 $res = array(
   'success' => 'ok', 'final' => $post, 'boardUri' => $boardUri, 'id' => $id,
   'postCount' => 0, // FIXME:
+  'boardSettings' => $boardData['settings'],
 );
 sendRawResponse($res);
 
