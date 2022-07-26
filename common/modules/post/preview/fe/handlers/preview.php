@@ -41,6 +41,8 @@ if (!empty($res['final'])) {
     // this is sometimes undefined? yes lynxbridge caused this
     // we just need to update the backend
     'postCount' => $res['postCount'],
+    // postCount?
+    'boardSettings' => $res['boardSettings'],
   )), $wrapOptions);
 } else {
   /*
