@@ -5,15 +5,15 @@ function validate_captcha_field($options = false) {
     'field' => 'captcha',
   ), $options));
 
-  $challenge = $_POST[$field];
-  //echo "challenge[$challenge]<br>\n";
-  if (empty($challenge)) {
+  if (empty($_POST[$field])) {
     return 'CAPTCHA is required';
   }
-  $captcha_id = $_POST['captcha_id'];
-  if (empty($captcha_id)) {
+  $challenge = $_POST[$field];
+  //echo "challenge[$challenge]<br>\n";
+  if (empty($_POST['captcha_id'])) {
     return 'CAPTCHA has no ID';
   }
+  $captcha_id = $_POST['captcha_id'];
   global $scratch, $now;
   $captchas = $scratch->get('captchas');
   if (!is_array($captchas)) {
