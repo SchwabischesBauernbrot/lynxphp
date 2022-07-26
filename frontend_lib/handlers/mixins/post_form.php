@@ -78,6 +78,8 @@ function renderPostFormHTML($boardUri, $options = false) {
   $formOptions = array_merge(jsChanStyle(), array(
     'buttonLabel' => $button,
     'formId'      => $formId,
+    // this stomped formClass that set form-post on it
+    'formClass'   => 'enable_formjs form-post',
     'postFormTag' => $postFormHTML,
   ));
 
