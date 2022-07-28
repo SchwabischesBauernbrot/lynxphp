@@ -52,7 +52,8 @@ if (!empty($res['final'])) {
   */
   // no wrap since we're embedded
   http_response_code(500);
-  echo "Error rendering post[$id] on board[$boardUri]<br>\n";
+  wrapContent("Error rendering post[$id] on board[$boardUri]<br>\n");
+  //print_r($res['final']);
 }
 
 ?>
