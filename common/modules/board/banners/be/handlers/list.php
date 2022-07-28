@@ -11,6 +11,8 @@ $res = $db->find($models['board_banner'], array('criteria' => array(
   array('board_id', '=', $boardData['boardid']),
 )));
 $banners = $db->toArray($res);
+// FIXME: boardData doesn't have json now
+
 // just pass through the settings for now...
 boardRowFilter($boardData, $boardData['json'], array('jsonFields' => 'settings'));
 // I don't think this is required
