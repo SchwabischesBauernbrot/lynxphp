@@ -78,6 +78,88 @@ function consume_beRsrc($options, $params = '') {
   //if ($postData) echo "POST[", print_r($postData, 1), "]<br>\n";
   //if (isset($options['method'])) echo "method[", $options['method'], "]<br>\n";
 
+  // do we make a HEAD call and check our local scratch?
+  // could always just check the cache
+  $saveCache = false;
+  $etag = '';
+  $ts = 0;
+  if (isset($options['cacheSettings'])) {
+    // likely cacheable
+    // we have the endpoint and params...
+
+    // GET vs POST
+    // get can be the URL
+    // POST, well... should these be cache?
+    if (empty($options['method'])) {
+      // what's our caching key?
+      $key = BACKEND_BASE_URL . $options['endpoint'] . $querystring;
+      // should we check our cache first?
+      global $scratch;
+      $check = $scratch->get('consume_beRsrc_' . $key);
+      // still need to see if backend is newer
+      //echo "<pre>check", htmlspecialchars(print_r($check, 1)), "</pre>\n";
+
+      // we don't need to bother with 304 becaues it's a HEAD already
+      /*
+      $sendHeaders = $headers;
+      if (!empty($check['ts'])) {
+        $sendHeaders['ts']
+      }
+      */
+      global $_HEAD_CACHE;
+      //echo "<pre>_HEAD_CACHE", htmlspecialchars(print_r($_HEAD_CACHE, 1)), "</pre>\n";
+      if (isset($_HEAD_CACHE[$options['endpoint'] . $querystring])) {
+        if (DEV_MODE) {
+          echo "Using head cache<br>\n";
+        }
+        $headRes = $_HEAD_CACHE[$options['endpoint'] . $querystring];
+      } else {
+        $result = request(array(
+          //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
+          'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
+          //
+          'headers' => $headers,
+          'method' => 'HEAD',
+        ));
+        $headRes = parseHeaders($result);
+      }
+      // unmarshall headRes
+      if (isset($headRes['etag'])) {
+        //echo "lib.backend::consume_beRsrc - etag cache write me!";
+        $etag = $headRes['etag'];
+      }
+      if (isset($headRes['last-modified'])) {
+        $ts = strtotime($headRes['last-modified']);
+      }
+      if ($etag || $ts) {
+        $saveCache = true;
+      }
+      //echo "etag[$etag] ts[$ts] save[$saveCache]<br>\n";
+
+      if ($etag && !empty($check['etag'])) {
+        if (DEV_MODE) {
+          echo "compare [$etag]vs[", $check['etag'], "]<br>\n";
+        }
+        // if valid
+        // return $check['res'];
+      }
+      if ($ts && !empty($check['ts'])) {
+        //echo "compare [$ts]vs[", $check['ts'], "]<br>\n";
+        // if valid
+        if ($ts <= $check['ts']) {
+          if (DEV_MODE) {
+            echo "Using scratch cache [$key@", $check['ts'], "] vs live[$ts]<br>\n";
+          }
+          return $check['res'];
+        }
+        // if newer, refresh it
+      }
+
+      // if $check is valid, return it's data
+    }
+  }
+
+
   // post login/IP
   $responseText = request(array(
     'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
@@ -88,21 +170,34 @@ function consume_beRsrc($options, $params = '') {
   //$responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
   //  $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
   //echo "<pre>responseText[$responseText]</pre>\n";
+  $retval = $responseText;
   if (!empty($options['expectJson']) || !empty($options['unwrapData'])) {
     $obj = expectJson($responseText, $options['endpoint'], $options);
     if ($obj) {
       if (!empty($options['unwrapData'])) {
         if (isset($obj['data'])) {
-          return $obj['data'];
+          $retval = $obj['data'];
         } else {
           // likely backend problem..
-          return false;
+          $retval = false;
         }
+      } else {
+        $retval = $obj;
       }
+    } else {
+      $retval = $obj;
     }
-    return $obj;
   }
-  return $responseText;
+  if ($saveCache) {
+    //echo "saving[$key]<br>\n";
+    $scratch->set('consume_beRsrc_' . $key, array(
+      'ts'   => $ts,
+      'etag' => $etag,
+      'res'  => $retval
+    ));
+  }
+
+  return $retval;
 }
 
 // returns
