@@ -36,7 +36,17 @@ $queue = new $queue_type_class;
 include '../common/workqueue.php';
 $workqueue = new work_queue;
 
+// reading from db to save db is it really worth it?
+// file might be fine
 /*
+// connect to scatch
+include '../common/scratch_implementations/' . SCRATCH_DRIVER . '.php';
+$scratch_type_class = SCRATCH_DRIVER . '_scratch_driver';
+$scratch = new $scratch_type_class;
+*/
+
+/*
+// seems to be similar to table_tracker
 // set up cache tracker
 include 'lib/lib.cache_tracker.php';
 $cache_tracker = new cache_tracker;
@@ -185,6 +195,12 @@ function sendResponse2($data, $options = array()) {
       'portals' => explode(',', $_GET['portals']),
       'out' => array(),
     );
+    if (!isset($io['data']['board'])) {
+      // how do we note this to the front end..
+      // a header?
+      // extra key?
+      $data['MISSING_BOARD'] = true;
+    }
     $pipelines[PIPELINE_PORTALS_DATA]->execute($io);
     if ($io['out']) {
       //$resp['meta']['portals'] = $io['out'];
