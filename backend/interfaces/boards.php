@@ -728,6 +728,7 @@ function getBoardThreadCount($boardUri, $posts_model) {
   return $threadCount;
 }
 
+// only used by boards/list so far
 function getBoardPostCount($boardUri, $posts_model) {
   global $db;
   // include deleted posts?
