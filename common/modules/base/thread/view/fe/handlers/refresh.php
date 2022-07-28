@@ -24,8 +24,10 @@ $result = $pkg->useResource('refresh', array(
 if (is_array($result)) {
   // without the wrap it's not very SEO friendly...
   // maybe js could make it smart...
+  global $boards_settings;
   foreach($result as $p) {
     echo renderPost($boardUri, $p, array(
+      'boardSettings' => $boards_settings[$boardUri],
       //'checkable' => false,
     ));
   }
