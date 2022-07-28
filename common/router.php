@@ -363,6 +363,32 @@ class Router {
       $maxMtime = PHP_INT_MAX;
     }
 
+    if (BACKEND_HEAD_SUPPORT && isset($cacheSettings['resource'])) {
+      // upgrade resources to backend...
+      //print_r($cacheSettings);
+      foreach($cacheSettings['resource'] as $r) {
+        //$r = 'homepage'
+        // key GET_ params is []
+        //echo "key[$key] params[", print_r($routeParams, 1), "]<br>\n";
+        //echo "<pre>", htmlspecialchars(print_r($routeOptions, 1)), "</pre>\n";
+        // $routeOptions
+        // .module = site_homepage
+        // .address = homepage
+        global $packages;
+        foreach($packages[$routeOptions['module']]->resources as $name => $data) {
+          // is this the right resource in the package
+          if ($name === $r) {
+            // there will only be one
+            //print_r($data);
+            if (!isset($cacheSettings['backend'])) $cacheSettings['backend'] = array();
+            $cacheSettings['backend'][] = array(
+              'route' => $data['endpoint'],
+            );
+          }
+        }
+      }
+    }
+
     // why don't we get a warning about BACKEND_HEAD_SUPPORT not being set?
     if (BACKEND_HEAD_SUPPORT && isset($cacheSettings['backend'])) {
       $params = array();
@@ -374,6 +400,8 @@ class Router {
       // hope for the best
       $checkMtime = true;
       $checkEtag = true;
+      // prevent double look ups in the same request
+      global $_HEAD_CACHE;
       // ask backend when it was last-modified/etag
       foreach($cacheSettings['backend'] as $be) {
         //echo "checking[", print_r($be, 1), "] [", print_r($params, 1), "]\n";
@@ -389,6 +417,7 @@ class Router {
           'method' => 'HEAD',
         ));
         $headers = parseHeaders($result);
+        $_HEAD_CACHE[$endpoint] = $headers;
         //echo "<pre>header", htmlspecialchars(print_r($headers, 1)), "</pre>\n";
 
         // check the interesting header
@@ -558,6 +587,12 @@ class Router {
       $isHead = true;
     }
     $methods = $this->methods[$method];
+    $originalPath = $path; // back it up
+
+    // can ? be used in a filename? no
+    if (strpos($path, '?') !== false) {
+      list($path, $querystring) = explode('?', $path, 2);
+    }
     // could strip & but that's non-standard
     $segments = explode('/', $path);
     //echo "router::exec[$level] - method[$method] path[$path] segments[", count($segments), "]<br>\n";
