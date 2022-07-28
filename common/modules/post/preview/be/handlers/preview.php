@@ -43,7 +43,7 @@ $post = count($posts) ? $posts[0] : array();
 $res = array(
   'success' => 'ok', 'final' => $post, 'boardUri' => $boardUri, 'id' => $id,
   'postCount' => 0, // FIXME:
-  'boardSettings' => $boardData['settings'],
+  'boardSettings' => empty($boardData['settings']) ? array() : $boardData['settings'],
 );
 sendRawResponse($res);
 
