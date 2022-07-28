@@ -11,6 +11,7 @@ return array(
         'sendSession' => true,
         'cacheSettings' => array(
           // FIXME: all public posts...
+          // user settings?
           'databaseTables' => array('boards', 'site_settings'),
           //'files' => array(),
         ),
