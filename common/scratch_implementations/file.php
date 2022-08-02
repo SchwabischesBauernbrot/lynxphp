@@ -2,11 +2,11 @@
 
 include 'base.php';
 
-// another type where two levels would help
-// two levels of what?
+// the size of the file caused more contention
+// do we need pooling and/or multiple files
 class file_scratch_driver extends scratch_implementation_base_class {
   function __construct() {
-    // we need to protect informatino in memory, such as IP addresses
+    // we need to protect information, such as IP addresses
     // so we'll use the php extension so that only PHP can access this info
     $this->file = '../frontend_storage/cache.php';
     $this->lock = '../frontend_storage/cache.lock';
@@ -48,7 +48,8 @@ class file_scratch_driver extends scratch_implementation_base_class {
     }
     global $ts;
     file_put_contents($lock, $ts . '_' . posix_getpid());
-    $this->checkPerms();
+    // why bother checking the perms on the non-lock file?
+    //$this->checkPerms();
     if (!file_exists($lock)) {
       echo "cant create lock[$lock]<br>\n";
       return false;
@@ -106,7 +107,7 @@ class file_scratch_driver extends scratch_implementation_base_class {
       return false;
     }
     $fp = fopen($this->file,'r');
-    $tmpfname = tempnam('/tmp', 'lynxphp');
+    $tmpfname = tempnam('/tmp', 'doubleplus');
     $wfp = fopen($tmpfname, 'w');
     if (!$fp || !$wfp) {
       unlink($this->lock);
@@ -132,8 +133,9 @@ class file_scratch_driver extends scratch_implementation_base_class {
     }
     fclose($wfp);
     unlink($this->file);
-    // Not NFS safe
-    rename($tmpfname, $this->file);
+    // NFS safe
+    copy($tmpfname, $this->file);
+    unlink($tmpfname);
     $this->checkPerms();
     // unlock
     unlink($this->lock);
