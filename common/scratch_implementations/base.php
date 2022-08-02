@@ -20,6 +20,12 @@ interface scratch_implementation_interface {
 
 // we either need a nukeAll functionality
 // or a way to discover keys that have been set
+
+// another type where two levels would help
+// two levels of what? group, key
+
+// cache level data
+// or required/persist data
 class scratch_implementation_base_class implements scratch_implementation_interface {
   // implement if doesn't exist
   function inc($key, $step=1) {
