@@ -149,6 +149,13 @@ if (0) {
 
 $db->ensureTables();
 
+ldr_done();
+
+// handle 304
+if ($router->sendHeaders($req_method, $req_path)) {
+  return; // 304
+}
+
 $response_template = array(
   'meta' => array(
     'code' => 200,
@@ -230,11 +237,11 @@ function sendResponse2($data, $options = array()) {
     // we need the HTML for the htmlspecialchars
     // and we need that to stop executing user generate js
     // but isn't it the default?
-    _doHeaders($mtime, array('contentType' => 'text/html'));
+    //_doHeaders($mtime, array('contentType' => 'text/html'));
     // code needs <br>s
     $output = '<pre>' . htmlspecialchars(json_encode($resp, JSON_PRETTY_PRINT)) . "</pre>\n";
   } else {
-    _doHeaders($mtime, array('contentType' => 'application/json'));
+    //_doHeaders($mtime, array('contentType' => 'application/json'));
     $output = json_encode($resp);
   }
   // you'd have to be able to calculate the output size
