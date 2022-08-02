@@ -32,8 +32,8 @@ if (class_exists('Redis')) {
   }
 */
 
-include 'file.php';
-class auto_scratch_driver extends file_scratch_driver {
+include 'file2.php';
+class auto_scratch_driver extends file2_scratch_driver {
 }
 
 ?>
