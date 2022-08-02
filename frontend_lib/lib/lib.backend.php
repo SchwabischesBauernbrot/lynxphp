@@ -109,9 +109,11 @@ function consume_beRsrc($options, $params = '') {
       global $_HEAD_CACHE;
       //echo "<pre>_HEAD_CACHE", htmlspecialchars(print_r($_HEAD_CACHE, 1)), "</pre>\n";
       if (isset($_HEAD_CACHE[$options['endpoint'] . $querystring])) {
+        /*
         if (DEV_MODE) {
           echo "Using head cache<br>\n";
         }
+        */
         $headRes = $_HEAD_CACHE[$options['endpoint'] . $querystring];
       } else {
         $result = request(array(
@@ -147,9 +149,13 @@ function consume_beRsrc($options, $params = '') {
         //echo "compare [$ts]vs[", $check['ts'], "]<br>\n";
         // if valid
         if ($ts <= $check['ts']) {
+          // this breaks /user/settings/theme.php
+          // key: http://localhost/backend/opt/settings@1658889353
+          /*
           if (DEV_MODE) {
             echo "Using scratch cache [$key@", $check['ts'], "] vs live[$ts]<br>\n";
           }
+          */
           return $check['res'];
         }
         // if newer, refresh it
