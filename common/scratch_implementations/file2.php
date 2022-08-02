@@ -8,7 +8,6 @@ class file2_scratch_driver extends scratch_implementation_base_class {
   function __construct() {
     // FIXME: on startup - do a write test check
     $file = realpath('../frontend_storage') . '/cache2';
-    //echo "file[$file]<br>\n";
     $res = $this->openFileInPool($file);
     $this->data = false;
     if ($res) {
@@ -16,16 +15,18 @@ class file2_scratch_driver extends scratch_implementation_base_class {
       $this->pid      = $res['pid'];
       $this->lockpath = $res['lock'];
       $this->filepath = $res['file'];
+    } else {
+      echo "FAILED";
     }
   }
 
   function __destruct() {
+    $this->commit();
     //$this->closeLock($this->lockpath, $this->pid);
-    //echo "cleaning up [", $this->lockpath, "]<br>\n";
     unlink($this->lockpath);
   }
 
-  function commmit() {
+  function commit() {
     if (!$this->data) return;
     file_put_contents($this->filepath, serialize($this->data));
     // probably want to retain this lock
