@@ -4,6 +4,10 @@ include 'base.php';
 
 // the size of the file caused more contention
 // do we need pooling and/or multiple files
+
+// file2: reduce time waiting for locks by using more disk space
+// cache is less effective
+// also we're a bit faster for reading/write because we're using a memory cache
 class file2_scratch_driver extends scratch_implementation_base_class {
   function __construct() {
     // FIXME: on startup - do a write test check
