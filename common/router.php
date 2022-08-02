@@ -18,6 +18,9 @@ function responseToText($response) {
   return $response['textResponse'];
 }
 
+// backend support
+if (!defined('DEV_MODE')) define('DEV_MODE', false);
+
 class Router {
   function __construct() {
     $this->methods = array();
@@ -345,23 +348,9 @@ class Router {
     // accumulators
     // should this be PHP_INT_MAX?
     // zero means we don't need to check backend
+    // for BE, we need this to be 0
     $maxMtime = 0;
     $compoundEtags = array();
-
-    // does this routes data change depending on BE calls?
-    // need to ignore whether or not config tells us to check it
-    // this is really important for setting headers on FE
-    if (isset($cacheSettings['backend'])) {
-      // mtime matters, we were supposed to check the backend
-      // but it doesn't support it, we can't get mtime
-      // so it's not useable
-
-      // this will force no cache
-      // because we should be dependent upon backend
-      // but it can't provide (or we don't check)
-      // if we cached it, it would likely be wrong
-      $maxMtime = PHP_INT_MAX;
-    }
 
     if (BACKEND_HEAD_SUPPORT && isset($cacheSettings['resource'])) {
       // upgrade resources to backend...
@@ -389,6 +378,25 @@ class Router {
       }
     }
 
+    // This is require for frontend (since be needs it to be 0)
+    // does this routes data change depending on BE calls?
+    // need to ignore whether or not config tells us to check it
+    // this is really important for setting headers on FE
+    // was isset($cacheSettings['backend'])
+    global $BASE_HREF;
+    // detect frontend
+    if ($BASE_HREF) {
+      // mtime matters, we were supposed to check the backend
+      // but it doesn't support it, we can't get mtime
+      // so it's not useable
+
+      // this will force no cache
+      // because we should be dependent upon backend
+      // but it can't provide (or we don't check)
+      // if we cached it, it would likely be wrong
+      $maxMtime = PHP_INT_MAX;
+    }
+
     // why don't we get a warning about BACKEND_HEAD_SUPPORT not being set?
     if (BACKEND_HEAD_SUPPORT && isset($cacheSettings['backend'])) {
       $params = array();
@@ -400,6 +408,7 @@ class Router {
       // hope for the best
       $checkMtime = true;
       $checkEtag = true;
+      $maxMtime = 0; // reset so max() works
       // prevent double look ups in the same request
       global $_HEAD_CACHE;
       // ask backend when it was last-modified/etag
@@ -437,6 +446,7 @@ class Router {
         if ($checkMtime) {
           if (isset($headers['last-modified'])) {
             $ts = strtotime($headers['last-modified']);
+            //header('X-Debug-isUncached-mtime: ' . $ts);
             $maxMtime = max($maxMtime, $ts);
           } else {
             if (DEV_MODE) {
@@ -468,6 +478,7 @@ class Router {
         }
       }
       header('X-Debug-isUncached-febemtime: ' . ($checkMtime ? 'use' : 'ignore'));
+      //header('X-Debug-isUncached-mtime: ' . $maxMtime);
       header('X-Debug-isUncached-febeeTag: ' . ($checkEtag ? 'use' : 'ignore'));
     }
     //if (DEV_MODE) {
