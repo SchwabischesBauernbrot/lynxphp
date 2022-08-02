@@ -183,7 +183,7 @@ $frontendRouterData = array(
           'cacheSettings' => array(
             'backend' => array(
               array(
-                'route' => 'opt/boards/:uri/:page',
+                'route' => 'opt/boards/:uri/:page?portals=board',
                 'method' => 'GET',
               ),
             ),
