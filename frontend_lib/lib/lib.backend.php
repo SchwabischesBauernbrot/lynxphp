@@ -83,6 +83,7 @@ function consume_beRsrc($options, $params = '') {
   $saveCache = false;
   $etag = '';
   $ts = 0;
+  // not sure this check makes much sense
   if (isset($options['cacheSettings'])) {
     // likely cacheable
     // we have the endpoint and params...
@@ -156,7 +157,7 @@ function consume_beRsrc($options, $params = '') {
             echo "Using scratch cache [$key@", $check['ts'], "] vs live[$ts]<br>\n";
           }
           */
-          return $check['res'];
+          return postProcessJson($check['res'], $options);
         }
         // if newer, refresh it
       }
@@ -176,6 +177,20 @@ function consume_beRsrc($options, $params = '') {
   //$responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
   //  $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
   //echo "<pre>responseText[$responseText]</pre>\n";
+
+  // has to be before, so we can re-run expectJson
+  if ($saveCache) {
+    //echo "saving[$key]<br>\n";
+    $scratch->set('consume_beRsrc_' . $key, array(
+      'ts'   => $ts,
+      'etag' => $etag,
+      'res'  => $responseText
+    ));
+  }
+  return postProcessJson($responseText, $options);
+}
+
+function postProcessJson($responseText, $options) {
   $retval = $responseText;
   if (!empty($options['expectJson']) || !empty($options['unwrapData'])) {
     $obj = expectJson($responseText, $options['endpoint'], $options);
@@ -193,14 +208,6 @@ function consume_beRsrc($options, $params = '') {
     } else {
       $retval = $obj;
     }
-  }
-  if ($saveCache) {
-    //echo "saving[$key]<br>\n";
-    $scratch->set('consume_beRsrc_' . $key, array(
-      'ts'   => $ts,
-      'etag' => $etag,
-      'res'  => $retval
-    ));
   }
 
   return $retval;
@@ -242,6 +249,7 @@ function expectJson($json, $endpoint = '', $options = array()) {
     if (isset($obj['meta']['portals'])) {
       // a wiring harness would be better than a global
       global $portalData;
+      //echo "<pre>uploaded portal data", print_r($obj['meta']['portals'], 1), "]</pre>\n";
       $portalData = $obj['meta']['portals'];
     }
     // singular
@@ -335,6 +343,10 @@ function getBoard($boardUri) {
   return $boardData['data'];
 }
 
+function getPortalsToUrl($q) {
+  return join(',', $q['portals']);
+}
+
 function addPortalsToUrl($q, $url) {
   // some portal BE stuff will need IP and probably SID
   // so we're have to send those for all requests
@@ -342,8 +354,19 @@ function addPortalsToUrl($q, $url) {
   // if (!empty($options['sendIP'])) $headers['HTTP_X_FORWARDED_FOR'] = getip();
   return $url . '?portals=' . join(',', $q['portals']);
 }
+
 function backendGetBoardThreadListing($q, $boardUri, $pageNum = 1) {
-  $threadListing = getExpectJson(addPortalsToUrl($q, 'opt/boards/' . $boardUri . '/' . $pageNum));
+  $options = array(
+    'endpoint'    => 'opt/boards/' . $boardUri . '/' . $pageNum,
+    'querystring' => array('portals' => getPortalsToUrl($q)),
+    'expectJson'  => true,
+    'sendSession' => true, // expectJson sends this
+    'cacheSettings' => true, // mark cacheable
+  );
+  // cacheable
+  $threadListing = consume_beRsrc($options);
+  //echo "<pre>lib.backend::backendGetBoardThreadListing -  ", print_r($threadListing, 1), "</pre>\n";
+  //$threadListing = getExpectJson(addPortalsToUrl($q, 'opt/boards/' . $boardUri . '/' . $pageNum));
   //echo "type[", gettype($threadListing), "][$threadListing]\n";
   if (!$threadListing) return;
   if (isset($threadListing['data']['board']['settings'])) {
