@@ -42,6 +42,7 @@ function request($options = array()) {
     'user' => false,
     'pass' => false,
     'body' => false,
+    'devData' => false,
   ), $options));
   $header = '';
 
@@ -50,7 +51,7 @@ function request($options = array()) {
   if (count($headers)) {
     $header = $headers;
   }
-  return curlHelper($url, $body, $header, $user, $pass, $method);
+  return curlHelper($url, $body, $header, $user, $pass, $method, $devData);
 }
 
 //open handle
@@ -58,7 +59,7 @@ $ch = curl_init();
 
 $curl_headers = array();
 
-function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='AUTO') {
+function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='AUTO', $devData = '') {
   global $ch;
   if (DEV_MODE) {
     $start = microtime(true);
@@ -167,6 +168,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
       'responseHeaders' => $respHeader,
       'result' => $result,
       'curlInfo' => $infos,
+      'devData' => $devData,
       // $l['curlInfo']['http_code']
       //'statusCode' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
     );
@@ -252,6 +254,9 @@ function curl_log_report() {
       }
     }
     echo '  Response headers: <pre>', htmlspecialchars(print_r($l['responseHeaders'], 1)), '</pre>', "\n";
+    if (!empty($l['devData'])) {
+      echo '  Dev Data: <pre>', htmlspecialchars(print_r($l['devData'], 1)), '</pre>', "\n";
+    }
     //echo '  <pre>', htmlspecialchars(print_r($l, 1)), '</pre>', "\n";
     echo '</details>';
     // we can't get the headers unless it's a HEAD...
