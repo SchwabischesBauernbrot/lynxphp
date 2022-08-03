@@ -152,7 +152,7 @@ function consume_beRsrc($options, $params = '') {
         // return $check['res'];
       }
       if ($ts && !empty($check['ts'])) {
-        //echo "compare [$ts]vs[", $check['ts'], "]<br>\n";
+        //echo "compare SERVER[$ts] vs CACHE[", $check['ts'], "]<br>\n";
         // if valid
         if ($ts <= $check['ts']) {
           // this breaks /user/settings/theme.php
