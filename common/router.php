@@ -424,11 +424,12 @@ class Router {
         // if we send our last timestamp
         // we might get a 304 and less database calls would happened
         // because it wouldn't need to render the content
-        $key = BACKEND_BASE_URL . $endpoint;
         global $scratch;
         $headers = array();
+        $check = false;
         if ($scratch) {
           // fe only
+          $key = BACKEND_BASE_URL . $endpoint;
           $check = $scratch->get('consume_beRsrc_' . $key);
           $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
         }
@@ -439,56 +440,71 @@ class Router {
           'method'  => 'HEAD',
           'headers' => $headers,
         ));
-        $headers = parseHeaders($result);
-        $_HEAD_CACHE[$endpoint] = $headers;
-        //echo "<pre>header", htmlspecialchars(print_r($headers, 1)), "</pre>\n";
-
-        // check the interesting header
-
-        // etag
-        $etag = empty($headers['etag']) ? false : $headers['etag'];
-        if ($checkEtag) {
-          if ($etag) {
-            $compoundEtags[] = $etag;
-          } else {
-            $checkEtag = false;
-            $compoundEtags = array(); // release some memory
-            // no dev warnings needed as this is a edge case...
+        // if we get a 304, we may not have the headers...
+        $code = substr($result, 9, 3);
+        //echo "code[$code]<br>\n";
+        if ($code === '304' && $check) {
+          if (isset($check['etag'])) {
+            $etag = $check['etag'];
+            $_HEAD_CACHE[$endpoint]['etag'] = $etag;
           }
-        }
-        // last-modified
-        if ($checkMtime) {
-          if (isset($headers['last-modified'])) {
-            $ts = strtotime($headers['last-modified']);
-            //header('X-Debug-isUncached-mtime: ' . $ts);
+          if (isset($check['ts'])) {
+            $ts = $check['ts'];
+            $_HEAD_CACHE[$endpoint]['last-modified'] = $ts;
             $maxMtime = max($maxMtime, $ts);
-          } else {
-            if (DEV_MODE) {
-              if ($etag) {
-                //echo "No last-modified on backend[", $be['route'], "]\n";
-              } else {
-                echo "No way to cache backend[", $be['route'], "], no cacheSettings on backend?\n";
+          }
+        } else {
+          $headers = parseHeaders($result);
+          $_HEAD_CACHE[$endpoint] = $headers;
+          //echo "<pre>header", htmlspecialchars(print_r($headers, 1)), "</pre>\n";
+
+          // check the interesting header
+
+          // etag
+          $etag = empty($headers['etag']) ? false : $headers['etag'];
+          if ($checkEtag) {
+            if ($etag) {
+              $compoundEtags[] = $etag;
+            } else {
+              $checkEtag = false;
+              $compoundEtags = array(); // release some memory
+              // no dev warnings needed as this is a edge case...
+            }
+          }
+          // last-modified
+          if ($checkMtime) {
+            if (isset($headers['last-modified'])) {
+              $ts = strtotime($headers['last-modified']);
+              //header('X-Debug-isUncached-mtime: ' . $ts);
+              $maxMtime = max($maxMtime, $ts);
+            } else {
+              if (DEV_MODE) {
+                if ($etag) {
+                  //echo "No last-modified on backend[", $be['route'], "]\n";
+                } else {
+                  echo "No way to cache backend[", $be['route'], "], no cacheSettings on backend?\n";
+                }
               }
+              if ($checkMtime) {
+                // this is the one that failed it...
+                header('X-Debug-isUncached-backendFailure: ' . $endpoint);
+              }
+              $checkMtime = false;
+              $maxMtime = PHP_INT_MAX;
+              // if this one doesn't have it, we're done, it's not mtime cacheable
+              // but we still need to check the rest for eTag now..
             }
-            if ($checkMtime) {
-              // this is the one that failed it...
-              header('X-Debug-isUncached-backendFailure: ' . $endpoint);
-            }
-            $checkMtime = false;
-            $maxMtime = PHP_INT_MAX;
-            // if this one doesn't have it, we're done, it's not mtime cacheable
-            // but we still need to check the rest for eTag now..
           }
-        }
 
 
-        // if both cache systems failed, we don't need to check any more
-        if (!$checkMtime && !$checkEtag) {
-          header('X-Debug-isUncached-backend-status: no-way-to-cache');
-          if (DEV_MODE) {
-            echo "No way to cache this frontend route\n";
+          // if both cache systems failed, we don't need to check any more
+          if (!$checkMtime && !$checkEtag) {
+            header('X-Debug-isUncached-backend-status: no-way-to-cache');
+            if (DEV_MODE) {
+              echo "No way to cache this frontend route\n";
+            }
+            break;
           }
-          break;
         }
       }
       header('X-Debug-isUncached-febemtime: ' . ($checkMtime ? 'use' : 'ignore'));
