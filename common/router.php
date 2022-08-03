@@ -436,6 +436,9 @@ class Router {
             $headHeaders['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
             $headHeaders['router-ts'] = $check['ts'];
           }
+          if (!empty($check['etag'])) {
+            $headHeaders['If-None-Match'] = $check['etag'];
+          }
         }
 
         $result = request(array(
