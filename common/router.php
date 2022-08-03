@@ -453,7 +453,7 @@ class Router {
           }
           if (isset($check['ts'])) {
             $ts = $check['ts'];
-            $_HEAD_CACHE[$endpoint]['last-modified'] = $ts;
+            $_HEAD_CACHE[$endpoint]['last-modified'] = $headHeaders['If-Modified-Since'];
             $maxMtime = max($maxMtime, $ts);
           }
         } else {
