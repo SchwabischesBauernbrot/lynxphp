@@ -56,6 +56,7 @@ function request($options = array()) {
 //open handle
 $ch = curl_init();
 
+$curl_headers = array();
 
 function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='AUTO') {
   global $ch;
@@ -121,20 +122,38 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   } else
   if ($method === 'HEAD') {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'HEAD');
-    curl_setopt($ch, CURLOPT_HEADER, true); // include response header in output
-    curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
     curl_setopt($ch, CURLOPT_NOBODY, 1);
     curl_setopt($ch, CURLOPT_VERBOSE, 1);
   }
+  // to get the request header, but we have those...
+  // but maybe we need to see what's actuall sent on the wire?
+  //curl_setopt($ch, CURLINFO_HEADER_OUT, 1); // this makes curl_getinfo($ch, CURLINFO_HEADER_OUT) work
+
+  // we need this for everything
+  //if (DEV_MODE) {
+    curl_setopt($ch, CURLOPT_HEADER, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  //}
+
   //curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false);
   curl_setopt($ch, CURLOPT_TIMEOUT, 45);
 
   //execute post
-  $result = curl_exec($ch);
+  $txt = curl_exec($ch);
+
+  $infos = curl_getinfo($ch); // curl_info
+  $header_size = $infos['header_size'];
+  $respHeader = substr($txt, 0, $header_size);
+  global $curl_headers;
+  $curl_headers[] = $respHeader;
+  if ($method === 'HEAD') {
+    $result = $respHeader;
+  } else {
+    $result = substr($txt, $header_size);
+  }
 
   if (DEV_MODE) {
     global $curlLog;
-    $infos = curl_getinfo($ch);
     $curlLog[] = array(
       'method' => $method,
       'url' => $url,
@@ -142,9 +161,13 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
       'postData' => $fields,
       'took' => (microtime(true) - $start) * 1000,
       'requestHeaders' => $header,
+      // gets the out header...
+      //'responseHeaders' => curl_getinfo($ch, CURLINFO_HEADER_OUT),
+      'responseHeaders' => $respHeader,
       'result' => $result,
       'curlInfo' => $infos,
-      'statusCode' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
+      // $l['curlInfo']['http_code']
+      //'statusCode' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
     );
   }
 
@@ -152,6 +175,11 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   //curl_close($ch);
 
   return $result;
+}
+
+function request_getLastHeader() {
+  global $curl_headers;
+  return $curl_headers[count($curl_headers) - 1];
 }
 
 function make_file($tmpfile, $type, $filename) {
@@ -200,7 +228,7 @@ function curl_log_report() {
 
     $clickUrl = str_replace(BACKEND_BASE_URL, BACKEND_PUBLIC_URL, $l['url']);
 
-    echo '<li>' . $m . ' <a target=_blank rel=noopener href="' . $clickUrl . $joinChar[$hasQ] . 'prettyPrint=1">' . $l['url'] . '</a> took ' . $l['took'] . 'ms => ' . $l['statusCode'];
+    echo '<li>' . $m . ' <a target=_blank rel=noopener href="' . $clickUrl . $joinChar[$hasQ] . 'prettyPrint=1">' . $l['url'] . '</a> took ' . $l['took'] . 'ms => ' . $l['curlInfo']['http_code'];
     if ($m === 'POST' && isset($l['postData'])) {
       if (is_array($l['postData'])) {
         echo ' [', print_r($l['postData'], 1), ']';
@@ -213,7 +241,7 @@ function curl_log_report() {
     echo $l['trace'];
     echo '<details>';
     echo '  <summary>Response</summary>', "\n";
-    if (isset($l['result']) && ($l['result'][0] === '[' || $l['result'][0] === '{')) {
+    if (isset($l['result'][0]) && ($l['result'][0] === '[' || $l['result'][0] === '{')) {
       echo '  <pre>', htmlspecialchars(json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT)), '</pre>', "\n";
     } else {
       if ($l['method'] === 'HEAD') {
@@ -222,6 +250,8 @@ function curl_log_report() {
         echo '  [', $l['result'][0], ']<pre>', htmlspecialchars($l['result']), '</pre>', "\n";
       }
     }
+    echo '  Response headers: <pre>', htmlspecialchars(print_r($l['responseHeaders'], 1)), '</pre>', "\n";
+    //echo '  <pre>', htmlspecialchars(print_r($l, 1)), '</pre>', "\n";
     echo '</details>';
     // we can't get the headers unless it's a HEAD...
     /*
@@ -233,6 +263,7 @@ function curl_log_report() {
   }
   echo '</ol>';
   echo count($curlLog), ' requests took ', number_format($ttl), 'ms<br>', "\n";
+  // details?
 }
 
 ?>
