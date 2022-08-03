@@ -120,6 +120,7 @@ function consume_beRsrc($options, $params = '') {
         $headers = array();
         if (!empty($check['ts'])) {
           $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
+          $headers['consume-ts'] = $check['ts'];
         }
         $result = request(array(
           //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
