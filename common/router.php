@@ -420,10 +420,24 @@ class Router {
         // isn't this pointless without an etag or last-modified
         // no, because it can set those without being asked
         // we don't need to save bw here because we're same byte cost as a 304
+
+        // if we send our last timestamp
+        // we might get a 304 and less database calls would happened
+        // because it wouldn't need to render the content
+        $key = BACKEND_BASE_URL . $endpoint;
+        global $scratch;
+        $headers = array();
+        if ($scratch) {
+          // fe only
+          $check = $scratch->get('consume_beRsrc_' . $key);
+          $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
+        }
+
         $result = request(array(
           //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
-          'url' => BACKEND_BASE_URL . $endpoint,
-          'method' => 'HEAD',
+          'url'     => BACKEND_BASE_URL . $endpoint,
+          'method'  => 'HEAD',
+          'headers' => $headers,
         ));
         $headers = parseHeaders($result);
         $_HEAD_CACHE[$endpoint] = $headers;
