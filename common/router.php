@@ -431,6 +431,7 @@ class Router {
           // fe only
           $key = BACKEND_BASE_URL . $endpoint;
           $check = $scratch->get('consume_beRsrc_' . $key);
+          //echo "<pre>", print_r($check, 1), "</pre>\n";
           if (!empty($check['ts'])) {
             $headHeaders['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
             $headHeaders['router-ts'] = $check['ts'];
@@ -454,6 +455,7 @@ class Router {
           if (isset($check['ts'])) {
             $ts = $check['ts'];
             $_HEAD_CACHE[$endpoint]['last-modified'] = $headHeaders['If-Modified-Since'];
+            //echo "transfering [", $_HEAD_CACHE[$endpoint]['last-modified'], "]<br>\n";
             $maxMtime = max($maxMtime, $ts);
           }
         } else {
