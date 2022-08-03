@@ -580,10 +580,10 @@ function wrapContentFooter($row) {
   }
   if (DEV_MODE) {
     echo "<h4>input</h4>";
+    echo "SERVER <pre>", print_r($_SERVER, 1), "</pre><br>\n";
     if (count($_GET)) echo "GET <pre>", print_r($_GET, 1), "</pre><br>\n";
     if (count($_POST)) echo "POST <pre>", print_r($_POST, 1), "</pre><br>\n";
     //if (count($_REQUEST)) echo "POST", print_r($_REQUEST, 1), "<br>\n";
-    //echo "SERVER", print_r($_SERVER, 1), "<br>\n";
   }
 }
 
