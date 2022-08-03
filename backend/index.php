@@ -1,5 +1,4 @@
 <?php
-
 // REST API
 
 require '../common/lib.loader.php';
@@ -99,7 +98,7 @@ function buildRouters($routeConfig) {
     $r = new BackendRouter;
     // we could put them all in one group
     $r->import(include 'routes/' . $f . '.php');
-    $router->all('/' . $n . '/*', $r);
+    $router->all('/' . $n . '/'. '*', $r);
     unset($r);
   }
   unset($f); // break link
@@ -292,6 +291,10 @@ function wrapContent($error) {
 //echo "method[$req_method]<br>\n";
 
 //print_r($_SERVER);
+//$headers = getallheaders();
+//$txt = $req_method . ' ' . $req_path . ' ' . print_r($headers, 1);
+//$txt = $req_method . ' ' . $req_path;
+//file_put_contents('log.txt', $txt.PHP_EOL , FILE_APPEND | LOCK_EX);
 
 $res = $router->exec($req_method, $req_path);
 if (!$res) {
