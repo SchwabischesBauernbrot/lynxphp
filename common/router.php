@@ -425,15 +425,15 @@ class Router {
         // we might get a 304 and less database calls would happened
         // because it wouldn't need to render the content
         global $scratch;
-        $headers = array();
+        $headHeaders = array();
         $check = false;
         if ($scratch) {
           // fe only
           $key = BACKEND_BASE_URL . $endpoint;
           $check = $scratch->get('consume_beRsrc_' . $key);
           if (!empty($check['ts'])) {
-            $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
-            $headers['router-ts'] = $check['ts'];
+            $headHeaders['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
+            $headHeaders['router-ts'] = $check['ts'];
           }
         }
 
@@ -441,7 +441,7 @@ class Router {
           //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
           'url'     => BACKEND_BASE_URL . $endpoint,
           'method'  => 'HEAD',
-          'headers' => $headers,
+          'headers' => $headHeaders,
         ));
         // if we get a 304, we may not have the headers...
         $code = substr($result, 9, 3);
