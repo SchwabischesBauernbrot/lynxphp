@@ -431,8 +431,10 @@ class Router {
           // fe only
           $key = BACKEND_BASE_URL . $endpoint;
           $check = $scratch->get('consume_beRsrc_' . $key);
-          $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
-          $headers['router-ts'] = $check['ts'];
+          if (!empty($check['ts'])) {
+            $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
+            $headers['router-ts'] = $check['ts'];
+          }
         }
 
         $result = request(array(
