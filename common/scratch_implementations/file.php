@@ -1,6 +1,6 @@
 <?php
 
-include 'base.php';
+include_once 'base.php';
 
 // the size of the file caused more contention
 // do we need pooling and/or multiple files
