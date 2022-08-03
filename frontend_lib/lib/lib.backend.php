@@ -139,6 +139,7 @@ function consume_beRsrc($options, $params = '') {
       if (isset($headRes['last-modified'])) {
         $ts = strtotime($headRes['last-modified']);
       }
+      //echo "ts[$ts]<br>\n";
       if ($etag || $ts) {
         $saveCache = true;
       }
@@ -157,11 +158,12 @@ function consume_beRsrc($options, $params = '') {
         if ($ts <= $check['ts']) {
           // this breaks /user/settings/theme.php
           // key: http://localhost/backend/opt/settings@1658889353
-          /*
+	  /*
           if (DEV_MODE) {
             echo "Using scratch cache [$key@", $check['ts'], "] vs live[$ts]<br>\n";
           }
           */
+          //echo "<pre>test[", gettype($check), gettype($check['res']), htmlspecialchars(print_r($check, 1)), "]</pre>\n";
           return postProcessJson($check['res'], $options);
         }
         // if newer, refresh it
