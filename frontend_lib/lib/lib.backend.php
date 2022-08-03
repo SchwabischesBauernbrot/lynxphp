@@ -117,6 +117,10 @@ function consume_beRsrc($options, $params = '') {
         */
         $headRes = $_HEAD_CACHE[$options['endpoint'] . $querystring];
       } else {
+        $headers = array();
+        if (!empty($check['ts'])) {
+          $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
+        }
         $result = request(array(
           //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
           'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
