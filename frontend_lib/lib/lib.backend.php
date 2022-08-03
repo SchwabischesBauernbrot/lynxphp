@@ -98,7 +98,7 @@ function consume_beRsrc($options, $params = '') {
       global $scratch;
       $check = $scratch->get('consume_beRsrc_' . $key);
       // still need to see if backend is newer
-      //echo "<pre>check", htmlspecialchars(print_r($check, 1)), "</pre>\n";
+      //echo "<pre>check [$key]", htmlspecialchars(print_r($check, 1)), "</pre>\n";
 
       // we don't need to bother with 304 becaues it's a HEAD already
       /*
@@ -117,16 +117,16 @@ function consume_beRsrc($options, $params = '') {
         */
         $headRes = $_HEAD_CACHE[$options['endpoint'] . $querystring];
       } else {
-        $headers = array();
+        $headHeaders = array('consume-head' => true);
         if (!empty($check['ts'])) {
-          $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
-          $headers['consume-ts'] = $check['ts'];
+          $headHeaders['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
+          $headHeaders['consume-ts'] = $check['ts'];
         }
         $result = request(array(
           //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
           'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
           //
-          'headers' => $headers,
+          'headers' => $headHeaders,
           'method' => 'HEAD',
         ));
         $headRes = parseHeaders($result);
@@ -179,16 +179,22 @@ function consume_beRsrc($options, $params = '') {
     'headers' => $headers,
     'body' => $postData,
   ));
+  //echo "<pre>respHeader[", print_r($respHeaders, 1), "]</pre>\n";
+
   //$responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
   //  $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
   //echo "<pre>responseText[$responseText]</pre>\n";
 
   // has to be before, so we can re-run expectJson
   if ($saveCache) {
+    $respHeaders = parseHeaders(request_getLastHeader());
+    $outTs = isset($respHeaders['last-modified']) ? strtotime($respHeaders['last-modified']) : $ts;
+    $outEtag = isset($respHeaders['etag']) ? $respHeaders['etag'] : $etag;
+    // how do we get headers from this...
     //echo "saving[$key]<br>\n";
     $scratch->set('consume_beRsrc_' . $key, array(
-      'ts'   => $ts,
-      'etag' => $etag,
+      'ts'   => $outTs,
+      'etag' => $outEtag,
       'res'  => $responseText
     ));
   }
