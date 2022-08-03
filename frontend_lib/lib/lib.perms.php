@@ -42,9 +42,9 @@ function loggedIn() {
 */
 
 function getUserData() {
-  global $scratch;
+  global $persist_scratch;
   $key = 'user_session' . $_COOKIE['session'];
-  $user = $scratch->get($key);
+  $user = $persist_scratch->get($key);
   return $user;
 }
 
@@ -58,10 +58,10 @@ function perms_getBoards() {
     if ($loggedIn === 'false') return false;
   }
   static $accountCache = array();
-  global $scratch, $now;
+  global $persist_scratch, $now;
   $key = 'user_session' . $_COOKIE['session'];
   //echo "key[$key]<br>\n";
-  $user = $scratch->get($key);
+  $user = $persist_scratch->get($key);
   //echo "<pre>", print_r($user, 1), "</pre>\n";
   // ensure $user['account']
   $getAccount = false;
@@ -84,7 +84,7 @@ function perms_getBoards() {
     if ($account) {
       $user['account'] = $account;
       $user['account_ts'] = $now;
-      $scratch->set($key, $user);
+      $persist_scratch->set($key, $user);
     } else {
       // backend problem? not parseable
       // either way we don't want invalid data in our cache...
