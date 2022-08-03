@@ -148,6 +148,7 @@ function checkCacheHeaders($mtime, $options = false) {
   $etagPass = $etag && !empty($headers['If-None-Match'])
               // do we need a string search instead of a compare?
            && strpos($headers['If-None-Match'], $etag) !== false;
+  // FIXME: datetime comparison!
   $mtimePass = $lastmod && !empty($headers['If-Modified-Since'])
            && $lastmod == $headers['If-Modified-Since'];
   if (0) {
