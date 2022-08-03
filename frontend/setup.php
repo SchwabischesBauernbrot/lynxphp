@@ -35,6 +35,12 @@ include '../common/scratch_implementations/' . SCRATCH_DRIVER . '.php';
 $scratch_type_class = SCRATCH_DRIVER . '_scratch_driver';
 $scratch = new $scratch_type_class;
 
+if (SCRATCH_DRIVER !== 'file') {
+  // auto will load file2
+  include '../common/scratch_implementations/file.php';
+}
+$persist_scratch = new file_scratch_driver;
+
 
 // nav, pages
 // routes make a page exist
