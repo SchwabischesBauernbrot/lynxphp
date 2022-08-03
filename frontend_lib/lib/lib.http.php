@@ -123,7 +123,8 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   if ($method === 'HEAD') {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'HEAD');
     curl_setopt($ch, CURLOPT_NOBODY, 1);
-    curl_setopt($ch, CURLOPT_VERBOSE, 1);
+    // apache writes all this shit to the error_log too
+    //curl_setopt($ch, CURLOPT_VERBOSE, 1);
   }
   // to get the request header, but we have those...
   // but maybe we need to see what's actuall sent on the wire?
