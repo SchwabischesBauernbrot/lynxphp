@@ -141,8 +141,10 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
       'trace' => gettrace(),
       'postData' => $fields,
       'took' => (microtime(true) - $start) * 1000,
+      'requestHeaders' => $header,
       'result' => $result,
       'curlInfo' => $infos,
+      'statusCode' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
     );
   }
 
@@ -161,6 +163,32 @@ function curl_log_clear() {
   $curlLog = array();
 }
 
+function curl_log_echo_header($l) {
+  $headers = parseHeaders($l['result']);
+  unset($headers['report-to']);
+  unset($headers['expect-ct']);
+  unset($headers['nel']);
+  unset($headers['alt-svc']);
+  unset($headers['cf-ray']);
+  unset($headers['strict-transport-security']);
+  unset($headers['x-frame-options']);
+  unset($headers['x-content-type-options']);
+  unset($headers['x-xss-protection']);
+  //unset($headers['cf-cache-status']);
+  unset($headers['server']);
+  // a table format maybe better here...
+  echo '<table>';
+  foreach($headers as $k => $v) {
+    echo '<tr><th>', $k, '<td>', $v, "\n";
+  }
+  echo '</table>';
+  //echo '  <pre>', htmlspecialchars(print_r($headers, 1)), '</pre>', "\n";
+  // FIXME: clean this up and integrate it better
+  echo '  <pre>requestHeaders', htmlspecialchars(print_r($l['requestHeaders'], 1)), '</pre>', "\n";
+  //echo '  <pre>statusCode', htmlspecialchars(print_r($l['statusCode'], 1)), '</pre>', "\n";
+  //echo '  <pre>result', htmlspecialchars(print_r($l['result'], 1)), '</pre>', "\n";
+}
+
 function curl_log_report() {
   global $curlLog;
   $ttl = 0;
@@ -172,7 +200,7 @@ function curl_log_report() {
 
     $clickUrl = str_replace(BACKEND_BASE_URL, BACKEND_PUBLIC_URL, $l['url']);
 
-    echo '<li>' . $m . ' <a target=_blank rel=noopener href="' . $clickUrl . $joinChar[$hasQ] . 'prettyPrint=1">' . $l['url'] . '</a> took ' . $l['took'] . 'ms';
+    echo '<li>' . $m . ' <a target=_blank rel=noopener href="' . $clickUrl . $joinChar[$hasQ] . 'prettyPrint=1">' . $l['url'] . '</a> took ' . $l['took'] . 'ms => ' . $l['statusCode'];
     if ($m === 'POST' && isset($l['postData'])) {
       if (is_array($l['postData'])) {
         echo ' [', print_r($l['postData'], 1), ']';
@@ -189,30 +217,18 @@ function curl_log_report() {
       echo '  <pre>', htmlspecialchars(json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT)), '</pre>', "\n";
     } else {
       if ($l['method'] === 'HEAD') {
-        $headers = parseHeaders($l['result']);
-        unset($headers['report-to']);
-        unset($headers['expect-ct']);
-        unset($headers['nel']);
-        unset($headers['alt-svc']);
-        unset($headers['cf-ray']);
-        unset($headers['strict-transport-security']);
-        unset($headers['x-frame-options']);
-        unset($headers['x-content-type-options']);
-        unset($headers['x-xss-protection']);
-        //unset($headers['cf-cache-status']);
-        unset($headers['server']);
-        // a table format maybe better here...
-        echo '<table>';
-        foreach($headers as $k => $v) {
-          echo '<tr><th>', $k, '<td>', $v, "\n";
-        }
-        echo '</table>';
-        //echo '  <pre>', htmlspecialchars(print_r($headers, 1)), '</pre>', "\n";
+        curl_log_echo_header($l);
       } else {
         echo '  [', $l['result'][0], ']<pre>', htmlspecialchars($l['result']), '</pre>', "\n";
       }
     }
     echo '</details>';
+    // we can't get the headers unless it's a HEAD...
+    /*
+    if ($l['method'] !== 'HEAD') {
+      curl_log_echo_header($l);
+    }
+    */
     $ttl += $l['took'];
   }
   echo '</ol>';
