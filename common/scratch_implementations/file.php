@@ -42,7 +42,7 @@ class file_scratch_driver extends scratch_implementation_base_class {
         usleep(333);
       }
       if ($stilllocked) {
-        echo "cant get lock[$lock]<br>\n";
+        echo "can't get lock[$lock] <!-- ", gettrace(), " --><br>\n";
         return false;
       }
     }
