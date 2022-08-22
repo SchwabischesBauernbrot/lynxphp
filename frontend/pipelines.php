@@ -81,6 +81,8 @@ $frontEndPipelines = array(
   'PIPELINE_HEADERS',
 
   'PIPELINE_SITE_HEAD',
+  'PIPELINE_SITE_HEAD_SCRIPTS',
+  'PIPELINE_SITE_HEAD_STYLES',
   'PIPELINE_SITE_LEFTNAV',
   'PIPELINE_SITE_RIGHTNAV',
   // we can have one pipeline adjust all this data
