@@ -3,6 +3,7 @@
 function validate_captcha_field($options = false) {
   extract(ensureOptions(array(
     'field' => 'captcha',
+    'remove' => true,
   ), $options));
 
   if (empty($_POST[$field])) {
@@ -17,7 +18,7 @@ function validate_captcha_field($options = false) {
   global $scratch, $now;
   $captchas = $scratch->get('captchas');
   if (!is_array($captchas)) {
-    return'No CAPTCHAs active';
+    return 'No CAPTCHAs active';
   }
 
   if (!isset($captchas[$captcha_id])) {
@@ -35,8 +36,10 @@ function validate_captcha_field($options = false) {
   }
 
   // success, remove it
-  unset($captchas[$captcha_id]);
-  $scratch->set('captchas', $captchas);
+  if ($remove) {
+    unset($captchas[$captcha_id]);
+    $scratch->set('captchas', $captchas);
+  }
 
   return '';
 }
