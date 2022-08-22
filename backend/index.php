@@ -155,6 +155,10 @@ if ($router->sendHeaders($req_method, $req_path)) {
   return; // 304
 }
 
+//$txt = $req_method . ' ' . $req_path;
+//file_put_contents('log.txt', $txt.PHP_EOL , FILE_APPEND | LOCK_EX);
+
+
 $response_template = array(
   'meta' => array(
     'code' => 200,
@@ -252,7 +256,7 @@ function sendResponse2($data, $options = array()) {
   return true;
 }
 
-// FIXME: this is a valid function, we should handle ttl stuff
+// deprecate for sendJson
 function sendRawResponse($mixed, $code = 200, $err = '') {
   if ($code !== 200) http_response_code($code);
   if (getQueryField('prettyPrint')) {
