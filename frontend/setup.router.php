@@ -11,9 +11,11 @@ foreach($packages as $pkg) {
 }
 
 if ($router->isTooBig()) {
+  /*
   if (!$sentBump) {
     echo '<div style="height: 40px;"></div>', "\n";
   }
+  */
   wrapContent('This POST request has sent too much data [' . formatBytes($_SERVER['CONTENT_LENGTH']). '] for this server [' . formatBytes($router->max_length) . '], try sending less data.');
   exit();
 }
@@ -245,7 +247,12 @@ $frontendRouterData = array(
       'newPost' => array(
         'method' => 'POST',
         'route'  => '/:uri/post',
-        'func'   => 'makePostHandler',
+        'func'   => 'makePostHandlerHtml',
+      ),
+      'newPostJson' => array(
+        'method' => 'POST',
+        'route'  => '/:uri/post.json',
+        'func'   => 'makePostHandlerJson',
       ),
       /*
       'catalog' => array(
