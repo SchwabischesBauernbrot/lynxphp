@@ -23,7 +23,9 @@ function setHeaderTopHTML(&$io, $banner) {
     $ih = (int)$h;
     $iw = (int)$w;
     $boardUri = $io['boardUri'];
-    $io['tags']['board_header_top'] = '<img src="'. BACKEND_PUBLIC_URL . $banner['image']. '" width="'.$w.'" height="'.$h.'" alt="a random ' . $boardUri .' banner">' . $io['tags']['board_header_top'];
+    // FIXME: allow templates to be able to style this tag better
+    // well if we slap a class on it css can manage it
+    $io['tags']['board_header_top'] = '<img class="board-banner" src="'. BACKEND_PUBLIC_URL . $banner['image']. '" width="'.$w.'" height="'.$h.'" alt="a random ' . $boardUri .' banner">' . $io['tags']['board_header_top'];
   } else {
     // array() just means no banners
     // maybe say nothing?
