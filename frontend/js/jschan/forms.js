@@ -12,6 +12,7 @@ function pad(n, width, z) {
 function doModal(data, postcallback) {
   //console.log('doModal', data)
   try {
+    // modal isn't defined
     const modalHtml = modal({ modal: data });
     let checkInterval;
     document.body.insertAdjacentHTML('afterbegin', modalHtml);
@@ -108,15 +109,19 @@ class formHandler {
       //
       //this.multipleFiles = this.fileLabel.parentNode.previousSibling.firstChild.textContent.endsWith('s[]');
       this.multipleFiles = this.fileLabel
-      this.fileLabelText = this.fileLabel.childNodes[0];
+      //this.fileLabelText = this.fileLabel.childNodes[0];
+      this.fileLabelText = this.fileLabel.querySelector('.fileLabelText')
       this.fileLabel.addEventListener('dragover', e => this.fileLabelDrag(e));
       this.fileLabel.addEventListener('drop', e => this.fileLabelDrop(e));
       this.fileInput.addEventListener('change', e => this.fileInputChange(e));
+      // middle click clears files
       this.fileLabel.addEventListener('auxclick', e => this.fileLabelAuxclick(e));
     }
     this.messageBox && this.messageBox.addEventListener('keydown', e => this.controlEnterSubmit(e));
     form.addEventListener('paste', e => this.paste(e));
     form.addEventListener('submit', e => this.formSubmit(e));
+    // just add .json
+    this.form.setAttribute('action', this.form.getAttribute('action') + '.json')
   }
 
   reset() {
@@ -135,6 +140,8 @@ class formHandler {
     if (captcha) {
       captcha.dispatchEvent(new Event('click'));
     }
+    // ensure it's unlocked
+    this.setFormLock(false)
   }
 
   controlEnterSubmit(e) {
@@ -143,26 +150,196 @@ class formHandler {
     }
   }
 
+  setFormLock(s) {
+    this.form.elements.name.disabled = s
+    this.form.elements.email.disabled = s
+    this.form.elements.sage.disabled = s
+    this.form.elements.subject.disabled = s
+    this.form.elements.message.disabled = s
+    this.fileInput.disabled = s
+    this.submit.disabled = s
+  }
+
   // only submits one file
   formSubmit(e) {
-    const xhr = new XMLHttpRequest();
+    this.setFormLock(true) // lock this fucker
+
+    // do we require capctha?
+    // https://dev.wrongthink.net/test/post
+    const u = new URL(this.form.action)
+    const parts = u.pathname.split('/')
+    const boardUri = parts[1]
+    //console.log('board', boardUri, 'settings', boardData[boardUri])
+
+    // FIXME: move out to module...
+    let captchaEnable = false
+    if (boardData[boardUri] && boardData[boardUri].captcha_mode) {
+      //console.log('CAPTCHA mode:', boardData[boardUri].captcha_mode)
+      if (boardData[boardUri].captcha_mode === 'posts') {
+        captchaEnable = true
+      } else
+      if (boardData[boardUri].captcha_mode === 'threads') {
+        // or maybe read the button?
+        // are we in a thread?
+        const loc = whereAmI()
+        if (!loc.threadNum) {
+          captchaEnable = true
+        }
+      }
+      // else 'no' just leave as false
+    }
+    //console.log('does this board require CAPTCHA?', captchaEnable)
+    if (captchaEnable) {
+      if (!this.inCaptcha) {
+        // prompt user for captcha
+        // UI decisions?
+        this.inCaptcha = 1
+        // lock form, insert captcha until it's fine
+        var container = document.createElement('section')
+        container.className = "row captchaRow"
+        // get fresh captcha
+        // we need img.src, fieldname _id for the captcha id
+        container.innerHTML = '<span class="col"><img class="captcha" src="images/awaiting_thumbnail.png"><input style="font-size: 2em;" type=text maxlength=6 size=6 name="captcha"></span>' +
+          '<span class="col"><button class="active-captcha-reload">reload</button><button class="active-captcha-cancel">cancel</button></span>'
+        // insert before the submit button
+        this.submit.parentNode.insertBefore(container, this.submit)
+        //this.form.appendChild(container)
+
+        const cInputElem = this.form.querySelector('.col input[name=captcha]')
+        const img = this.form.querySelector('.col img.captcha')
+        var ref = this
+        function reloadCaptcha() {
+          //console.log('CAPTCHA loading')
+          fetch('/CAPTCHA/json').then(function(response) {
+            return response.json()
+          }).then(function(data) {
+            //console.log('captcha data', data)
+            img.src = 'data:image/jpeg;base64, ' + data.img
+            // save id somewhere
+            ref.captchaId = data.id
+            cInputElem.value = ''
+            cInputElem.focus()
+            ref.captchaRefreshTimer = setTimeout(function() {
+              reloadCaptcha()
+            }, data.ex * 1000)
+          })
+        }
+        reloadCaptcha()
+        const rlButElem = this.form.querySelector('.col button.active-captcha-reload')
+        rlButElem.onclick = function() {
+          reloadCaptcha()
+          return false;
+        }
+        const cxlButElem = this.form.querySelector('.col button.active-captcha-cancel')
+        cxlButElem.onclick = function() {
+          // remove captcha rows
+          /*
+          var rows = document.querySelectorAll('.col.captcha')
+          for (var j = rows.length-1; j >= 0; j--) {
+            if (rows[j].parentNode) {
+              rows[j].parentNode.removeChild(rows[j]);
+            }
+          }
+          */
+          ref.inCaptcha = 0 // update state that the form is removed
+          clearTimeout(ref.captchaRefreshTimer)
+          const crowElem = ref.submit.parentNode.querySelector('.captchaRow')
+          if (crowElem) {
+            crowElem.remove()
+          } else {
+            console.warn('cant find captcahRow')
+          }
+          ref.setFormLock(false) // unlock
+          return false;
+        }
+        /*
+        img.onload = function() {
+          console.log('captcha loaded')
+        }
+        */
+        this.submit.disabled = false
+        e.preventDefault()
+        return false
+      } else
+      if (this.inCaptcha === 1) {
+        //console.log('processing captcha response...')
+        const cInputElem = this.form.querySelector('.col input[name=captcha]')
+        if (!cInputElem) {
+          console.warn('cInputElem not found')
+          alert("cant find CAPTCHA field")
+          e.preventDefault()
+          return false
+        }
+        // make sure it's acceptable before we upload files...
+        const fd = new FormData()
+        fd.append('captcha', cInputElem.value)
+        //fd.append('captcha_id', this.captchaId)
+        var ref = this
+        fetch('/CAPTCHAs/' + this.captchaId + '/solve', { method: 'POST', body: fd }).then(function(response) {
+          return response.json()
+        }).then(function(data) {
+          //console.debug('solve', data)
+          if (data.ok) {
+            ref.inCaptcha = 2
+            ref.captcha = cInputElem.value
+            clearTimeout(ref.captchaRefreshTimer)
+            const crowElem = ref.submit.parentNode.querySelector('.captchaRow')
+            if (crowElem) {
+              crowElem.remove()
+            } else {
+              console.warn('cant find captcahRow')
+            }
+            // and resubmit
+            ref.formSubmit(e)
+          } else {
+            /*
+            doModal({
+              'title': 'Error',
+              'message': 'incorrect captcha'
+            });
+            */
+            alert('incorrect captcha')
+            // unlock form
+            ref.submit.disabled = false
+          }
+        })
+        e.preventDefault()
+        return false
+      }
+    }
+    //console.debug('attempting to make post')
+    // js pipelines?
+
     // inject captcha if we have it
     const captchaResponse = recaptchaResponse;
     // setup postData based on type of form
     let postData;
+    let addMode = false
+    //console.log('enctype', this.enctype)
     if (this.enctype === 'multipart/form-data') {
       // lib.form always uses this
-      this.fileInput && (this.fileInput.disabled = true);
+      //this.fileInput && (this.fileInput.disabled = true); // disable it
+
+      // probably have to unlock the fields, so we can read them
+      this.setFormLock(false)
       postData = new FormData(this.form);
+
+      /*
+      console.log('postData', postData)
+      for(var k in data) {
+        console.log('test', k, postData.get(k))
+      }
+      */
       if (captchaResponse) {
         postData.append('captcha', captchaResponse);
       }
-      // the input is in the named keys of this list more thanonce
+      // the input is in the named keys of this list more than once
       // but the count seems sane
       // we can map if there's only one file field
       // what do we do if there's more than one?
       //console.log('form', this.form.elements)
-      this.fileInput && (this.fileInput.disabled = false);
+
+      //this.fileInput && (this.fileInput.disabled = false); // enable it
       if (this.files && this.files.length > 0) {
         //console.log('fileInput', this.fileInput, this.fileInput.name)
         //add files to file input element
@@ -170,6 +347,7 @@ class formHandler {
           postData.append(this.fileInput.name, this.files[i]);
         }
       }
+      this.setFormLock(true) // relock hopefully now it's build
     } else {
       var data = Object.keys(this.form.elements).reduce((obj, field) => { if (isNaN(field)) obj[field] = this.form.elements[field].value; return obj; }, {});
       postData = new URLSearchParams();
@@ -187,6 +365,16 @@ class formHandler {
         postData.set('captcha', captchaResponse);
       }
     }
+    if (this.inCaptcha === 2) {
+      // we had a valid CAPTCHA solved
+      const cInputElem = this.form.querySelector('.col input[name=captcha]')
+      // set isn't available in chrome 49
+      postData.append('captcha_id', this.captchaId)
+      postData.append('captcha', this.captcha)
+      //console.debug('solving', this.captchaId, 'with', this.captcha)
+      this.inCaptcha = 0 // reset captcha mode if we make it this far
+    }
+
     // ban filter
     if (this.banned
       || this.minimal
@@ -195,8 +383,12 @@ class formHandler {
     } else {
       e.preventDefault();
     }
-    this.submit.disabled = true;
+
+    //this.submit.disabled = true;
     this.submit.value = 'Processing...';
+
+    const xhr = new XMLHttpRequest();
+
     // enable extra file handling
     if (this.files && this.files.length > 0) {
       //show progress on file uploads
@@ -223,7 +415,8 @@ class formHandler {
           captchaController.removeCaptcha();
           this.captchaField = null;
         }
-        this.submit.disabled = false;
+        this.setFormLock(false) // unlock
+        //this.submit.disabled = false;
         this.submit.value = this.originalSubmitText;
         let json;
         if (xhr.responseText) {
@@ -231,12 +424,13 @@ class formHandler {
             json = JSON.parse(xhr.responseText);
           } catch (e) {
             //wasnt json response
-            console.log('not json', e)
+            console.log('not json', e, xhr.responseText)
           }
         }
-        console.log('response status code', xhr.status)
+        //console.debug('response status code', xhr.status)
+        //console.log('json', json)
         if (xhr.status == 200) {
-          console.log('json', json)
+          //console.log('json', json)
           if (!json) {
             // interesting constraint...
             let action = this.form.getAttribute('action')
@@ -260,6 +454,12 @@ class formHandler {
           } else {
             // has json
             if (json.postId) {
+              /*
+              var storedArray = JSON.parse(localStorage.getItem('yous'))
+              storedArray.push(json.boardUri + '-' + json.postId)
+              localStorage.setItem('yous', JSON.stringify(storedArray))
+              */
+
               // yous.js use this
               // something to coordinate with addPost events
               // forms set window.location.hash
@@ -270,25 +470,41 @@ class formHandler {
             if (json.redirect) {
               const redirectBoard = json.redirect.split('/')[1];
               const redirectPostId = json.redirect.split('#')[1];
+              //console.debug('redirectBoard', redirectBoard, 'redirectPostId', redirectPostId)
               if (redirectBoard && redirectPostId) {
                 appendLocalStorageArray('yous', `${redirectBoard}-${redirectPostId}`);
               }
             }
             if (json.message || json.messages || json.error || json.errors) {
-              doModal(json);
-            } else if (socket && socket.connected) {
-              window.location.hash = json.postId
+              //doModal(json);
+              alert(JSON.stringify(json))
+            // we're not likely going to use websockets
+            // however some ajax polling might be good
+            //} else if (socket && socket.connected) {
+              //window.location.hash = json.postId
             } else {
               // success
+
+              // we need to trigger a JS refresh
+              if (typeof(manual_refresh) !== 'undefined') {
+                console.log('refresh.js detected, calling')
+                manual_refresh()
+              }
+
               // assumes redirect...
+              console.log('isThread', isThread)
               if (!isThread) {
+                // we end up here if we're making a new thread from board page
                 console.debug('redirect to', json.redirect)
-                return //window.location = json.redirect;
+                // stay on board thread listing and refresh?
+                // or do we jump to the new thread you made?
+                //window.location = json.redirect;
+                return
               }
               // used to set hash
               setLocalStorage('myPostId', json.postId);
               // live.js
-              forceUpdate();
+              //forceUpdate();
             }
           }
           if (this.form.getAttribute('action') !== '/forms/editpost'
@@ -299,10 +515,13 @@ class formHandler {
           if (xhr.status === 413) {
             this.clearFiles();
             //not json, must be nginx response
+            alert('Your upload was too large')
+            /*
             doModal({
               'title': 'Payload Too Large',
               'message': 'Your upload was too large',
             });
+            */
           } else if (json) {
             if (!this.captchaField && json.message === 'Incorrect captcha answer') {
               captchaController.addMissingCaptcha();
@@ -313,9 +532,13 @@ class formHandler {
                 captcha.dispatchEvent(new Event('click'));
               }
             }
+            /*
             doModal(json, () => {
               this.formSubmit(e);
             });
+            */
+            alert(JSON.stringify(json))
+            //this.formSubmit(e)
           } else {
 //for bans, post form to show TODO: make modal support bans json and send dynamicresponse from it (but what about appeals, w/ captcha, etc?)
             this.clearFiles(); //dont resubmit files
@@ -336,9 +559,9 @@ class formHandler {
       this.submit.value = this.originalSubmitText;
     }
     xhr.open(this.form.getAttribute('method'), this.form.getAttribute('action'), true);
-    if (!this.minimal) {
-      xhr.setRequestHeader('x-using-xhr', true);
-    }
+    //if (!this.minimal) {
+      //xhr.setRequestHeader('x-using-xhr', true);
+    //}
     const isLive = localStorage.getItem('live') == 'true' && socket && socket.connected;
     if (isLive) {
       xhr.setRequestHeader('x-using-live', true);
@@ -350,6 +573,7 @@ class formHandler {
   }
 
   updateMessageBox() {
+    // for counter
     this.messageBox && this.messageBox.dispatchEvent(new Event('input'));
   }
 
@@ -450,9 +674,10 @@ class formHandler {
     if (this.files && this.files.length === 0) {
       this.fileUploadList.textContent = '';
       this.fileUploadList.style.display = 'none';
-      this.fileLabelText.nodeValue = `Select/Drop/Paste file${this.multipleFiles ? 's' : ''}`;
+      //console.log('fileLabelText', this.fileLabelText, this.fileLabelText.innerText)
+      this.fileLabelText.innerText = `Select/Drop/Paste file${this.multipleFiles ? 's' : ''}`;
     } else {
-      this.fileLabelText.nodeValue = `${this.files.length} file${this.files.length > 1 ? 's' : ''} selected`;
+      this.fileLabelText.innerText = `${this.files.length} file${this.files.length > 1 ? 's' : ''} selected`;
     }
   }
 
@@ -532,11 +757,11 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('addPost', (e) => {
-    console.log('adding post', e.detail)
     if (e.detail.hover) {
       return; //dont need to handle hovered posts for this
     }
     if (window.myPostId == e.detail.postId) {
+      console.debug('jumping to newly added post', e.detail.postId)
       window.location.hash = e.detail.postId;
     }
   });
