@@ -71,7 +71,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
     addToMessageBox(quoteText);
     messageBox.focus();
-    messageBox.dispatchEvent(new Event('input'));
+    messageBox.dispatchEvent(new Event('input')); // for counter.js
   }
 
   const quote = function(e) {
