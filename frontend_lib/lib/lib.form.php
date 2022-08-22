@@ -126,8 +126,9 @@ function generateForm($action, $fields, $values, $options = false) {
       $tlabelwrap2 = '</div>';
     }
     */
+    $labelId = empty($details['uniqueId']) ? $field : uniqid();
     if (isset($details['label'])) {
-      $html .= '<' . $labelTag . $tlabelClass . '><label for="' . $field . '">' .
+      $html .= '<' . $labelTag . $tlabelClass . '><label for="' . $labelId . '">' .
         $tlabelwrap1 . $details['label'] . ': &nbsp;' . $tlabelwrap2 .
         $sublabel . '</label>' . $postlabel . '</' . $labelTag . '>' . "\n";
     }
@@ -139,7 +140,7 @@ function generateForm($action, $fields, $values, $options = false) {
     }
     $ac = '';
     if (isset($details['autocomplete'])) {
-      $ac = ' autocomplete="chrome-off"';
+      $ac = ' autocomplete="' . $details['autocomplete'] . '"';
     }
     $ph = '';
     if (isset($details['placeholder'])) {
@@ -167,7 +168,7 @@ function generateForm($action, $fields, $values, $options = false) {
       break;
       case 'password':
         // always blank and can't be cleared
-        $html .= '<input type=password name="'.$field.'">';
+        $html .= '<input type=password name="'.$field.'"' . $ac . $ph . '>';
       break;
       case 'integer':
       case 'number':
@@ -190,7 +191,9 @@ function generateForm($action, $fields, $values, $options = false) {
       break;
       case 'checkbox':
         $checked = $value ? ' CHECKED' : '';
-        $html .= '<input id="'.$field.'" type=checkbox name="'.$field.'" value="1"'.$checked.'>';
+        // causes duplicates:
+        // id="'.$field.'"
+        $html .= '<input type=checkbox name="'.$field.'" value="1"'.$checked.'>';
       break;
       case 'captcha':
         // great for keeping the size of this file down
@@ -219,9 +222,9 @@ function generateForm($action, $fields, $values, $options = false) {
       break;
       case 'image':
         if ($value) {
-          // FIXME: BACKEND_BASE_URL
           // if not set it will clear it, so we need a clear checkbox...
-          $html .= '<img height=100 src="backend/' . $value . '"><br>';
+          global $BACKEND_BASE_URL;
+          $html .= '<img height=100 src="' . $BACKEND_BASE_URL . $value . '"><br>';
         }
         $html .= '<label><input type=checkbox name="'.$field.'_clear"> Reset back to default</label><br>';
         $html .= '<input type=file name="'.$field.'">';
@@ -237,10 +240,11 @@ function generateForm($action, $fields, $values, $options = false) {
           $html .= '</ul>';
           $html .= '<input type=hidden name="'. $field. '_already_uploaded" value=\'' . $value . '\'>';
         }
+        // we just removed the jsonly and it's fine...
         $html .= '<span class="col">
-                    <label class="jsonly postform-style filelabel" for="file">
-                      <input id="file" type="file" name="' . $field . '[]" multiple>
-                      Select/Drop/Paste files
+                    <label class="postform-style filelabel" for="' . $labelId . '">
+                      <input type="file" id="' . $labelId . '" name="' . $field . '[]" multiple>
+                      <span class="fileLabelText">Select/Drop/Paste files</span>
                     </label>
                     <div class="upload-list" data-spoilers="true"></div>
                   </span>
