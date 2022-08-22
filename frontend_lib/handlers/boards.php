@@ -118,7 +118,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
       //if ($i === 0) $threads_html .= $threadHdr_tmpl;
       $topReply = isset($posts[1]) ? $posts[1]['no'] : false;
       $threads_html .= renderPost($boardUri, $post, array(
-        'checkable' => true, 'postCount' => $thread['thread_reply_count'],
+        'checkable' => true, 'postCount' => empty($thread['thread_reply_count']) ? -1 : $thread['thread_reply_count'],
         'topReply' => $topReply, 'where' => $boardUri . '/', 'boardSettings' => $boardData['settings'],
       ));
       //if ($i === count($posts) - 1) $threads_html .= $threadFtr_tmpl;
@@ -226,23 +226,55 @@ function getBlockBypass($boardUri, $row) {
   wrapContent('blockBypass was invalid, please try again: <br>' . "\n" . $bypassForm);
 }
 
+function askWithCaptcha($boardUri, $row) {
+  // generate form with post data hidden
+  $data = array(
+    //'reply' => $row['threadId'],
+    'formId' => 'bottom_postform',
+    'showClose' => false,
+    'values' => $row,
+  );
+  if (!empty($row['threadId'])) {
+    $data['reply'] = $row['threadId'];
+  }
+  //$postform = renderPostFormHTML($boardUri, $data);
+  $formfields = array(
+    'post'   => array('type' => 'hidden'),
+    'captcha'    => array('type' => 'captcha', 'label' => 'Bypass CAPTCHA'),
+  );
+  $values = array('post' => json_encode($row));
+  $formOptions = array();
+  $captchaForm = generateForm('/' . $boardUri, $formfields, $values, $formOptions);
+  wrapContent('a CAPTCHA is required, please answer: <br>' . "\n" . $captchaForm);
+}
 
 function retryCaptcha($boardUri, $row) {
   // regenerate post form...
   // how did $row get threadId = 1
   // FIXME: need a shorthand for files
-  $postform = renderPostFormHTML($boardUri, array(
-    'reply' => $row['threadId'],
+  $data = array(
+    //'reply' => $row['threadId'],
     'formId' => 'bottom_postform',
     'showClose' => false,
     'values' => $row,
-  ));
+    'pipelineOptions' => array('showCAPTCHA' => true)
+  );
+  if (!empty($row['threadId'])) {
+    $data['reply'] = $row['threadId'];
+  }
+  // this isn't going to inject a CAPTCHA now
+  // so we got to hack it in?
+  // hard to do if it closes the form
+  // we'd need like a option...
+  // an option that hits a pipeline...
+  $postform = renderPostFormHTML($boardUri, $data);
+
   //echo "<pre>", htmlspecialchars(print_r($postform, 1)), "</pre>\n";
   // 'Thread #' . $row['thread'] . '<br>'. "\n"
-  wrapContent('Your Captcha was invalid, please try again: <br>' . "\n" . $postform);
+  wrapContent('Your CAPTCHA was invalid, please try again: <br>' . "\n" . $postform);
 }
 
-function makePostHandler($request) {
+function makePostHandlerEngine($request) {
   global $pipelines, $max_length;
   $boardUri = $request['params']['uri'];
 
@@ -253,7 +285,7 @@ function makePostHandler($request) {
 
   $res = processFiles();
   if ($res && count($res['errors'])) {
-    // actually have to have something set thi
+    // actually have to have something set this
   }
   //echo '<pre>res: ', print_r($res, 1), "</pre>\n";
   // it's not always files? getting file... form.js causes this...
@@ -319,21 +351,26 @@ function makePostHandler($request) {
   $row     = $io['values'];
   $headers = $io['headers'];
   $redir   = $io['redir'];
+
   if (!empty($io['error'])) {
-    //print_r($io);
-    // FIXME: clean this up better
-    if ($io['error'] === 'CAPTCHA is required') {
-      retryCaptcha($boardUri, $row);
-      return;
-    }
-    echo "error";
-    wrapContent($io['error']);
-    return;
+    return array(
+      'requestValid' => false,
+      'boardUri' => $boardUri,
+      'row'      => $row,
+      'error'    => $io['error'],
+    );
   }
+  // what's this used for? nothing right now
   if (!empty($io['redirNow'])) {
-    echo "redirNow";
-    redirectTo($io['redirNow']);
-    return;
+    return array(
+      'requestValid' => false,
+      'boardUri' => $boardUri,
+      'row'      => $row,
+      'redirect' => $io['redirNow'],
+    );
+    //echo "redirNow";
+    //redirectTo($io['redirNow']);
+    //return;
   }
 
   // make post...
@@ -342,7 +379,47 @@ function makePostHandler($request) {
   //$result = expectJson($json, $endpoint)
   //echo "json[$json]<br>\n";
   $result = json_decode($json, true);
+  return array(
+    'requestValid' => true,
+    'boardUri' => $boardUri,
+    'result'   => $result,
+    'json'     => $json,
+  );
+}
+
+function makePostHandlerHtml($request) {
+  $arr = makePostHandlerEngine($request);
+  $boardUri = $arr['boardUri'];
+  if (!empty($arr['redirect'])) {
+    // redirection handling
+    //echo "redirNow";
+    redirectTo($arr['redirect']);
+    return;
+  }
+  if (!$arr['requestValid']) {
+    // didn't pass validation
+
+    // error handling
+    $error = $arr['error'];
+    //print_r($io);
+
+    // FIXME: clean this up better
+
+    // special error handlers:
+    if ($error === 'CAPTCHA is required') {
+      // was there a CAPTCHA present in the previous form?
+      retryCaptcha($boardUri, $arr['row']);
+      return;
+    }
+
+    // default error
+    echo "error";
+    wrapContent($error);
+    return;
+  }
+  $result = $arr['result'];
   if ($result === false) {
+    $json = $arr['json'];
     // invalid json
     wrapContent('Post Error: <pre>' . $json . '</pre>');
   } else {
@@ -365,6 +442,7 @@ EOB;
 //setLocalStorage('myPostId', json.postId);
 */
       // success
+      $redir = $arr['redirect'];
       redirectTo($redir);
     } else
     if ($result && is_array($result) && isset($result['data']) && is_array($result['data']) && $result['data']['status'] === 'queued') {
@@ -390,6 +468,26 @@ EOB;
       }
     }
   }
+}
+function makePostHandlerJson($request) {
+  $arr = makePostHandlerEngine($request);
+  $code = $arr['requestValid'] ? 200 : 400;
+  // postId
+  if (!empty($arr['result'])) {
+    $result = $arr['result'];
+    if ($result && is_array($result) && isset($result['data']) && is_numeric($result['data'])) {
+      // just reuse JSChan's format for now
+      $arr['postId'] = $result['data'];
+      // though redirect seems more helpful
+      $arr['redirect'] = '/' . $arr['boardUri'] . '/#' . $result['data'];
+    }
+  }
+  // maybe move into sendJson?
+  if (DEV_MODE) {
+    // for XHR (we're not going to get this in the page report because there is no page report)
+    $arr['POST'] = $_POST;
+  }
+  sendJson($arr, array('code' => $code));
 }
 
 // /:uri/
