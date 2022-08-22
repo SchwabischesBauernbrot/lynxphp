@@ -3,13 +3,15 @@
 $fePkgs = array(
   array(
     'handlers' => array(
-      /*
       array(
-        'method'  => 'GET',
-        'route'   => '/:uri/banners',
-        'handler' => 'public_list',
+        'route'   => '/CAPTCHA/json',
+        'handler' => 'captcha_js',
       ),
-      */
+      array(
+        'method'  => 'POST',
+        'route'   => '/CAPTCHAs/:captcha_id/solve',
+        'handler' => 'captcha_solve',
+      ),
     ),
     'forms' => array(
       /*
@@ -45,7 +47,6 @@ $fePkgs = array(
         'pipeline' => 'PIPELINE_BOARD_SETTING_GENERAL',
         'module' => 'board_settings',
       ),
-
     ),
   ),
 );
