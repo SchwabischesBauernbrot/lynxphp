@@ -197,6 +197,11 @@ function getNav($navItems, $options = array()) {
 }
 
 /*
+maybe components can be scoped to a specific portal
+ie can't exist outside one...
+*/
+
+/*
   $portalOptions = array(
     'headerPipeline' => PIPELINE_USER_HEADER_TMPL,
     'footerPipeline' => PIPELINE_USER_FOOTER_TMPL,
