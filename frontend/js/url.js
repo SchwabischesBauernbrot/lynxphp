@@ -1,3 +1,5 @@
+// maybe JSON should be left in the page to reduce this...
+// or we make a fetch call to reduce b/w
 function whereAmI() {
   if (window.location.pathname.match(/\/thread\//)) {
     const parts = window.location.pathname.split('/')
