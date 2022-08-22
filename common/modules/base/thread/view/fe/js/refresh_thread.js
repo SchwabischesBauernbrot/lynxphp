@@ -39,11 +39,11 @@ function refreshCallback(error, html) {
   divElem.innerHTML = html
 
   var children = Array.from(divElem.children)
-  //console.log('children', children)
+  //console.debug('children', children)
   var posts = []
   for(var i in children) {
     const child = children[i]
-    //console.log('checking child', child, 'id', child.dataset.postId)
+    //console.debug('checking child', child, 'id', child.dataset.postId)
     if (child.dataset.postId) {
       // we get html back, so not much data
 
@@ -57,16 +57,17 @@ function refreshCallback(error, html) {
       // filters.js - hover
       // forms.js - hover and postId
       // threadstat.js - json [files, userId]
-      //console.log('pushing', child.dataset.postId)
+      console.log('base/thread/view/refresh_thread.js - pushing', child.dataset.postId)
+      //console.log('base/thread/view/refresh_thread.js - pushing', child.dataset)
       posts.push({
         post: child,
         postId: child.dataset.postId,
         json: {
+          board: child.dataset.board, // needs board for yous system
           name: child.dataset.name,
           subject: child.dataset.subject,
           quotes: [],
           backlinks: [],
-          board: '',
           files: [],
         },
         hover: false
@@ -141,7 +142,6 @@ function refreshCallback(error, html) {
     updateEmbedElements()
   }
   */
-
   return {
     foundNewReplies: foundPosts,
     posts: posts,
