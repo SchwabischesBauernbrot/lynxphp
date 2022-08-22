@@ -55,14 +55,18 @@ if (yousEnabled) {
 }
 
 const handleNewYous = (e) => {
+  //console.debug('e.detail', e.detail)
+  //console.debug('e.detail.json', e.detail.json)
   const postYou = `${e.detail.json.board}-${e.detail.postId}`;
   // is this event actually our post
   const isYou = window.myPostId == e.detail.postId
   if (isYou) {
     //save you
+    //console.debug('savedYous', savedYous, 'postYou', postYou)
     savedYous.add(postYou);
     const arrayYous = [...savedYous];
-    yousList.value = arrayYous.toString();
+    //console.debug('savings', arrayYous)
+    //yousList.value = arrayYous.toString();
     setLocalStorage('yous', JSON.stringify(arrayYous));
   }
   if (savedYous.has(postYou)) {
