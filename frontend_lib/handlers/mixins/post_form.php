@@ -18,6 +18,7 @@ function renderPostFormHTML($boardUri, $options = false) {
     'values'    => array(),
     'formId'    => 'postform',
     'maxMessageLength' => false,
+    'pipelineOptions' => false,
   ), $options));
 
 
@@ -48,7 +49,7 @@ function renderPostFormHTML($boardUri, $options = false) {
   $formfields = array(
     'thread'   => array('type' => 'hidden'),
     //''         => array('type' => 'title', 'label' => 'New ' . $type, 'wrapClass' => 'jsonly', 'labelClass'=> 'noselect', 'wrapId' => 'dragHandle'),
-    'name'     => array('type' => 'text',          'label' => 'Name', 'maxlength' => 100),
+    'name'     => array('type' => 'text',          'label' => 'Name', 'maxlength' => 100, 'autocomplete' => 'off'),
     'email'    => array('type' => 'text',          'label' => 'Email',
       'maxlength' => 255, 'autocomplete' => 'off'),
     'sage'     => array('type' => 'checkbox',      'label' => 'Sage'),
@@ -58,14 +59,17 @@ function renderPostFormHTML($boardUri, $options = false) {
       // array based label?
     'message'  => array('type' => 'textarea',      'label' => 'Message',
       'postlabel' => '<span class="messageCounter"></span>', 'autocomplete' => 'off'),
-    'files'    => array('type' => 'multidropfile', 'label' => 'Files',
+    'files'    => array('type' => 'multidropfile', 'label' => 'Files', 'uniqueId' => true,
       'postlabel' => 'Max ' . $maxfiles . ' files</small><small>' . formatBytes($maxfilesize) . ' total'),
   );
   if ($maxMessageLength) {
     $formfields['message']['maxLength'] = $maxMessageLength;
   }
   if (!isLoggedIn()) {
-    $formfields['postpassword'] = array('type' => 'password',      'label' => 'Passwords', 'maxlength' => 50);
+    $formfields['postpassword'] = array(
+      'type' => 'password', 'label' => 'Passwords', 'maxlength' => 50, 'autocomplete' => 'new-password',
+      'placeholder' => 'Password to delete/spoiler/unlink later',
+    );
   }
 
   $postFormHTML = '<div class="noselect" id="dragHandle">New ' . $type . '</div>';
@@ -88,7 +92,9 @@ function renderPostFormHTML($boardUri, $options = false) {
     'boardUri'   => $boardUri,
     'type'       => $type,
     'formfields' => $formfields,
+    'pipelineOptions' => $pipelineOptions,
   );
+  // CAPTCHA probably hooks in here somewhere
   $pipelines[PIPELINE_POST_FORM_FIELDS]->execute($io);
   $formfields = $io['formfields']; // map ouptut
   $pipelines[PIPELINE_POST_FORM_OPTIONS]->execute($formOptions);
@@ -119,6 +125,7 @@ function renderPostForm($boardUri, $url, $options = false) {
   //echo "type[$type]<br>\n";
 
   $templates = loadTemplates('mixins/post_form');
+
   $tags = array(
     'form'   => renderPostFormHTML($boardUri, $options),
     'type'   => $type,
