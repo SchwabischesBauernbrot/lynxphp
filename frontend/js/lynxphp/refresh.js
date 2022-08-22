@@ -4,6 +4,7 @@ var autoRefresh = false
 var unreadPosts = 0
 var originalTitle = document.title
 
+// manual affects the timer
 function refreshPosts(manual) {
 
   // prevent more clicks...
@@ -15,6 +16,11 @@ function refreshPosts(manual) {
   // we have to ask the backend, is there anything new...
   const loc = whereAmI()
   let statusCode = false
+  if (typeof(getRefreshUrl) === 'undefined') {
+    console.error('no getRefreshUrl defined, just doing a full page reload for now')
+    window.location.reload()
+    return
+  }
   fetch(getRefreshUrl(loc)).then(res => { statusCode = res.status; return res.text() } ).then(html => {
     //console.log('refreshPosts - status', statusCode)
     var result
@@ -24,20 +30,25 @@ function refreshPosts(manual) {
       result = { foundNewReplies: false }
     } else {
       result = refreshCallback(null, html)
-
+      //console.log('refresh.js - result', result)
       if (result.foundNewReplies) {
-        console.log('new replies', result.posts.length)
+        //console.log('new replies', result.posts.length)
         for(var i in result.posts) {
+          //var post = JSON.parse(JSON.stringify(result.posts[i]))
           var post = result.posts[i]
-          //console.log('firing event')
-          const newPostEvent = new CustomEvent('addPost', {
-             detail: post
-          })
-          //dispatch the event so quote click handlers, image expand, etc can be added in separate scripts by listening to the event
-          setTimeout(() => {
-            //console.log('dispatching event')
-            window.dispatchEvent(newPostEvent)
-          }, 50);
+          function scope(post) {
+            //console.log('post', post, 'loc', loc)
+            //console.log('firing event')
+            const newPostEvent = new CustomEvent('addPost', {
+               detail: post
+            })
+            //dispatch the event so quote click handlers, image expand, etc can be added in separate scripts by listening to the event
+            setTimeout(() => {
+              //console.log('dispatching event')
+              window.dispatchEvent(newPostEvent)
+            }, 50);
+          }
+          scope(post)
         }
       //} else {
         //console.log('result foundNewReplies is falsish', result)
@@ -127,6 +138,11 @@ function changeRefresh(dontSave) {
   */
 }
 
+function manual_refresh() {
+  stopTimer()
+  refreshPosts(true)
+}
+
 if (!DISABLE_JS) {
   // wire up checkbox
   var autoCheckbox = document.getElementById('autoRefreshEnable')
@@ -146,8 +162,7 @@ if (!DISABLE_JS) {
     updateButton.onclick = function() {
       // make sure we can make it do something
       if (typeof(refreshCallback) !== 'undefined') {
-        stopTimer()
-        refreshPosts(true)
+        manual_refresh()
         return false
       }
     }
@@ -165,7 +180,7 @@ if (!DISABLE_JS) {
     if (rect.bottom < window.innerHeight) {
       // refresh post would set this...
       unreadPosts = 0
-      console.log('refresh - restorigin original title')
+      console.log('refresh - restoring original title')
       document.title = originalTitle
     }
 
