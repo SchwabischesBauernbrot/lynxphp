@@ -6,6 +6,52 @@
 
 // 304 just decreases bandwidth (for slow link/cost)
 
+// returns if we outputed or false if 304
+function sendJson($arr, $options = false) {
+  // unpack options
+  extract(ensureOptions(array(
+    //'contentType' => 'application/json',
+    'code' => 200,
+    //'mtime'  => 0, // 0 is don't set
+    //'fileSize' => 0,
+    //'etag' => false,
+  ), $options));
+  if ($code !== 200) http_response_code($code);
+
+  // 304 should check should have already happened...
+  /*
+  // just a last stop, to prevent just in case we already have this
+  if (checkCacheHeaders($mtime, array(
+    'contentType' => $contentType,
+    'fileSize' => $fileSize,
+    'etag' => $etag,
+  ))) {
+    return false;
+  }
+  */
+
+  // make sure we describe this resource
+  // set should already be set tbh
+  /*
+  _doHeader($mtime, array(
+    'contentType' => $contentType,
+    'fileSize' => $fileSize,
+    'etag' => $etag,
+  ));
+  */
+
+  if (getQueryField('prettyPrint')) {
+    // we need the HTML for the htmlspecialchars
+    // and we need that to stop executing user generate js
+    //header('Content-Type: text/html'); // should be the default
+    echo '<pre>', htmlspecialchars(json_encode($arr, JSON_PRETTY_PRINT)), "</pre>\n";
+  } else {
+    header('Content-Type: application/json');
+    echo json_encode($arr);
+  }
+  return true;
+}
+
 // FIXME: rename make public
 // FIXME: change prototype
 // mtime === 0 => doesn't set lastmod
