@@ -101,6 +101,31 @@ require '../frontend_lib/handlers/mixins/tabs.php'; // maybe more of a lib...
 
 registerPackages();
 
+// seems smarter to make a pipeline for board header
+// and inject the css there
+// thought site_head* would be even better...
+
+// yea you could just inject to PIPELINE_SITE_HEAD_STYLES
+// directly yourselves, since you're in the frontend
+// but you don't want to inject on all pages
+// so when do you inject?
+// well the page handler should have it's own pipeline, that's the ideal place
+// maybe something like PIPELINE_BOARD_DETAILS_TMPL
+
+// add this module/fe/data style to this pipeline on the current page load
+function css_add_style($pkg, $sheet, $options = false) {
+  extract(ensureOptions(array(
+    'orderConstraints' => false,
+  ), $options));
+
+  $bsn = new pipeline_module(PIPELINE_SITE_END_SCRIPTS . '_' . $pkg->name . '_' . $sheet);
+  $bsn->attach(PIPELINE_SITE_END_SCRIPTS,
+    function(&$io, $options = false) use ($pkg, $sheet) {
+      $io['styles'][] = array('module' => $pkg->name, 'sheet' => $sheet);
+  });
+}
+
+// add this module/fe/data script to this pipeline on the current page load
 function js_add_script($pkg, $script, $options = false) {
   extract(ensureOptions(array(
     'orderConstraints' => false,
