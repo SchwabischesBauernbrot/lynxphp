@@ -28,7 +28,9 @@ function listBoards($options = false) {
 
   $qOptions = array();
   $filterPublic = false;
+  // check for options
   if ($options !== false && is_array($options)) {
+    // now handle each option
     if (!empty($options['search'])) {
       $qOptions['criteria'] = array(
         '(',
@@ -64,6 +66,7 @@ function listBoards($options = false) {
     }
     boardDBtoAPI($row);
     if ($json) {
+      // handle notpublic
       if (empty($json['settings']['notpublic'])) {
         $boards[] = $row;
       }
@@ -106,17 +109,17 @@ function getBoardRaw($boardUri) {
 
 function boardRowFilter(&$row, $json = false, $options = false) {
   boardDBtoAPI($row);
-  if ($json) {
-    if (isset($options['jsonFields'])) {
-      if (!is_array($options['jsonFields'])) $options['jsonFields'] = array($options['jsonFields']);
-      foreach($options['jsonFields'] as $field) {
-        if (isset($json[$field])) {
-          $row[$field] = $json[$field];
-        } else {
-          // most are arrays
-          $row[$field] = array();
-        }
-      }
+  if (!$json) return;
+  // json passed in
+
+  // handle all options
+  if (isset($options['jsonFields'])) {
+    // upgrade string to array
+    if (!is_array($options['jsonFields'])) $options['jsonFields'] = array($options['jsonFields']);
+    // copy in options if they're set
+    foreach($options['jsonFields'] as $field) {
+      // most values are arrays, so we'll use that as a default
+      $row[$field] = isset($json[$field]) ? $json[$field] : array();
     }
   }
 }
