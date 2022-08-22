@@ -1,5 +1,8 @@
 <?php
 
+// filter_fields - which keys in _FILES to process, if false then all
+// FIXME: we should not output at all
+// option to not upload?
 function processFiles($filter_fields = false) {
   $fields = $filter_fields;
   if ($fields === false) {
@@ -23,8 +26,8 @@ function processFiles($filter_fields = false) {
     );
     //print_r($_FILES);
     foreach($fields as $field) {
-      // each field could have multiple file support...
       $files[$field] = array();
+      // each field could have multiple file support...
       if (is_array($_FILES[$field]['tmp_name'])) {
         foreach($_FILES[$field]['tmp_name'] as $i=>$path) {
           if (!$path) {
@@ -39,6 +42,7 @@ function processFiles($filter_fields = false) {
             }
             continue;
           }
+          // lib.backend, so must upload the file to the BE
           $res = sendFile($path, $_FILES[$field]['type'][$i], $_FILES[$field]['name'][$i]);
           // check for error
           if (empty($res['data']['hash'])) {
@@ -70,6 +74,7 @@ function processFiles($filter_fields = false) {
       }
     }
   }
+  // input errors vs upload errors?
   return array(
     'errors' => array(),
     'handles' => $files,
