@@ -63,8 +63,8 @@ function renderPost($boardUri, $p, $options = false) {
 
   if ($boardSettings === false) {
     if (DEV_MODE) {
-      //echo "No boardSettings passed to renderPost [", gettrace(), "]<Br>\n";
-      echo "No boardSettings passed to renderPost<Br>\n";
+      echo "No boardSettings passed to renderPost [", gettrace(), "]<Br>\n";
+      //echo "No boardSettings passed to renderPost<Br>\n";
     }
     $boardData = getBoard($boardUri);
     if (isset($boardData['settings'])) {
@@ -322,6 +322,8 @@ function renderPost($boardUri, $p, $options = false) {
   $replies_html = '';
 
   // pass in p and get it back modified
+  // com isn't required if there's a file
+  if (!isset($p['com'])) $p['com'] = ''; // might be safer for pipeline
   $p['safeCom'] = htmlspecialchars($p['com']);
   $p['boardUri'] = $boardUri; // communicate what board we're on
   // we'll we communicate what board this post is on
