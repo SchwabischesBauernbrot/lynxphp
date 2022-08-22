@@ -230,25 +230,122 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
   if ($fullHead) {
     $templates = loadTemplates('head');
 
+    // FIXME: it would be nice to have an accumulator tag
+    // so designers can send us non-positional data (maybe ordered tho)
+
     $mobilecss = '';
+    $styles_io = array(
+      'styles' => array(
+      ),
+    );
     if (checkmobile()) {
-      $mobilecss = '<link rel="stylesheet" href="css/mobile.css">';
+      //$mobilecss = '<link rel="stylesheet" href="css/mobile.css">';
+      $styles_io['styles'][] = 'css/mobile.css';
+    }
+    $pipelines[PIPELINE_SITE_HEAD_STYLES]->execute($styles_io);
+
+    $styles_html = '';
+    foreach($styles_io['styles'] as $p) {
+      if (is_array($p)) {
+        // can add a type/version key later
+        // FIXME: support multiple sheets on one module (an array)
+        // FIXME: generate support to drop the need for php call
+        //        well we could internally decode it and diretly reference
+        //        but this needs to work with the multi-loader
+        // make all the scripts local to webroot
+        $p = 'css.php?module=' .$p['module'] . '&sheets=' . $p['sheet'];
+      }
+      $styles_html .= '<link rel="stylesheet" href="' . $p . '">' . "\n";
     }
 
     global $BASE_HREF;
+    $footer = '';
+    // FIXME:footer pipeline
     $tags = array(
       'backend_url' => BACKEND_PUBLIC_URL,
       'basehref' => $BASE_HREF,
-      'footer' => $mobilecss,
+      'footer' => $footer,
+      'stylesheets' => $styles_html,
     );
     $head_html .= '<head>' . $term;
     $head_html .= replace_tags($templates['header'], $tags) . $term;
   }
 
+  // a script could be
+  // - a relative url
+  // - a file in a module
+  // ordering of the script can be important too
+  // so a single list is preferred
+  // however that doesn't let us group load a module...
+  // so we have scenarios where we want to combine
+  // and others we don't
+  // we'd have to compile it...
+  // well for now, we'll add an option
+  // and deal with it when we have a need for ordering...
+  $script_io = array(
+    'scripts' => array(
+      // lynxphp and jschan both use this
+      'js/url.js',
+      // jschan
+      // and modal before settings.js
+      // i think js/settings.js is expected to be before localStorage
+      //'js/settings.js',
+      // quote requires localstorage
+      'js/localstorage.js',
+      // click to reply
+      'js/jschan/quote.js',
+      // preview quotes on hover
+      'js/jschan/hover.js',
+      // make top form draggable
+      'js/jschan/dragable.js',
+      // post form message character counter
+      // you need to set message limits
+      'js/jschan/counter.js',
+      // expand media
+      'js/jschan/expand.js',
+      // yous
+      'js/jschan/yous.js',
+      // broken because it doesn't handle the output of new posts
+      // queues, refused, success, error...
+      // breaks post actions (can't handle array checkboxes)
+      'js/jschan/forms.js',
+      // upload item template
+      'js/uploaditem.js',
+      // lynxphp
+      'js/lynxphp/embed.js',
+      'js/lynxphp/refresh.js',
+      'js/lynxphp/expander_thread.js',
+      //'js/lynxphp/expander_media.js',
+    ),
+  );
+  // THINK: how do we let JS live in module directories
+  // but be efficently servered by web server?
+  // so that we don't have to fire up php each time
+  // make the static generation engine can copy them
+  // and then we have PHP fallback
+  $pipelines[PIPELINE_SITE_HEAD_SCRIPTS]->execute($script_io);
+  $scripts = $script_io['scripts'];
+
+  // THINK: how to use a pipeline to override this behavior?
+  // maybe fallback if pipeline has no hooks
+  $scripts_html = '';
+  foreach($scripts as $p) {
+    if (is_array($p)) {
+      // can add a type/version key later
+      // FIXME: support multiple scripts on one module
+      // FIXME: generate support to drop the need for php call
+      // make all the scripts local to webroot
+      $p = 'js.php?module=' .$p['module'] . '&scripts=' . $p['script'];
+    }
+    // integrity, nomodule=false,type
+    // async allows them to run out of order...
+    $scripts_html .= '<script src="' . $p . '" defer></script>' . "\n";
+  }
+
   $head_html .= $io['head_html'] . "\n" . '<script>
     const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
     const DISABLE_JS = false
-  </script>' . "\n";
+  </script>' . "\n" . $scripts_html;
 
   if (!empty($row['canonical'])) {
     $head_html .= '<link rel="canonical" href="' . $row['canonical'] . '" />';
@@ -409,50 +506,8 @@ function wrapContentFooter($row) {
   $doWork = $row['doWork'];
   $closeHeader = $row['closeHeader'];
 
-  // a script could be
-  // - a relative url
-  // - a file in a module
-  // ordering of the script can be important too
-  // so a single list is preferred
-  // however that doesn't let us group load a module...
-  // so we have scenarios where we want to combine
-  // and others we don't
-  // we'd have to compile it...
-  // well for now, we'll add an option
-  // and deal with it when we have a need for ordering...
-  $io = array(
-    'scripts' => array(
-      // lynxphp and jschan both use this
-      'js/url.js',
-      // jschan
-      // quote requires localstorage
-      'js/localstorage.js',
-      // click to reply
-      'js/jschan/quote.js',
-      // preview quotes on hover
-      'js/jschan/hover.js',
-      // make top form draggable
-      'js/jschan/dragable.js',
-      // post form message character counter
-      // you need to set message limits
-      'js/jschan/counter.js',
-      // expand media
-      'js/jschan/expand.js',
-      // yous
-      'js/jschan/yous.js',
-      // broken because it doesn't handle the output of new posts
-      // queues, refused, success, error...
-      // breaks post actions (can't handle array checkboxes)
-      'js/jschan/forms.js',
-      // upload item template
-      'js/uploaditem.js',
-      // lynxphp
-      'js/lynxphp/embed.js',
-      'js/lynxphp/refresh.js',
-      'js/lynxphp/expander_thread.js',
-      //'js/lynxphp/expander_media.js',
-    ),
-  );
+
+  $io = array('scripts' => array());
   // THINK: how do we let JS live in module directories
   // but be efficently servered by web server?
   // so that we don't have to fire up php each time
@@ -555,12 +610,12 @@ function wrapContentFooter($row) {
     // sandbox="allow-same-origin"
     if (DEV_MODE) {
       $start = microtime(true);
-      echo '<iframe width=99% onload="this.style.height = (this.contentWindow.document.body.scrollHeight)+\'px\'" src="' . $workUrl . '"></iframe>', "\n";
+      echo '<noscript><iframe width=99% onload="this.style.height = (this.contentWindow.document.body.scrollHeight)+\'px\'" src="' . $workUrl . '"></iframe></noscript>', "\n";
       //global $packages;
       // add 200ms to script time
       //$result = $packages['base']->useResource('work', false, array('inWrapContent' => true));
     } else {
-      echo '<iframe style="display: none" src="' . $workUrl . '"></iframe>', "\n";
+      echo '<noscript><iframe style="display: none" src="' . $workUrl . '"></iframe></noscript>', "\n";
       $result = '';
     }
     // expirations happen here...
