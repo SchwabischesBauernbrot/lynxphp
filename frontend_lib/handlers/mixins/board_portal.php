@@ -1,5 +1,24 @@
 <?php
 
+// separate so overboard can inject multiple times
+function generateJsBoardInfo($boardUri, $boardSettings, $options = false) {
+  extract(ensureOptions(array(
+    'first' => true,
+  ), $options));
+  $json = json_encode($boardSettings);
+  $firstJs = $first ? 'boardData = {}' : 'if (typeof(boardData) === \'undefined\') boardData = {}';
+  // header/footer can be stripped here
+  // could be passed as data-attributes too
+  // not sure this should be embedded
+  // since it's JS only maybe an ajax call?
+  return <<< EOB
+<script>
+$firstJs
+boardData.$boardUri = $json
+</script>
+EOB;
+}
+
 // refactored out so we can share data between header/footer
 // without having to recalculate it
 function renderBoardPortalData($boardUri, $pageCount, $options = false) {
@@ -122,7 +141,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
 
   $p = array(
     'tags' => array(
-      'board_header_top' => '',
+      'board_header_top' => generateJsBoardInfo($boardUri, $boardSettings),
       'board_header_bottom' => '',
     ),
     'boardUri' => $boardUri,
