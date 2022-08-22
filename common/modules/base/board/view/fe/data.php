@@ -24,6 +24,9 @@ $fePkgs = array(
       ),
       */
     ),
+    'css' => array(
+      array('file' => 'board_banner.css')
+    ),
     'js' => array(
       array('file' => 'refresh_boardpage.js')
     ),
