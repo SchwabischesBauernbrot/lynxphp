@@ -178,6 +178,7 @@ $frontendRouterData = array(
           ),
         ),
       ),
+      /*
       'view' => array(
         'route'  => '/:uri/',
         'func'   => 'getBoardThreadListingHandler',
@@ -225,6 +226,7 @@ $frontendRouterData = array(
           ),
         ),
       ),
+      */
       /*
       'thread' => array(
         'route'  => '/:uri/thread/:num.html',
