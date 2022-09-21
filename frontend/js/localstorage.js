@@ -1,4 +1,5 @@
 const isCatalog = window.location.pathname.endsWith('catalog');
+// these shouldn't be calculated or embedded
 const isThread = /\/\w+\/thread\/\d+.html/.test(window.location.pathname);
 const isModView = /\/\w+\/manage\/(thread\/)?(index|\d+).html/.test(window.location.pathname);
 const isManage = /\/(\w+\/manage|globalmanage)\/(recent|reports|bans|boards|logs|settings|banners|accounts|news).html/.test(window.location.pathname);
@@ -35,24 +36,31 @@ function setDefaultLocalStorage(key, value) {
   }
 }
 
-//todo: just make the localstorage name match the names of settings and put a loop
-setDefaultLocalStorage('volume', settings.defaultVolume);
-setDefaultLocalStorage('loop', settings.loop);
-setDefaultLocalStorage('imageloadingbars', settings.imageLoadingBars);
-setDefaultLocalStorage('live', settings.live);
-setDefaultLocalStorage('scroll', settings.sctollToPosts);
-setDefaultLocalStorage('localtime', settings.localTime);
-setDefaultLocalStorage('relative', settings.relativeTime);
-setDefaultLocalStorage('24hour', settings.hour24Time);
-setDefaultLocalStorage('notifications', settings.notificationsEnabled);
-setDefaultLocalStorage('notification-yous-only', settings.notificationsYousOnly);
-setDefaultLocalStorage('yous-setting', settings.showYous);
+window.addEventListener('DOMContentLoaded', (event) => {
+  //todo: just make the localstorage name match the names of settings and put a loop
+  const settings = document.getElementById('settings');
+  if (settings) { //can be false if we are in minimal view
+    setDefaultLocalStorage('volume', settings.defaultVolume);
+    setDefaultLocalStorage('loop', settings.loop);
+    setDefaultLocalStorage('imageloadingbars', settings.imageLoadingBars);
+    setDefaultLocalStorage('live', settings.live);
+    setDefaultLocalStorage('scroll', settings.sctollToPosts);
+    setDefaultLocalStorage('localtime', settings.localTime);
+    setDefaultLocalStorage('relative', settings.relativeTime);
+    setDefaultLocalStorage('24hour', settings.hour24Time);
+    setDefaultLocalStorage('notifications', settings.notificationsEnabled);
+    setDefaultLocalStorage('notification-yous-only', settings.notificationsYousOnly);
+    setDefaultLocalStorage('yous-setting', settings.showYous);
+  } else {
+    console.warn('#settings not found')
+  }
 
-setDefaultLocalStorage('dragtop', null);
-setDefaultLocalStorage('dragleft', null);
-setDefaultLocalStorage('filters1', '[]');
-setDefaultLocalStorage('yous', '[]');
-setDefaultLocalStorage('name', '');
-setDefaultLocalStorage('theme', 'default');
-setDefaultLocalStorage('codetheme', 'default');
-setDefaultLocalStorage('customcss', '');
+  setDefaultLocalStorage('dragtop', null);
+  setDefaultLocalStorage('dragleft', null);
+  setDefaultLocalStorage('filters1', '[]');
+  setDefaultLocalStorage('yous', '[]');
+  setDefaultLocalStorage('name', '');
+  setDefaultLocalStorage('theme', 'default');
+  setDefaultLocalStorage('codetheme', 'default');
+  setDefaultLocalStorage('customcss', '');
+})
