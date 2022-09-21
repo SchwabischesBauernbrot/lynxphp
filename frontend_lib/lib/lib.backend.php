@@ -158,7 +158,7 @@ function consume_beRsrc($options, $params = '') {
         if ($ts <= $check['ts']) {
           // this breaks /user/settings/theme.php
           // key: http://localhost/backend/opt/settings@1658889353
-	  /*
+          /*
           if (DEV_MODE) {
             echo "Using scratch cache [$key@", $check['ts'], "] vs live[$ts]<br>\n";
           }
@@ -366,27 +366,6 @@ function addPortalsToUrl($q, $url) {
   // isn't the end of the world but meh...
   // if (!empty($options['sendIP'])) $headers['HTTP_X_FORWARDED_FOR'] = getip();
   return $url . '?portals=' . join(',', $q['portals']);
-}
-
-function backendGetBoardThreadListing($q, $boardUri, $pageNum = 1) {
-  $options = array(
-    'endpoint'    => 'opt/boards/' . $boardUri . '/' . $pageNum,
-    'querystring' => array('portals' => getPortalsToUrl($q)),
-    'expectJson'  => true,
-    'sendSession' => true, // expectJson sends this
-    'cacheSettings' => true, // mark cacheable
-  );
-  // cacheable
-  $threadListing = consume_beRsrc($options);
-  //echo "<pre>lib.backend::backendGetBoardThreadListing -  ", print_r($threadListing, 1), "</pre>\n";
-  //$threadListing = getExpectJson(addPortalsToUrl($q, 'opt/boards/' . $boardUri . '/' . $pageNum));
-  //echo "type[", gettype($threadListing), "][$threadListing]\n";
-  if (!$threadListing) return;
-  if (isset($threadListing['data']['board']['settings'])) {
-    global $board_settings;
-    $board_settings = $threadListing['data']['board']['settings'];
-  }
-  return $threadListing['data'];
 }
 
 // calls that eventually call getboardportal needs a optional flag
