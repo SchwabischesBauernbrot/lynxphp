@@ -83,17 +83,41 @@ function consume_beRsrc($options, $params = '') {
   $saveCache = false;
   $etag = '';
   $ts = 0;
+  $key = '';
+  $check = array(
+    'ts' => '',
+    'etag' => '',
+  );
   // not sure this check makes much sense
-  if (isset($options['cacheSettings'])) {
+  // well options is special because it's a module resource
+  // the one case the FE gets route info from the BE
+  // but not useable because of the bridge
+  // if etag is present, use that to save bandwidth
+  // the bridge's caches will fill up tho, caching everyload
+  // luckily it's keyed, so only one key stored at a time
+  // key per page per session though
+  // so we need an expiration system...
+
+  // not it's just localhost to the bridge
+  // a reduction in bandwidth doesn't help much
+  // and the extra HEAD request on a miss has a cost 9-477ms
+
+  //if (isset($options['cacheSettings'])) {
     // likely cacheable
     // we have the endpoint and params...
 
     // GET vs POST
     // get can be the URL
     // POST, well... should these be cache?
-    if (empty($options['method'])) {
+
+    if (empty($options['method']) && empty($options['dontCache'])) {
       // what's our caching key?
       $key = BACKEND_BASE_URL . $options['endpoint'] . $querystring;
+      // uhm this defeats passing SID to backend
+      if (!empty($headers['sid'])) {
+        // maybe it should be prefixed...
+        $key .= '_' . $headers['sid'];
+      }
       // should we check our cache first?
       global $scratch;
       $check = $scratch->get('consume_beRsrc_' . $key);
@@ -122,13 +146,27 @@ function consume_beRsrc($options, $params = '') {
           $headHeaders['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
           $headHeaders['consume-ts'] = $check['ts'];
         }
-        $result = request(array(
+        // etag can also be used with POST to make sure another user didn't edit
+        if (!empty($check['etag'])) {
+          $headHeaders['If-None-Match'] = $check['etag'];
+        }
+        $requestOptions = array(
           //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
           'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
           //
           'headers' => $headHeaders,
           'method' => 'HEAD',
-        ));
+        );
+        if (DEV_MODE) {
+          $requestOptions['devData'] = array(
+            'resourceCacheSettings' => empty($options['cacheSettings']) ? 'none' : $options['cacheSettings'],
+            'key' => $key,
+            'cacheTs' => empty($check['ts']) ? '' : $check['ts'],
+            'cacheEtag' => empty($check['etag']) ? '' : $check['etag'],
+          );
+        }
+
+        $result = request($requestOptions);
         $headRes = parseHeaders($result);
       }
       // unmarshall headRes
@@ -145,12 +183,17 @@ function consume_beRsrc($options, $params = '') {
       }
       //echo "etag[$etag] ts[$ts] save[$saveCache]<br>\n";
 
+      // if $check is valid, return it's data
       if ($etag && !empty($check['etag'])) {
+        /*
         if (DEV_MODE) {
           echo "compare [$etag]vs[", $check['etag'], "]<br>\n";
         }
+        */
         // if valid
-        // return $check['res'];
+        if ($etag === $check['etag']) {
+          return postProcessJson($check['res'], $options);
+        }
       }
       if ($ts && !empty($check['ts'])) {
         //echo "compare SERVER[$ts] vs CACHE[", $check['ts'], "]<br>\n";
@@ -169,18 +212,30 @@ function consume_beRsrc($options, $params = '') {
         // if newer, refresh it
       }
 
-      // if $check is valid, return it's data
-    }
+    //}
   }
 
 
   // post login/IP
-  $responseText = request(array(
+  $requestOptions = array(
     'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
     'method' => empty($options['method']) ? 'AUTO' : $options['method'],
     'headers' => $headers,
     'body' => $postData,
-  ));
+  );
+  if (DEV_MODE) {
+    $requestOptions['devData'] = array(
+      'resourceCacheSettings' => empty($options['cacheSettings']) ? 'none' : $options['cacheSettings'],
+      'key' => $key,
+      'cacheTs' => empty($check['ts']) ? '' : $check['ts'],
+      'cacheEtag' => empty($check['etag']) ? '' : $check['etag'],
+      'serverTs' => $ts,
+      'serverEtag' => $etag,
+      'headCache' => empty($_HEAD_CACHE[$options['endpoint'] . $querystring]) ? '' : $_HEAD_CACHE[$options['endpoint'] . $querystring],
+      'saveCache' => $saveCache,
+    );
+  }
+  $responseText = request($requestOptions);
   //echo "<pre>respHeader[", print_r($respHeaders, 1), "]</pre>\n";
 
   //$responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
