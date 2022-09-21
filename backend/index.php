@@ -108,6 +108,7 @@ function buildRouters($routeConfig) {
 $routers = buildRouters($routeConfig);
 
 include 'lib/lib.board.php';
+include 'lib/lib.ffmpeg.php';
 include 'lib/middlewares.php';
 include 'interfaces/boards.php';
 include 'interfaces/posts.php';
