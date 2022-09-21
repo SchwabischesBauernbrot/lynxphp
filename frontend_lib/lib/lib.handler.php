@@ -316,6 +316,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       'js/lynxphp/refresh.js',
       'js/lynxphp/expander_thread.js',
       //'js/lynxphp/expander_media.js',
+      'js/lynxphp/work.js',
     ),
   );
   // THINK: how do we let JS live in module directories
