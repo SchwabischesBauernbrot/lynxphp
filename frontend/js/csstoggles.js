@@ -6,39 +6,39 @@ const renderSheet = renderCSSLink.sheet;
 const rulesKey = renderSheet.rules ? 'rules' : 'cssRules';
 
 class CssToggle {
-	constructor (settingId, localStorageKey, localStorageDefault, settingCss) {
-		this.localStorageKey = localStorageKey;
-		this.localStorageDefault = localStorageDefault;
-		setDefaultLocalStorage(this.localStorageKey, this.localStorageDefault);
-		this.settingBoolean = localStorage.getItem(this.localStorageKey) == 'true';
-		this.settingCss = settingCss;
-		window.addEventListener('settingsReady', () => {
-			//on event fire, set boolean to correct checked stats
-			this.setting = document.getElementById(settingId);
-			this.setting.checked = this.settingBoolean;
-			this.setting.addEventListener('change', () => {
-				this.toggle();
-			}, false);
-		});
-		this.apply();
-	}
-	toggle () {
-		this.settingBoolean = !this.settingBoolean;
-		console.log('toggling', this.localStorageKey, this.settingBoolean);
-		this.apply();
-		setLocalStorage(this.localStorageKey, this.settingBoolean);
-	}
-	apply () {
-		if (this.settingBoolean) {
-			renderSheet.insertRule(this.settingCss);
-		} else {
-			for (let i = 0; i < renderSheet[rulesKey].length; i++) {
-				if (renderSheet[rulesKey][i].selectorText == this.settingCss.split(' {')[0]) {
-					renderSheet.deleteRule(i);
-				}
-			}
-		}
-	}
+  constructor (settingId, localStorageKey, localStorageDefault, settingCss) {
+    this.localStorageKey = localStorageKey;
+    this.localStorageDefault = localStorageDefault;
+    setDefaultLocalStorage(this.localStorageKey, this.localStorageDefault);
+    this.settingBoolean = localStorage.getItem(this.localStorageKey) == 'true';
+    this.settingCss = settingCss;
+    window.addEventListener('settingsReady', () => {
+      //on event fire, set boolean to correct checked stats
+      this.setting = document.getElementById(settingId);
+      this.setting.checked = this.settingBoolean;
+      this.setting.addEventListener('change', () => {
+        this.toggle();
+      }, false);
+    });
+    this.apply();
+  }
+  toggle () {
+    this.settingBoolean = !this.settingBoolean;
+    console.log('toggling', this.localStorageKey, this.settingBoolean);
+    this.apply();
+    setLocalStorage(this.localStorageKey, this.settingBoolean);
+  }
+  apply () {
+    if (this.settingBoolean) {
+      renderSheet.insertRule(this.settingCss);
+    } else {
+      for (let i = 0; i < renderSheet[rulesKey].length; i++) {
+        if (renderSheet[rulesKey][i].selectorText == this.settingCss.split(' {')[0]) {
+          renderSheet.deleteRule(i);
+        }
+      }
+    }
+  }
 };
 
 //define the css
