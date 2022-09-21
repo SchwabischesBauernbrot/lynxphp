@@ -138,18 +138,24 @@ class package {
         //echo "<pre>params[", print_r($rsrc['params'], 1), "]</pre>\n";
         if (!isset($rsrc['params']['querystring'])) $rsrc['params']['querystring'] = array();
         if (!isset($rsrc['params']['formData']))    $rsrc['params']['formData'] = array();
+        if (!isset($rsrc['params']['params']))      $rsrc['params']['params'] = array();
         if (!is_array($rsrc['params']['querystring'])) $rsrc['params']['querystring'] = array($rsrc['params']['querystring']);
         if (!is_array($rsrc['params']['formData']))    $rsrc['params']['formData'] = array($rsrc['params']['formData']);
+        if (!is_array($rsrc['params']['params']))      $rsrc['params']['params'] = array($rsrc['params']['params']);
         $qs = array_flip($rsrc['params']['querystring']);
         $fd = array_flip($rsrc['params']['formData']);
+        $ps = array_flip($rsrc['params']['params']);
         //echo "<pre>[", print_r($qs, 1), "]</pre>\n";
         //echo "<pre>[", print_r($fd, 1), "]</pre>\n";
         // FIXME: what if we call this multiple times?
         foreach($params as $k => $v) {
+          //echo "[$k=$v]<br>\n";
           if (isset($qs[$k])) {
-            $rsrc['querystring'][] = $k . '=' . urlencode($v);
+            $rsrc['querystring'][$k] = urlencode($v);
           } else if (isset($fd[$k])) {
             $rsrc['formData'][$k] = $v;
+          } else if (isset($ps[$k])) {
+            // don't warn
           } else {
             echo "lib.package:::package::useResource($label) - Don't know what to do with $k in $label<br>\n";
           }
@@ -219,7 +225,7 @@ class package {
       }
     }
     //echo "<pre>lib.package:::package::useResource - cookie: ", print_r($_COOKIE, 1), "</pre>\n";
-    //echo "<pre>lib.package:::package::useResource - out: ", print_r($rsrc, 1), "</pre>\n";
+    //echo "<pre>lib.package:::package::useResource - out: ", print_r($rsrc, 1), "</pre>\n", gettrace();
 
     // make the call
     $result = consume_beRsrc($rsrc, $params);
@@ -533,6 +539,7 @@ class frontend_package {
           $options = array(
             'cacheSettings' => empty($h['cacheSettings']) ? false : $h['cacheSettings'],
             'loggedIn' => empty($h['loggedIn']) ? false : $h['loggedIn'],
+            'portals' => empty($h['portals']) ? false : $h['portals'],
           );
           //echo $m, '_', $h['route'], ' ', print_r($options, 1), "\n";
           // file maybe more descriptive and consistent than handler
@@ -581,7 +588,7 @@ class frontend_package {
     if (!isset($this->handlers[$method])) {
       $this->handlers[$method] = array();
     }
-    //echo "[$method][$cond]=>opts[", print_r($options, 1), "]\n";
+    //echo "<pre>[$method][$cond]=>opts[", print_r($options, 1), "]</pre>\n";
     $this->handlers[$method][$cond] = array(
       'file' => $file,
       'options' => $options,
@@ -724,6 +731,12 @@ class frontend_package {
           if (isset($ref->shared)) {
             $shared = $ref->shared;
           }
+
+          // upload portals into $request if set in options
+          if (!empty($row['options']['portals'])) {
+            $request['portals'] = $row['options']['portals'];
+          }
+
           // lastMod function?
           // well just deep memiozation could work...
           // middlewares, wrapContent => sendResponse
