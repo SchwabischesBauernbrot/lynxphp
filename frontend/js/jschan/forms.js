@@ -338,15 +338,20 @@ class formHandler {
       // we can map if there's only one file field
       // what do we do if there's more than one?
       //console.log('form', this.form.elements)
+      //console.log('postData', postData)
 
+      // we don't want to add it twice...
       //this.fileInput && (this.fileInput.disabled = false); // enable it
+      /*
       if (this.files && this.files.length > 0) {
         //console.log('fileInput', this.fileInput, this.fileInput.name)
         //add files to file input element
         for (let i = 0; i < this.files.length; i++) {
+          console.log(i, 'adding', this.fileInput.name)
           postData.append(this.fileInput.name, this.files[i]);
         }
       }
+      */
       this.setFormLock(true) // relock hopefully now it's build
     } else {
       var data = Object.keys(this.form.elements).reduce((obj, field) => { if (isNaN(field)) obj[field] = this.form.elements[field].value; return obj; }, {});
@@ -364,6 +369,7 @@ class formHandler {
       if (captchaResponse) {
         postData.set('captcha', captchaResponse);
       }
+      //console.log('postData', postData)
     }
     if (this.inCaptcha === 2) {
       // we had a valid CAPTCHA solved
@@ -540,6 +546,10 @@ class formHandler {
             alert(JSON.stringify(json))
             //this.formSubmit(e)
           } else {
+            // call it at least once per file tbh
+            for(var i = 0; i < this.files.length; i++) {
+              doWork() // generate thumb
+            }
 //for bans, post form to show TODO: make modal support bans json and send dynamicresponse from it (but what about appeals, w/ captcha, etc?)
             this.clearFiles(); //dont resubmit files
             this.banned = true;
