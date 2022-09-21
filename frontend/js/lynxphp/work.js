@@ -1,7 +1,7 @@
 
 function doWork() {
   fetch('backend/opt/work').then(res => { statusCode = res.status; return res.text() } ).then(html => {
-    console.log('work', html)
+    //console.debug('work', html)
   })
 }
 
