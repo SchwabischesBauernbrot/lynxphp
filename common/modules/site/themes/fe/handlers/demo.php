@@ -1,5 +1,7 @@
 <?php
 
+include '../common/modules/base/board/view/fe/common.php';
+
 $params = $getHandler();
 
 //echo "<pre>", print_r($params, 1), "</pre>\n";
