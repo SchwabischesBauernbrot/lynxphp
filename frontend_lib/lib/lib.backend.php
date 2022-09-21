@@ -102,6 +102,7 @@ function consume_beRsrc($options, $params = '') {
   // a reduction in bandwidth doesn't help much
   // and the extra HEAD request on a miss has a cost 9-477ms
 
+  // cacheSettings matter because lynx/randomBanner can't HEAD at all
   //if (isset($options['cacheSettings'])) {
     // likely cacheable
     // we have the endpoint and params...
@@ -446,7 +447,7 @@ function getBoardCatalog($boardUri) {
 }
 
 function getBoardThread($boardUri, $threadNum) {
-  $result = getExpectJson('opt/' . $boardUri . '/thread/' . $threadNum . '.json');
+  $result = getExpectJson('opt/' . $boardUri . '/thread/' . $threadNum . '.json?portals=board');
   if ($result === false) {
     // 404
     return $result;
