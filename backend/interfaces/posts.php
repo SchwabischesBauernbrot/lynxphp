@@ -38,6 +38,7 @@ function postDBtoAPI(&$row) {
   $pipelines[PIPELINE_BE_POST_FILTER_DATA_FIELD]->execute($public_fields_io);
   $row['exposedFields'] = $public_fields_io['fields'];
 
+  unset($row['password']); //never send password field...
   unset($row['json']);
   // ensure frontend doesn't have to worry about database differences
   $bools = array('deleted', 'sticky', 'closed');

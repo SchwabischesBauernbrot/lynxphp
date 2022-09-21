@@ -83,6 +83,7 @@ function threadDBtoAPI(&$row, $boardUri) {
   }
 
   unset($row['json']);
+  unset($row['password']); //never send password field...
   // ensure frontend doesn't have to worry about database differences
   $bools = array('deleted', 'sticky', 'closed');
   foreach($bools as $f) {
