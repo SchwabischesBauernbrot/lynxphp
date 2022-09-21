@@ -1,5 +1,7 @@
 <?php
 
+// base/board/view - be module
+
 global $tpp;
 
 $boardUri = $request['params']['uri'];
