@@ -3,6 +3,49 @@
 $fePkgs = array(
   array(
     'handlers' => array(
+      // might be able to combine these into the same handler
+      array(
+        'route'  => '/:uri/page/:page.html',
+        'handler' => 'page',
+        'portals' => array('board'),
+        //'func'   => 'getBoardThreadListingPageHandler',
+        /*
+        'options' => array(
+          'cacheSettings' => array(
+            'files' => array(
+              // theme is also would affect this caching
+              'templates/header.tmpl', // wrapContent
+              'templates/footer.tmpl', // wrapContent
+              'templates/mixins/board_header.tmpl', // board_portal
+              'templates/mixins/board_footer.tmpl', // board_portal
+              'templates/mixins/post_detail.tmpl', // renderPost
+              'templates/mixins/post_actions.tmpl', // renderPostActions
+            ),
+          ),
+        ),
+        */
+      ),
+      array(
+        'route'   => '/:uri/',
+        'handler' => 'view',
+        'portals' => array('board'),
+        //'func'   => 'getBoardThreadListingHandler',
+        /*
+        'options' => array(
+          'cacheSettings' => array(
+            'files' => array(
+              // theme is also would affect this caching
+              'templates/header.tmpl', // wrapContent
+              'templates/footer.tmpl', // wrapContent
+              'templates/mixins/board_header.tmpl', // board_portal
+              'templates/mixins/board_footer.tmpl', // board_portal
+              'templates/mixins/post_detail.tmpl', // renderPost
+              'templates/mixins/post_actions.tmpl', // renderPostActions
+            ),
+          ),
+        ),
+        */
+      ),
       /*
       array(
         'route'   => '/:uri/thread/:num.html',
