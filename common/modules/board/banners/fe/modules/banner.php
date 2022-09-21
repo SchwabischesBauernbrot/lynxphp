@@ -35,7 +35,7 @@ function setHeaderTopHTML(&$io, $banner) {
 
 global $portalData;
 if (isset($portalData['board']['banners'])) {
-  if (count($portalData['board']['banners'])) {
+  if (is_array($portalData['board']['banners']) && count($portalData['board']['banners'])) {
     $banners = $portalData['board']['banners'];
     //print_r($banners);
     $key = array_rand($banners);
@@ -43,6 +43,7 @@ if (isset($portalData['board']['banners'])) {
     //print_r($banner);
     setHeaderTopHTML($io, $banner);
   } else {
+    // was false
     setHeaderTopHTML($io, array());
   }
   return;
