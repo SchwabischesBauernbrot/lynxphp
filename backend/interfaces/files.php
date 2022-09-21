@@ -1,5 +1,13 @@
 <?php
 
+function hasThumbnail($mediaPath) {
+  // original file doesn't matter
+  $path = parsePath($mediaPath);
+  $thumb = $path['thumb'];
+  //echo "thumb[$thumb]<br>\n";
+  return file_exists($thumb);
+}
+
 function fileDBtoAPI(&$row, $boardUri) {
   // expect file_ fields and strip the file_
   $row = key_map(function($v) { return substr($v, 5); }, array_filter($row, function($v, $k) {
@@ -86,6 +94,7 @@ function fileDBtoAPI(&$row, $boardUri) {
   unset($row['json']);
 }
 
+// FIXME: apply this
 // JPEG, TIFF, WAV
 // https://stackoverflow.com/a/38862429
 function removeExif($old, $new) {
@@ -135,6 +144,16 @@ function parsePath($filePath) {
   );
 }
 
+function getPostFiles($boardURI, $post_id) {
+  $post_files_model = getPostFilesModel($boardURI);
+  if (!$post_files_model) {
+    return false;
+  }
+  global $db;
+  $res = $db->find($post_files_model, array('criteria' => array('postid' => $post_id)));
+  return $db->toArray($res);
+}
+
 function getThumbnailSize($row) {
   $m6 = substr($row['mime_type'], 0, 6);
 
@@ -144,11 +163,12 @@ function getThumbnailSize($row) {
 
   $urow = array();
   //echo "mime[", $row['mime_type'], "] isImage[$isImage]<br>\n";
-  if ($isImage) {
+  if ($isImage || $isVideo) {
     list($urow['tn_w'], $urow['tn_h']) = scaleSize($row['w'], $row['h'], 240);
     $urow['tn_w'] = (int)$urow['tn_w'];
     $urow['tn_h'] = (int)$urow['tn_h'];
   } else {
+    // audio doesn't have a size
     $urow['tn_w'] = 240;
     $urow['tn_h'] = 240;
   }
@@ -239,117 +259,6 @@ function make_thumbnail($fileData, $duration = 1) {
   }
 }
 
-function make_image_thumbnail_ffmpeg($filePath, $width, $height, $duration = 1) {
-  $fileIn = $filePath;
-  if (!$fileIn || !file_exists($fileIn)) {
-    echo "Source file does not exists[$fileIn]<br>\n";
-    return false;
-  }
-  $sFileIn = escapeshellarg($filePath);
-
-  $path = parsePath($filePath);
-
-  $fileOut = $path['thumb'];
-
-  // clean up zero byte files to prevent prompt
-  $outExists = file_exists($fileOut);
-  if ($outExists && !filesize($fileOut)) {
-    unlink($fileOut);
-    $outExists = false;
-  }
-  if ($outExists) {
-    echo "File[$fileOut] already exists<br>\n";
-    return false;
-  }
-
-  $sFileOut = escapeshellarg($fileOut);
-  $ffmpegPath = '/usr/bin/ffmpeg';
-
-  $width = (int)$width;
-  $height = (int)$height;
-
-  $ffmpeg_out = array();
-  $try = floor($duration / 2);
-  //exec('$ffmpegPath -strict -2 -ss ' . $try . ' -i ' . $fileIn . ' -v quiet -an -vframes 1 -f mjpeg -vf scale=' . $width . ':' . $height .' ' . $fileOut . ' 2>&1', $ffmpeg_out, $ret);
-  // webm may need -frames:v 1 or -update
-  exec($ffmpegPath . ' -i ' . $sFileIn . ' -vf scale=' . $width . ':' . $height .' ' . $sFileOut . ' 2>&1', $ffmpeg_out, $ret);
-  echo "ret[$ret]<br>\n";
-  // failure seems to be 1 (if the file already exists)
-  // ret === 0 on success
-  //if (!$ret) {
-    echo "<pre>", print_r($ffmpeg_out, 1), "</pre>\n";
-  //}
-  // if duration fails
-  if (!file_exists($fileOut) || !filesize($fileOut)) {
-    echo "file does not exist or empty [$fileOut] ret[$ret]<br>\n";
-    return false;
-    //  && $trg
-    /*
-    exec("$ffmpegPath -y -strict -2 -ss 0 -i $filename -v quiet -an -vframes 1 -f mjpeg -vf scale=$width:$height $thumbnailfc 2>&1", $ffmpeg_out, $ret);
-    clearstatcache();
-    if (!filesize($fileOut)) {
-      return false;
-    }
-    */
-  }
-  return true;
-}
-
-function make_audio_thumbnail_ffmpeg($filePath, $width, $height, $duration = 1) {
-  $fileIn = $filePath;
-  if (!$fileIn || !file_exists($fileIn)) {
-    echo "Source file does not exists[$fileIn]<br>\n";
-    return false;
-  }
-  $sFileIn = escapeshellarg($filePath);
-
-  $path = parsePath($filePath);
-
-  $fileOut = $path['thumb'];
-
-  // clean up zero byte files to prevent prompt
-  $outExists = file_exists($fileOut);
-  if ($outExists && !filesize($fileOut)) {
-    unlink($fileOut);
-    $outExists = false;
-  }
-  if ($outExists) {
-    echo "File[$fileOut] already exists<br>\n";
-    return false;
-  }
-
-  $sFileOut = escapeshellarg($fileOut);
-  $ffmpegPath = '/usr/bin/ffmpeg';
-
-  $width = (int)$width;
-  $height = (int)$height;
-
-  $ffmpeg_out = array();
-  $try = floor($duration / 2);
-  //exec('$ffmpegPath -strict -2 -ss ' . $try . ' -i ' . $fileIn . ' -v quiet -an -vframes 1 -f mjpeg -vf scale=' . $width . ':' . $height .' ' . $fileOut . ' 2>&1', $ffmpeg_out, $ret);
-  exec($ffmpegPath . ' -i ' . $sFileIn . ' -filter_complex "showwavespic=s='.$width.'x'.$height.':split_channels=1" -frames:v 1 ' . $sFileOut . ' 2>&1', $ffmpeg_out, $ret);
-  echo "ret[$ret]<br>\n";
-  // failure seems to be 1 (if the file already exists)
-  // ret === 0 on success
-  //if (!$ret) {
-    echo "<pre>", print_r($ffmpeg_out, 1), "</pre>\n";
-  //}
-  // if duration fails
-  if (!file_exists($fileOut) || !filesize($fileOut)) {
-    echo "file does not exist or empty [$fileOut] ret[$ret]<br>\n";
-    return false;
-    //  && $trg
-    /*
-    exec("$ffmpegPath -y -strict -2 -ss 0 -i $filename -v quiet -an -vframes 1 -f mjpeg -vf scale=$width:$height $thumbnailfc 2>&1", $ffmpeg_out, $ret);
-    clearstatcache();
-    if (!filesize($fileOut)) {
-      return false;
-    }
-    */
-  }
-  return true;
-}
-
 // might be a big delay between upload and this call
 function processFiles($boardUri, $files_json, $threadid, $postid) {
   $issues = array();
@@ -393,9 +302,24 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     }
     $arr = explode('.', $file['name']);
     $ext = end($arr);
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+    // php 5.3+ has this by default...
+    $mime = finfo_file($finfo, $srcPath);
+    $m6 = substr($mime, 0, 6);
+
+    $isImage = $m6 === 'image/';
+    $isVideo = $m6 === 'video/';
+    $isAudio = $m6 === 'audio/';
+
     // FIXME: escape ext?
     $finalPath = $threadPath . '/' . $postid . '_' . $num . '.' . $ext;
-    copy($srcPath, $finalPath);
+
+    if ($isImage) {
+      removeExif($srcPath, $finalPath);
+    } else {
+      copy($srcPath, $finalPath);
+    }
     if (!file_exists($finalPath)) {
       $issues[] = $num . ' - can not copy to ' . $finalPath;
       continue;
@@ -403,15 +327,6 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     unlink($srcPath);
 
     $size = filesize($finalPath);
-    $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
-    // php 5.3+ has this by default...
-    $mime = finfo_file($finfo, $finalPath);
-    $m6 = substr($mime, 0, 6);
-
-    $isImage = $m6 === 'image/';
-    $isVideo = $m6 === 'video/';
-    $isAudio = $m6 === 'audio/';
-
     $type = 'file';
     if ($isImage) $type = 'image';
     if ($isVideo) $type = 'video';
@@ -420,13 +335,13 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     $sizes = array(0, 0);
     if ($isImage) {
       $sizes = getimagesize($finalPath);
-      // FIXME: strip exif from JPG
     }
     if ($isVideo) {
-      // FIXME: get sizes
+      $vr = getVideoResolution($finalPath);
+      $sizes = array($vr['width'], $vr['height']);
     }
     if ($isAudio) {
-      // FIXME: What are we using?
+      $sizes = array(240, 240);
     }
 
     // calculate thumbnail size
