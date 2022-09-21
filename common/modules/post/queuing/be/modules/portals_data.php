@@ -4,7 +4,13 @@ $module = $getModule();
 
 if (in_array('board', $io['portals'])) {
   // need to access request but all we got is response
-  $boardUri = $io['data']['board']['uri'];
+  // and it seems board isn't always set here...
+  if (isset($io['data']['board'])) {
+    $boardUri = $io['data']['board']['uri'];
+  } else
+  if (isset($io['data']['uri'])) {
+    $boardUri = $io['data']['uri'];
+  }
   //echo "boardUri[$boardUri]<br>\n";
 
   // get all moderation actions for this user on this board
