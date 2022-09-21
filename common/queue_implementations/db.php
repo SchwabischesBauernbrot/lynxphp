@@ -11,6 +11,7 @@ class db_queue_driver extends queue_implementation_base_class implements queue_i
         'queue' => array('type' => 'str'),
         'type'  => array('type' => 'str'),
         'job'   => array('type' => 'text'),
+        //'reads'   => array('type' => 'int'),
         // how would we handle broadcast expiration?
         // we'd need to register all the active listeners
         // but in a web framework theoretic workers and active workers are two different things
@@ -35,6 +36,7 @@ class db_queue_driver extends queue_implementation_base_class implements queue_i
   }
 
   // limit? get one? get all?
+  // it's getting one rn
   function receive($queue, $waitformsg = false) {
     global $db;
     // if we delete, we should only retrieve one at a time...
@@ -52,6 +54,8 @@ class db_queue_driver extends queue_implementation_base_class implements queue_i
 
     //while($row = $db->get_row($res)) {
     $row = $db->get_row($res);
+    //$row['reads']++;
+    //$db->updateById($this->queue_model, $row['queueid'], array('reads' => $row['reads']));
 
     $workitems[$row['queueid']] = json_decode($row['job'], true);
       //$ids[] = $row['id'];
