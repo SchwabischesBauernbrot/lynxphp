@@ -1,6 +1,6 @@
 <?php
 
-// this data and functions used for all module php code
+// this data and functions used for all frontend module php code
 
 // function are automatically exported
 
