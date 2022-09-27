@@ -210,6 +210,7 @@ class formHandler {
         var ref = this
         function reloadCaptcha() {
           //console.log('CAPTCHA loading')
+          img.src = 'images/awaiting_thumbnail.png'
           fetch('/CAPTCHA/json').then(function(response) {
             return response.json()
           }).then(function(data) {
