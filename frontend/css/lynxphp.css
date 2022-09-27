@@ -19,6 +19,12 @@
   width: 1px;
 }
 
+.board-banner {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /**/
 /* NAV bar stuff */
 /**/
