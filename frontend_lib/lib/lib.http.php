@@ -272,4 +272,23 @@ function curl_log_report() {
   // details?
 }
 
+function _doWeHaveEtag($etag, $checkEtag) {
+  //if (DEV_MODE) echo "compare [$etag]vs[$checkEtag]<br>\n";
+  return $etag === $checkEtag;
+}
+
+function _isTimestampValid($ts, $checkTs) {
+  //if (DEV_MODE) echo "compare SERVER[$ts] vs CACHE[$checkTs]<br>\n";
+  return $ts <= $checkTs;
+}
+
+// check: etag, ts, res
+function doWeHaveHeader($headers, $check) {
+  //echo "<pre>test[", gettype($check), gettype($check['res']), htmlspecialchars(print_r($check, 1)), "]</pre>\n";
+  // if our local cache is valid, return it's data
+  $hasEtag = isset($headers['etag']) && isset($check['etag']) && _doWeHaveEtag($headers['etag'], $check['etag']);
+  if ($hasEtag) return true;
+  return isset($headers['last-modified']) && isset($check['ts']) && _isTimestampValid(strtotime($headers['last-modified']), $check['ts']);
+}
+
 ?>
