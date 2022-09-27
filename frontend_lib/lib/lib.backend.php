@@ -134,17 +134,20 @@ function consume_beRsrc($options, $params = '') {
           return postProcessJson($check['res'], $options);
         }
       } else {
-        // no _HEAD_CACHE
-        //$headers['consume-head'] = true; // we don't need this
-        if (!empty($check['ts'])) {
-          if (!$headers || !is_array($headers)) $headers = array();
-          $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
-          //$headers['consume-ts'] = $check['ts']; // for debug reasoning
-        }
-        // etag can also be used with POST to make sure another user didn't edit
-        if (!empty($check['etag'])) {
-          if (!$headers || !is_array($headers)) $headers = array();
-          $headers['If-None-Match'] = $check['etag'];
+        // FIXME: should be contains
+        if ($_SERVER['HTTP_CACHE_CONTROL'] !== 'no-cache') {
+          // no _HEAD_CACHE
+          //$headers['consume-head'] = true; // we don't need this
+          if (!empty($check['ts'])) {
+            if (!$headers || !is_array($headers)) $headers = array();
+            $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
+            //$headers['consume-ts'] = $check['ts']; // for debug reasoning
+          }
+          // etag can also be used with POST to make sure another user didn't edit
+          if (!empty($check['etag'])) {
+            if (!$headers || !is_array($headers)) $headers = array();
+            $headers['If-None-Match'] = $check['etag'];
+          }
         }
       }
     }
@@ -347,10 +350,12 @@ function getBoard($boardUri) {
   if (!isset($boardData['data'])) {
     return false;
   }
-  //echo "<pre>", print_r($boardData, 1), "</pre>\n";
+  // getExpectJson only processes meta information
+  //echo "<pre>", htmlspecialchars(print_r($boardData['data']['settings'], 1)), "</pre>\n";
   if (isset($boardData['data']['settings'])) {
-    global $board_settings;
-    $board_settings = $boardData['data']['settings'];
+    global $boards_settings;
+    //echo "setting[$boardUri]<br>\n";
+    $boards_settings[$boardUri] = $boardData['data']['settings'];
   }
   return $boardData['data'];
 }
