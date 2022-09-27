@@ -25,6 +25,12 @@ $boardnav_html = $tmp;
 $boardData = $pkg->useResource('last_posts',
   array('boardUri' => $boardUri, 'thread' => $threadNum));
 
+//echo "data[", print_r($boardData['settings'], 1), "]<br>\n";
+global $boards_settings;
+if (isset($boardData['settings'])) {
+  $boards_settings[$boardUri] = $boardData['settings'];
+}
+
 foreach($boardData['posts'] as $j => $post) {
   preprocessPost($boardData['posts'][$j]);
 }
@@ -38,15 +44,19 @@ $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
 
 $posts_html = '';
 $files = 0;
-global $boards_settings;
+//echo "checking[$boardUri][", print_r($boards_settings[$boardUri], 1), "]<br>\n";
 foreach($boardData['posts'] as $post) {
   //echo "<pre>", print_r($post, 1), "</pre>\n";
-  $tmp = $post_template;
+  //$tmp = $post_template;
+  //echo "checking[", print_r($boards_settings[$boardUri], 1), "]<br>\n";
   $posts_html .= renderPost($boardUri, $post, array(
     'checkable' => true, 'boardSettings' => $boards_settings[$boardUri],
   ));
-  $files += count($post['files']);
+  if (isset($post['files'])) {
+    $files += count($post['files']);
+  }
 }
+//echo "checking[$boardUri]2[", print_r($boards_settings[$boardUri], 1), "]<br>\n";
 
 $p = array(
   'boardUri' => $boardUri,
@@ -74,6 +84,7 @@ $closed = false;
 if (count($boardData['posts'])) {
   $closed = empty($boardData['posts'][0]['closed']) ? false : true;
 }
+//echo "checking[$boardUri]3[", print_r($boards_settings[$boardUri], 1), "]<br>\n";
 
 $boardPortal = getBoardPortal($boardUri, $boardData, array(
   'isThread' => true,
