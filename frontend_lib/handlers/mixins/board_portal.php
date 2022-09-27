@@ -6,7 +6,7 @@ function generateJsBoardInfo($boardUri, $boardSettings, $options = false) {
     'first' => true,
   ), $options));
   $json = json_encode($boardSettings);
-  $firstJs = $first ? 'boardData = {}' : 'if (typeof(boardData) === \'undefined\') boardData = {}';
+  $firstJs = $first ? 'const boardData = {}' : 'if (typeof(boardData) === \'undefined\') boardData = {}';
   // header/footer can be stripped here
   // could be passed as data-attributes too
   // not sure this should be embedded
