@@ -1,6 +1,7 @@
 <?php
 
 // common response utilities
+// for PHP to send to browsers
 
 // requires config (frontend?)
 
