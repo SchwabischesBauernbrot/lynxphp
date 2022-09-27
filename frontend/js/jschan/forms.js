@@ -220,6 +220,7 @@ class formHandler {
             ref.captchaId = data.id
             cInputElem.value = ''
             cInputElem.focus()
+            //console.log('data.ex', data.ex, 'seconds')
             ref.captchaRefreshTimer = setTimeout(function() {
               reloadCaptcha()
             }, data.ex * 1000)
