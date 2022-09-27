@@ -230,7 +230,9 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
     $files = 0;
     //echo "[", print_r($boardData['posts'], 1), "]<br>\n";
     foreach($boardData['posts'] as $post) {
-      $files += count($post['files']);
+      if (isset($post['files'])) {
+        $files += count($post['files']);
+      }
     }
     $threadstats_html = replace_tags($threadstats_tmpl, array(
       'replies' => count($boardData['posts']) - 1,
