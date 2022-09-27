@@ -43,7 +43,9 @@ foreach($boardData['posts'] as $post) {
     'checkable' => true, 'postCount' => $cnt,
     'noOmit' => true, 'boardSettings' => $boardData['settings'],
   ));
-  $files += count($post['files']);
+  if (isset($post['files'])) {
+    $files += count($post['files']);
+  }
 }
 
 $p = array(
