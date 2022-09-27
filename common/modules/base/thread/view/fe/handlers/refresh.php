@@ -27,7 +27,7 @@ if (is_array($result)) {
   global $boards_settings;
   foreach($result as $p) {
     echo renderPost($boardUri, $p, array(
-      'boardSettings' => $boards_settings[$boardUri],
+      'boardSettings' => empty($boards_settings[$boardUri]) ? false : $boards_settings[$boardUri],
       //'checkable' => false,
     ));
   }
