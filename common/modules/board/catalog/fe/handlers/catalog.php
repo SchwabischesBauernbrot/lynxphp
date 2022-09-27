@@ -87,7 +87,7 @@ if (is_array($catalog)) {
         'jstime' => gmdate('Y-m-d', $thread['created_at']) . 'T' . gmdate('H:i:s.v', $thread['created_at']) . 'Z',
         'human_created_at' => gmdate('n/j/Y H:i:s', $thread['created_at']),
         'replies' => $thread['reply_count'],
-        'files' => $thread['file_count'],
+        'files' => empty($thread['file_count']) ? 0 : $thread['file_count'],
         // starts at 0
         'page' => $pageNum + 1,
         'tile_image' => replace_tags($image_template, $tile_tags),
