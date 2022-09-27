@@ -80,7 +80,6 @@ function consume_beRsrc($options, $params = '') {
 
   // do we make a HEAD call and check our local scratch?
   // could always just check the cache
-  $saveCache = false;
   $etag = '';
   $ts = 0;
   $key = '';
@@ -104,118 +103,53 @@ function consume_beRsrc($options, $params = '') {
 
   // cacheSettings matter because lynx/randomBanner can't HEAD at all
   //if (isset($options['cacheSettings'])) {
-    // likely cacheable
-    // we have the endpoint and params...
+  // likely cacheable
+  // we have the endpoint and params...
 
-    // GET vs POST
-    // get can be the URL
-    // POST, well... should these be cache?
+  // GET vs POST
+  // get can be the URL
+  // POST, well... should these be cache?
 
-    if (empty($options['method']) && empty($options['dontCache'])) {
-      // what's our caching key?
-      $key = BACKEND_BASE_URL . $options['endpoint'] . $querystring;
-      // uhm this defeats passing SID to backend
-      if (!empty($headers['sid'])) {
-        // maybe it should be prefixed...
-        $key .= '_' . $headers['sid'];
-      }
-      // should we check our cache first?
-      global $scratch;
-      $check = $scratch->get('consume_beRsrc_' . $key);
-      // still need to see if backend is newer
-      //echo "<pre>check [$key]", htmlspecialchars(print_r($check, 1)), "</pre>\n";
-
-      // we don't need to bother with 304 becaues it's a HEAD already
-      /*
-      $sendHeaders = $headers;
-      if (!empty($check['ts'])) {
-        $sendHeaders['ts']
-      }
-      */
+  $feCachable = empty($options['method']) && empty($options['dontCache']);
+  if ($feCachable) {
+    // what's our caching key?
+    $key = BACKEND_BASE_URL . $options['endpoint'] . $querystring;
+    // uhm this defeats passing SID to backend
+    if (!empty($headers['sid'])) {
+      // maybe it should be prefixed...
+      $key .= '_' . $headers['sid'];
+    }
+    // should we check our cache first?
+    global $scratch;
+    $check = $scratch->get('consume_beRsrc_' . $key);
+    // still need to see if backend is newer
+    //echo "<pre>check [$key]", htmlspecialchars(print_r($check, 1)), "</pre>\n";
+    if ($check && is_array($check)) {
       global $_HEAD_CACHE;
       //echo "<pre>_HEAD_CACHE", htmlspecialchars(print_r($_HEAD_CACHE, 1)), "</pre>\n";
+      // $_HEAD_CACHE &&  needed?
       if (isset($_HEAD_CACHE[$options['endpoint'] . $querystring])) {
-        /*
-        if (DEV_MODE) {
-          echo "Using head cache<br>\n";
+        //if (DEV_MODE) echo "Using head cache<br>\n";
+        if (doWeHaveHeader($_HEAD_CACHE[$options['endpoint'] . $querystring], $check)) {
+          return postProcessJson($check['res'], $options);
         }
-        */
-        $headRes = $_HEAD_CACHE[$options['endpoint'] . $querystring];
       } else {
-        $headHeaders = array('consume-head' => true);
+        // no _HEAD_CACHE
+        //$headers['consume-head'] = true; // we don't need this
         if (!empty($check['ts'])) {
-          $headHeaders['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
-          $headHeaders['consume-ts'] = $check['ts'];
+          if (!$headers || !is_array($headers)) $headers = array();
+          $headers['If-Modified-Since'] = gmdate('D, d M Y H:i:s', $check['ts']) . ' GMT';
+          //$headers['consume-ts'] = $check['ts']; // for debug reasoning
         }
         // etag can also be used with POST to make sure another user didn't edit
         if (!empty($check['etag'])) {
-          $headHeaders['If-None-Match'] = $check['etag'];
-        }
-        $requestOptions = array(
-          //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
-          'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
-          //
-          'headers' => $headHeaders,
-          'method' => 'HEAD',
-        );
-        if (DEV_MODE) {
-          $requestOptions['devData'] = array(
-            'resourceCacheSettings' => empty($options['cacheSettings']) ? 'none' : $options['cacheSettings'],
-            'key' => $key,
-            'cacheTs' => empty($check['ts']) ? '' : $check['ts'],
-            'cacheEtag' => empty($check['etag']) ? '' : $check['etag'],
-          );
-        }
-
-        $result = request($requestOptions);
-        $headRes = parseHeaders($result);
-      }
-      // unmarshall headRes
-      if (isset($headRes['etag'])) {
-        //echo "lib.backend::consume_beRsrc - etag cache write me!";
-        $etag = $headRes['etag'];
-      }
-      if (isset($headRes['last-modified'])) {
-        $ts = strtotime($headRes['last-modified']);
-      }
-      //echo "ts[$ts]<br>\n";
-      if ($etag || $ts) {
-        $saveCache = true;
-      }
-      //echo "etag[$etag] ts[$ts] save[$saveCache]<br>\n";
-
-      // if $check is valid, return it's data
-      if ($etag && !empty($check['etag'])) {
-        /*
-        if (DEV_MODE) {
-          echo "compare [$etag]vs[", $check['etag'], "]<br>\n";
-        }
-        */
-        // if valid
-        if ($etag === $check['etag']) {
-          return postProcessJson($check['res'], $options);
+          if (!$headers || !is_array($headers)) $headers = array();
+          $headers['If-None-Match'] = $check['etag'];
         }
       }
-      if ($ts && !empty($check['ts'])) {
-        //echo "compare SERVER[$ts] vs CACHE[", $check['ts'], "]<br>\n";
-        // if valid
-        if ($ts <= $check['ts']) {
-          // this breaks /user/settings/theme.php
-          // key: http://localhost/backend/opt/settings@1658889353
-          /*
-          if (DEV_MODE) {
-            echo "Using scratch cache [$key@", $check['ts'], "] vs live[$ts]<br>\n";
-          }
-          */
-          //echo "<pre>test[", gettype($check), gettype($check['res']), htmlspecialchars(print_r($check, 1)), "]</pre>\n";
-          return postProcessJson($check['res'], $options);
-        }
-        // if newer, refresh it
-      }
-
-    //}
+    }
   }
-
+  //}
 
   // post login/IP
   $requestOptions = array(
@@ -233,7 +167,7 @@ function consume_beRsrc($options, $params = '') {
       'serverTs' => $ts,
       'serverEtag' => $etag,
       'headCache' => empty($_HEAD_CACHE[$options['endpoint'] . $querystring]) ? '' : $_HEAD_CACHE[$options['endpoint'] . $querystring],
-      'saveCache' => $saveCache,
+      //'saveCache' => $saveCache,
     );
   }
   $responseText = request($requestOptions);
@@ -243,18 +177,27 @@ function consume_beRsrc($options, $params = '') {
   //  $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
   //echo "<pre>responseText[$responseText]</pre>\n";
 
-  // has to be before, so we can re-run expectJson
-  if ($saveCache) {
+  if ($feCachable) {
     $respHeaders = parseHeaders(request_getLastHeader());
-    $outTs = isset($respHeaders['last-modified']) ? strtotime($respHeaders['last-modified']) : $ts;
-    $outEtag = isset($respHeaders['etag']) ? $respHeaders['etag'] : $etag;
-    // how do we get headers from this...
-    //echo "saving[$key]<br>\n";
-    $scratch->set('consume_beRsrc_' . $key, array(
-      'ts'   => $outTs,
-      'etag' => $outEtag,
-      'res'  => $responseText
-    ));
+    // only need to save if we don't already have it
+
+    // handle 304 response
+    // has to be before, so we can re-run expectJson
+    if (doWeHaveHeader($respHeaders, $check)) {
+      // basically a 304
+      return postProcessJson($check['res'], $options);
+    } else {
+      // actually have content?
+      $outTs = isset($respHeaders['last-modified']) ? strtotime($respHeaders['last-modified']) : $ts;
+      $outEtag = isset($respHeaders['etag']) ? $respHeaders['etag'] : $etag;
+      // how do we get headers from this...
+      //echo "saving[$key]<br>\n";
+      $scratch->set('consume_beRsrc_' . $key, array(
+        'ts'   => $outTs,
+        'etag' => $outEtag,
+        'res'  => $responseText
+      ));
+    }
   }
   return postProcessJson($responseText, $options);
 }
