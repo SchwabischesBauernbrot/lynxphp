@@ -16,6 +16,7 @@ if (in_array('board', $io['portals'])) {
 
   //print_r($io);
 
+  // boards not board?
   if (!isset($io['out']['boards'])) $io['out']['boards'] = array();
 
   $io['out']['board']['banners'] = getBannersByUri($boardUri);
