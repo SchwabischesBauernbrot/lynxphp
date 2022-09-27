@@ -182,16 +182,16 @@ function renderPost($boardUri, $p, $options = false) {
   }
   if (!empty($p['flag'])) {
     $flag = addslashes(htmlspecialchars($p['flag']));
-    if ($p['flag_cc']) {
-      // country flag
-      $postmeta .= ' <span class="flag flag-'.$p['flag_cc'].'" title="'.$p['flagName'].'"></span>';
-    } else {
+    if (empty($p['flag_cc'])) {
       // non-country flag
       //$postmeta .= ' <span title="'.$p['flagName'].'">';
       // FIXME: flag width and height
       // 19x12 for IGA
       // and 16x16 for Nuro+ https://endchan.wrongthink.net:8443/ausneets/flags/5e4b58dfe571bd1c7b890205
       $postmeta .= ' <img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '" alt="'.$p['flagName'].'">';
+    } else {
+      // country flag
+      $postmeta .= ' <span class="flag flag-'.$p['flag_cc'].'" title="'.$p['flagName'].'"></span>';
     }
   }
   // post-
