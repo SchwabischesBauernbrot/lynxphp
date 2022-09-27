@@ -239,11 +239,13 @@ function curl_log_report() {
         echo ' [', $l['postData'], ']';
       }
     }
+    //echo '<span title="', print_r($l['curlInfo'], 1) , '">CurlInfos</span>';
     //echo '<span title="', $l['result'] , '">Result</span>';
     //echo '<span title="', $l['trace'] , '">Trace</span>';
     echo $l['trace'];
     echo '<details>';
-    echo '  <summary>Response</summary>', "\n";
+    echo '  <summary>Response [', number_format($l['curlInfo']['size_download']), ' bytes]</summary>', "\n";
+    //echo "<pre>", htmlspecialchars(print_r($l['curlInfo'], 1)), "</pre>\n";
     if (isset($l['result'][0]) && ($l['result'][0] === '[' || $l['result'][0] === '{')) {
       echo '  <pre>', htmlspecialchars(json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT)), '</pre>', "\n";
     } else {
