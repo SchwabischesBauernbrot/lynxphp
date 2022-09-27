@@ -135,7 +135,7 @@ function consume_beRsrc($options, $params = '') {
         }
       } else {
         // FIXME: should be contains
-        if ($_SERVER['HTTP_CACHE_CONTROL'] !== 'no-cache') {
+        if (empty($_SERVER['HTTP_CACHE_CONTROL']) || $_SERVER['HTTP_CACHE_CONTROL'] !== 'no-cache') {
           // no _HEAD_CACHE
           //$headers['consume-head'] = true; // we don't need this
           if (!empty($check['ts'])) {
