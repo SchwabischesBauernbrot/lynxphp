@@ -217,6 +217,7 @@ function sendResponse2($data, $options = array()) {
       //$resp['meta']['portals'] = $io['out'];
       // strict filter
       foreach($io['portals'] as $p) {
+        // board
         $resp['meta']['portals'][$p] = isset($io['out'][$p]) ? $io['out'][$p] : '';
       }
     }
