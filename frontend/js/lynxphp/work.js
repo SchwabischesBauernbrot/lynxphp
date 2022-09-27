@@ -1,5 +1,6 @@
 
 function doWork() {
+  let statusCode = 0
   fetch('backend/opt/work').then(res => { statusCode = res.status; return res.text() } ).then(html => {
     //console.debug('work', html)
   })

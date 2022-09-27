@@ -40,17 +40,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
   //todo: just make the localstorage name match the names of settings and put a loop
   const settings = document.getElementById('settings');
   if (settings) { //can be false if we are in minimal view
-    setDefaultLocalStorage('volume', settings.defaultVolume);
-    setDefaultLocalStorage('loop', settings.loop);
-    setDefaultLocalStorage('imageloadingbars', settings.imageLoadingBars);
-    setDefaultLocalStorage('live', settings.live);
-    setDefaultLocalStorage('scroll', settings.sctollToPosts);
-    setDefaultLocalStorage('localtime', settings.localTime);
-    setDefaultLocalStorage('relative', settings.relativeTime);
-    setDefaultLocalStorage('24hour', settings.hour24Time);
-    setDefaultLocalStorage('notifications', settings.notificationsEnabled);
-    setDefaultLocalStorage('notification-yous-only', settings.notificationsYousOnly);
-    setDefaultLocalStorage('yous-setting', settings.showYous);
+    setDefaultLocalStorage('volume', settings.defaultVolume || '');
+    setDefaultLocalStorage('loop', settings.loop || '');
+    setDefaultLocalStorage('imageloadingbars', settings.imageLoadingBars || '');
+    setDefaultLocalStorage('live', settings.live || '');
+    setDefaultLocalStorage('scroll', settings.sctollToPosts || '');
+    // time should be one setting
+    setDefaultLocalStorage('localtime', settings.localTime || '');
+    setDefaultLocalStorage('relative', settings.relativeTime || '');
+    setDefaultLocalStorage('24hour', settings.hour24Time || '');
+    setDefaultLocalStorage('notifications', settings.notificationsEnabled || '');
+    setDefaultLocalStorage('notification-yous-only', settings.notificationsYousOnly || '');
+    setDefaultLocalStorage('yous-setting', settings.showYous || '');
   } else {
     console.warn('#settings not found')
   }

@@ -268,5 +268,5 @@ if (!DISABLE_JS) {
     isActive = false
   }
 } else {
-  delete originalTitle
+  originalTitle = ''
 }

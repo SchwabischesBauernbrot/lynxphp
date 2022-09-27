@@ -1,5 +1,5 @@
-YTready = false
-YTreadyQ = []
+let YTready = false
+let YTreadyQ = []
 function onYouTubeIframeAPIReady() {
   //console.log('iframeapiready', YTreadyQ.length)
   // fire all pending function in queue
@@ -444,7 +444,7 @@ if (!isCatalog) { //dont show embed buttons in catalog
       pl.enableUI()
     }
 
-    updateEmbedLinks = (e) => {
+    const updateEmbedLinks = (e) => {
       if (e.detail.hover) {
         return;
       }
