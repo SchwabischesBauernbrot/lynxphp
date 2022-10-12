@@ -43,8 +43,28 @@ function request($options = array()) {
     'pass' => false,
     'body' => false,
     'devData' => false,
+    'multipart' => 'auto',
   ), $options));
   $header = '';
+
+  if ($multipart !== 'auto') {
+    if ($multipart) {
+      // $body needs to be an array
+      if (!is_array($body)) {
+        // convert string to array?
+      }
+    } else {
+      // $body needs to be a string
+      if (is_array($body)) {
+        // convert to string
+        $list = array();
+        foreach($body as $key => $value) {
+          $list[] = $key . '=' . urlencode($value);
+        }
+        $body = join('&', $list);
+      }
+    }
+  }
 
   // workaround curlHelper compatibility (in at least consume_beRsrc)
   if ($headers === '') $headers = array();
