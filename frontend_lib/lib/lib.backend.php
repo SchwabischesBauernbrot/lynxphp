@@ -466,9 +466,18 @@ function backendRegister($chal, $sig, $email = '') {
 }
 
 function backendLogin($user, $pass) {
+  // ok an array of body data makes multipart
+  $json = request(array(
+    'url' => BACKEND_BASE_URL . 'opt/verifyAccount',
+    'body' => array('u' => $user, 'p' => $pass),
+    'headers' => array('HTTP_X_FORWARDED_FOR' => getip()),
+    'multipart' => false,
+  ));
+  /*
   $json = curlHelper(BACKEND_BASE_URL . 'opt/verifyAccount', array(
     'u' => $user, 'p' => $pass,
   ), array('HTTP_X_FORWARDED_FOR' => getip()));
+  */
   $res = expectJson($json, 'opt/verifyAccount');
   //echo "<pre>backendLogin", print_r($res, 1), "</pre>\n";
   if ($res === false) {
