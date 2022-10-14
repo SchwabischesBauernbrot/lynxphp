@@ -80,13 +80,14 @@ if (is_array($catalog)) {
       //echo "page[$pageNum]<br>\n";
       $tags = array(
         'uri' => $boardUri,
-        'subject' => htmlspecialchars($thread['sub']),
+        'subject' => empty($thread['sub']) ? '' : htmlspecialchars($thread['sub']),
         'message' => htmlspecialchars($thread['com']),
         'name' => htmlspecialchars($thread['name']),
         'no' => $thread['no'],
         'jstime' => gmdate('Y-m-d', $thread['created_at']) . 'T' . gmdate('H:i:s.v', $thread['created_at']) . 'Z',
         'human_created_at' => gmdate('n/j/Y H:i:s', $thread['created_at']),
-        'replies' => $thread['reply_count'],
+        // why is this sometimes empty?
+        'replies' => empty($thread['reply_count']) ? 0 : $thread['reply_count'],
         'files' => empty($thread['file_count']) ? 0 : $thread['file_count'],
         // starts at 0
         'page' => $pageNum + 1,
