@@ -328,6 +328,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       'js/lynxphp/expander_thread.js',
       //'js/lynxphp/expander_media.js',
       'js/lynxphp/work.js',
+      //'js/lynxphp/lazy_audit.js',
     ),
   );
   // THINK: how do we let JS live in module directories
@@ -539,7 +540,7 @@ function wrapContentFooter($row) {
       // make all the scripts local to webroot
       $p = 'js.php?module=' .$p['module'] . '&scripts=' . $p['script'];
     }
-    $scripts_html .= '<script src="' . $p . '"></script>' . "\n";
+    $scripts_html .= '<script src="' . $p . '" defer></script>' . "\n";
   }
 
   $footerNavItems = array(
