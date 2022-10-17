@@ -226,6 +226,15 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
 
   $threadstats_html = '';
 
+  $enabler_html = '';
+  if (!$row['threadNum']) {
+    $enabler_html = '<style>
+#autoRefreshEnable {
+  display: none;
+}
+</style>';
+  }
+
   if (isset($boardData['posts']) && is_array($boardData['posts'])) {
     $files = 0;
     //echo "[", print_r($boardData['posts'], 1), "]<br>\n";
@@ -251,6 +260,8 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
     'boardNav' => $row['boardNav'],
     'threadstats' => $threadstats_html,
     'postactions' => renderPostActions($boardUri),
+    'enabler' => $enabler_html,
+    'enableAutoRefresh' => 'checked',
     'postForm' => $row['postForm'] ? str_replace('{{postForm}}', $row['postForm'], $postForm_tmpl) : '',
   )));
 }
