@@ -311,6 +311,17 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       'js/jschan/forms.js',
       // upload item template
       'js/uploaditem.js',
+      // probably needs some work
+      //'js/jschan/hideimages.js',
+      // password?
+      // threadstat?
+      // time?
+      // yous
+      // viewfulltext
+      // theme
+      // forms
+      // filters
+
       // lynxphp
       'js/lynxphp/embed.js',
       'js/lynxphp/refresh.js',
