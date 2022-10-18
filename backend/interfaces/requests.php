@@ -11,7 +11,7 @@ function logRequest($ip) {
     // only holds the record for 60s and then nukes it...
     // we don't want that because we want that history if they're active..
     // so clear any history when they're inactive for 15 mins
-    // $db->make_direct
+    // 10 mins
     array(array(($db->unixtime() . ' - updated_at'), '>', $db->make_direct('600')))
   ));
   //echo "ip[$ip]<br>\n";
