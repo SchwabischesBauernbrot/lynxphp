@@ -154,6 +154,8 @@ function consume_beRsrc($options, $params = '') {
   }
   //}
 
+  //echo "feCachable[$feCachable] header[", print_r($headers, 1), "]<br>\n";
+
   // post login/IP
   $requestOptions = array(
     'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
@@ -178,15 +180,26 @@ function consume_beRsrc($options, $params = '') {
 
   //$responseText = curlHelper(BACKEND_BASE_URL . $options['endpoint'] . $querystring,
   //  $postData, $headers, '', '', empty($options['method']) ? 'AUTO' : $options['method']);
-  //echo "<pre>responseText[$responseText]</pre>\n";
+  //echo "<pre>responseText[", print_r($responseText, 1), "]</pre>\n";
 
   if ($feCachable) {
-    $respHeaders = parseHeaders(request_getLastHeader());
+    $rawHeaders = request_getLastHeader();
+    //echo "rawHeaders[", print_r($rawHeaders, 1), "]<br>\n";
+    $is304 = strpos($rawHeaders, '304 Not Modified') !== false;
+
+    $respHeaders = parseHeaders($rawHeaders);
     // only need to save if we don't already have it
+
+    //$log = request_getLastLog();
+    //echo "<pre>log[", print_r($log, 1), "]</pre>\n";
+
+    // if 304, on apache there's no headers beyond date
+    //echo "respHeaders[", print_r($respHeaders, 1), "]<br>\n";
 
     // handle 304 response
     // has to be before, so we can re-run expectJson
-    if (doWeHaveHeader($respHeaders, $check)) {
+    //doWeHaveHeader($respHeaders, $check)
+    if ($is304) {
       // basically a 304
       return postProcessJson($check['res'], $options);
     } else {
@@ -195,6 +208,7 @@ function consume_beRsrc($options, $params = '') {
       $outEtag = isset($respHeaders['etag']) ? $respHeaders['etag'] : $etag;
       // how do we get headers from this...
       //echo "saving[$key]<br>\n";
+      // we should require ($outTs || $outEtag)
       $scratch->set('consume_beRsrc_' . $key, array(
         'ts'   => $outTs,
         'etag' => $outEtag,
