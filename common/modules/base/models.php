@@ -51,6 +51,14 @@ $user_session_model = array(
   )
 );
 
+$user_login_model = array(
+  'name'   => 'user_login',
+  'fields' => array(
+    'user_id'  => array('type' => 'int'),
+    'ip'       => array('type' => 'str'),
+  )
+);
+
 $auth_challenges_model = array(
   'name'   => 'auth_challenge',
   'fields' => array(
@@ -246,6 +254,7 @@ $db->autoupdate($request_model);
 $db->autoupdate($settings_model);
 //$db->autoupdate($frontends_model);
 $db->autoupdate($auth_challenges_model);
+$db->autoupdate($user_login_model);
 
 // for each board set up:
 // a posts_model table
@@ -268,6 +277,7 @@ $models = array(
   //'site'      => $sites_model,
   'setting'   => $settings_model,
   'auth_challenge' => $auth_challenges_model,
+  'login'     => $user_login_model, // log
   //'frontend'  => $frontends_model,
 );
 
