@@ -185,6 +185,11 @@ function request_getLastHeader() {
   return $curl_headers[count($curl_headers) - 1];
 }
 
+function request_getLastLog() {
+  global $curlLog;
+  return $curlLog[count($curlLog) - 1];
+}
+
 function make_file($tmpfile, $type, $filename) {
   return curl_file_create($tmpfile, $type, $filename);
 }
