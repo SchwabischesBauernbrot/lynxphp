@@ -344,16 +344,44 @@ class formHandler {
 
       // we don't want to add it twice...
       //this.fileInput && (this.fileInput.disabled = false); // enable it
-      /*
+      // well it depends how they were added
+      // if you click on the button and add, they'll be in the files input
+      // but if you drag and drop, it won't..
+      //console.log('postData', postData)
+      // this is the drag and drop managed list
+      //console.log('files', this.files, 'count', this.files.length)
+      // sync this.files and this.fileInput
+      // this is the drag and drop managed list
+      //console.log('files', this.files, 'count', this.files.length)
+      //console.log('this.forms.controls', this.form.elements)
+      //console.log('value', this.form.elements["files[]"].files)
+      //console.log('test', this.fileInput.files)
+
       if (this.files && this.files.length > 0) {
         //console.log('fileInput', this.fileInput, this.fileInput.name)
-        //add files to file input element
+
+        //add files to file input element that aren't already there
         for (let i = 0; i < this.files.length; i++) {
-          console.log(i, 'adding', this.fileInput.name)
-          postData.append(this.fileInput.name, this.files[i]);
+          //console.log('dnd file info', this.files[i])
+          let have = false
+          const df = this.files[i]
+          const dkey = df.name + '_' + df.size + '_' + df.type + '_'  + df.lastModified
+          for(let j = 0; j < this.fileInput.files.length; j++) {
+            //console.log('files info', this.fileInput.files[j])
+            const cf = this.fileInput.files[j]
+            const ckey = cf.name + '_' + cf.size + '_' + cf.type + '_'  + cf.lastModified
+            if (ckey === dkey) {
+              have = true
+              break
+            }
+          }
+          if (!have) {
+            console.log(i, 'adding', this.files[i], 'to', this.fileInput.name)
+            postData.append(this.fileInput.name, this.files[i]);
+          }
         }
       }
-      */
+
       this.setFormLock(true) // relock hopefully now it's build
     } else {
       var data = Object.keys(this.form.elements).reduce((obj, field) => { if (isNaN(field)) obj[field] = this.form.elements[field].value; return obj; }, {});
