@@ -9,17 +9,45 @@ function createSession($userid) {
   $cnt = 1;
   while($cnt) {
     $session = md5(uniqid());
-    $cnt = $db->count($models['session'], array('criteria'=>array('session'=>$session)));
+    $cnt = $db->count($models['session'], array('criteria' => array('session' => $session)));
   }
-  $id = $db->insert($models['session'], array(array(
+
+  $sesRow = array(
     'session' => $session,
     'user_id' => (int)$userid, // (postgres) requires it to be an int
     'expires' => $ttl,
     'ip'      => getip(),
-  )));
+  );
+  $id = $db->insert($models['session'], array($sesRow));
+
+  // schedule expiration check
+  global $workqueue;
+  $workqueue->addWork(PIPELINE_SESSION_EXPIRATION, array());
+
+  // handle db failure
   if (!$id) {
     return false;
   }
+
+  // if a BO or BV we might need to mark last login
+  // we should bring the board record up-to-date now
+  // so pipeline? is it optional?
+  // we should be able to log it
+  // so make a table and insert a login record here
+  // either way, it's we should have a hook
+  $loginLogRow = array(
+    'user_id' => $sesRow['user_id'],
+    'ip' => $sesRow['ip'],
+  );
+  $db->insert($models['login'], array($loginLogRow));
+
+  global $pipelines;
+  // don't need PRE/POST because after the record is created
+  // we can update it after the fact
+  // not much to change before hand, no validations or checks here
+  $sesRow['id'] = $id;
+  $pipelines[PIPELINE_USER_LOGIN]->execute($sesRow);
+
   return array(
     'sessionid' => $id,
     'session'   => $session,
@@ -48,6 +76,7 @@ function getSession($sid = '') {
   return $sesRow;
 }
 
+// I don't think anything uses this anymore
 function sessionSetUserID($ses, $userid) {
   global $db, $models;
   // FIXME: expiration check?
