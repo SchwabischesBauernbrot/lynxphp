@@ -274,4 +274,4 @@ window.addEventListener('DOMContentLoaded', () => {
   } else {
     originalTitle = ''
   }
-}
+})
