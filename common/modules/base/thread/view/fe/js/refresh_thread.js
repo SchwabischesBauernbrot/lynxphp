@@ -148,8 +148,12 @@ function refreshCallback(error, html) {
   }
 }
 
-var autoCheckbox = document.getElementById('autoRefreshEnable')
-if (autoCheckbox && autoCheckbox.checked) {
-  // have to start because callback wasn't defined...
-  startTimer(5)
-}
+// we have to wait for startTimer to be defined in other script tags
+// before we can call startTimer
+window.addEventListener('DOMContentLoaded', () => {
+  var autoCheckbox = document.getElementById('autoRefreshEnable')
+  if (autoCheckbox && autoCheckbox.checked) {
+    // have to start because callback wasn't defined...
+    startTimer(5)
+  }
+})
