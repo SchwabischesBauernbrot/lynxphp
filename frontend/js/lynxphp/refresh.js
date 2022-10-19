@@ -44,7 +44,8 @@ function refreshPosts(manual) {
             for(var i in images) {
               if (!images.hasOwnProperty(i)) continue
               var img = images[i]
-              console.log(i, 'imgsrc', img.src)
+              // seems to work fine...
+              //console.log(i, 'imgsrc', img.src)
               if (img.src.match('images/awaiting_thumbnail.png')) {
                 // uri and postid, url or hash
                 checkPost = true
@@ -214,59 +215,63 @@ function manual_refresh() {
   refreshPosts(true)
 }
 
-if (!DISABLE_JS) {
-  // wire up checkbox
-  var autoCheckbox = document.getElementById('autoRefreshEnable')
-  if (autoCheckbox) {
-    autoCheckbox.onclick = function() {
-      changeRefresh(false)
-    }
-    // bring online
-    if (autoCheckbox.checked) {
-      changeRefresh(true)
-    }
-  }
-
-  // wire up button
-  var updateButton = document.getElementById('updatePage')
-  if (updateButton) {
-    updateButton.onclick = function() {
-      // make sure we can make it do something
-      if (typeof(refreshCallback) !== 'undefined') {
-        manual_refresh()
-        return false
+// we have to wait for refreshCallback to be defined in other script tags
+// before we can call changeRefresh
+window.addEventListener('DOMContentLoaded', () => {
+  if (!DISABLE_JS) {
+    // wire up checkbox
+    var autoCheckbox = document.getElementById('autoRefreshEnable')
+    if (autoCheckbox) {
+      autoCheckbox.onclick = function() {
+        changeRefresh(false)
+      }
+      // bring online
+      if (autoCheckbox.checked) {
+        changeRefresh(true)
       }
     }
-  }
 
-  document.onscroll = function() {
-
-    if (!unreadPosts) {
-      return;
+    // wire up button
+    var updateButton = document.getElementById('updatePage')
+    if (updateButton) {
+      updateButton.onclick = function() {
+        // make sure we can make it do something
+        if (typeof(refreshCallback) !== 'undefined') {
+          manual_refresh()
+          return false
+        }
+      }
     }
 
-    var threadElem = document.getElementById('threadsContainer')
-    var rect = threadElem.children[threadElem.children.length - 1].getBoundingClientRect()
+    document.onscroll = function() {
 
-    if (rect.bottom < window.innerHeight) {
-      // refresh post would set this...
-      unreadPosts = 0
-      console.log('refresh - restoring original title')
-      document.title = originalTitle
+      if (!unreadPosts) {
+        return;
+      }
+
+      var threadElem = document.getElementById('threadsContainer')
+      var rect = threadElem.children[threadElem.children.length - 1].getBoundingClientRect()
+
+      if (rect.bottom < window.innerHeight) {
+        // refresh post would set this...
+        unreadPosts = 0
+        console.log('refresh - restoring original title')
+        document.title = originalTitle
+      }
+
     }
 
-  }
+    var isActive = true
 
-  var isActive = true
+    window.onfocus = function () {
+      isActive = true
+      document.onscroll()
+    }
 
-  window.onfocus = function () {
-    isActive = true
-    document.onscroll()
+    window.onblur = function () {
+      isActive = false
+    }
+  } else {
+    originalTitle = ''
   }
-
-  window.onblur = function () {
-    isActive = false
-  }
-} else {
-  originalTitle = ''
 }
