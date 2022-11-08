@@ -26,6 +26,7 @@ function renderPost($boardUri, $p, $options = false) {
   global $pipelines;
 
   //echo "<pre>", print_r($p['files'], 1), "</pre>\n";
+  //echo "<pre>", print_r($p, 1), "</pre>\n";
 
   // unpack options
   extract(ensureOptions(array(
@@ -180,19 +181,22 @@ function renderPost($boardUri, $p, $options = false) {
   if (!empty($p['name'])) {
     $postmeta .= '<span class="post-name">' . htmlspecialchars($p['name']) . '</span>';
   }
+  //echo "<pre>", print_r($p['flag_cc'], 1), "</pre>\n";
+  // lynxchan doesn't need flag to set flag_cc / flagName
+  if (!empty($p['flag_cc'])) {
+    // country flag
+    $flagTitle = empty($p['flagName']) ? '' : $p['flagName'];
+    $postmeta .= ' <span class="flag flag-'.$p['flag_cc'].'" title="' . $flagTitle . '"></span>';
+  } else // only one flag
   if (!empty($p['flag'])) {
     $flag = addslashes(htmlspecialchars($p['flag']));
-    if (empty($p['flag_cc'])) {
-      // non-country flag
-      //$postmeta .= ' <span title="'.$p['flagName'].'">';
-      // FIXME: flag width and height
-      // 19x12 for IGA
-      // and 16x16 for Nuro+ https://endchan.wrongthink.net:8443/ausneets/flags/5e4b58dfe571bd1c7b890205
-      $postmeta .= ' <img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '" alt="'.$p['flagName'].'">';
-    } else {
-      // country flag
-      $postmeta .= ' <span class="flag flag-'.$p['flag_cc'].'" title="'.$p['flagName'].'"></span>';
-    }
+    // non-country flag
+    //$postmeta .= ' <span title="'.$p['flagName'].'">';
+    // FIXME: flag width and height
+    // 19x12 for IGA
+    // and 16x16 for Nuro+ https://endchan.wrongthink.net:8443/ausneets/flags/5e4b58dfe571bd1c7b890205
+    $flagTitle = empty($p['flagName']) ? '' : $p['flagName'];
+    $postmeta .= ' <img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '" alt="'.$flagTitle.'">';
   }
   // post-
   if (!empty($p['capcode'])) {
