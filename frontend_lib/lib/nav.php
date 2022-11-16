@@ -5,6 +5,7 @@
 // new items format:
 // [] => array(label, alt, destinations)
 // destinations can be an array if multiple URLs point to the same content
+// FIXME: subnavs
 
 // label is design and we can now do that in the template
 // problems with template
@@ -75,23 +76,29 @@ function getNav2($navItems, $options = array()) {
   foreach($navItems as $data) {
     $label = empty($data['label']) ? '' : $data['label'];
     if (empty($data['html_override'])) {
-      $urlTemplate = $data['destinations'];
       $alt = empty($data['alt']) ? '' : ' aria-label="' . $data['alt'] . '"';
-      if (is_array($urlTemplate)) {
-        // always link to first one
-        $url = replace_tags($urlTemplate[0], $replaces);
-        if ($selectedURL !== false) {
-          // maybe like pageURLs?
-          $checkUrl = array();
-          foreach($urlTemplate as $tmpl) {
-            $checkUrl[] = replace_tags($tmpl, $replaces);
+      // dev error if $data['destinations'] isn't set...
+      if (isset($data['destinations'])) {
+        $urlTemplate = $data['destinations'];
+        if (is_array($urlTemplate)) {
+          // always link to first one
+          $url = replace_tags($urlTemplate[0], $replaces);
+          if ($selectedURL !== false) {
+            // maybe like pageURLs?
+            $checkUrl = array();
+            foreach($urlTemplate as $tmpl) {
+              $checkUrl[] = replace_tags($tmpl, $replaces);
+            }
+          //} else {
+            //$checkUrl = $url;
           }
-        //} else {
-          //$checkUrl = $url;
+        } else {
+          $url = replace_tags($urlTemplate, $replaces);
+          $checkUrl = $url;
         }
       } else {
-        $url = replace_tags($urlTemplate, $replaces);
-        $checkUrl = $url;
+        $checkUrl = '';
+        $url = '';
       }
     }
     switch($type) {
@@ -129,7 +136,7 @@ function getNav2($navItems, $options = array()) {
         $use_template = $selected_template;
       } else {
         // default mode...
-        $classes['bold'] = 'bold';
+        $classes['active'] = 'active'; // was bold
       }
     }
     $id = isset($ids[$label]) ? ' id="' . $ids[$label] . '"' : '';
@@ -161,9 +168,17 @@ function getNav2($navItems, $options = array()) {
             $linkAdd .= ' target=_top';
           }
         }
-        $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $linkAdd . $alt . '>';
-        $nav_html .= $prelabel . $label . $postlabel . '</a>' . "\n";
+        if (isset($data['destinations'])) {
+          $nav_html .= '<a' . $class . $id . ' href="' . $url . '"' . $linkAdd . $alt . '>';
+        }
+        $nav_html .= $prelabel . $label . $postlabel;
+        if (isset($data['destinations'])) {
+          $nav_html .= '</a>' . "\n";
+        }
       }
+    }
+    if (isset($data['subItems'])) {
+      $nav_html .= getNav2($data['subItems'], $options);
     }
   }
   switch($type) {
@@ -251,6 +266,7 @@ function renderPortalHeader($type, $options = false) {
     'navPipeline' => false,
       'useNavFirstItem' => false,
     'navItems'  => array(),
+    'navItems2'  => array(),
     'prelabel'  => '[',
     'postlabel' => ']',
   ), $options));
@@ -270,7 +286,14 @@ function renderPortalHeader($type, $options = false) {
     'prelabel' => $prelabel,
     'postlabel' => $postlabel,
   );
-  $nav_html = getNav($navItems, $navOptions);
+  if (count($navItems2)) {
+    $nav_html = getNav2($navItems2, $navOptions);
+  }
+  if (count($navItems)) {
+    // the concat seems to work for now
+    // could just inject into navItems2...
+    $nav_html .= getNav($navItems, $navOptions);
+  }
 
   $p = array(
     'tags' => array(
