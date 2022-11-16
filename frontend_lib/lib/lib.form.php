@@ -223,8 +223,7 @@ function generateForm($action, $fields, $values, $options = false) {
       case 'image':
         if ($value) {
           // if not set it will clear it, so we need a clear checkbox...
-          global $BACKEND_BASE_URL;
-          $html .= '<img height=100 src="' . $BACKEND_BASE_URL . $value . '"><br>';
+          $html .= '<img height=100 src="' . BACKEND_PUBLIC_URL . $value . '"><br>';
         }
         $html .= '<label><input type=checkbox name="'.$field.'_clear"> Reset back to default</label><br>';
         $html .= '<input type=file name="'.$field.'">';
