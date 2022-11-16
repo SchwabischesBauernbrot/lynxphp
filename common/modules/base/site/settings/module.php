@@ -2,6 +2,22 @@
 return array(
   'name' => 'base_settings',
   'version' => 1,
+  'settings' => array(
+    array(
+      'level' => 'admin', // constant?
+      'location' => 'site', // /tab/group
+      'addFields' => array(
+        'siteName' => array(
+          'label' => 'Site Name',
+          'type'  => 'text',
+        ),
+        'logo' => array(
+          'label' => 'Site Logo',
+          'type'  => 'image',
+        ),
+      )
+    ),
+  ),
   'resources' => array(
     // admin settings
     array(
