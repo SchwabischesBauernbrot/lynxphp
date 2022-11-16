@@ -1,5 +1,7 @@
 <?php
 
+// probably more specific to individual PHP captchas
+
 function validate_captcha_field($options = false) {
   extract(ensureOptions(array(
     'field' => 'captcha',
