@@ -61,6 +61,9 @@ $tags = array(
   'showWelcome' => empty($settings['site']['showWelcome']) ? ' style="display: none"' : '',
   'showSlogan' => empty($settings['site']['showSlogan']) ? ' style="display: none"' : '',
   'showLogo' => empty($settings['site']['showLogo']) ? 'none' : 'block',
+  'showShortlist' => empty($settings['site']['showShortlist']) ? ' style="display: none"' : '',
+  'showRecentImages' => empty($settings['site']['showRecentImages']) ? ' style="display: none"' : '',
+  'showRecentPosts' => empty($settings['site']['showRecentPosts']) ? ' style="display: none"' : '',
 );
 
 $content = replace_tags($templates['header'], $tags);
