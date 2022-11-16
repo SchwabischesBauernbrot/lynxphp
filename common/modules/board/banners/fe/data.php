@@ -48,7 +48,7 @@ $fePkgs = array(
         'module' => 'banner',
       ),
       */
-      // adds banners to nav settings
+      // adds Banners to nav settings
       array(
         'pipeline' => 'PIPELINE_BOARD_SETTING_NAV',
         'module' => 'nav_settings',
