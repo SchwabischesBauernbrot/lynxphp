@@ -36,6 +36,7 @@ class package {
     // we should understand the path of the module...
     $this->dir = $dir . '/'; // ends in trailing slash...
     $this->resources = array();
+    $this->settingsBlocks = array();
     // should we register with something? not now...
     $this->frontend_packages = array();
     $this->backend_packages = array();
@@ -147,6 +148,7 @@ class package {
         $ps = array_flip($rsrc['params']['params']);
         //echo "<pre>[", print_r($qs, 1), "]</pre>\n";
         //echo "<pre>[", print_r($fd, 1), "]</pre>\n";
+        //echo "<pre>[", print_r($params, 1), "]</pre>\n";
         // FIXME: what if we call this multiple times?
         foreach($params as $k => $v) {
           //echo "[$k=$v]<br>\n";
@@ -230,6 +232,15 @@ class package {
     // make the call
     $result = consume_beRsrc($rsrc, $params);
     return $result;
+  }
+
+  function addSettingsBlock($loc, $options) {
+    // ensure array
+    if (!isset($this->settingsBlocks[$loc])) $this->settingsBlocks[$loc] = array();
+    // very little value to put here, maybe a global is best...
+    // well good metadata, so we'll keep a copy...
+    // wonder if we can lazy load this to reduce memory usage...
+    $this->settingsBlocks[$loc][] = $options;
   }
 
   // hotpath
