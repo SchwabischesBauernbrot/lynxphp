@@ -10,7 +10,7 @@ $params = $getModule();
 // costly but polish
 $result = $pkg->useResource('open_reports', array('boardUri' => $io['boardUri']));
 
-if (!is_array($result['reports'])) $result['reports'] = array();
+if (!isset($result['reports']) || !is_array($result['reports'])) $result['reports'] = array();
 
 $io['navItems']['reports ('.count($result['reports']).')'] = '{{uri}}/settings/reports';
 
