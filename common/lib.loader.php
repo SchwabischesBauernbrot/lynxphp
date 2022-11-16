@@ -4,6 +4,8 @@
 // module loading functions
 //
 
+// maybe also functions for dealing with a collection of packages?
+
 $module_base = 'common/modules/';
 
 $_loader_data = array();
@@ -53,6 +55,53 @@ function isBackend() {
   return $db ? true : false;
 }
 
+global $settingsBlock;
+function initSettingsBlock() {
+  global $settingsBlock;
+  $settingsBlock = array(
+    'all' => array(),
+    'loggedin' => array(),
+    'bo' => array(),
+    //'bv' => array(),
+    //'bj' => array(),
+    'global' => array(),
+    'admin' => array(),
+  );
+}
+
+function compileSettingsBlock($loc, $block) {
+  global $settingsBlock;
+  $level = empty($block['level']) ? 'all' : $block['level'];
+  // ensure array
+  if (!isset($settingsBlock[$level])) $settingsBlock[$level] = array();
+  if (!isset($settingsBlock[$level][$loc])) $settingsBlock[$level][$loc] = array();
+  //echo "compiling[$level] [", print_r($block, 1), "]<br>\n";
+  //$cLevel = $settingsBlock[$level][$loc];
+  if (isset($block['addFields'])) {
+    foreach($block['addFields'] as $f => $d) {
+      // what if we add and the field is already there? meh
+      // we should exit immediately so a dev never grabs that
+      if (isset($settingsBlock[$level][$loc][$f])) {
+        $msg = "$f is already used";
+        if (isBackend()) {
+          echo $msg;
+        } else {
+          wrapContent($msg);
+        }
+        exit(1);
+      }
+      $settingsBlock[$level][$loc][$f] = $d;
+    }
+  }
+  // modified field
+  // remove field
+}
+
+function getCompiledSettings($level) {
+  global $settingsBlock;
+  return $settingsBlock[$level];
+}
+
 function registerPackage($pkg_path) {
   //echo "pkg_path[$pkg_path]<br>\n";
   global $module_base;
@@ -61,6 +110,11 @@ function registerPackage($pkg_path) {
   // FIXME: could reduce diskio if we had a $pkg_path lock
 
   $pkg = false;
+  $shared = false;
+  if (is_readable($full_pkg_path . 'shared.php')) {
+    // make $share available to the next include
+    $shared = include $full_pkg_path . 'shared.php';
+  }
   if (is_readable($full_pkg_path . 'module.php')) {
     //echo "Loading [$full_pkg_path] module<br>\n";
     // we want to keep these to pure data as much as possible (no calculation to get result)
@@ -120,6 +174,15 @@ function registerPackage($pkg_path) {
           echo "<pre>Weird name not set", print_r($rsrcHdr, 1), "in [$full_pkg_path]</pre>\n";
         }
         $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params']);
+      }
+    }
+
+    if (!empty($data['settings'])) {
+      foreach($data['settings'] as $block) {
+        // level, actions: addFields
+        // location: where this action is happening...
+        compileSettingsBlock($block['location'], $block);
+        $pkg->addSettingsBlock($block['location'], $block);
       }
     }
   } else {
@@ -184,6 +247,8 @@ function registerPackages() {
   global $packages;
   $packages = array();
   //$packages['base'] = registerPackage('base');
+
+  initSettingsBlock();
 
   // data
   $groups = array(
