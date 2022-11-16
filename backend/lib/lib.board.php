@@ -23,9 +23,14 @@ getBoardSettingForm($uri)
 // getBoardUri to updateBoard URI, should create an object...
 // and bitch if it's held too long...
 // needs to return ID
+// why? for locking and multiuser edits, so we don't lose json data
+
 // what's the difference between this and getBoard?
-// well getBoard doesn't include boardid which somethings use
-function getBoardByUri($boardUri) {
+// well getBoard doesn't include boardid which somethings (like banner) use
+function getBoardByUri($boardUri, $options = false) {
+  extract(ensureOptions(array(
+    'include_fields' => array('settings'),
+  ), $options));
   /*
   global $db, $models;
   $res = $db->find($models['board'], array('criteria'=>array(
@@ -44,18 +49,20 @@ function getBoardByUri($boardUri) {
     }
   }
   */
+  // this doesn't return the boardid
   // definitely include the settings from json field
   //$boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
 
   $row = getBoardRaw($boardUri);
   $json = json_decode($row['json'], true);
   unset($row['json']);
-  $field = 'settings';
-  if (isset($json[$field])) {
-    $row[$field] = $json[$field];
-  } else {
-    // most are arrays
-    $row[$field] = array();
+  foreach($include_fields as $field) {
+    if (isset($json[$field])) {
+      $row[$field] = $json[$field];
+    } else {
+      // most are arrays
+      $row[$field] = array();
+    }
   }
 
   // don't worry about error handling
@@ -95,6 +102,8 @@ function recordRequest($type, $ip = '') {
   global $db, $models;
   if ($ip === '') $ip = getip();
 }
+
+// what uses this?
 function boardDealer($connections, $boardUri) {
   $mc = strlen($boardUri);
   $v = 0;
