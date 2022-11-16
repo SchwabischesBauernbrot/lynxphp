@@ -3,7 +3,8 @@ account identifier: {{login}}<br>
 {{global}}
 <a href="{{account}}">Account Settings</a><br>
 <!-- make tag, userboards are configurable -->
-<a href="{{create_board}}">Create Board</a><br>
+{{other_links}}
+<!-- a href="{{create_board}}">Create Board</a><br -->
 Owned boards
 <ul>
 {{ownedBoards}}
@@ -17,4 +18,9 @@ Owned boards
 <!-- end -->
 <!-- loop -->
   <a href="{{global}}">Global interface</a><br>
+<!-- end -->
+<!-- loop -->
+  <!-- we add bold to class if it's selected -->
+  <!-- url, label, classes, id -->
+  <a href="{{url}}" class="{{classess}}" id="{{id}}">{{label}}</a><br>
 <!-- end -->
