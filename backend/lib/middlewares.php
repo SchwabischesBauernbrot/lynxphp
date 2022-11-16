@@ -8,24 +8,32 @@
 // new name suggestion: boardExistsMiddleware ?
 function boardMiddleware($request, $options = false) {
   $boardUri = getQueryField('boardUri');
+  // also accept uri in request.params
+  if (!$boardUri && isset($request['params']['uri'])) {
+    $boardUri = $request['params']['uri'];
+  }
+  if (!$boardUri && isset($request['params']['boardUri'])) {
+    $boardUri = $request['params']['boardUri'];
+  }
   if (!$boardUri) {
-    sendResponse(array(), 400, 'No boardUri passed');
+    sendResponse2(array(), array('code' => 400, 'err' => 'No boardUri passed'));
     return;
   }
-  $boardData = getBoardByUri($boardUri);
+  extract(ensureOptions(array(
+    'getPageCount' => false,
+    'include_fields' => array('settings'),
+  ), $options));
+  $boardData = getBoardByUri($boardUri, array('include_fields' => $include_fields));
   if (!$boardData) {
-    sendResponse(array(), 404, 'Board does not exist');
+    sendResponse2(array(), array('code' => 404, 'err' => 'Board does not exist'));
     return;
   }
 
-  extract(ensureOptions(array(
-    'getPageCount' => false,
-  ), $options));
   if ($getPageCount) {
     $posts_model = getPostsModel($boardUri);
     $threadCount = getBoardThreadCount($boardUri, $posts_model);
     global $tpp;
-    $boardData['pageCount'] = ceil($threadCount/$tpp);
+    $boardData['pageCount'] = ceil($threadCount / $tpp);
   }
   return $boardData;
 }
@@ -33,8 +41,15 @@ function boardMiddleware($request, $options = false) {
 // way more useful if we just pass boardUri in...
 function boardOwnerMiddleware($request) {
   $boardUri = getQueryField('boardUri');
+  // also accept uri in request.params
+  if (!$boardUri && isset($request['params']['uri'])) {
+    $boardUri = $request['params']['uri'];
+  }
+  if (!$boardUri && isset($request['params']['boardUri'])) {
+    $boardUri = $request['params']['boardUri'];
+  }
   if (!$boardUri) {
-    sendResponse(array(), 400, 'No boardUri passed');
+    sendResponse2(array(), array('code' => 400, 'err' => 'No boardUri passed'));
     return;
   }
   $user_id = loggedIn();
@@ -56,7 +71,7 @@ function boardOwnerMiddleware($request) {
   }
   if (!$ok) {
     //wrapContent('You do not own this board: [' . $boardUri . ']' . print_r($ownedBoards, 1));
-    sendResponse(array(), 400, 'You do not own this board');
+    sendResponse2(array(), array('code' => 400, 'err' => 'You do not own this board'));
     return;
   }
   return $boardUri;
@@ -70,7 +85,7 @@ function userInGroupMiddleware($request, $groups) {
   }
   $pass = userInGroup($user_id, $groups); // does not send something
   if (!$pass) {
-    sendResponse(array(), 401, 'One of these access groups is required: '. join(',', $groups));
+    sendResponse2(array(), array('code' => 401, 'err' => 'One of these access groups is required: '. join(',', $groups)));
     return;
   }
   return true;
