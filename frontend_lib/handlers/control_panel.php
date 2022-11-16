@@ -16,6 +16,7 @@ function getControlPanel() {
   $board_html = $templates['loop0'];
   $admin_tmpl = $templates['loop1'];
   $global_tmpl = $templates['loop2'];
+  $link_tmpl = $templates['loop3'];
 
   $isAdmin = false;
   $isGlobal = false;
@@ -34,8 +35,8 @@ function getControlPanel() {
   }
 
   $boards_html = '';
+  global $pipelines;
   if (isset($account['ownedBoards']) && is_array($account['ownedBoards'])) {
-    global $pipelines;
     foreach($account['ownedBoards'] as $board) {
       $tmp = $board_html;
 
@@ -64,11 +65,24 @@ function getControlPanel() {
       $boards_html .= $tmp;
     }
   }
+
+  $links_io = array(
+    //'template' => $link_tmpl, // href, label
+    //'html' => '',
+    'navItems' => array(),
+  );
+  $pipelines[PIPELINE_ACCOUNT_NAV]->execute($links_io);
+  // $other_links_html = $links_io['html'];
+  $other_links_html = getNav2($links_io['navItems'], array(
+    'template' => $link_tmpl,
+  ));
+
   $tags = array(
     'login' => $account['login'],
     // FIXME get named route
     'account' => $BASE_HREF . 'account.php',
-    'create_board' => $BASE_HREF . 'create_board.html',
+    //'create_board' => $BASE_HREF . 'create_board.html',
+    'other_links' => $other_links_html,
     'logout' => $BASE_HREF . 'logout.php',
     'admin' => $isAdmin ? $admin_html : '',
     'global' => $isGlobal ? $global_html : '',
