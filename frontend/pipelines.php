@@ -74,6 +74,8 @@ $frontEndPipelines = array(
   'PIPELINE_GLOBALS_NAV',
   'PIPELINE_GLOBALS_HEADER_TMPL',
 
+  'PIPELINE_ACCOUNT_NAV',
+
   // SETTINGS be included in the next 2?
   'PIPELINE_USER_NAV',
   'PIPELINE_USER_HEADER_TMPL',
