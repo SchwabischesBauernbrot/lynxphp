@@ -277,7 +277,8 @@ function curl_log_report() {
       if ($l['method'] === 'HEAD') {
         curl_log_echo_header($l);
       } else {
-        echo '  [', $l['result'][0], ']<pre>', htmlspecialchars($l['result']), '</pre>', "\n";
+        // result can be empty on 304s
+        echo '  [', (empty($l['result'][0]) ? '' : $l['result'][0]), ']<pre>', htmlspecialchars($l['result']), '</pre>', "\n";
       }
     }
     echo '  Response headers: <pre>', htmlspecialchars(print_r($l['responseHeaders'], 1)), '</pre>', "\n";
