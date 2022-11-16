@@ -740,6 +740,61 @@ function getBoardPostCount($boardUri, $posts_model) {
   return $postCount;
 }
 
+function createBoard($uri, $title, $desc, $user_id) {
+  $uri = strtolower($uri);
+  // RFC1738: a-z0-9 $-_.~+!*'(),
+  // RFC3986: a-z0-9 -_.~
+  // now reserved: :/?#[]@!$&'()*+,;=
+  // {}^\~ are unsafe
+  // but some can be urlencoded...
+  // _ takes a shift and we don't need another separator like -
+  // ~ takes a shift but also unsafe...
+  // - is not allowed in postgres table names...
+  // postgres allows a-z ( also letters with diacritical marks and non-Latin letters)
+  // _$[0-9]
+  // $ aren't SQL standard
+  // mysql [0-9a-zAz]$_
+  $allowedChars = array('-', '.');
+  for($p = 0; $p < strlen($uri); $p++) {
+    if (preg_match('/^[a-z0-9]$/', $uri[$p])) {
+      // allowed
+      continue;
+    }
+    if (!in_array($uri[$p], $allowedChars)) {
+      // not allowed
+      return array(
+        'code' => 400,
+        'errors' => array('boardUri has invalid characters: [' . $uri[$p] . ']'. $uri)
+      );
+    }
+  }
+  global $db, $models;
+  $res = $db->find($models['board'], array('criteria'=>array(
+    array('uri', '=', $uri),
+  )));
+  if ($db->num_rows($res)) {
+    return array(
+      'code' => 403,
+      'errors' => array('Board already exists')
+    );
+  }
+  $fupPath = 'storage/boards/' . $uri;
+  if (!file_exists($fupPath) && !@mkdir($fupPath)) {
+    return array(
+      'code' => 500,
+      'errors' => array('Can not create board directory for file uploads')
+    );
+  }
+
+  $boardid = $db->insert($models['board'], array(array(
+    'uri'         => $uri,
+    'title'       => $title,
+    'description' => $desc,
+    'owner_id'    => $user_id,
+  )));
+  return $boardid;
+}
+
 function deleteBoard($boardid) {
   global $db, $models;
   // FIXME: posts? files?
