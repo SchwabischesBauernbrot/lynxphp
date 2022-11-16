@@ -6,7 +6,7 @@ return array(
     ),
     'forms' => array(
       array(
-        'route'   => '/admin/settings',
+        'route'   => '/admin/settings/:section',
         'handler' => 'admin_settings',
       ),
     ),
