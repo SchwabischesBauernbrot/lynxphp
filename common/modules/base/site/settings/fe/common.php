@@ -11,6 +11,11 @@ return array(
       'label' => 'Site Name',
       'type'  => 'text',
     ),
+    'logo' => array(
+      'label' => 'Site Logo',
+      'type'  => 'image',
+    ),
+    /*
     'showSiteName' => array(
       'label' => 'Show Site Name',
       'type'  => 'checkbox',
@@ -30,15 +35,12 @@ return array(
       'type'  => 'checkbox',
       'default' => true,
     ),
-    'logo' => array(
-      'label' => 'Site Logo',
-      'type'  => 'image',
-    ),
     'showLogo' => array(
       'label' => 'Show Logo',
       'type'  => 'checkbox',
       'default' => true,
     ),
+    */
   ),
 );
 
