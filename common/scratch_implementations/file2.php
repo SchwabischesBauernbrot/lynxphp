@@ -12,6 +12,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
   function __construct() {
     // FIXME: on startup - do a write test check
     $file = realpath('../frontend_storage') . '/cache2';
+    $this->changed = false;
     $res = $this->openFileInPool($file);
     $this->data = false;
     if ($res) {
@@ -24,16 +25,18 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     }
   }
 
+  function commit() {
+    if (!$this->data) return;
+    if ($this->changed) {
+      file_put_contents($this->filepath, serialize($this->data));
+    }
+    // probably want to retain this lock
+  }
+
   function __destruct() {
     $this->commit();
     //$this->closeLock($this->lockpath, $this->pid);
     unlink($this->lockpath);
-  }
-
-  function commit() {
-    if (!$this->data) return;
-    file_put_contents($this->filepath, serialize($this->data));
-    // probably want to retain this lock
   }
 
   function manyFilesGetPath($filename) {
@@ -61,6 +64,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     // these shouldn't be more than 1mb
     $serializedStr = file_get_contents($filepath);
     $data = unserialize($serializedStr);
+    $this->changed = false;
     return array(
       'file' => $filepath,
       'lock' => $lockpath,
@@ -109,6 +113,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
   }
 
   function set($key, $val) {
+    $this->changed = true;
     $this->data[$key] = $val;
     return true;
   }
