@@ -1,6 +1,6 @@
 <?php
 return array(
-  'name' => 'board_view',
+  'name' => 'base_board_view',
   'version' => 1,
   'resources' => array(
     array(
