@@ -8,8 +8,8 @@ class file_scratch_driver extends scratch_implementation_base_class {
   function __construct() {
     // we need to protect information, such as IP addresses
     // so we'll use the php extension so that only PHP can access this info
-    $this->file = '../frontend_storage/cache.php';
-    $this->lock = '../frontend_storage/cache.lock';
+    $this->file = '../frontend_storage/cache_v2.php';
+    $this->lock = '../frontend_storage/cache_v2.lock';
     if (!file_exists($this->file)) {
       if (!touch($this->file)) {
         echo "Can't create[", getcwd(), '/', $this->file, "] webserver can't create files or write to data?<br>\n";
@@ -32,11 +32,11 @@ class file_scratch_driver extends scratch_implementation_base_class {
     $lock = $this->lock;
     if (file_exists($lock)) {
       // wait until unlocked
-      $stilllocked=1;
+      $stilllocked = 1;
       // retry 3 times in 1s
-      for($i=0; $i<3; $i++) {
+      for($i = 0; $i < 3; $i++) {
         if (!file_exists($lock)) {
-          $stilllocked=0;
+          $stilllocked = 0;
           break;
         }
         usleep(333);
@@ -71,8 +71,9 @@ class file_scratch_driver extends scratch_implementation_base_class {
     }
     $found = 0;
     while(($line = fgets($fp)) !== false) {
-      $data = unserialize(trim($line));
-      if ($data['k'] != $key) {
+      $tline = trim($line);
+      list($lKey, $sValue) = explode('_:_', $tline, 2);
+      if ($lKey !== $key) {
         fputs($wfp, $line);
       }
     }
@@ -92,10 +93,12 @@ class file_scratch_driver extends scratch_implementation_base_class {
     $fp = fopen($this->file, 'r');
     if (!$fp) return false;
     while(($line = fgets($fp)) !== false) {
-      $data = unserialize(trim($line));
-      if ($data['k'] === $key) {
+      $tline = trim($line);
+      list($lKey, $sValue) = explode('_:_', $tline, 2);
+      if ($lKey === $key) {
+        $data = unserialize($sValue);
         fclose($fp);
-        return $data['v'];
+        return $data;
       }
     }
     fclose($fp);
@@ -106,30 +109,30 @@ class file_scratch_driver extends scratch_implementation_base_class {
     if (!$this->getlock()) {
       return false;
     }
-    $fp = fopen($this->file,'r');
+    $fp = fopen($this->file, 'r');
     $tmpfname = tempnam('/tmp', 'doubleplus');
     $wfp = fopen($tmpfname, 'w');
     if (!$fp || !$wfp) {
       unlink($this->lock);
       return true;
     }
-    $found=0;
-    // FIXME: change format so don't need to unserailize to get the k
-    // or just serialize the whole thing...
+    $found = 0;
     while(($line = fgets($fp)) !== false) {
-      $data = unserialize(trim($line));
-      if ($data['k'] !== $key) {
+      $tline = trim($line);
+      list($lKey, $sValue) = explode('_:_', $tline, 2);
+      if ($lKey !== $key) {
         fputs($wfp, $line);
       } else {
         // if key exists, replace it with new info
-        fputs($wfp, serialize(array('k'=>$key, 'v'=>$val))."\n");
-        $found=1;
+        //$data = unserialize($tline);
+        fputs($wfp, $key . '_:_' . serialize($val) . "\n");
+        $found = 1;
       }
     }
     fclose($fp);
     if (!$found) {
       // insert key at the end
-      fputs($wfp, serialize(array('k'=>$key, 'v'=>$val))."\n");
+      fputs($wfp, $key . '_:_' . serialize($val) . "\n");
     }
     fclose($wfp);
     unlink($this->file);
