@@ -42,7 +42,14 @@ if (strpos($_SERVER['REQUEST_URI'], '/themedemo/') !== false) {
     $theme = $io['userSettings']['current_theme'];
   }
   if ($theme) {
-    $sheet = 'css/themes/' . $theme . '.css';
+    // /user/settings/theme.php
+    // but then too much PHP executing...
+    // so we need a webroot for modules
+    // a webserver writeable directory under webroot
+    // or webserver magic to pull from common
+    //$sheet = 'css/themes/' . $theme . '.css';
+    // seems to be fine for the moment (maybe because no backend amplication)
+    $sheet = 'css.php?module=site_themes&sheets=' . $theme . '.css';
   } else {
     $io['head_html'] .= 'no theme in userSettings or overrideTheme in io [' . print_r($io, 1) . ']';
     return;
