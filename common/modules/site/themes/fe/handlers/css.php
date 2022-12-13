@@ -11,6 +11,7 @@ global $packages, $now;
 // FIXME: fileSize would be good to know per theme
 // can put a timer around this...
 $result = $packages['user_setting']->useResource('settings');
+//echo "<pre>", print_r($result, 1), "</pre>\n";
 $userSettings = $result['settings'];
 
 // normalize $theme
@@ -43,7 +44,8 @@ if (!empty($allThemes[$theme])) {
   // load theme
   header('Content-type: text/css');
   // or we could redirect where the theme is always cacheable
-  readfile('css/themes/' . $userSettings['current_theme'] . '.css');
+  // it's not in the webroot though...
+  readfile('../common/modules/site/themes/fe/css/' . $userSettings['current_theme'] . '.css');
 } else {
   echo "Invalid theme[", $userSettings['current_theme'], "]<br>\n";
   echo "Valid themes: ", join(',', $themes), "<br>\n";
