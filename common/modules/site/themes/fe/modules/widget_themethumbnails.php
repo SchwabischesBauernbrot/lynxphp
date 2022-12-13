@@ -7,6 +7,11 @@ $details = $io['details'];
 $fieldName = $io['field'];
 $value = $io['value'];
 
+if (!$value) {
+  $value = theme_getDefault();
+}
+//echo "value[$value]<br>\n";
+
 $io['html'] = '
 <style>
 .dummie-themes-ul {
@@ -66,9 +71,9 @@ $io['html'] = '
 <ul class="dummie-themes-ul">
 ';
 
-$first = array_shift($details['options']);
+//$first = array_shift($details['options']);
 asort($details['options']);
-array_unshift($details['options'], $first);
+//array_unshift($details['options'], $first);
 
 //global $shared;
 //echo "<pre>shared[", print_r($shared, 1), "]</pre>\n";
@@ -84,7 +89,8 @@ foreach($details['options'] as $v => $l) {
   }
   // ?v=' . $mtime . '
   */
-  if ($v === 0) $v = theme_getDefault();
+  //if ($v === 0) $v = theme_getDefault();
+  //echo "file[", $v, "] value[$value] sel[$sel]<br>\n";
   $io['html'] .= '
 <li class="dummie-themes-li">
   <div class="thumbnail-container" title="' . $l . '">
