@@ -13,14 +13,14 @@ foreach($packages as $pkg) {
   $pkg->frontendPrepare(false, 'GET', array(
     'loadHandlers'  => false,
     'loadForms'     => false,
-    'loadJs'        => true,
+    'loadCss'       => true,
     'loadModules'   => false,
     'loadPipelines' => false,
   ));
 }
 
 if (empty($_GET['module'])) {
-  echo "alert('module is not passed to js.php')";
+  echo "alert('module is not passed to css.php')";
   return;
 }
 
@@ -28,33 +28,34 @@ if (empty($_GET['module'])) {
 $module = $_GET['module'];
 //echo "module[$module]<br>\n";
 if (!isset($packages[$module])) {
-  echo "alert('js.php - [$module] module is not found')";
+  echo "alert('css.php - [$module] module is not found')";
   return;
 }
 
-$scripts = array();
-if (isset($_GET['scripts'])) {
-  $scripts = explode(',', $_GET['scripts']);
+$sheets = array();
+if (isset($_GET['sheets'])) {
+  $sheets = explode(',', $_GET['sheets']);
 }
 
 
 $pkg = $packages[$module];
 // can only be a fe folder
-$dir = $pkg->dir . 'fe/js/';
+$dir = $pkg->dir . 'fe/css/';
 
 $paths = array();
 $max = 0;
 $size = 0;
 foreach($pkg->frontend_packages as $fe_pkg) {
-  foreach($fe_pkg->js as $j) {
+  foreach($fe_pkg->css as $j) {
+    //echo "// ", print_r($j, 1), "\n";
     // could do generated JS here too tbh
     // but need to see how that would work with generate.php
-    if (count($scripts)) {
+    if (count($sheets)) {
       //echo "checking[", getcwd(), '/', $dir . $j['file'], "][", realpath(getcwd() . '/' . $dir . $j['file']), "]<br>\n";
       // data.php js.file needs to match script in js_add_script
       // also the _GET['scripts']
-      //echo "file[", basename($j['file']), "] scripts[", print_r($scripts, 1), "]<br>\n";
-      if (!in_array(basename($j['file']), $scripts)) {
+      //echo "file[", basename($j['file']), "] scripts[", print_r($sheets, 1), "]<br>\n";
+      if (!in_array(basename($j['file']), $sheets)) {
         continue;
       }
     }
@@ -74,11 +75,11 @@ foreach($pkg->frontend_packages as $fe_pkg) {
   }
 }
 
-if (checkCacheHeaders($max, array('contentType' => 'text/javascript', 'fileSize' => $size))) return;
+if (checkCacheHeaders($max, array('contentType' => 'text/css', 'fileSize' => $size))) return;
 
 // generate content
 foreach($paths as $p) {
-  echo "// $p\n";
+  echo "/* $p */\n";
   readfile($p);
 }
 
