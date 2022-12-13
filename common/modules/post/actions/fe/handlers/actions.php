@@ -22,6 +22,14 @@ $action = $_POST['action'];
 switch($action) {
   case 'delete':
     // FIXME: could be a ban-delete too
+    if (!is_array($_POST['checkedposts'])) {
+      if (strpos($_POST['checkedposts'], ',') === false) {
+        // just upgrade this single into an array
+        $_POST['checkedposts'] = array($_POST['checkedposts']);
+      } else {
+        $_POST['checkedposts'] = explode(',', $_POST['checkedposts']);
+      }
+    }
     if (is_array($_POST['checkedposts'])) {
       $threadNum = getOptionalPostField('thread') ? getOptionalPostField('thread') : 'ThreadNum';
       $postFields = array();
@@ -47,7 +55,8 @@ switch($action) {
         }
       }
     } else {
-      echo "write me!<br>\n";
+      // probably empty or invalid
+      echo "checkedpost is not an array, write me!<br>\n";
     }
   break;
   case 'report':
