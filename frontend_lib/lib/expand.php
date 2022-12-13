@@ -132,7 +132,9 @@ details[open].img#' . $labelId . ' .contentarea {
     // media
 
     // nojs
-    $classes[] = 'nojsonly-block';
+    if ($styleContentUrl) {
+      $classes[] = 'nojsonly-block';
+    }
     $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
     $html = $style;
     $html .= '<details' . $id . $class . '>' . "\n";
@@ -144,7 +146,9 @@ details[open].img#' . $labelId . ' .contentarea {
     // we need to reserve the space to avoid relayout
     // we can't just have JS insert these later...
     // or manipulate the html above...
-    $html .= '<a class="jsonly" href="' . $styleContentUrl . '">' . $label . '</a>';
+    if ($styleContentUrl) {
+      $html .= '<a class="jsonly" href="' . $styleContentUrl . '">' . $label . '</a>';
+    }
   }
   return $html;
 }
