@@ -143,13 +143,15 @@ class package {
         if (!is_array($rsrc['params']['querystring'])) $rsrc['params']['querystring'] = array($rsrc['params']['querystring']);
         if (!is_array($rsrc['params']['formData']))    $rsrc['params']['formData'] = array($rsrc['params']['formData']);
         if (!is_array($rsrc['params']['params']))      $rsrc['params']['params'] = array($rsrc['params']['params']);
+        //echo "<pre>params[", print_r($rsrc['params']['params'], 1), "]</pre>\n";
         $qs = array_flip($rsrc['params']['querystring']);
         $fd = array_flip($rsrc['params']['formData']);
         $ps = array_flip($rsrc['params']['params']);
-        //echo "<pre>[", print_r($qs, 1), "]</pre>\n";
-        //echo "<pre>[", print_r($fd, 1), "]</pre>\n";
-        //echo "<pre>[", print_r($params, 1), "]</pre>\n";
+        //echo "<pre>qs[", print_r($qs, 1), "]</pre>\n";
+        //echo "<pre>fd[", print_r($fd, 1), "]</pre>\n";
+        //echo "<pre>params[", print_r($ps, 1), "]</pre>\n";
         // FIXME: what if we call this multiple times?
+        //echo "<pre>params[", print_r($params, 1), "]</pre>\n";
         foreach($params as $k => $v) {
           //echo "[$k=$v]<br>\n";
           if (isset($qs[$k])) {
@@ -162,6 +164,7 @@ class package {
             echo "lib.package:::package::useResource($label) - Don't know what to do with $k in $label<br>\n";
           }
         }
+        //print_r($rsrc);
       } else
       if ($rsrc['params'] === 'querystring') {
         if (!isset($rsrc['querystring'])) $rsrc['querystring'] = array();
@@ -369,6 +372,7 @@ class package {
       'loadHandlers'  => true,
       'loadForms'     => true,
       'loadJs'        => false,
+      'loadCss'       => false,
       'loadModules'   => true,
       'loadPipelines' => true,
       'router' => $router, // false
@@ -519,6 +523,7 @@ class frontend_package {
     $this->handlers = array();
     $this->modules = array();
     $this->js = array();
+    $this->css = array();
     $this->ranOnce = false;
   }
 
@@ -568,6 +573,12 @@ class frontend_package {
       // no need to unpack, we just need to transfer the data
       // maybe some rules to determine if to load it or not?
       $this->js = $pData['js'];
+      // unpack it into pipelines if we're on this page?
+    }
+    if ($loadCss && isset($pData['css']) && is_array($pData['css'])) {
+      // no need to unpack, we just need to transfer the data
+      // maybe some rules to determine if to load it or not?
+      $this->css = $pData['css'];
       // unpack it into pipelines if we're on this page?
     }
     if ($loadModules && isset($pData['modules'])) {
