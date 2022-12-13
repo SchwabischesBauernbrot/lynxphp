@@ -17,6 +17,10 @@
 .v {
 }
 
+.boarduri {
+  font-family: monospace;
+}
+
 /* ported from hidefileinput.js */
 .form-post input[name="files[]"] {
   /* not using display: none because we still want to show the browser prompt for a "required" file */
