@@ -44,7 +44,7 @@ function getBoardThreadListing($q, $boardUri, $pagenum = 1) {
   // will this upload $threadListing['data']['board']['settings']
   // probably
   // also we know the portals because of the nature of the groupdata and where this file is
-  $boardThreads = $packages['board_view']->useResource('board_page', array('uri' => $boardUri, 'page' => $pagenum, 'portals' => join(',', $q['portals'])));
+  $boardThreads = $packages['base_board_view']->useResource('board_page', array('uri' => $boardUri, 'page' => $pagenum, 'portals' => join(',', $q['portals'])));
   if (!$boardThreads) {
     wrapContent("There is a problem with the backend [$boardUri]");
     return;
