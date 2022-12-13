@@ -1,5 +1,9 @@
 <?php
 
+// action
+//   link
+//   label
+//   includeWhere
 function action_getLevels() {
   $actions = array(
     'all'    => array(),
@@ -39,50 +43,80 @@ function action_getLinkHTML($a, $options) {
   return '<a href="' . $link . '">' . $a['label'] . '</a>';
 }
 
-// used for multiple levels of access
-function action_getHtml($actions, $options = false) {
+// decode permissions
+function action_decodePerms($actions, $options = false) {
   // unpack options
   extract(ensureOptions(array(
-    'boardUri' => false, // only if board context
-    'join'     => '<br>' . "\n",
+    'boardUri' => false, // for BO permission context
   ), $options));
 
-  $actions_html_parts = array();
+  $permitted = array();
   if (count($actions['all'])) {
     foreach($actions['all'] as &$a) {
-      /*
-      $post_actions_html_parts[] = '<a href="dynamic.php?boardUri=' . urlencode($boardUri) .
-        '&action=' . urlencode($a). '&id=' . $p['no']. '">' . $l . '</a>';
-      */
-      $actions_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
+      $permitted[] = $a;
+    }
+    unset($a);
+  }
+  if (count($actions['user']) && isLoggedIn()) {
+    foreach($actions['user'] as &$a) {
+      $permitted[] = $a;
     }
     unset($a);
   }
   if ($boardUri) {
     if (count($actions['bo']) && perms_isBO($boardUri)) {
       foreach($actions['bo'] as &$a) {
-        $actions_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
+        $permitted[] = $a;
       }
       unset($a);
     }
   }
-  if (count($actions['user']) && isLoggedIn()) {
-    foreach($actions['user'] as &$a) {
-      $actions_html_parts[] = action_getLinkHTML($a, $options);
+  if (perms_inGroups(array('global'))) {
+    foreach($actions['global'] as &$a) {
+      $permitted[] = $a;
     }
     unset($a);
   }
+  if (perms_inGroups(array('admin'))) {
+    foreach($actions['admin'] as &$a) {
+      $permitted[] = $a;
+    }
+    unset($a);
+  }
+  return $permitted;
+}
+
+function action_permittedToHtml($permitted, $options = false) {
+  // unpack join
+  extract(ensureOptions(array(
+    'join'     => '<br>' . "\n",
+  ), $options));
+
+  $actions_html_parts = array();
+  foreach($permitted as &$a) {
+    /*
+    $post_actions_html_parts[] = '<a href="dynamic.php?boardUri=' . urlencode($boardUri) .
+      '&action=' . urlencode($a). '&id=' . $p['no']. '">' . $l . '</a>';
+    */
+    //$actions_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
+    $actions_html_parts[] = action_getLinkHTML($a, $options);
+  }
+  unset($a);
 
   return join($join, $actions_html_parts);
 }
 
+// used for multiple levels of access
 /*
-  $htmlLinks = array();
-  foreach($dataActions as $a) {
-    $htmlLinks[] = action_getLinkHTML($a, array('where' => false));
-  }
-  $str .= '<td>' . join('<br>' > "\n", $htmlLinks);
+Options
+- boardUri: for BO permission context
+- join: how to join all the actions
+- where: parameter to set if includeWhere is set on the link
 */
+function action_getHtml($actions, $options = false) {
+  $permitted = action_decodePerms($actions, $options);
+  return action_permittedToHtml($permitted, $options);
+}
 
 // we should move the expander in here
 // so we can hide if no actions
@@ -90,5 +124,16 @@ function action_getHtml($actions, $options = false) {
 
 // the expand isn't always ideal because you can have more than one open at a time
 // but js could fix that...
+function action_getExpandHtml($actions, $options = false) {
+  $permitted = action_decodePerms($actions, $options);
+  if (count($permitted)) {
+    if (count($permitted) === 1) {
+      return action_permittedToHtml($permitted, $options);
+    } else {
+      return action_permittedToHtml($permitted, $options);
+    }
+  }
+}
+
 
 ?>
