@@ -29,7 +29,8 @@
 <div class="table-container flex-center mv-10 text-center">
 <table class="boardtable w900">
   <tr>
-    <th>Board</th>
+    <th>Link</th>
+    <th>Name</th>
     <th>Description</th>
     {{fields}}
     <!-- th>PPH</th>
@@ -43,8 +44,11 @@
 <!-- end -->
 <!-- loop -->
   <tr>
+    <td class="boarduri">
+      <a href="{{uri}}/"><nobr>/{{uri}}/</nobr></a>
+    </td>
     <td>
-      <span class="left"></span><a href="{{uri}}/"><nobr>/{{uri}}/</nobr> - <nobr>{{title}}</nobr></a>
+      <nobr>{{title}}</nobr>
     </td>
     <td>{{description}}</td>
     <!-- td>pph</td>
