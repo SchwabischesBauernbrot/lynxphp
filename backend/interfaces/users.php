@@ -28,6 +28,21 @@ function getAccount($user_id) {
   return $user;
 }
 
+function getUserByPubkey($pubkey) {
+  global $db, $models;
+  $res = $db->find($models['user'], array('criteria'=>array(
+    'publickey' => $pubkey,
+  )));
+  if (!$db->num_rows($res)) {
+    $db->free($res);
+    return null;
+  }
+  $user = $db->get_row($res);
+  $db->free($res);
+  return $user;
+}
+
+
 function getUserGroups($user_id) {
   global $db, $models;
   $models['usergroup']['parents'] = array(
