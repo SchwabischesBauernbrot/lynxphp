@@ -5,9 +5,14 @@
 
 function boardOwnerMiddleware($request) {
   $boardUri = $request['params']['uri'];
+  $ok = false;
+  // FIXME: board vols...
+  if (perms_isBO($boardUri) || perms_inGroups(array('admin', 'global'))) {
+    $ok = true;
+  }
+  /*
   // do we own this board?
   $account = backendLynxAccount();
-  $ok = false;
 
   // are we an admin or global?
   if (isset($account['groups'])) {
@@ -24,7 +29,7 @@ function boardOwnerMiddleware($request) {
       }
     }
   }
-  // FIXME: board vols...
+  */
   if (!$ok) {
     wrapContent('You do not own this board');
     return;
