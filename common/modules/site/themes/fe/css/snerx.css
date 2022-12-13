@@ -1,38 +1,38 @@
-/*yotsuba snerx*/
+/* snerx (from yotsuba) */
 :root
 {
-	--icon-color: invert(17%)sepia(89%)saturate(7057%)hue-rotate(2deg)brightness(93%)contrast(120%);
-	--alt-label-color: #F9CDA8;
-	--alt-font-color: #282828;
-	--background-top: #4E4A47;
-	--background-rest: #4E4A47;
-	--navbar-color: #4E4A47;
-	--post-color: #4A4644;
-	--post-outline-color: #413D3B;
-	--label-color: #4E4A47;
-	--box-border-color: #55504D;
-	--darken: #00000010;
-	--highlighted-post-color: #595653;
-	--highlighted-post-outline-color: #413F3D;
-	--board-title: #F9CDA8;
-	--hr: #3F3C3A;
-	--font-color: #ADADAD;
-	--name-color: #FBB2B2;
-	--capcode-color: #9F9E9E;
-	--subject-color: #F5A1A1;
-	--link-color: #F0CEB1;
-	--post-link-color: #78C5A4;
-	--link-hover: #F5A1A1;
-	--input-borders: #55504D;
-	--input-color: #ADADAD;
-	--input-background: #4E4A47;
-	--dice-color: #FFBE70;
-	--title-color: #FF7E7E;
-	--greentext-color: #8BE98B;
-	--pinktext-color: #E0727F;
+  --icon-color: invert(17%)sepia(89%)saturate(7057%)hue-rotate(2deg)brightness(93%)contrast(120%);
+  --alt-label-color: #F9CDA8;
+  --alt-font-color: #282828;
+  --background-top: #4E4A47;
+  --background-rest: #4E4A47;
+  --navbar-color: #4E4A47;
+  --post-color: #4A4644;
+  --post-outline-color: #413D3B;
+  --label-color: #4E4A47;
+  --box-border-color: #55504D;
+  --darken: #00000010;
+  --highlighted-post-color: #595653;
+  --highlighted-post-outline-color: #413F3D;
+  --board-title: #F9CDA8;
+  --hr: #3F3C3A;
+  --font-color: #ADADAD;
+  --name-color: #FBB2B2;
+  --capcode-color: #9F9E9E;
+  --subject-color: #F5A1A1;
+  --link-color: #F0CEB1;
+  --post-link-color: #78C5A4;
+  --link-hover: #F5A1A1;
+  --input-borders: #55504D;
+  --input-color: #ADADAD;
+  --input-background: #4E4A47;
+  --dice-color: #FFBE70;
+  --title-color: #FF7E7E;
+  --greentext-color: #8BE98B;
+  --pinktext-color: #E0727F;
 }
 
 .post-container, #float .post-container, .stickynav, .pages, .toggle-summary, .catalog-tile, #livetext, #threadstats
 {
-	border-width: 0 1px 1px 0;
+  border-width: 0 1px 1px 0;
 }
