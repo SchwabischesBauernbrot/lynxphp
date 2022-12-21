@@ -4,6 +4,19 @@ $fePkgs = array(
   array(
     'handlers' => array(
       array(
+        'route'   => '/overboard/page/:page.html',
+        'handler' => 'overboard',
+        /*
+        'cacheSettings' => array(
+          'files' => array(
+            // theme is also would affect this caching
+            'templates/header.tmpl', // wrapContent
+            'templates/footer.tmpl', // wrapContent
+          ),
+        ),
+        */
+      ),
+      array(
         'route'   => '/overboard.html',
         'handler' => 'overboard',
         /*
@@ -34,6 +47,10 @@ $fePkgs = array(
       array(
         'pipeline' => 'PIPELINE_SITE_LEFTNAV',
         'module' => 'site_nav',
+      ),
+      array(
+        'pipeline' => 'PIPELINE_BOARD_NAV',
+        'module' => 'board_nav',
       ),
     ),
   ),
