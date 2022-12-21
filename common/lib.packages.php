@@ -582,11 +582,11 @@ class frontend_package {
       // unpack it into pipelines if we're on this page?
     }
     if ($loadModules && isset($pData['modules'])) {
-      foreach($pData['modules'] as $m) {
+      foreach($pData['modules'] as $i => $m) {
         if (!defined($m['pipeline'])) {
           echo "Pipeline [", $m['pipeline'], "] is not defined, found in [", $this->pkg->dir, "]<br>\n";
         } else {
-          $this->addModule(constant($m['pipeline']), $m['module']);
+          $this->addModule(constant($m['pipeline']), $i, $m['module']);
         }
       }
     }
@@ -626,8 +626,9 @@ class frontend_package {
     $this->addHandler('POST', $cond . '.php', 'form_'.$file.'_post', $options['post_options']);
   }
 
-  function addModule($pipeline_name, $file = false) {
-    $bsn = new pipeline_module($this->pkg->name. '_' . $pipeline_name);
+  // idx because we can stack multiple on the same pipeline with different requirements
+  function addModule($pipeline_name, $idx, $file = false) {
+    $bsn = new pipeline_module($this->pkg->name. '_' . $pipeline_name . '_' . $idx);
     if ($file === false) $file = $pipeline_name;
     $path = strtolower($this->pkg->dir) . 'fe/modules/' . strtolower($file) . '.php';
     $pkg = &$this->pkg;
