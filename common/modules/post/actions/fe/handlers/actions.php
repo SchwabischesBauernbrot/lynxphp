@@ -33,8 +33,13 @@ switch($action) {
     if (is_array($_POST['checkedposts'])) {
       $threadNum = getOptionalPostField('thread') ? getOptionalPostField('thread') : 'ThreadNum';
       $postFields = array();
-      foreach($_POST['checkedposts'] as $postNum) {
-        $postFields[$boardUri . '-' . $threadNum . '-' . $postNum] = true;
+      foreach($_POST['checkedposts'] as $in) {
+        $parts = explode('-', $in);
+        if (count($parts) === 3) {
+          $postFields[$parts[0] . '-' . $parts[1] . '-' . $parts[2]] = true;
+        } else {
+          $postFields[$boardUri . '-' . $threadNum . '-' . $postNum] = true;
+        }
       }
       // how is multiple handled?
       $result = $pkg->useResource('content_actions',
@@ -141,7 +146,7 @@ if (is_array($result) && count($result['issues'])) {
 
   if ($ok && $boardUri) {
     if (!empty($_POST['page'])) {
-      redirectTo('/' . $boardUri . '/page/' . $_POST['page']);
+      redirectTo('/' . $boardUri . '/page/' . $_POST['page'] . '.html');
     } else
     if ($result['request'][0]['threadid'] !== 'ThreadNum') {
       redirectTo('/'. $boardUri . '/thread/' . $result['request'][0]['threadid'] . '.html');
