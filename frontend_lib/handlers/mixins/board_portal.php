@@ -38,15 +38,16 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
 
   $templates = loadTemplates('mixins/board_header');
   $tmpl = $templates['header'];
-  $page_wrapper_tmpl    = $templates['loop0'];
-  $pageLink_tmpl        = $templates['loop1'];
-  $pageLinkCurrent_tmpl = $templates['loop2'];
-  $boardNavLink_tmpl    = $templates['loop3'];
-  $boardNavCurrent_tmpl = $templates['loop4'];
-  $boardNavPrevLink_tmpl = $templates['loop5'];
-  $boardNavPrevCurrentLink_tmpl = $templates['loop6'];
-  $boardNavNextLink_tmpl = $templates['loop7'];
-  $boardNavNextCurrentLink_tmpl = $templates['loop8'];
+  $nav_wrapper_tmpl    = $templates['loop0'];
+  $page_wrapper_tmpl    = $templates['loop1'];
+  $pageLink_tmpl        = $templates['loop2'];
+  $pageLinkCurrent_tmpl = $templates['loop3'];
+  $boardNavLink_tmpl    = $templates['loop4'];
+  $boardNavCurrent_tmpl = $templates['loop5'];
+  $boardNavPrevLink_tmpl = $templates['loop6'];
+  $boardNavPrevCurrentLink_tmpl = $templates['loop7'];
+  $boardNavNextLink_tmpl = $templates['loop8'];
+  $boardNavNextCurrentLink_tmpl = $templates['loop9'];
 
   // would be nice to have the board settings by here
   // so we can pass it in to control/hint the nav
@@ -131,13 +132,19 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     }
 
     // pop them into page_wrapper_tmpl
-    $boardNav = replace_tags($page_wrapper_tmpl, array(
+    $page_nav_html = replace_tags($page_wrapper_tmpl, array(
       'pages' => $pages_html,
       'boardNav' => $nav_html,
     ));
   } else {
-    $boardNav = $nav_html;
+    $page_nav_html = $nav_html;
   }
+  if ($page_nav_html) {
+    $boardNav = replace_tags($nav_wrapper_tmpl, array(
+      'boardNav' => $page_nav_html,
+    ));
+  }
+  //echo "<pre>boardNav[", htmlspecialchars(print_r($boardNav, 1)), "]</pre>\n";
 
   $p = array(
     'tags' => array(
@@ -268,6 +275,7 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
 
 // this isn't chainable
 // it doesn't return a str
+// see options in renderBoardPortalData, renderBoardPortalHeaderEngine, and renderBoardPortalFooterEngine
 function getBoardPortal($boardUri, $boardData = false, $options = false) {
   //echo "[", print_r($boardData, 1), "]";
   //echo "options[", print_r($options, 1), "]";
