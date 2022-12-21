@@ -61,6 +61,14 @@ $fePkgs = array(
         'pipeline' => 'PIPELINE_GLOBALS_NAV',
         'module' => 'global_nav',
       ),
+      array(
+        'pipeline' => 'PIPELINE_POST_META_PROCESS',
+        'module' => 'post_meta_check',
+      ),
+      array(
+        'pipeline' => 'PIPELINE_POST_META_PROCESS',
+        'module' => 'post_meta_label',
+      ),
     ),
   ),
 );
