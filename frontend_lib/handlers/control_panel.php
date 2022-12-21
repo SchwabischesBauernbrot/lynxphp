@@ -38,7 +38,6 @@ function getControlPanel() {
   global $pipelines;
   if (isset($account['ownedBoards']) && is_array($account['ownedBoards'])) {
     foreach($account['ownedBoards'] as $board) {
-      $tmp = $board_html;
 
       $boardUri = $board;
       $board_actions = action_getLevels();
@@ -60,9 +59,11 @@ function getControlPanel() {
       ));
 
       // ['uri'] lynxchan just lists the names, if you need this use an /opt
-      $tmp = str_replace('{{uri}}', $board, $tmp);
-      $tmp = str_replace('{{actions}}', $board_actions_html, $tmp);
-      $boards_html .= $tmp;
+      $tags = array(
+        'uri' => $board,
+        'actions' => $board_actions_html
+      );
+      $boards_html .= replace_tags($board_html, $tags);
     }
   }
 
