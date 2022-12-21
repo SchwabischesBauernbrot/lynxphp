@@ -286,8 +286,9 @@ function renderPortalHeader($type, $options = false) {
     'prelabel' => $prelabel,
     'postlabel' => $postlabel,
   );
+  $nav_html = '';
   if (count($navItems2)) {
-    $nav_html = getNav2($navItems2, $navOptions);
+    $nav_html .= getNav2($navItems2, $navOptions);
   }
   if (count($navItems)) {
     // the concat seems to work for now
