@@ -137,19 +137,16 @@ function renderPost($boardUri, $p, $options = false) {
 
   // os disk cache will handle caching
   $templates = loadTemplates('mixins/post_detail');
-  $checkable_template = $templates['loop0'];
-  $posticons_template = $templates['loop1'];
+  //$checkable_template = $templates['loop0'];
+  $posticons_template = $templates['loop0'];
   // icon, title
-  $icon_template      = $templates['loop2'];
-  $file_template      = $templates['loop3'];
-  $replies_template   = $templates['loop4'];
-  $reply_template     = $templates['loop5'];
-  $omitted_template   = $templates['loop6'];
+  $icon_template      = $templates['loop1'];
+  $file_template      = $templates['loop2'];
+  $replies_template   = $templates['loop3'];
+  $reply_template     = $templates['loop4'];
+  $omitted_template   = $templates['loop5'];
 
   $postmeta = '';
-  if ($checkable) {
-    $postmeta .= replace_tags($checkable_template, array('no' => $p['no']));
-  }
 
   // add icons to postmeta
   $icon_io = array(
@@ -206,9 +203,17 @@ function renderPost($boardUri, $p, $options = false) {
     $postmeta .= '<span class="user-id">' . htmlspecialchars($p['user-id']) . '</span>';
   }
 
-  if ($postmeta !== '' && $checkable) {
-    $postmeta = '      <label>' . "\n" . $postmeta . '      </label>';
-  }
+  // Hook processing for $postmeta
+  $meta_io = array(
+    'uri' => $boardUri,
+    'threadNum' => $threadId,
+    'p' => $p,
+    'meta' => $postmeta,
+    // temp, remove later
+    'checkable' => $checkable,
+  );
+  $pipelines[PIPELINE_POST_META_PROCESS]->execute($meta_io);
+  $postmeta = $meta_io['meta'];
 
   $omitted_html = '';
   if ($isOP) {
