@@ -3,7 +3,7 @@
 $fePkgs = array(
   array(
     'handlers' => array(
-      // might be able to combine these into the same handler
+      // might be able to combine these into the same handler, yea...
       array(
         'route'  => '/:uri/page/:page.html',
         'handler' => 'page',
