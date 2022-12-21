@@ -31,6 +31,9 @@ function loadTemplatesFile($path) {
   $section = 'header';
   $loop = -1;
   $templates = array('header' => '');
+  if (DEV_MODE) {
+    $templates = array('header' => '<!-- DEV_MODE: included from ' . $path . ' -->' . "\n");
+  }
   foreach($lines as $line) {
     $tline = trim($line);
     if ($tline === '<!-- loop -->') {
@@ -50,6 +53,9 @@ function loadTemplatesFile($path) {
 function loadTemplatesFile2($path) {
   $section = 'header';
   $templates = array($section => '');
+  if (DEV_MODE) {
+    $templates = array('header' => '<!-- DEV_MODE: included from ' . $path . ' -->' . "\n");
+  }
   $lines = file($path);
   foreach($lines as $line) {
     $tline = trim($line);
