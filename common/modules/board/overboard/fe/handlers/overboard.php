@@ -45,16 +45,8 @@ foreach($boards as $c=>$b) {
   $boards_html .= $tmp . "\n";
 }
 */
-$tags = array(
-  'uri' => 'overboard',
-  'title' => 'Overboard Index',
-  'description' => 'content from all of our boards',
-  'boards' => $boards_html,
-);
-
-$content = replace_tags($templates['header'], $tags);
-
 $threads_html = '';
+
 if (isset($overboardData['threads'])) {
   global $boards_settings;
   foreach($overboardData['threads'] as $thread) {
@@ -75,7 +67,7 @@ if (isset($overboardData['threads'])) {
   }
 }
 
-if (0) {
+if (1) {
   $boardData = array(
     'pageCount' => 1,
     'title' => 'All Boards',
@@ -86,6 +78,9 @@ if (0) {
 
   $boardPortal = getBoardPortal('overboard', $boardData, array(
     'pagenum' => $pagenum,
+    'noBoardHeaderTmpl' => true, // controls banner
+    'isThread' => true, // turn off paging
+    //'isCatalog' => true, // prefix title
     'threadClosed' => true, // turn off post form
   ));
   // need to turn off over-catalog? over-logs? over banner?
@@ -96,4 +91,17 @@ if (0) {
   );
 }
 
-wrapContent($boardPortal['header'] . $threads_html . $boardPortal['footer']);
+$tags = array(
+  'uri' => 'overboard',
+  'title' => 'Overboard Index',
+  'description' => 'content from all of our boards',
+  'boards' => $boards_html,
+
+  'pagenum' => $pagenum,
+  'boardNav' => '',
+  'threads' => $threads_html,
+);
+
+$content = replace_tags($templates['header'], $tags);
+
+wrapContent($boardPortal['header'] . $content . $boardPortal['footer']);
