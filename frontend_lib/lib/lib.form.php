@@ -25,6 +25,10 @@ function simpleForm($action, $formFields, $button) {
   return generateForm($action, $formFields, $values, $formOptions);
 }
 
+// fields (keyed by field name)
+// - type
+// - label
+
 function generateForm($action, $fields, $values, $options = false) {
   //echo "[", print_r($options, 1), "]<br>\n";
   global $pipelines;
