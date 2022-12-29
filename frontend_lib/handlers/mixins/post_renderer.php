@@ -81,6 +81,8 @@ function renderPost($boardUri, $p, $options = false) {
     'p' => $p,
     'actions'  => $post_actions,
     // FIXME: pass post count...
+    // what uses this and what data does it need?
+    // probably to see if things like reacts are enabled...
     'boardSettings' => $boardSettings,
   );
   if ($postCount !== false) {
