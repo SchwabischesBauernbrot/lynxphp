@@ -27,11 +27,13 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   extract(ensureOptions(array(
     'pagenum'   => 0,
     'isCatalog' => false,
+    // isn't isThread and ThreadNum the samething?
     'isThread'  => false,
     'threadNum' => 0,
     'noBoardHeaderTmpl' => false,
     // turns off post_form:
     'threadClosed'      => false,
+    'threadSaged'       => false,
     'maxMessageLength'  => false,
     'boardSettings'     => false,
   ), $options));
@@ -171,6 +173,8 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'isCatalog' => $isCatalog,
     'threadNum' => $threadNum,
     'pagenum' => $pagenum,
+    'threadClosed' => $threadClosed,
+    'threadSaged'  => $threadSaged,
     // used in footer
     'boardNav' => $boardNav,
     'postForm' => $form_html,
@@ -220,6 +224,9 @@ function renderBoardPortalHeaderEngine($row, $boardUri, $boardData) {
     'pretitle' => $isCatalog ? 'Catalog(' : '',
     'posttitle' => $isCatalog ? ')' : '',
     'linkStyle' => $isCatalog ? '' : ' style="color: var(--board-title)"',
+    'vichanBanner' => $threadNum ? '' : ' style="display: none"',
+    // Closed > Saged > Reply
+    'mode' => $row['threadClosed'] ? 'Closed' : ($row['threadSaged'] ? 'Saged' : 'Reply'),
   )));
 }
 
@@ -268,7 +275,7 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
     'threadstats' => $threadstats_html,
     'postactions' => renderPostActions($boardUri),
     'enabler' => $enabler_html,
-    'enableAutoRefresh' => 'checked',
+    'enableAutoRefresh' => $row['threadClosed'] ? '' : 'checked',
     'postForm' => $row['postForm'] ? str_replace('{{postForm}}', $row['postForm'], $postForm_tmpl) : '',
   )));
 }
