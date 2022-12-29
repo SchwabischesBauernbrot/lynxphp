@@ -21,6 +21,18 @@ $boardnav_html = $tmp;
 */
 
 $boardData = getBoardThread($boardUri, $threadNum);
+/*
+if ($boardData === false) {
+  // 404
+  http_response_code(404);
+  wrapContent('This thread does not exist');
+  return;
+}
+*/
+//echo "<pre>", $boardData['sageLimit'], "</pre>\n";
+
+$sageLimit  = empty($boardData['sageLimit']) ? 500 : $boardData['sageLimit'];
+$replyLimit = empty($boardData['replyLimit']) ? 500 : $boardData['replyLimit'];
 
 foreach($boardData['posts'] as $j => $post) {
   preprocessPost($boardData['posts'][$j]);
@@ -36,6 +48,16 @@ $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
 $posts_html = '';
 $files = 0;
 $cnt = count($boardData['posts']);
+$closed = false;
+// FIXME: move into a pipeline
+if (count($boardData['posts'])) {
+  $closed = empty($boardData['posts'][0]['closed']) ? false : true;
+}
+if ($cnt > $replyLimit) {
+  $closed = true;
+}
+$saged = $cnt > $sageLimit;
+//echo "cnt[$cnt / $sageLimit / $replyLimit]<br>\n";
 foreach($boardData['posts'] as $post) {
   //echo "<pre>", print_r($post, 1), "</pre>\n";
   $tmp = $post_template;
@@ -69,16 +91,11 @@ global $pipelines;
 $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
 $tmpl = replace_tags($tmpl, $p['tags']);
 
-// FIXME: move into a pipeline
-$closed = false;
-if (count($boardData['posts'])) {
-  $closed = empty($boardData['posts'][0]['closed']) ? false : true;
-}
-
 $boardPortal = getBoardPortal($boardUri, $boardData, array(
   'isThread' => true,
   'threadNum' => $threadNum,
   'threadClosed' => $closed,
+  'threadSaged'  => $saged,
   'maxMessageLength' => $boardData['maxMessageLength'],
 ));
 
