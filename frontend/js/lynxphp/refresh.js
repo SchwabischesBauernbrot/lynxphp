@@ -130,7 +130,7 @@ function refreshPosts(manual) {
     // refreshButton.style.display = 'inline'
     //console.log('refreshPosts - autoRefresh', autoRefresh)
     if (autoRefresh) {
-      startTimer((manual || result.foundNewReplies) ? 20 : lastRefresh * 2)
+      startTimer((manual || result.foundNewReplies) ? 10 : lastRefresh * 2)
     }
     refreshElem.style.display = 'block'
     refreshingElem.style.display = 'none'
