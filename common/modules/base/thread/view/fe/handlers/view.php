@@ -22,15 +22,13 @@ $boardnav_html = $tmp;
 
 $boardData = getBoardThread($boardUri, $threadNum);
 if ($boardData === false) {
-  // 404
   http_response_code(404);
   wrapContent('Board ' . $boardUri . ' does not exist');
   return;
 }
 // MISSING_BOARD just means no board key in data...
 // empty may pick up an valid empty array
-if (!isset($boardData['title']) || $boardData['posts'] === false) {
-  // 404
+if (!isset($boardData['title']) || !isset($boardData['posts']) || $boardData['posts'] === false) {
   http_response_code(404);
   wrapContent('This thread does not exist');
   return;
@@ -38,13 +36,11 @@ if (!isset($boardData['title']) || $boardData['posts'] === false) {
 // lynxchan bridge error handling:
 // uri and settings: array(), pageCount: 15 will be set
 if (!isset($boardData['title'])) {
-  // 404
   http_response_code(404);
   wrapContent('Board ' . $boardUri . ' does not exist');
   return;
 }
 if (!isset($boardData['posts'])) {
-  // 404
   http_response_code(404);
   wrapContent('This thread does not exist');
   return;
