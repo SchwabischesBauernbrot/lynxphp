@@ -21,14 +21,27 @@ $boardnav_html = $tmp;
 */
 
 $boardData = getBoardThread($boardUri, $threadNum);
-/*
 if ($boardData === false) {
+  // 404
+  http_response_code(404);
+  wrapContent('Board ' . $boardUri . ' does not exist');
+  return;
+}
+// lynxchan bridge error handling:
+//echo "boardData[", print_r($boardData, 1), "]<br>\n";
+// uri and settings: array(), pageCount: 15 will be set
+if (!isset($boardData['title'])) {
+  // 404
+  http_response_code(404);
+  wrapContent('Board ' . $boardUri . ' does not exist');
+  return;
+}
+if (!isset($boardData['posts'])) {
   // 404
   http_response_code(404);
   wrapContent('This thread does not exist');
   return;
 }
-*/
 //echo "<pre>", $boardData['sageLimit'], "</pre>\n";
 
 $sageLimit  = empty($boardData['sageLimit']) ? 500 : $boardData['sageLimit'];
