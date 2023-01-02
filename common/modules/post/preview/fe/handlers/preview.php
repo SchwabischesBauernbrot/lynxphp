@@ -35,6 +35,12 @@ if (!empty($res['final'])) {
       'canonical' => CANONICAL_BASE . $boardUri . '/preview/' . $id,
     );
   }
+  // final.threadid, final.created_at
+  if (!isset($res['final']['created_at'])) {
+    http_response_code(404);
+    wrapContent("Post[$id] on board[$boardUri] does not exist<br>\n");
+    return;
+  }
 
   wrapContent(renderPost($boardUri, $res['final'], array(
     'checkable' => false,
@@ -43,6 +49,8 @@ if (!empty($res['final'])) {
     'postCount' => $res['postCount'],
     // postCount?
     'boardSettings' => $res['boardSettings'],
+    // FIXME: get some BE-EP somehow
+    'userSettings' => getUserSettings(),
   )), $wrapOptions);
 } else {
   /*
