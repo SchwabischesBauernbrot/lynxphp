@@ -51,7 +51,7 @@ if (!isset($boardData['posts'])) {
 //echo "<pre>", $boardData['sageLimit'], "</pre>\n";
 
 $sageLimit  = empty($boardData['sageLimit']) ? 500 : $boardData['sageLimit'];
-$replyLimit = empty($boardData['replyLimit']) ? 500 : $boardData['replyLimit'];
+$replyLimit = empty($boardData['replyLimit']) ? 1000 : $boardData['replyLimit'];
 
 foreach($boardData['posts'] as $j => $post) {
   preprocessPost($boardData['posts'][$j]);
