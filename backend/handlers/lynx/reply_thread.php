@@ -71,34 +71,6 @@ if ($newpost_process_io['addToPostsDB']) {
   // can be an array (issues,id) if file errors
   $data = createPost($boardUri, $post, $files, $privPost);
 
-  /*
-  $id = $db->insert($posts_model, array($post));
-  $data = (int)$id;
-  $posts_priv_model = getPrivatePostsModel($boardUri);
-  $privPost['postid'] = $id; // update postid
-  $db->insert($posts_priv_model, array($privPost));
-  $issues = processFiles($boardUri, $_POST['files'], $threadid, $id);
-
-  // bump board
-  $urow = array('last_post' => (int)$now);
-  $db->update($models['board'], $urow, array('criteria'=>array(
-    array('uri', '=', $boardUri),
-  )));
-
-  // bump thread
-  $urow = array();
-  $db->update($posts_model, $urow, array('criteria'=>array(
-    array('postid', '=', $threadid),
-  )));
-
-  if (is_array($issues)) {
-    return sendResponse(array(
-      'issues' => $issues,
-      'id' => $data
-    ));
-  }
-  */
-
   sendResponse($data);
 } else {
   sendResponse($newpost_process_io['returnId']);
