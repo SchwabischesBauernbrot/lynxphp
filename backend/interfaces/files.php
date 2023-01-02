@@ -17,7 +17,8 @@ function fileDBtoAPI(&$row, $boardUri) {
   //echo "<pre>[", print_r($row, 1), "]</pre>\n";
 
   // if file exists
-  if (file_exists($row['path']) && filesize($row['path'])) {
+  $haveSourceFile = file_exists($row['path']) && filesize($row['path']);
+  if ($haveSourceFile) {
     // fix size
     if (empty($row['size']) && $row['fileid']) {
       global $db;
@@ -27,6 +28,7 @@ function fileDBtoAPI(&$row, $boardUri) {
       $db->update($post_files_model, $urow, array('criteria' =>  array('fileid' => $row['fileid'])));
       $row['size'] = $size;
     }
+
     // fix mime_type since it drives thumbnailing
     if (empty($row['mime_type']) && $row['fileid']) {
       global $db;
@@ -41,7 +43,8 @@ function fileDBtoAPI(&$row, $boardUri) {
     }
     $m6 = substr($row['mime_type'], 0, 6);
     $isImage = $m6 === 'image/';
-    // fix image size
+
+    // fix 0 image sizes
     if ((empty($row['w']) || empty($row['h'])) && $row['fileid'] && $isImage) {
       global $db;
       $post_files_model = getPostFilesModel($boardUri);
@@ -81,12 +84,14 @@ function fileDBtoAPI(&$row, $boardUri) {
       $row['tn_h'] = $sizes[1];
     }
   } else {
-    // request generation
-    //echo "Requesting generation of [", $row['path'], "]<br>\n";
-    global $workqueue;
-    $row['boardUri'] = $boardUri;
-    $workqueue->addWork(PIPELINE_FILE, $row);
     // but how do we not loop?
+    if ($haveSourceFile) {
+      // request generation
+      //echo "Requesting generation of [", $row['path'], "]<br>\n";
+      global $workqueue;
+      $row['boardUri'] = $boardUri;
+      $workqueue->addWork(PIPELINE_FILE, $row);
+    }
   }
 
   unset($row['fileid']);
@@ -140,7 +145,10 @@ function parsePath($filePath) {
   return array(
     'file' => $filename,
     'thumb' => $path . '/t_' . $filename,
-    'path' => $path,
+    // this isn't the full source path
+    // this is the directory of storage
+    // maybe should be dir
+    'dir' => $path,
   );
 }
 
