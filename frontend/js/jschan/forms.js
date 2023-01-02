@@ -793,8 +793,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const myPostId = localStorage.getItem('myPostId');
   if (myPostId) {
-    console.log('jumping to', myPostId)
-    window.location.hash = myPostId;
+    // we don't always want to jump
+    // say you're reading a large thread and slowly reading all the responses
+    // may encourage reply-guying but sometimes needed
+    //console.log('jumping to', myPostId)
+    //window.location.hash = myPostId;
     localStorage.removeItem('myPostId');
   }
 
