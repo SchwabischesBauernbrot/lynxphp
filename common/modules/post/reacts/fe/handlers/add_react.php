@@ -14,7 +14,8 @@ $result = $pkg->useResource('add_react', array(
   'react'    => $react,
 ));
 
-if ($result['success']) {
+// but why isn't success set?
+if (isset($result['success']) && $result['success']) {
   // redirect back to the post
   global $BASE_HREF;
   redirectTo($BASE_HREF . $uri . '/thread/' . $threadId . '.html#' . $postId);
