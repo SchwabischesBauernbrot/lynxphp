@@ -10,6 +10,7 @@ return array(
         'unwrapData' => true,
         'requires' => array('boardUri'),
         'params' => 'querystring',
+        'dontCache' => true,
       ),
     ),
     array(
