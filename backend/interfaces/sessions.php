@@ -46,6 +46,8 @@ function createSession($userid) {
   // we can update it after the fact
   // not much to change before hand, no validations or checks here
   $sesRow['id'] = $id;
+  // is this always a login though
+  // an empty session doesn't mean it's complete
   $pipelines[PIPELINE_USER_LOGIN]->execute($sesRow);
 
   return array(
