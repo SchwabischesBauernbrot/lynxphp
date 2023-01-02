@@ -196,6 +196,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
               toggle(thumbElement, expandedElement, fileName, pfs);
             }, true);
             expandedElement.controls = 'true';
+            expandedElement.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              toggle(thumbElement, expandedElement, fileName, pfs);
+            }, true)
             source = document.createElement('source');
             expandedElement.appendChild(source);
             if (type === 'audio' && thumbElement.nodeName === 'IMG') {
