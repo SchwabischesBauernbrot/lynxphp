@@ -1,5 +1,6 @@
 <?php
 
+/** send $_FILES to BE and get handles */
 // filter_fields - which keys in _FILES to process, if false then all
 // FIXME: we should not output at all
 // option to not upload?
