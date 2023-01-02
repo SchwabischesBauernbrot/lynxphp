@@ -27,8 +27,14 @@ if ($boardData === false) {
   wrapContent('Board ' . $boardUri . ' does not exist');
   return;
 }
+// MISSING_BOARD just means no board key in data...
+if ($boardData['posts'] === false) {
+  // 404
+  http_response_code(404);
+  wrapContent('This thread does not exist');
+  return;
+}
 // lynxchan bridge error handling:
-//echo "boardData[", print_r($boardData, 1), "]<br>\n";
 // uri and settings: array(), pageCount: 15 will be set
 if (!isset($boardData['title'])) {
   // 404
