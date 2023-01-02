@@ -49,6 +49,12 @@ function getBoardThreadListing($q, $boardUri, $pagenum = 1) {
     wrapContent("There is a problem with the backend [$boardUri]");
     return;
   }
+  // lynxbridge
+  if (empty($boardThreads['pageCount'])) {
+    http_response_code(404);
+    wrapContent("Board [$boardUri] does not exist");
+    return;
+  }
   //echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
 
   getBoardThreadListingRender($boardUri, $boardThreads, $pagenum);
@@ -75,6 +81,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
 
   extract(ensureOptions(array(
     'noBoardHeaderTmpl' => false,
+    'noActions' => false,
   ), $wrapOptions));
 
   //echo "test[", htmlspecialchars(print_r($templates, 1)),"]<br>\n";
@@ -114,6 +121,9 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   unset($nPosts);
 
   $threads_html = '';
+  // hack for now
+  $userSettings = getUserSettings();
+  //echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
   foreach($pageData as $thread) {
     //echo "<pre>", print_r($thread, 1), "</pre>\n";
     //echo "[", $thread['posts'][0]['no'], "] replies[", $thread['thread_reply_count'], "]<br>\n";
@@ -130,6 +140,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
       $threads_html .= renderPost($boardUri, $post, array(
         'checkable' => true, 'postCount' => empty($thread['thread_reply_count']) ? -1 : $thread['thread_reply_count'],
         'topReply' => $topReply, 'where' => $boardUri . '/', 'boardSettings' => $boardData['settings'],
+        'userSettings' => $userSettings, 'noActions' => $noActions,
       ));
       //if ($i === count($posts) - 1) $threads_html .= $threadFtr_tmpl;
     }
@@ -168,7 +179,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
       'pagenum' => $pagenum,
       // mixin
       //'postform' => renderPostForm($boardUri, $boardUri . '/catalog'),
-      'postactions' => renderPostActions($boardUri),
+      'postactions' => $noActions ? '' : renderPostActions($boardUri),
     ),
   );
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
