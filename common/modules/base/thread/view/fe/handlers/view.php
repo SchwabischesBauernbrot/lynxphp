@@ -28,7 +28,8 @@ if ($boardData === false) {
   return;
 }
 // MISSING_BOARD just means no board key in data...
-if ($boardData['posts'] === false) {
+// empty may pick up an valid empty array
+if (!isset($boardData['title']) || $boardData['posts'] === false) {
   // 404
   http_response_code(404);
   wrapContent('This thread does not exist');
@@ -77,12 +78,16 @@ if ($cnt > $replyLimit) {
 }
 $saged = $cnt > $sageLimit;
 //echo "cnt[$cnt / $sageLimit / $replyLimit]<br>\n";
+// hack for now
+$userSettings = getUserSettings();
+//echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
 foreach($boardData['posts'] as $post) {
   //echo "<pre>", print_r($post, 1), "</pre>\n";
   $tmp = $post_template;
   $posts_html .= renderPost($boardUri, $post, array(
     'checkable' => true, 'postCount' => $cnt,
     'noOmit' => true, 'boardSettings' => $boardData['settings'],
+    'userSettings' => $userSettings,
   ));
   if (isset($post['files'])) {
     $files += count($post['files']);
