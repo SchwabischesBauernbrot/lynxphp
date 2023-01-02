@@ -301,6 +301,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
   }
 
+  // process all the quotes
   // from top to bottom, posts are created in order
   // so a reference here means the post may exist before it
   const toAdd = []
@@ -349,7 +350,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
     quotes[i].addEventListener('mouseover', toggleHighlightPost, false);
     quotes[i].addEventListener('mouseout', toggleHighlightPost, false);
   }
-  console.log('quotes processed')
+  console.log('quotes', toAdd.length, 'processed')
+
+  // add backlinks
   for(var i in toAdd) {
     const elem = toAdd[i][0]
     const span = toAdd[i][1]
