@@ -6,6 +6,7 @@ if (in_array('board', $io['portals'])) {
 
   // need to access request but all we got is response
   // response isn't going to have boardid
+  $boardUri = false;
   if (isset($io['data']['board'])) {
     $boardUri = $io['data']['board']['uri'];
   } else
@@ -19,7 +20,11 @@ if (in_array('board', $io['portals'])) {
   // boards not board?
   if (!isset($io['out']['boards'])) $io['out']['boards'] = array();
 
-  $io['out']['board']['banners'] = getBannersByUri($boardUri);
+  if ($boardUri) {
+    $io['out']['board']['banners'] = getBannersByUri($boardUri);
+  } else {
+    $io['out']['board']['banners'] = array();
+  }
 }
 
 ?>
