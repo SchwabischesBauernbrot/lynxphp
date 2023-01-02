@@ -39,8 +39,8 @@ if (SCRATCH_DRIVER !== 'file') {
   // auto will load file2
   include '../common/scratch_implementations/file.php';
 }
+// so users don't get logged out
 $persist_scratch = new file_scratch_driver;
-
 
 // nav, pages
 // routes make a page exist
@@ -79,10 +79,12 @@ require '../frontend_lib/lib/lib.files.php'; // file upload functions
 require '../frontend_lib/lib/lib.form.php'; // form helper
 require '../frontend_lib/lib/lib.perms.php'; // permission helper
 require '../frontend_lib/lib/lib.actions.php'; // UI helper
+require '../frontend_lib/lib/lib.fe.settings.php'; // user settings stuff
 // structures
 require '../frontend_lib/lib/nav.php'; // nav structure
 require '../frontend_lib/lib/expand.php'; // maybe more of a lib...
 require '../frontend_lib/lib/middlewares.php';
+//require '../frontend_lib/lib/lib.listing.php'; // a component for SCRUD
 
 // frontend handlers
 
