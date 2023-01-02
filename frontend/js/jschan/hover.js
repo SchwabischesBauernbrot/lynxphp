@@ -304,16 +304,34 @@ window.addEventListener('DOMContentLoaded', (event) => {
   // from top to bottom, posts are created in order
   // so a reference here means the post may exist before it
   const toAdd = []
+  // quote is a list of .quote elements
   for (let i = 0; i < quotes.length; i++) {
     // get the board and post
-    const parts = quotes[i].href.split(/\/#?/)
+    // might need to strip off THREADNUM.html#
 
+    const href = quotes[i].href
+    let threadNum = 0
+    let postNum = 0
+    if (href.match(/#/)) {
+      if (href.match(/\/thread\//)) {
+        const after = href.split('/thread/')[1].split(/#/)
+        threadNum = after[0]
+        postNum = after[1]
+      } else {
+        postNum = href.split(/#/)[1]
+      }
+    } else {
+      console.warn('unhandled quote href', href)
+    }
+
+    //const parts = quotes[i].href.split(/\/#?/)
     //console.log('parts', parts)
-    const postNum = parts[5]
+    //const postNum = parts[5]
+
     // is this post / board on the page?
     const elem = document.querySelector('.post-container[data-post-id="' + postNum + '"]')
-    //console.log('searching for', postNum, 'found', elem)
     if (elem) {
+      //console.log('searching for', postNum, 'found', elem)
       // find it's replies and put this link in there
       const repliesElem = elem.querySelector('.replies')
       //console.log('replies', repliesElem)
@@ -325,6 +343,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
       newSpan.innerHTML = '&nbsp;<a class="quote" href="' + link + '">&gt;&gt;' + postData.postId + '</a>';
       toAdd.push([repliesElem, newSpan])
       //repliesElem.appendChild(newSpan)
+    } else {
+      //console.warn('postNum', postNum, 'not found')
     }
     quotes[i].addEventListener('mouseover', toggleHighlightPost, false);
     quotes[i].addEventListener('mouseout', toggleHighlightPost, false);
