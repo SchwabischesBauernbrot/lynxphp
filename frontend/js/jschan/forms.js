@@ -521,12 +521,6 @@ class formHandler {
             } else {
               // success
 
-              // we need to trigger a JS refresh
-              if (typeof(manual_refresh) !== 'undefined') {
-                console.log('refresh.js detected, calling')
-                manual_refresh()
-              }
-
               // assumes redirect...
               console.log('isThread', isThread)
               if (!isThread) {
@@ -541,6 +535,14 @@ class formHandler {
               setLocalStorage('myPostId', json.postId);
               // live.js
               //forceUpdate();
+
+              // we need to trigger a JS refresh
+              // do this last because BE (lynxchan) needs some time to write the files
+              // FIXME: maybe a delay value could be returned of how long to delay this
+              if (typeof(manual_refresh) !== 'undefined') {
+                console.log('refresh.js detected, calling')
+                manual_refresh()
+              }
             }
           }
           if (this.form.getAttribute('action') !== '/forms/editpost'
