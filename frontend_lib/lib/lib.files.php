@@ -90,7 +90,8 @@ function getFileType($file) {
     }
   }
   if ($type === 'video') {
-    $isPlayable = $file['mime_type'] === 'video/mp4' || $file['mime_type'] === 'video/webm' || $file['mime_type'] === 'video/ogg';
+    // browsers affect this
+    $isPlayable = $file['mime_type'] === 'video/mp4' || $file['mime_type'] === 'video/webm' || $file['mime_type'] === 'video/ogg' || $file['mime_type'] === 'video/quicktime' || $file['mime_type'] === 'video/x-flv';
     if (!$isPlayable) {
       $type = 'image';
     }
@@ -249,7 +250,7 @@ function getAudioVideo($file, $options = false) {
   return getViewer($file, $options);
 }
 
-// anything use this bsides getAudioVideo?
+// anything use this besides getAudioVideo?
 function getViewer($file, $options = false) {
   extract(ensureOptions(array(
      // only should be used when we know we're opening a ton of requests in parallel
