@@ -113,11 +113,16 @@ function getAdminBERoutesPage() {
       foreach($pkg->resources as $name => $data) {
         // endpoint
         // method, sendSession, unwrapData, requires, params, handlerFile
+        $cacheSettings = $pkg->resourcesCache[$name];
+        //echo "test[", print_r($cacheSettings, 1), "]<br>\n";
         $routes[] = array(
           'method'   => (empty($data['method']) ? 'GET' : $data['method']),
           'endpoint' => $data['endpoint'],
           'module'   => $pname,
           'address'  => $data['handlerFile'],
+          'form'     => '',
+          'auth'     => '',
+          'cache'    => $cacheSettings ? 'Y' : '',
         );
       }
       //echo '<pre>', htmlspecialchars(print_r($pkg->resources, 1)), "</pre>\n";
