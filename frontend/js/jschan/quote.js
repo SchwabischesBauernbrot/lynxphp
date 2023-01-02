@@ -60,9 +60,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
   const messageBox = document.querySelector('#postform textarea[name="message"]')
 
   const addToMessageBox = (str) => {
-    const index = messageBox.selectionStart
-    messageBox.value = `${messageBox.value.substr(0,index)}${str}${messageBox.value.substr(index)}`
-    messageBox.setSelectionRange(index+str.length, index+str.length) //this scroll anyway, no need to set scrolltop
+    // there won't be one, if a closed thread
+    if (messageBox) {
+      const index = messageBox.selectionStart
+      messageBox.value = `${messageBox.value.substr(0,index)}${str}${messageBox.value.substr(index)}`
+      messageBox.setSelectionRange(index+str.length, index+str.length) //this scroll anyway, no need to set scrolltop
+      messageBox.dispatchEvent(new Event('input')) // for counter.js
+    }
   }
 
   const addQuote = function(number) {
@@ -83,8 +87,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
       quoteText += `${quotedSelection}\n`
     }
     addToMessageBox(quoteText)
-    messageBox.focus()
-    messageBox.dispatchEvent(new Event('input')) // for counter.js
+    if (messageBox) {
+      messageBox.focus()
+    }
   }
 
   const quote = function(e) {
