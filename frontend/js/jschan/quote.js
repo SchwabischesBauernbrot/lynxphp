@@ -52,6 +52,7 @@ const addToMessageBox = (str) => {
   }
 }
 
+// adds reply to message box
 const addQuote = function(number) {
   openPostForm()
   let quoteText = `>>${number}\n`
