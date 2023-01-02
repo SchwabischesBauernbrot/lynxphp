@@ -97,6 +97,7 @@ function threadDBtoAPI(&$row, $boardUri) {
   // decode user_id
 }
 
+// false means thread does not exist
 function getThread($boardUri, $threadNum, $options = false) {
   // unpack options
   extract(ensureOptions(array(
@@ -145,9 +146,13 @@ function getThread($boardUri, $threadNum, $options = false) {
   // why? /:board/thread/:thread uses this too
   $posts = array();
   if ($includeOP) {
-    $res = $db->find($posts_model, array('criteria'=>array(
+    $res = $db->find($posts_model, array('criteria' => array(
       array('postid', '=', $threadNum),
     )));
+    // OP does not exist (no tombstone)
+    if (!$db->num_rows($res)) {
+      return false;
+    }
     while($row = $db->get_row($res)) {
       //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
       if (!isset($posts[$row['postid']])) {
@@ -181,6 +186,10 @@ function getThread($boardUri, $threadNum, $options = false) {
   $res = $db->find($posts_model, array(
     'criteria' => $crit, 'order' => 'created_at')
   );
+  // no OP and no replies, consider 404
+  if (!count($posts) && !$db->num_rows($res)) {
+    return false;
+  }
   while($row = $db->get_row($res)) {
     //echo "<pre>", print_r($row, 1), "</pre>\n";
     $orow = $row;
