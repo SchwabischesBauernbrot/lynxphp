@@ -39,6 +39,8 @@ function threadDBtoAPI(&$row, $boardUri) {
     $f5 = substr($k, 0, 5);
     return $f5 !== 'file_' && $f5 !== 'post_';
   }, ARRAY_FILTER_USE_BOTH);
+  // prevent a bunch of warnings
+  if (!$row) return false;
 
   $row['no'] = empty($row['postid']) ? 0 : $row['postid'];
   unset($row['postid']);

@@ -84,6 +84,8 @@ function getPost($boardUri, $postNo, $posts_model) {
   */
   $posts = array();
   $row = $db->findById($posts_model, $postNo);
+  // prevent a bunch of warnings
+  if (!$row) return false;
   //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
   if ($db->isTrue($row['deleted'])) return array();
   if (!isset($posts[$row['postid']])) {
