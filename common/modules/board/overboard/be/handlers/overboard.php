@@ -84,12 +84,24 @@ foreach($threads as $i => $t) {
 
   // there's tpp but it's like 10...
   $threads[$i]['posts'] = getThread($t['boardUri'], $t['no'], array(
+    // weird unexpected results if we turn this off...
+   'includeOP' => true,
     //'posts_model' => $model['post'],
     //'post_files_model' => $model['files'],
   ));
   $threads[$i]['thread_reply_count'] = count($threads[$i]['posts']);
   // post previw = 5
-  $threads[$i]['posts'] = array_slice($threads[$i]['posts'], 0, 5);
+  // we want the last 5 posts, not the first 5
+  $thdPstCnt = count($threads[$i]['posts']);
+  // thread has the op and that contains these posts
+  // we have to filter the out if it's included...
+  if ($thdPstCnt > 6) {
+    // we can't include the op, so we need at least 6 posts count
+    $threads[$i]['posts'] = array_slice($threads[$i]['posts'], $thdPstCnt - 5, 5);
+  } else {
+    // just skip op, show the rest
+    $threads[$i]['posts'] = array_slice($threads[$i]['posts'], 1);
+  }
 }
 
 sendResponse2(array(
