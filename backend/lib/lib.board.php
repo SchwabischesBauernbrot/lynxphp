@@ -27,6 +27,8 @@ getBoardSettingForm($uri)
 
 // what's the difference between this and getBoard?
 // well getBoard doesn't include boardid which somethings (like banner) use
+
+// this needs to return falsish if the board doesn't exist
 function getBoardByUri($boardUri, $options = false) {
   extract(ensureOptions(array(
     'include_fields' => array('settings'),
@@ -54,6 +56,12 @@ function getBoardByUri($boardUri, $options = false) {
   //$boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
 
   $row = getBoardRaw($boardUri);
+  //echo "boardDataRaw[", print_r($row, 1), "]<br>\n";
+
+  // this needs to return falsish if the board doesn't exist
+  if (!$row) return false;
+
+  // this will insert fields that might not exist
   $json = json_decode($row['json'], true);
   unset($row['json']);
   foreach($include_fields as $field) {
