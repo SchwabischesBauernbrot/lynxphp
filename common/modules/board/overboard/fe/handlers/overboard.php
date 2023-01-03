@@ -57,6 +57,12 @@ if (isset($overboardData['threads'])) {
     $bUri = $thread['boardUri'];
     // we use base tag I believe...
     $threads_html .= '<h2><a href="/' . $bUri . '/">&gt;&gt;&gt;/' . $bUri . '/</a></h2>' . $threadhdr_template;
+    // FIXME: render the OP
+    $threads_html .= renderPost($bUri, $thread, array(
+      'checkable' => true, 'postCount' => $thread['thread_reply_count'],
+      'inMixedBoards' => true, 'boardSettings' => $boards_settings[$bUri],
+    ));
+
     foreach($posts as $i => $post) {
       $threads_html .= renderPost($bUri, $post, array(
         'checkable' => true, 'postCount' => $thread['thread_reply_count'],
