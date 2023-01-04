@@ -85,7 +85,7 @@ function processFiles($filter_fields = false) {
 function getFileType($file) {
   $type = isset($file['type']) ? $file['type'] : 'image';
   if ($type === 'audio') {
-    $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg';
+    $isPlayable = $file['mime_type'] === 'audio/mpeg' || $file['mime_type'] === 'audio/wav' || $file['mime_type'] === 'audio/ogg'  || $file['mime_type'] === 'audio/flac';
     if (!$isPlayable) {
       $type = 'file';
     }
