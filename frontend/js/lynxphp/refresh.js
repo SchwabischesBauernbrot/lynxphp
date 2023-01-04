@@ -21,120 +21,127 @@ function refreshPosts(manual) {
     window.location.reload()
     return
   }
-  fetch(getRefreshUrl(loc)).then(res => { statusCode = res.status; return res.text() } ).then(html => {
-    //console.log('refreshPosts - status', statusCode)
-    var result
-    if (statusCode === 500) {
-      // we get a 500 warning in the js console already
-      //console.warn('backend problem')
-      result = { foundNewReplies: false }
-    } else {
-      result = refreshCallback(null, html)
-      //console.log('refresh.js - result', result)
-      if (result.foundNewReplies) {
-        //console.log('new replies', result.posts.length)
-        for(var i in result.posts) {
-          //var post = JSON.parse(JSON.stringify(result.posts[i]))
-          var post = result.posts[i]
-          function scope(post) {
-            //console.log('post', post, 'loc', loc)
-            // first one is the summary one...
-            var images = post.post.querySelectorAll('a.jsonly img.file-thumb')
-            var checkPost = false
-            for(var i in images) {
-              if (!images.hasOwnProperty(i)) continue
-              var img = images[i]
-              // seems to work fine...
-              //console.log(i, 'imgsrc', img.src)
-              if (img.src.match('images/awaiting_thumbnail.png')) {
-                // uri and postid, url or hash
-                checkPost = true
-                break
+  try {
+    fetch(getRefreshUrl(loc)).then(res => { statusCode = res.status; return res.text() } ).then(html => {
+      //console.log('refreshPosts - status', statusCode)
+      var result
+      if (statusCode === 500) {
+        // we get a 500 warning in the js console already
+        //console.warn('backend problem')
+        result = { foundNewReplies: false }
+      } else {
+        result = refreshCallback(null, html)
+        //console.log('refresh.js - result', result)
+        if (result.foundNewReplies) {
+          //console.log('new replies', result.posts.length)
+          for(var i in result.posts) {
+            //var post = JSON.parse(JSON.stringify(result.posts[i]))
+            var post = result.posts[i]
+            function scope(post) {
+              //console.log('post', post, 'loc', loc)
+              // first one is the summary one...
+              var images = post.post.querySelectorAll('a.jsonly img.file-thumb')
+              var checkPost = false
+              for(var i in images) {
+                if (!images.hasOwnProperty(i)) continue
+                var img = images[i]
+                // seems to work fine...
+                //console.log(i, 'imgsrc', img.src)
+                if (img.src.match('images/awaiting_thumbnail.png')) {
+                  // uri and postid, url or hash
+                  checkPost = true
+                  break
+                }
               }
-            }
-            if (checkPost) {
-              //console.log('need to generate', post.postId)
-              function waitForThumb(postId, loc) {
-                var uri = loc.boardUri
-                // CF will aggressive cache the 404 though...
-                // also talking to the BE is yucky
-                /*
-                fetch(BACKEND_PUBLIC_URL + 'storage/boards/' + uri + '/THREADID/t_POSTID_MEDIA.jpg', { method: 'HEAD' }).then(res => {
-                  if (res.ok) {
-                    console.log('need to load image in')
-                  } else {
-                    // reschedule check
-                  }
-                }).catch(function(err) {
-                  console.error('waitForThumb err', err)
-                })
-                */
-                doWork() // queue probably needs some help
-                fetch('/' + uri + '/posts/' + postId + '/thumbnail.json').then(res => { statusCode = res.status; return res.text() } ).then(html => {
-                  try {
-                    var thumbs = JSON.parse(html)
-                    //console.log('thumbs', thumbs)
-                    var haveAll = true
-                    for(var i in thumbs) {
-                      var t = thumbs[i]
-                      if (t.e) {
-                        var thumbUrl = BACKEND_PUBLIC_URL + 'storage/boards/' + uri + '/' + loc.threadNum + '/t_' + postId + '_' + i  + '.jpg'
-                        // locate img elem to swap
-                        if (images[i]) {
-                          //console.log('loading', thumbUrl, 'into', i, t, images[i])
-                          images[i].src = thumbUrl
-                          // adjust w/h
-                          if (t.w) images[i].width = t.w
-                          if (t.h) images[i].height = t.h
+              if (checkPost) {
+                //console.log('need to generate', post.postId)
+                function waitForThumb(postId, loc) {
+                  var uri = loc.boardUri
+                  // CF will aggressive cache the 404 though...
+                  // also talking to the BE is yucky
+                  /*
+                  fetch(BACKEND_PUBLIC_URL + 'storage/boards/' + uri + '/THREADID/t_POSTID_MEDIA.jpg', { method: 'HEAD' }).then(res => {
+                    if (res.ok) {
+                      console.log('need to load image in')
+                    } else {
+                      // reschedule check
+                    }
+                  }).catch(function(err) {
+                    console.error('waitForThumb err', err)
+                  })
+                  */
+                  doWork() // queue probably needs some help
+                  fetch('/' + uri + '/posts/' + postId + '/thumbnail.json').then(res => { statusCode = res.status; return res.text() } ).then(html => {
+                    try {
+                      var thumbs = JSON.parse(html)
+                      //console.log('thumbs', thumbs)
+                      var haveAll = true
+                      for(var i in thumbs) {
+                        var t = thumbs[i]
+                        if (t.e) {
+                          var thumbUrl = BACKEND_PUBLIC_URL + 'storage/boards/' + uri + '/' + loc.threadNum + '/t_' + postId + '_' + i  + '.jpg'
+                          // locate img elem to swap
+                          if (images[i]) {
+                            //console.log('loading', thumbUrl, 'into', i, t, images[i])
+                            images[i].src = thumbUrl
+                            // adjust w/h
+                            if (t.w) images[i].width = t.w
+                            if (t.h) images[i].height = t.h
+                          }
+                        } else {
+                          console.log('post', postId, 'missing thumb', i, t)
+                          haveAll = false
                         }
-                      } else {
-                        console.log('post', postId, 'missing thumb', i, t)
-                        haveAll = false
                       }
+                      if (!haveAll) {
+                        // schedule next
+                        setTimeout(function() {
+                          waitForThumb(postId, loc)
+                        }, 1000)
+                      }
+                    } catch(err) {
+                      console.error('waitForThumb err', html, err)
+                      // no need to reschedule
+                      // minor UI error instead of hitting the server forever
                     }
-                    if (!haveAll) {
-                      // schedule next
-                      setTimeout(function() {
-                        waitForThumb(postId, loc)
-                      }, 1000)
-                    }
-                  } catch(err) {
-                    console.error('waitForThumb err', html, err)
-                    // no need to reschedule
-                    // minor UI error instead of hitting the server forever
-                  }
-                })
+                  })
+                }
+                waitForThumb(post.postId, loc)
               }
-              waitForThumb(post.postId, loc)
+              // post.json.files is empty?
+              // are there any thumbnails?
+
+              //console.log('firing event')
+              const newPostEvent = new CustomEvent('addPost', {
+                 detail: post
+              })
+              //dispatch the event so quote click handlers, image expand, etc can be added in separate scripts by listening to the event
+              setTimeout(() => {
+                //console.log('dispatching event')
+                window.dispatchEvent(newPostEvent)
+              }, 50);
             }
-            // post.json.files is empty?
-            // are there any thumbnails?
-
-            //console.log('firing event')
-            const newPostEvent = new CustomEvent('addPost', {
-               detail: post
-            })
-            //dispatch the event so quote click handlers, image expand, etc can be added in separate scripts by listening to the event
-            setTimeout(() => {
-              //console.log('dispatching event')
-              window.dispatchEvent(newPostEvent)
-            }, 50);
+            scope(post)
           }
-          scope(post)
+        //} else {
+          //console.log('result foundNewReplies is falsish', result)
         }
-      //} else {
-        //console.log('result foundNewReplies is falsish', result)
       }
-    }
 
-    // refreshButton.style.display = 'inline'
-    //console.log('refreshPosts - autoRefresh', autoRefresh)
+      // refreshButton.style.display = 'inline'
+      //console.log('refreshPosts - autoRefresh', autoRefresh)
+      if (autoRefresh) {
+        startTimer((manual || result.foundNewReplies) ? 10 : lastRefresh * 2)
+      }
+      refreshElem.style.display = 'block'
+      refreshingElem.style.display = 'none'
+    })
+  } catch(e) {
+    console.error('refresh fetch? err', e)
     if (autoRefresh) {
       startTimer((manual || result.foundNewReplies) ? 10 : lastRefresh * 2)
     }
-    refreshElem.style.display = 'block'
-    refreshingElem.style.display = 'none'
-  })
+  }
 }
 
 function stopTimer() {
