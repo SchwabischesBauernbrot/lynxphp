@@ -3,7 +3,9 @@ var lastReplyId = 0
 function updateLastReply() {
   var threadElem = document.getElementById('threadsContainer')
   // just get last on the page
-  lastReplyId = parseInt(threadElem.children[threadElem.children.length - 1].dataset.postId)
+  if (threadElem.children.length && threadElem.children[threadElem.children.length - 1]) {
+    lastReplyId = parseInt(threadElem.children[threadElem.children.length - 1].dataset.postId)
+  }
   //console.log('page last reply', lastReplyId)
 }
 
@@ -111,6 +113,7 @@ function refreshCallback(error, html) {
   //console.log('update check: doc hidden', document.hidden, 'isActive', isActive)
   if (rect.bottom < window.innerHeight && !document.hidden) {
     unreadPosts = 0
+    console.log('refresh_thread - restoring original title')
     document.title = originalTitle
   }
 
