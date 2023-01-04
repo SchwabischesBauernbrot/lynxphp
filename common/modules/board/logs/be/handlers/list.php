@@ -1,8 +1,12 @@
 <?php
 $params = $get();
 
+//echo "request[", print_r($request, 1), "]<br>\n";
 $boardData = boardMiddleware($request);
-//print_r($boardData);
+
+// handle 404
+if (!$boardData) return;
+//echo "boardData[", gettype($boardData), print_r($boardData, 1), "]<br>\n";
 //$data = getBoardByUri($boardData['uri']);
 $data = $boardData;
 
@@ -20,6 +24,7 @@ if (isset($data['json']['reports'])) {
 }
 global $tpp;
 // just pass through the settings for now...
+if (!isset($boardData['json'])) $boardData['json'] = array();
 boardRowFilter($boardData, $boardData['json'], array('jsonFields' => 'settings'));
 // I don't think this is required
 $posts_model = getPostsModel($boardData['uri']);

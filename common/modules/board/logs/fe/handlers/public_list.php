@@ -10,6 +10,13 @@ $boardUri = $request['params']['uri'];
 // get a list of banners from backend
 $logs = $pkg->useResource('list', array('boardUri' => $boardUri));
 
+//echo "<pre>logs:", gettype($logs), print_r($logs, 1), "</pre>\n";
+if (!is_array($logs) && !$logs) {
+  http_response_code(404);
+  wrapContent("Board \"$boardUri\" does not exist");
+  return;
+}
+
 $templates = moduleLoadTemplates('log_listing', __DIR__);
 
 $tmpl = $templates['header'];

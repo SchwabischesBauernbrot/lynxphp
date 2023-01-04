@@ -249,6 +249,7 @@ function sendResponse2($data, $options = array()) {
     //_doHeaders($mtime, array('contentType' => 'application/json'));
     $output = json_encode($resp);
   }
+  if ($code !== 200) http_response_code($code);
   // you'd have to be able to calculate the output size
   // on a 304 check
   //$filesize = strlen($output);

@@ -7,6 +7,8 @@ $fePkgs = array(
         'method'  => 'GET',
         'route'   => '/:uri/logs.html',
         'handler' => 'public_list',
+        // needs backend resources
+        /*
         'cacheSettings' => array(
           'files' => array(
             // theme is also would affect this caching
@@ -15,6 +17,7 @@ $fePkgs = array(
             'templates/footer.tmpl', // wrapContent
           ),
         ),
+        */
       ),
       /*
       array(
