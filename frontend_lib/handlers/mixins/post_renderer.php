@@ -320,6 +320,8 @@ function renderPost($boardUri, $p, $options = false) {
         //'viewer' => getViewer($file, array('type' => $majorMimeType)),
         // not currently used but we'll include it incase they want to do something different
         'avmedia' => $avmedia,
+        'codec' => empty($file['codec']) ? '' : $file['codec'],
+        'codecSpace' => empty($file['codec']) ? '' : ' ',
         'path' => $path,
         'tn_w' => $tn_w,
         'tn_h' => $tn_h,
