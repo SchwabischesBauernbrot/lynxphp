@@ -453,6 +453,7 @@ class formHandler {
         }
         this.setFormLock(false) // unlock
         //this.submit.disabled = false;
+        // onload does this too
         this.submit.value = this.originalSubmitText;
         let json;
         if (xhr.responseText) {
@@ -521,6 +522,15 @@ class formHandler {
             } else {
               // success
 
+              // clear all message boxes
+              const messageBoxes = document.querySelectorAll('textarea[name=message]')
+              for(var i in messageBoxes) {
+                if (messageBoxes.hasOwnProperty(i)) {
+                  // clear value
+                  messageBoxes[i].value = ''
+                }
+              }
+
               // assumes redirect...
               console.log('isThread', isThread)
               if (!isThread) {
@@ -551,7 +561,10 @@ class formHandler {
           }
         } else {
           if (xhr.status === 413) {
-            this.clearFiles();
+            // maybe not clear all of them...
+            // let them decide
+            //this.clearFiles()
+
             //not json, must be nginx response
             alert('Your upload was too large')
             /*
@@ -585,9 +598,11 @@ class formHandler {
 //for bans, post form to show TODO: make modal support bans json and send dynamicresponse from it (but what about appeals, w/ captcha, etc?)
             this.clearFiles(); //dont resubmit files
             this.banned = true;
+            // does this submit the form
             this.form.dispatchEvent(new Event('submit'));
           }
         }
+        // done on ajax onload too
         this.submit.value = this.originalSubmitText;
       }
     }
