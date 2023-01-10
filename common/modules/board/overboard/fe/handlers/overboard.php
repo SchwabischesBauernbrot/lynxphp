@@ -48,6 +48,7 @@ foreach($boards as $c=>$b) {
 $threads_html = '';
 
 if (isset($overboardData['threads'])) {
+  $userSettings = getUserSettings();
   global $boards_settings;
   foreach($overboardData['threads'] as $thread) {
     if (!isset($thread['posts'])) continue;
@@ -61,12 +62,14 @@ if (isset($overboardData['threads'])) {
     $threads_html .= renderPost($bUri, $thread, array(
       'checkable' => true, 'postCount' => $thread['thread_reply_count'],
       'inMixedBoards' => true, 'boardSettings' => $boards_settings[$bUri],
+      'userSettings' => $userSettings,
     ));
 
     foreach($posts as $i => $post) {
       $threads_html .= renderPost($bUri, $post, array(
         'checkable' => true, 'postCount' => $thread['thread_reply_count'],
         'inMixedBoards' => true, 'boardSettings' => $boards_settings[$bUri],
+        'userSettings' => $userSettings,
       ));
     }
     $threads_html .= $threadftr_template;
