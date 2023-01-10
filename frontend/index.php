@@ -8,13 +8,6 @@ ldr_require('../frontend_lib/lib/lib.handler.php'); // sendBump() and output fun
 $req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 
-/*
-if (isPostTooBig()) {
-  echo '<div style="height: 40px;"></div>', "\n";
-  echo "This POST request has sent too much data for this server, try sending less data.<br>\n";
-  return;
-}
-*/
 require 'setup.php';
 require 'setup.router.php';
 ldr_done(); // free memory
