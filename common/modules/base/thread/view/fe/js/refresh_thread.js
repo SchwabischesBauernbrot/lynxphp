@@ -83,9 +83,13 @@ function refreshCallback(error, html) {
   // but now we can put it in there for the hover cache...
 
   // we'll get 2 divs per post...
-  console.log('updating title with', posts.length, 'unread posts')
-  unreadPosts = posts.length
-  document.title = '(' + unreadPosts + ') ' + originalTitle
+
+  // only update title if there's a reason
+  if (posts.length) {
+    console.log('updating title with', posts.length, 'unread posts')
+    unreadPosts = posts.length
+    document.title = '(' + unreadPosts + ') ' + originalTitle
+  }
 
   //divElem.className = "post-container"
   // we'll have to build the checkbox unless we request it...
