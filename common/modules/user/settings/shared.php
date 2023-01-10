@@ -7,19 +7,30 @@
 return array(
   'CategoryFields' => array(
     'general' => array (
-/*
-    'current_theme' => array(
-      'label' => 'Theme',
-      'type'  => 'select',
-      'options' => array(
+      'hover' => array(
+        'label' => 'Hover to expand media',
+        'type'  => 'checkbox',
       ),
-    ),
-    'code_theme' => array(
-      'label' => 'Code Theme',
-      'type'  => 'select',
-      'options' => array(),
-    ),
-*/
+      'mute' => array(
+        'label' => 'Mute audio on videos',
+        'type'  => 'checkbox',
+      ),
+/*
+      'current_theme' => array(
+        'label' => 'Theme',
+        'type'  => 'select',
+        'options' => array(
+        ),
+      ),
+      'code_theme' => array(
+        'label' => 'Code Theme',
+        'type'  => 'select',
+        'options' => array(),
+      ),
+      'volume' => array(
+        'label' => 'Default volume, enter number between 0 to 100',
+        'type'  => 'integer',
+      ),
       'name' => array(
         'label' => 'Default post name',
         'type'  => 'text',
@@ -41,6 +52,7 @@ return array(
         'label' => 'Non color IDs',
         'type'  => 'checkbox',
       ),
+      */
       'time' => array(
         'label' => 'Display time as',
         'type'  => 'select',
@@ -58,6 +70,7 @@ return array(
         'label' => 'Disable all JavaScript',
         'type'  => 'checkbox',
       ),
+      /*
       // should be per board
       'disablecustomcss' => array(
         'label' => 'Disable board custom CSS',
@@ -66,11 +79,6 @@ return array(
       'sitecustomcss' => array(
         'label' => 'Site custom CSS',
         'type'  => 'textarea',
-      ),
-      /*
-      'logo' => array(
-        'label' => 'Site Logo',
-        'type'  => 'image',
       ),
       */
     ),
