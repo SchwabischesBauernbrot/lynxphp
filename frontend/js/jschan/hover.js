@@ -10,6 +10,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
   const toggleDottedUnderlines = (hoveredPost, id) => {
     let uniqueQuotes = new Set();
+    // hoveredPost can be null... (from processHTML:168ish)
+    if (!hoveredPost) return; // can't do anything
     const posts = hoveredPost.querySelectorAll('.post-message .quote')
     //console.log('posts', posts)
     for(var i = 0; i < posts.length; i++) {
@@ -142,7 +144,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
         //hoveredPost = wrap.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;
         hoveredPost = wrap.querySelector('.post-container')
         if (hoveredPost === null) {
-          console.log('no post-container', wrap)
+          // one example seems to be a 404 (backend hasn't generated it or was deleted)
+          var test = wrap.querySelector('.container')
+          if (test) {
+            console.log('hover.js - no post-container', test.innerText)
+          } else {
+            console.log('hover.js - no post-container', wrap)
+          }
+          return
         }
         //console.log('hoveredPost', hoveredPost)
         //need this event so handlers like post hiding still apply to hover introduced posts
