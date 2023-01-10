@@ -16,6 +16,7 @@ if ($router->isTooBig()) {
     echo '<div style="height: 40px;"></div>', "\n";
   }
   */
+  http_response_code(413);
   wrapContent('This POST request has sent too much data [' . formatBytes($_SERVER['CONTENT_LENGTH']). '] for this server [' . formatBytes($router->max_length) . '], try sending less data.');
   exit();
 }
