@@ -328,6 +328,8 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       'js/lynxphp/expander_thread.js',
       //'js/lynxphp/expander_media.js',
       'js/lynxphp/work.js',
+      // only need this on the settings page...
+      'js/lynxphp/volume_upgrade.js',
       //'js/lynxphp/lazy_audit.js',
     ),
   );
