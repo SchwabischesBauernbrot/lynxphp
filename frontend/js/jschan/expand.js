@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   const volumeSetting = document.getElementById('volume-setting');
   let volumeLevel = localStorage.getItem('volume')
   if (volumeLevel === 'undefined') volumeLevel = 50
-  //console.log('volumeLevel', volumeLevel)
+  //console.debug('expand.js - volumeLevel', volumeLevel)
   if (volumeSetting) {
     const changeVolume = (change) => {
       volumeLevel = volumeSetting.value;
@@ -55,12 +55,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const thumbs = document.getElementsByClassName('post-file-src');
     const toggle = function(thumb, expanded, filename, src) {
       if (thumb.style.display === 'none') { //closing
-        //console.log('closing', thumb, expanded, filename)
+        //console.log('expand.js - closing', thumb, expanded, filename)
         thumb.style.display = '';
         expanded.style.display = 'none';
         filename.style.maxWidth = '';
       } else { //expanding
-        //console.log('expanding', thumb, expanded, filename)
+        //console.log('expand.js - expanding', thumb, expanded, filename)
         thumb.style.display = 'none';
         expanded.style.display = '';
         if (expanded.offsetWidth >= filename.offsetWidth) {
@@ -69,10 +69,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
       }
       //handle css thing for play icon on vid/audio
       const close = thumb.nextSibling.textContent === '[Close]' ? thumb.nextSibling : null;
-      //console.log('close', close)
+      //console.log('expand.js - close', close)
       if (close) {
         expanded.loop = loopEnabled;
         expanded.volume = volumeLevel/100;
+        //console.debug('expand.js - volume set to', expanded.volume)
         if (src.style.visibility === 'hidden') {
           src.style.visibility = 'visible';
           close.style.display = 'none';
