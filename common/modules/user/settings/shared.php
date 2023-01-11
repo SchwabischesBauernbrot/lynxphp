@@ -15,18 +15,17 @@ return array(
         'label' => 'Mute audio on videos',
         'type'  => 'checkbox',
       ),
+      'videoloop' => array(
+        'label' => 'Loop videos by default',
+        'type'  => 'checkbox',
+        'default' => true,
+      ),
+      'audioloop' => array(
+        'label' => 'Make audio player loop by default',
+        'type'  => 'checkbox',
+        'default' => false,
+      ),
 /*
-      'current_theme' => array(
-        'label' => 'Theme',
-        'type'  => 'select',
-        'options' => array(
-        ),
-      ),
-      'code_theme' => array(
-        'label' => 'Code Theme',
-        'type'  => 'select',
-        'options' => array(),
-      ),
       'volume' => array(
         'label' => 'Default volume, enter number between 0 to 100',
         'type'  => 'integer',
@@ -39,10 +38,6 @@ return array(
       'postpass' => array(
         'label' => 'Default post password',
         'type'  => 'textpass',
-      ),
-      'volume' => array(
-        'label' => 'Default volume, enter number between 0 to 100',
-        'type'  => 'integer',
       ),
       'nsfw' => array(
         'label' => 'Show Not Safe For Work content',
