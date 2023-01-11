@@ -240,6 +240,8 @@ function getAudioVideo($file, $options = false) {
   extract(ensureOptions(array(
      // only should be used when we know we're opening a ton of requests in parallel
     'maxW' => 0,
+    'loop' => true,
+    'mute' => false,
     'type' => false,
   ), $options));
   if (!$type) $type = getFileType($file);
@@ -252,10 +254,13 @@ function getAudioVideo($file, $options = false) {
 }
 
 // anything use this besides getAudioVideo?
+// this is the full player not the thumb
 function getViewer($file, $options = false) {
   extract(ensureOptions(array(
      // only should be used when we know we're opening a ton of requests in parallel
     'maxW' => 0,
+    'loop' => true,
+    'mute' => false,
     'type' => false,
   ), $options));
   if (!$type) $type = getFileType($file);
@@ -296,9 +301,13 @@ function getViewer($file, $options = false) {
     $path = BACKEND_PUBLIC_URL . $path;
   }
   // loop
+  //echo "loop[$loop] mute[$mute]<br>\n";
+  $loopAtt = $loop ? ' loop=true' : '';
+  $muteAtt = $mute ? ' muted=true' : '';
+  // poster (show this while downloading)
   // can't loop because of how we collapse
   // class="" ?
-  return '<' . $type . '  src="' . $path . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls  preload=none />';
+  return '<' . $type . '  src="' . $path . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls' . $loopAtt . $muteAtt . ' autoplay=true preload=none />';
 }
 
 ?>
