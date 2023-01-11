@@ -272,6 +272,9 @@ function makePostHandlerEngine($request) {
     'json'     => $json,
     // we could get the hashes from $res (handles.files[].hash)
     // nah it's a refresh issue...
+    // this is really handy
+    // but maybe not as handy as
+    // backend/opt/boards/test/posts/295/media_debug?prettyPrint=1
     //'filesDebugs' => $res,
     //'_FILES' => $_FILES,
   );
