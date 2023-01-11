@@ -37,7 +37,9 @@ function renderPost($boardUri, $p, $options = false) {
     //'inMixedBoards' => false, // ?
     'firstThread' => false, // for adjusting loading=lazy
     'where' => '',
+    'userSettings' => false,
     'boardSettings' => false,
+    'noActions' => false, // for themes to reduce BE calls
   ), $options));
 
   //$isBO = perms_isBO($boardUri);
@@ -62,10 +64,17 @@ function renderPost($boardUri, $p, $options = false) {
   }
   */
 
+  if ($userSettings === false) {
+    if (DEV_MODE) {
+      echo "No userSettings passed to renderPost [", gettrace(), "]<Br>\n";
+    }
+    //echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
+    $userSettings = getUserSettings();
+  }
+
   if ($boardSettings === false) {
     if (DEV_MODE) {
       echo "No boardSettings passed to renderPost [", gettrace(), "]<Br>\n";
-      //echo "No boardSettings passed to renderPost<Br>\n";
     }
     $boardData = getBoard($boardUri);
     if (isset($boardData['settings'])) {
@@ -88,7 +97,7 @@ function renderPost($boardUri, $p, $options = false) {
   if ($postCount !== false) {
     $action_io['postCount'] = $postCount;
   }
-  if ($isOP) {
+  if ($isOP && !$noActions) {
     $pipelines[PIPELINE_THREAD_ACTIONS]->execute($action_io);
   }
   $pipelines[PIPELINE_POST_ACTIONS]->execute($action_io);
@@ -260,6 +269,9 @@ function renderPost($boardUri, $p, $options = false) {
       $omitted_html = $add_html . replace_tags($omitted_template, $omit_tags);
     }
   }
+
+  //echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
+
   // tn_w, tn_h aren't enabled yet
   $files_html = '';
   if (isset($p['files']) && is_array($p['files'])) {
@@ -281,12 +293,33 @@ function renderPost($boardUri, $p, $options = false) {
       }
       $majorMimeType = getFileType($file);
       $fileSha256 = 'f' . uniqid();
+      $thumbUrl = $file['path'];
+      if (isset($file['thumbnail_path'])) {
+        $thumbUrl = $file['thumbnail_path'];
+      }
+      if (strpos($thumbUrl, '://') === false) {
+        $thumbUrl = BACKEND_PUBLIC_URL . $thumbUrl;
+      }
+
       $thumb   = getThumbnail($file, array(
         'type' => $majorMimeType, 'alt' => 'thumbnail of ' . $file['filename'],
         // if a list of threads, any way to tell if this is the first?
         // && $firstThread
         'noLazyLoad' => $isOP));
-      $avmedia = getAudioVideo($file, array('type' => $majorMimeType));
+      $mute = empty($userSettings['mute']) ? false : true;
+      $loop = false;
+      //echo "majorMimeType[$majorMimeType]<br>\n";
+      if ($majorMimeType === 'video') {
+        $loop = empty($userSettings['videoloop']) ? false : true;
+      } else
+      if ($majorMimeType === 'audio') {
+        $loop = empty($userSettings['audioloop']) ? false : true;
+      }
+      $avmedia = getAudioVideo($file, array(
+        'type' => $majorMimeType,
+        'mute' => $mute,
+        'loop' => $loop,
+      ));
       $shortenSize = 10;
       if (!empty($file['tn_w'])) {
         //$shortenSize = max($shortenSize, (int)($file['tn_w'] / 8));
@@ -299,16 +332,23 @@ function renderPost($boardUri, $p, $options = false) {
       }
       $tn_w = empty($file['tn_w']) ? 0 : $file['tn_w'];
       $tn_h = empty($file['tn_h']) ? 0 : $file['tn_h'];
+      $hover = empty($userSettings['hover']) ? false : true;
       $fTags = array(
         'path' => $path,
+        // but matter if audio/video, we can handle that in css
+        'postFileClasses' => $hover ? ' useViewer ' : '',
         'expander' => getExpander($thumb, $avmedia, array(
+          'thumbUrl' => $thumbUrl, // didn't use
+          'hover' => $hover,
+          'majorMimeType' => $majorMimeType,
           'classes' => array('postFile', $majorMimeType),
           'tn_sz' => array($tn_w, $tn_h),
           'sz' => array($file['w'], $file['h']),
-          'labelId' => $fileSha256,
+          'labelId' => 'details_' . $fileSha256,
           'styleContentUrl' => $path,
         )),
         'fileid' => $fileSha256,
+        'fileId' => ' id="container_' . $fileSha256 . '"',
         'filename' => $file['filename'],
         'majorMimeType' => $majorMimeType,
         'shortfilename' => snippet($noext, $shortenSize) . ' ' . $ext,
