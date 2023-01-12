@@ -1,3 +1,7 @@
+/*
+our additions to style.css (from jschan)
+any modifications to existing will go directly into style.css with notes
+*/
 .nojsonly-block {
   display: none;
 }
@@ -10,6 +14,7 @@
   width: 100px;
 }
 
+/* simple rows/col utilities */
 .h {
   padding-left: 0;
   float: left;
@@ -28,6 +33,12 @@
   border: none;
   height: 1px;
   width: 1px;
+}
+
+.form-post textarea[name="message"] {
+  /* 100px is about 7 lines of text at 13px */
+  /* 4chan 60px, 8moe, 75px, 94ch 80px */
+  min-height: 80px;
 }
 
 .board-banner {
