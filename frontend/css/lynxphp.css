@@ -104,3 +104,22 @@ any modifications to existing will go directly into style.css with notes
   padding-right: 5px;
 }
 
+/* make board name smaller when it's the default */
+.post-name.default-name {
+  font-size: smaller;
+}
+
+.op .doubleplus-actions {
+  background-color: var(--background-rest);
+}
+
+.doubleplus-actions {
+  background-color: var(--post-color);
+  position: absolute; 
+  top: 20px; 
+  z-index: 1; 
+  padding: 5px;
+}
+.doubleplus-actions a {
+  white-space:nowrap;
+}
