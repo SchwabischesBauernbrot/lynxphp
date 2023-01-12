@@ -43,6 +43,17 @@ if (!empty($res['setCookies'])) {
 if ($res['success']) {
   // maybe a js alert?
   echo "Success<br>\n";
+  // sync localStorage to match settings if JS is loaded
+  // maybe should be a json blob
+/*
+echo <<< EOB
+<script>
+// volume alreayd handed
+// audio or video?
+//setLocalStorage('loop', $loop)
+</script>
+EOB;
+*/
   redirectTo('/user/settings.html');
 } else {
   wrapContent('Something went wrong...' . print_r($res, 1));

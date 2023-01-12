@@ -26,6 +26,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
     volumeSetting.addEventListener('change', changeVolume, false);
   }
 
+  // video vs audio
+  let loopEnabled = true // default
+  /*
   const loopSetting = document.getElementById('loop-setting');
   let loopEnabled = localStorage.getItem('loop') == 'true';
   if (loopSetting) {
@@ -37,6 +40,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     loopSetting.checked = loopEnabled;
     loopSetting.addEventListener('change', toggleLoop, false);
   }
+  */
 
   const imageloadingbarsSetting = document.getElementById('imageloadingbars-setting');
   let imageloadingbarsEnabled = localStorage.getItem('imageloadingbars') == 'true';
@@ -65,6 +69,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
         expanded.style.display = '';
         if (expanded.offsetWidth >= filename.offsetWidth) {
           filename.style.maxWidth = expanded.offsetWidth+'px';
+        }
+      }
+
+      // should be flexible enough for css/design changes
+      const postFileSrcElem = thumb.closest('.post-file-src')
+      if (postFileSrcElem) {
+        const nojsVideoElem = postFileSrcElem.querySelector('video')
+        if (nojsVideoElem) {
+          // load nojs setting
+
+          //console.log('nojsVideoElem', nojsVideoElem, nojsVideoElem.loop, nojsVideoElem.muted)
+          loopEnabled = nojsVideoElem.loop
         }
       }
       //handle css thing for play icon on vid/audio

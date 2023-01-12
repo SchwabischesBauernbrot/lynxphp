@@ -177,6 +177,7 @@ if (!function_exists('secondsToTime')) {
 
 getBoardThreadListingRender($boardUri, $boardThreads, 1, array(
   'noBoardHeaderTmpl' => true,
+  'noActions' => true, // prevent BE call
   // stop settings http request
   /*
   'settings' => array(
