@@ -57,9 +57,9 @@ function captcha_generateCode() {
 }
 
 function captcha_register($text) {
-  global $scratch, $now;
+  global $persist_scratch, $now;
   $captcha_id = md5(uniqid());
-  $captchas = $scratch->get('captchas');
+  $captchas = $persist_scratch->get('captchas');
   if (!is_array($captchas)) $captchas = array();
   $captchas[$captcha_id] = array(
     // probably don't need to restore id, since we're keying by it
@@ -72,7 +72,7 @@ function captcha_register($text) {
     // good for 24 hours => 5 minutes
     'expires' => (int)($now) + (5 * 60),
   );
-  $scratch->set('captchas', $captchas);
+  $persist_scratch->set('captchas', $captchas);
   return array(
     'id'      => $captcha_id,
     'expires' => $captchas[$captcha_id]['expires'],

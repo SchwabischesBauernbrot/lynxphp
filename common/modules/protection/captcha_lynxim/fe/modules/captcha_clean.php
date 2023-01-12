@@ -4,9 +4,9 @@ $params = $getModule();
 
 // io is results but don't need it here
 
-global $scratch, $now;
+global $persist_scratch, $now;
 
-$captchas = $scratch->get('captchas');
+$captchas = $persist_scratch->get('captchas');
 if (!is_array($captchas)) $captchas = array();
 if (DEV_MODE) {
   $startCount = count($captchas);
@@ -20,6 +20,6 @@ if (DEV_MODE) {
   $endCount = count($captchas);
   echo "$startCount => $endCount CAPTCHAS<br>\n";
 }
-$scratch->set('captchas', $captchas);
+$persist_scratch->set('captchas', $captchas);
 
 ?>
