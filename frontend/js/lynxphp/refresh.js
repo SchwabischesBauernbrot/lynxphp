@@ -25,7 +25,7 @@ function refreshPosts(manual) {
     fetch(getRefreshUrl(loc)).then(res => { statusCode = res.status; return res.text() } ).then(html => {
       //console.log('refreshPosts - status', statusCode)
       var result
-      if (statusCode === 500) {
+      if (statusCode !== 200) {
         // we get a 500 warning in the js console already
         //console.warn('backend problem')
         result = { foundNewReplies: false }
