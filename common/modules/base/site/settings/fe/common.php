@@ -5,6 +5,8 @@
 // function are automatically exported
 
 // allow export of data as $common in your handlers and modules
+// now set in module.php s
+
 return array(
   'fields' => array(
     'siteName' => array(
