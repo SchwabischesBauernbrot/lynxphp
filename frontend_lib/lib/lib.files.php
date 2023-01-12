@@ -307,7 +307,8 @@ function getViewer($file, $options = false) {
   // poster (show this while downloading)
   // can't loop because of how we collapse
   // class="" ?
-  return '<' . $type . '  src="' . $path . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls' . $loopAtt . $muteAtt . ' autoplay=true preload=none />';
+  // autoplay=true seemed to make chrome49 and icecat download and play all thumbs without clicking on them
+  return '<' . $type . '  src="' . $path . '" width="'.$w.'" height="'.$h.'" loading="lazy" controls' . $loopAtt . $muteAtt . ' preload=none />';
 }
 
 ?>
