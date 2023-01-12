@@ -113,8 +113,18 @@ function perms_inGroups($groups) {
   // post_renderer calls this
   //echo gettrace();
   $user = getUserData();
+  if (isset($user['account']['meta']) && $user['account']['meta']['code'] !== 200) {
+    return false;
+  }
   if ($user === false) return false;
-  $usergroups = $user['account']['groups'];
+  $usergroups = array();
+  if (isset($user['account']['groups'])) {
+    $usergroups = $user['account']['groups'];
+  } else {
+    if (DEV_MODE) {
+      echo "<pre>DEV NOTE: no account.groups [", print_r($user, 1), "]</pre>\n";
+    }
+  }
   foreach($groups as $g) {
     if (!in_array($g, $usergroups)) return false;
   }
