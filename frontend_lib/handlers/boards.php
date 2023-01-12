@@ -270,6 +270,8 @@ function makePostHandlerEngine($request) {
     'boardUri' => $boardUri,
     'result'   => $result,
     'json'     => $json,
+    // needed for (yous) apparently on the json side
+    'redirect' => $redir,
     // we could get the hashes from $res (handles.files[].hash)
     // nah it's a refresh issue...
     //'filesDebugs' => $res,
@@ -277,6 +279,7 @@ function makePostHandlerEngine($request) {
   );
 }
 
+// nojs handler
 function makePostHandlerHtml($request) {
   $arr = makePostHandlerEngine($request);
   $boardUri = $arr['boardUri'];
@@ -337,6 +340,7 @@ EOB;
     } else
     if ($result && is_array($result) && isset($result['data']) && is_array($result['data']) && $result['data']['status'] === 'queued') {
       // success (queued)
+      $redir = $arr['redirect'];
       redirectTo($redir);
     } else
     if ($result && is_array($result) && isset($result['data']) && is_array($result['data']) && $result['data']['status'] === 'refused') {
