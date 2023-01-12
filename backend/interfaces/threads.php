@@ -100,6 +100,9 @@ function threadDBtoAPI(&$row, $boardUri) {
 }
 
 // false means thread does not exist
+// and also means no replies (since)
+// FIXME: we need differentiate because all sorts of error codes
+// board/thread not found needs to be separate from results like no post
 function getThread($boardUri, $threadNum, $options = false) {
   // unpack options
   extract(ensureOptions(array(
