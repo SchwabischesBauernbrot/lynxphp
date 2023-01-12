@@ -15,6 +15,7 @@ $last = (int)getQueryField('last');
 $result = $pkg->useResource('refresh', array(
   'boardUri' => $boardUri, 'thread'=> $threadNum, 'last' => $last,
 ));
+// result === false might not be an error but just no posts...
 
 //echo "<pre>", htmlspecialchars(print_r($result, 1)), "</pre>\n";
 //$res = json_decode($result, true);
@@ -37,9 +38,15 @@ if (is_array($result)) {
   echo "<pre>be", htmlspecialchars(print_r($result, 1)), "</pre>\n";
   echo "<pre>decode", htmlspecialchars(print_r($res, 1)), "</pre>\n";
   */
+  // not great, we're flipping formats, how is JS behavior supposed to stay consistent
+  // but we do need the porting....
   // no wrap since we're embedded
-  echo "Error rendering updates since[$last] to thread[$threadNum] on board[$boardUri]<br>\n";
-  echo "<pre>", htmlspecialchars(print_r($result, 1)), "</pre>\n";
+  if (DEV_MODE) {
+    wrapContent("<pre>BE Error, params since[$last] thread[$threadNum] board[$boardUri] DEBUG:", htmlspecialchars(print_r($result, 1)), "</pre>\n");
+  } else {
+    // json envelope for meta information?
+    echo "Error rendering updates since[$last] to thread[$threadNum] on board[$boardUri]<br>\n";
+  }
 }
 
 ?>
