@@ -177,8 +177,17 @@ function renderPost($boardUri, $p, $options = false) {
     // needs trailing space to let name breathe on it's own
     $postmeta .= '<span class="post-subject">' . htmlspecialchars($p['sub']) . '</span> ';
   }
+  $small = false;
+  if (empty($p['name'])) {
+    $small = true;
+    $p['name'] = 'anonymous';
+  }
   if (!empty($p['name'])) {
-    $postmeta .= '<span class="post-name">' . htmlspecialchars($p['name']) . '</span>';
+    if ($small) {
+      $postmeta .= '<span class="post-name"><small>' . htmlspecialchars($p['name']) . '</small></span>';
+    } else {
+      $postmeta .= '<span class="post-name">' . htmlspecialchars($p['name']) . '</span>';
+    }
   }
   //echo "<pre>", print_r($p['flag_cc'], 1), "</pre>\n";
   // lynxchan doesn't need flag to set flag_cc / flagName
