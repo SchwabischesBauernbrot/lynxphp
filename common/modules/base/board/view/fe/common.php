@@ -131,7 +131,9 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
     //echo "[", $thread['posts'][0]['no'], "] replies[", $thread['thread_reply_count'], "]<br>\n";
     if (!isset($thread['posts'])) continue;
     $posts = $thread['posts'];
-    $threadId = $posts[0]['no'];
+    // a thread can have no replies
+    //$threadId = $posts[0]['no'];
+    $threadId = $thread['no'];
     //echo "count[", count($posts), "]<br>\n";
     $threads_html .= $threadHdr_tmpl;
     // we only include 6...
