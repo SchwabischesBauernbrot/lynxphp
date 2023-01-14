@@ -1,0 +1,3 @@
+Some templates can be found in the modules which would be `common/modules/CATEGORY/MODULE_NAME/fe/views`.
+
+homepage is in the `site` category in `homepage` module (i.e. common/modules/site/homepage/fe/views)

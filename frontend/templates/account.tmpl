@@ -1,10 +1,11 @@
 account identifier: {{login}}<br>
+<ul>
 {{admin}}
 {{global}}
 <a href="{{account}}">Account Settings</a><br>
-<!-- make tag, userboards are configurable -->
+<!-- for things like user_boards board creation -->
 {{other_links}}
-<!-- a href="{{create_board}}">Create Board</a><br -->
+</ul>
 Owned boards
 <ul>
 {{ownedBoards}}
@@ -14,10 +15,10 @@ Owned boards
   <li>{{uri}} {{actions}}
 <!-- end -->
 <!-- loop -->
-  <a href="{{admin}}">Admin interface</a><br>
+  <a href="{{admin}}">Site settings</a><br>
 <!-- end -->
 <!-- loop -->
-  <a href="{{global}}">Global interface</a><br>
+  <a href="{{global}}">Moderation interface</a><br>
 <!-- end -->
 <!-- loop -->
   <!-- we add bold to class if it's selected -->

@@ -1,6 +1,7 @@
 body {
   font-family: arial, helvetica, sans-serif;
-  font-size: 12px;
+  /* shiban 230112 12px => 13px font is too smaller */
+  font-size: 13px;
   color: var(--font-color);
   background: linear-gradient(var(--background-top) 3em, var(--background-rest) 230px);
   flex: 1;

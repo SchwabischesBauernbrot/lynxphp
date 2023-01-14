@@ -20,7 +20,8 @@ if (isset($adminSettings[$section])) {
 // handle hooks for additionl settings
 //$pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
 
-//echo "<pre>", print_r($fields, 1), "</pre>\n";
+//echo "<pre>fields:", print_r($fields, 1), "</pre>\n";
+//echo "<pre>values:", print_r($values, 1), "</pre>\n";
 
 $html = generateForm($params['action'], $fields, $values);
 

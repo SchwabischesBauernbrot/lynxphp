@@ -186,8 +186,15 @@ function renderPost($boardUri, $p, $options = false) {
     // needs trailing space to let name breathe on it's own
     $postmeta .= '<span class="post-subject">' . htmlspecialchars($p['sub']) . '</span> ';
   }
+  $defaultName = false;
+  if (empty($p['name'])) {
+    $defaultName = true;
+    $p['name'] = 'anonymous';
+  }
   if (!empty($p['name'])) {
-    $postmeta .= '<span class="post-name">' . htmlspecialchars($p['name']) . '</span>';
+    // less bytes than a small tag and give BO/theme/custom css better control over look
+    $defaultClass = $defaultName ? ' default-name' : '';
+    $postmeta .= '<span class="post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</span>';
   }
   //echo "<pre>", print_r($p['flag_cc'], 1), "</pre>\n";
   // lynxchan doesn't need flag to set flag_cc / flagName
@@ -412,7 +419,7 @@ function renderPost($boardUri, $p, $options = false) {
     'files'     => $files_html,
     'replies'   => $replies_html,
     // for actions details/summary
-    'backgroundColorCSS' => $isOP ? 'var(--background-rest)' : 'var(--post-color)',
+    //'backgroundColorCSS' => $isOP ? 'var(--background-rest)' : 'var(--post-color)',
     'jstime'    => gmdate('Y-m-d', $p['created_at']) . 'T' . gmdate('H:i:s.v', $p['created_at']) . 'Z',
     'human_created_at' => gmdate('n/j/Y H:i:s', $p['created_at']),
     'links'     => $links_html,

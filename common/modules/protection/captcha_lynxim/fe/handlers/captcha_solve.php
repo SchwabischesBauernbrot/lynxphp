@@ -8,7 +8,20 @@ $_POST['captcha_id'] = $cid;
 $err = validate_captcha_field(array('remove' => false));
 
 header('Content-Type: application/json');
-echo json_encode(array(
-  'ok' => $err === '',
-));
+$res = array('ok' => $err === '');
+
+if (DEV_MODE) {
+  global $persist_scratch, $now;
+  $captchas = $persist_scratch->get('captchas');
+  $res['debug'] = array(
+    'err' => $err,
+    'captcha_id' => $cid,
+    'captcha' => $_POST['captcha'],
+    '_POST' => $_POST,
+    'ourRecord' => $captchas[$cid],
+    'captchas' => $captchas,
+  );
+}
+
+echo json_encode($res);
 ?>

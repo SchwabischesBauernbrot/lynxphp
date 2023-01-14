@@ -4,9 +4,14 @@ function updateLastReply() {
   var threadElem = document.getElementById('threadsContainer')
   // just get last on the page
   if (threadElem.children.length && threadElem.children[threadElem.children.length - 1]) {
-    lastReplyId = parseInt(threadElem.children[threadElem.children.length - 1].dataset.postId)
+    if (threadElem.children[threadElem.children.length - 1].dataset.postId) {
+      lastReplyId = parseInt(threadElem.children[threadElem.children.length - 1].dataset.postId)
+      //console.debug('refresh_thread.js - setting page last reply to', lastReplyId)
+    } else {
+      //console.debug('refresh_thread.js - lastThreadELem dataset is missing post', threadElem.children[threadElem.children.length - 1].dataset, threadElem.children[threadElem.children.length - 1])
+    }
   }
-  //console.log('page last reply', lastReplyId)
+  //console.debug('refresh_thread.js - page last reply', lastReplyId)
 }
 
 function getRefreshUrl(loc) {
@@ -29,6 +34,14 @@ function refreshCallback(error, html) {
   if (error) {
     console.error('refreshCallback error', error)
     // stop will be called already
+    return {
+      foundNewReplies: foundPosts
+    }
+  }
+
+  // don't append errors to page
+  if (html.match(/Error rendering updates/) || html.match(/BE Error, params/)) {
+    // right now to be expected but once fixed, we should communicate errors to browser
     return {
       foundNewReplies: foundPosts
     }

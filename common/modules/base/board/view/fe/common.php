@@ -49,8 +49,10 @@ function getBoardThreadListing($q, $boardUri, $pagenum = 1) {
     wrapContent("There is a problem with the backend [$boardUri]");
     return;
   }
+  //echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
   // lynxbridge
-  if (empty($boardThreads['pageCount'])) {
+  // pageCount can be 0 meaning the board exists in doubleplus
+  if (!isset($boardThreads['pageCount'])) {
     http_response_code(404);
     wrapContent("Board [$boardUri] does not exist");
     return;
@@ -129,7 +131,9 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
     //echo "[", $thread['posts'][0]['no'], "] replies[", $thread['thread_reply_count'], "]<br>\n";
     if (!isset($thread['posts'])) continue;
     $posts = $thread['posts'];
-    $threadId = $posts[0]['no'];
+    // a thread can have no replies
+    //$threadId = $posts[0]['no'];
+    $threadId = $thread['no'];
     //echo "count[", count($posts), "]<br>\n";
     $threads_html .= $threadHdr_tmpl;
     // we only include 6...

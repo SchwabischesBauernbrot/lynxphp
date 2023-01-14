@@ -17,8 +17,8 @@ function validate_captcha_field($options = false) {
     return 'CAPTCHA has no ID';
   }
   $captcha_id = $_POST['captcha_id'];
-  global $scratch, $now;
-  $captchas = $scratch->get('captchas');
+  global $persist_scratch, $now;
+  $captchas = $persist_scratch->get('captchas');
   if (!is_array($captchas)) {
     return 'No CAPTCHAs active';
   }
@@ -40,7 +40,7 @@ function validate_captcha_field($options = false) {
   // success, remove it
   if ($remove) {
     unset($captchas[$captcha_id]);
-    $scratch->set('captchas', $captchas);
+    $persist_scratch->set('captchas', $captchas);
   }
 
   return '';

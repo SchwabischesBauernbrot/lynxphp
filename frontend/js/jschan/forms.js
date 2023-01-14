@@ -511,6 +511,8 @@ class formHandler {
               if (redirectBoard && redirectPostId) {
                 appendLocalStorageArray('yous', `${redirectBoard}-${redirectPostId}`);
               }
+              // if new thread, we need to either clear the message
+              // or redirect to the new thread?
             }
             if (json.message || json.messages || json.error || json.errors) {
               //doModal(json);
