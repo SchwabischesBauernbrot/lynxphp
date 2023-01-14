@@ -5,8 +5,11 @@ function renderUserPortalHeader() {
   $portalOptions = array(
     'headerPipeline' => PIPELINE_USER_HEADER_TMPL,
     'navPipeline'    => PIPELINE_USER_NAV,
+    // FIXME: from compiled list (lib.loader?)
     'navItems' => array(
       'general' => 'user/settings/general.html',
+      'post' => 'user/settings/post.html',
+      'media' => 'user/settings/media.html',
       'theme' => 'user/settings/theme.html',
     ),
   );
