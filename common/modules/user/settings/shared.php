@@ -6,30 +6,8 @@
 
 return array(
   'CategoryFields' => array(
-    'general' => array (
-      'hover' => array(
-        'label' => 'Hover to expand media',
-        'type'  => 'checkbox',
-      ),
-      'mute' => array(
-        'label' => 'Mute audio on videos',
-        'type'  => 'checkbox',
-      ),
-      'videoloop' => array(
-        'label' => 'Loop videos by default',
-        'type'  => 'checkbox',
-        'default' => true,
-      ),
-      'audioloop' => array(
-        'label' => 'Make audio player loop by default',
-        'type'  => 'checkbox',
-        'default' => false,
-      ),
-/*
-      'volume' => array(
-        'label' => 'Default volume, enter number between 0 to 100',
-        'type'  => 'integer',
-      ),
+    'post' => array(
+      /*
       'name' => array(
         'label' => 'Default post name',
         'type'  => 'text',
@@ -38,10 +16,6 @@ return array(
       'postpass' => array(
         'label' => 'Default post password',
         'type'  => 'textpass',
-      ),
-      'nsfw' => array(
-        'label' => 'Show Not Safe For Work content',
-        'type'  => 'checkbox',
       ),
       'noncolorids' => array(
         'label' => 'Non color IDs',
@@ -56,16 +30,63 @@ return array(
           'local time',
           'relative time',
         ),
+        'default' => 'local time',
       ),
       'miltime' => array(
         'label' => 'Use 24h (military) time',
         'type'  => 'checkbox',
+        'default' => false,
       ),
+      'numreply' => array(
+        'label' => 'Clicking on post number replies',
+        'type'  => 'checkbox',
+        'default' => false,
+      ),
+    ),
+    'media' => array(
+      'hover' => array(
+        'label' => 'Hover to expand media',
+        'type'  => 'checkbox',
+        'default' => true,
+      ),
+      'hover' => array(
+        'label' => 'Hover to expand media',
+        'type'  => 'checkbox',
+        'default' => true,
+      ),
+      /*
+      'volume' => array(
+        'label' => 'Default volume, enter number between 0 to 100',
+        'type'  => 'integer',
+      ),
+      */
+      'mute' => array(
+        'label' => 'Mute audio on videos',
+        'type'  => 'checkbox',
+        'default' => true,
+      ),
+      'videoloop' => array(
+        'label' => 'Loop videos by default',
+        'type'  => 'checkbox',
+        'default' => true,
+      ),
+      'audioloop' => array(
+        'label' => 'Make audio player loop by default',
+        'type'  => 'checkbox',
+        'default' => false,
+      ),
+    ),
+    'general' => array (
       'nojs' => array(
         'label' => 'Disable all JavaScript',
         'type'  => 'checkbox',
+        'default' => false,
       ),
       /*
+      'nsfw' => array(
+        'label' => 'Show Not Safe For Work content',
+        'type'  => 'checkbox',
+      ),
       // should be per board
       'disablecustomcss' => array(
         'label' => 'Disable board custom CSS',
@@ -77,6 +98,7 @@ return array(
       ),
       */
     ),
+    // has to be set to make it a valid category
     'theme' => array (
     ),
   ),
