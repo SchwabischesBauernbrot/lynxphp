@@ -25,9 +25,19 @@ if (is_array($result)) {
   // without the wrap it's not very SEO friendly...
   // maybe js could make it smart...
   global $boards_settings;
+  if (empty($boards_settings[$boardUri])) {
+    $boardData = getBoard($boardUri);
+    if (isset($boardData['settings'])) {
+      $boardSettings = $boardData['settings'];
+      $boards_settings[$boardUri] = $boardData['settings'];
+    }
+  }
+  $userSettings = getUserSettings();
   foreach($result as $p) {
     echo renderPost($boardUri, $p, array(
-      'boardSettings' => empty($boards_settings[$boardUri]) ? false : $boards_settings[$boardUri],
+      // empty($boards_settings[$boardUri]) ? false :
+      'boardSettings' => $boards_settings[$boardUri],
+      'userSettings' => $userSettings,
       //'checkable' => false,
     ));
   }
