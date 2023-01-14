@@ -93,6 +93,7 @@ function generateForm($action, $fields, $values, $options = false) {
   if ($listTag) {
     $html.= '<' . $listTag . '>';
   }
+  //echo "values[", print_r($values, 1), "]<br>\n";
   foreach($fields as $field => $details) {
     if (!isset($details['label']) && $details['type'] !== 'hidden') {
       echo "Skipping [$field], no label<br>\n";
@@ -138,6 +139,12 @@ function generateForm($action, $fields, $values, $options = false) {
     }
     // can be stomped if needed
     // do we need to escape?
+    /*
+    if (DEV_MODE && empty($values[$field])) {
+      echo "<pre>DEV_MODE: [$field] is missing from values\n";
+      echo "values[", print_r($values, 1), "]</pre>\n";
+    }
+    */
     $value = empty($values[$field]) ? '' : $values[$field];
     if ($fieldTag) {
       $html .= '<' . $fieldTag . '>';
@@ -188,8 +195,9 @@ function generateForm($action, $fields, $values, $options = false) {
       case 'select':
         $html .= '<select name="' . $field . '">';
         foreach($details['options'] as $v => $l) {
-          $sel  = $v === $value ? ' selected' : '';
-          $html .= '<option value="' . $v . '"' . $sel . '>' . $l;
+          $sel  = $l === $value ? ' selected' : '';
+          //echo "v[$l] value[$value] = [$sel] field[$field]<br>\n";
+          $html .= '<option value="' . $l . '"' . $sel . '>' . $l;
         }
         $html .= '</select>';
       break;
