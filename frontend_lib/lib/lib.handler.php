@@ -108,10 +108,19 @@ function wrapContentData($options = false) {
     'overrideTheme' => '',
     // wth passes this in?
     'canonical'   => false,
+    'userSettings' => false,
   ), $options));
 
   //echo "settings[", print_r($settings, 1), "]<bR>\n";
 
+  /*
+  if ($userSettings === false) {
+    $userSettings = getUserSettings();
+  }
+  //echo "<pre>userSettings[", print_r($userSettings, 1), "]</pre>\n";
+
+  $enableJs = empty($userSettings['nojs']);
+  */
   $enableJs = true;
 
   /*
@@ -162,6 +171,8 @@ function wrapContentData($options = false) {
     // FIXME: I don't think this is even used
     // it was used for themes in the pipeline
     // but we have a unified call, so there's no cost atm
+
+    // we need this for hover now
     //'userSettings' => $userSettings,
     'enableJs' => $enableJs,
     'doWork' => !$noWork,
@@ -323,9 +334,11 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       // filters
 
       // lynxphp
+      'js/lynxphp/user_settings.js',
       'js/lynxphp/embed.js',
       'js/lynxphp/refresh.js',
       'js/lynxphp/expander_thread.js',
+      'js/lynxphp/expander_hover_media.js',
       //'js/lynxphp/expander_media.js',
       'js/lynxphp/work.js',
       // only need this on the settings page...
