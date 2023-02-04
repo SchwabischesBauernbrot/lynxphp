@@ -135,6 +135,11 @@ function refreshPosts(manual) {
       }
       refreshElem.style.display = 'block'
       refreshingElem.style.display = 'none'
+    }).catch(e => {
+      console.error('refresh fetch err', e)
+      if (autoRefresh) {
+        startTimer((manual || result.foundNewReplies) ? 10 : lastRefresh * 2)
+      }
     })
   } catch(e) {
     console.error('refresh fetch? err', e)
