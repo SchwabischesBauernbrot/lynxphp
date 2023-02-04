@@ -51,6 +51,7 @@ $board_settings = array(
 global $now;
 $pageData = array(
   'page1' => array(
+    'no' => 1,
     'posts' => array(
       array(
         'no' => 1,
@@ -95,6 +96,7 @@ $pageData = array(
     'thread_reply_count' => 1,
   ),
   array(
+    'no' => 3,
     'posts' => array(
       array(
         'no' => 3,
