@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   // grab from settings
   const volumeSetting = document.getElementById('volume-setting');
   let volumeLevel = localStorage.getItem('volume')
-  if (volumeLevel === 'undefined') volumeLevel = 50
+  if (volumeLevel === 'undefined' || volumeLevel === '') volumeLevel = 50
   //console.debug('expand.js - volumeLevel', volumeLevel)
   if (volumeSetting) {
     const changeVolume = (change) => {
