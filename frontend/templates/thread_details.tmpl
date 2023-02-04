@@ -1,3 +1,4 @@
+thread_details is worthless, we have post_details that drives most of this
 <form action="/forms/board/{{uri}}/actions" method="POST" enctype="application/x-www-form-urlencoded">
   <input type="hidden" name="thread" value="{{threadNum}}">
   <hr size="1">
@@ -31,14 +32,16 @@
   <a class="quote" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}">&gt;&gt;{{no}}</a>
 <!-- end -->
 <!-- loop -->
+  not used? no templates/mixins/post_details is used
   <div class="anchor" id="{{no}}"></div>
   <div class="post-container op" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
     <div class="post-info">
       <span>
-        <label>
+        {{meta}}
+        <!-- label>
           <input class="post-check" type="checkbox" name="checkedposts[]" value="{{no}}"/>
           <span class="post-name">{{name}}</span>
-        </label>
+        </label -->
         <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
       </span>
       <span class="post-links">
