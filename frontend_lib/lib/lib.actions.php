@@ -125,12 +125,43 @@ function action_getHtml($actions, $options = false) {
 // the expand isn't always ideal because you can have more than one open at a time
 // but js could fix that...
 function action_getExpandHtml($actions, $options = false) {
+  extract(ensureOptions(array(
+    'label' => 'Actions',
+    'float' => true,
+  ), $options));
   $permitted = action_decodePerms($actions, $options);
-  if (count($permitted)) {
-    if (count($permitted) === 1) {
+  $cnt = count($permitted);
+  if ($cnt) {
+    if ($cnt === 1) {
       return action_permittedToHtml($permitted, $options);
     } else {
-      return action_permittedToHtml($permitted, $options);
+      $inner = action_permittedToHtml($permitted, $options);
+      //
+      /*
+      <details style="display: inline;">
+        <summary>...</summary>
+        <div style="position: relative; z-index: 1; background-color: var(--post-color); padding: 5px;">
+        {{actions}}
+        </div>
+      </details>
+      */
+      /*
+      <details style="display: inline; position: relative;">
+        <summary>Actions</summary>
+        <nav class="doubleplus-actions">
+          {{ actions }}
+        </nav>
+      </details>
+      */
+      // we can set an id or a class
+      $classes = array('doubleplus-actions-dropdown');
+      if ($float) {
+        $classes []= 'float';
+      } else {
+        $classes []= 'non-float';
+      }
+      $wrap = '<nav class="doubleplus-actions">' .  $inner . '</nav>';
+      return getExpander($label, $wrap, array('classes' => $classes,));
     }
   }
 }
