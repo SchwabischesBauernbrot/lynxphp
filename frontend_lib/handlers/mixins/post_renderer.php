@@ -124,8 +124,9 @@ function renderPost($boardUri, $p, $options = false) {
   }
   $post_actions_html = join('<br>' . "\n", $post_actions_html_parts);
   */
+
   // how do we set where?
-  $post_actions_html = action_getHtml($post_actions, array(
+  $post_actions_html = action_getExpandHtml($post_actions, array(
     'boardUri' => $boardUri, 'where' => $where));
 
   // should we have pre and post links around the no #123 part?
@@ -194,7 +195,8 @@ function renderPost($boardUri, $p, $options = false) {
   if (!empty($p['name'])) {
     // less bytes than a small tag and give BO/theme/custom css better control over look
     $defaultClass = $defaultName ? ' default-name' : '';
-    $postmeta .= '<span class="post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</span>';
+    // FIXME: email?
+    $postmeta .= '<address style="display: inline-block" class="post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</address>';
   }
   //echo "<pre>", print_r($p['flag_cc'], 1), "</pre>\n";
   // lynxchan doesn't need flag to set flag_cc / flagName
@@ -340,6 +342,7 @@ function renderPost($boardUri, $p, $options = false) {
       $tn_w = empty($file['tn_w']) ? 0 : $file['tn_w'];
       $tn_h = empty($file['tn_h']) ? 0 : $file['tn_h'];
       $hover = empty($userSettings['hover']) ? false : true;
+      $containerId = 'container_' . $fileSha256;
       $fTags = array(
         'path' => $path,
         // but matter if audio/video, we can handle that in css
@@ -347,6 +350,7 @@ function renderPost($boardUri, $p, $options = false) {
         'expander' => getExpander($thumb, $avmedia, array(
           'thumbUrl' => $thumbUrl, // didn't use
           'hover' => $hover,
+          'parentContainerId' => $containerId, // needed for hover
           'majorMimeType' => $majorMimeType,
           'classes' => array('postFile', $majorMimeType),
           'tn_sz' => array($tn_w, $tn_h),
@@ -355,7 +359,7 @@ function renderPost($boardUri, $p, $options = false) {
           'styleContentUrl' => $path,
         )),
         'fileid' => $fileSha256,
-        'fileId' => ' id="container_' . $fileSha256 . '"',
+        'fileId' => ' id="' . $containerId . '"',
         'filename' => $file['filename'],
         'majorMimeType' => $majorMimeType,
         'shortfilename' => snippet($noext, $shortenSize) . ' ' . $ext,

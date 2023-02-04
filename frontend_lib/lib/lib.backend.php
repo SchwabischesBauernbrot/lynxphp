@@ -172,6 +172,7 @@ function consume_beRsrc($options, $params = '') {
       'serverTs' => $ts,
       'serverEtag' => $etag,
       'headCache' => empty($_HEAD_CACHE[$options['endpoint'] . $querystring]) ? '' : $_HEAD_CACHE[$options['endpoint'] . $querystring],
+      'headers' => $headers,
       //'saveCache' => $saveCache,
     );
   }

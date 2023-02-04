@@ -1,6 +1,6 @@
 <!-- we need to prefix the uri here -->
-<div id="{{no}}" class="post-container {{op}}" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
-  <div class="post-info">
+<article id="{{no}}" class="post-container {{op}}" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
+  <header class="post-info">
     {{postmeta}}
     <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
     <!-- span class="post-links" -->
@@ -16,23 +16,21 @@
     we can use css to compress minimize options
     or summary/details
     -->
-    <details style="display: inline; position: relative;">
-      <summary>Actions</summary>
-      <nav class="doubleplus-actions">
-        {{actions}}
-      </nav>
-    </details>
+    {{actions}}
     {{links}}
-  </div>
+  </header>
   <!-- there is an overflow: hidden .post-data -->
   <!-- we could remove post-data to reduce DOM elements -->
   <div class="post-data">
-    <div class="post-files">{{files}}</div>
+    <div class="post-files">
+      {{files}}
+      <div class="viewer"></div>
+    </div>
     <pre class="post-message">{{message}}</pre>
     {{omitted}}
     <!-- leave a place for js to dump these -->
   </div>
-</div>
+</article>
 <!-- loop -->
         <span class="post-icons">
           {{icons}}
@@ -42,7 +40,7 @@
           <img src="images/img/{{icon}}.png" height="14" width="14" title="{{title}}">
 <!-- end -->
 <!-- loop -->
-  <div class="post-file {{majorMimeType}}">
+  <div class="post-file {{postFileClasses}} {{majorMimeType}}" {{fileId}}>
     <!-- src is more like media... -->
     <div class="post-file-src" data-type="{{majorMimeType}}" data-attachment="false">
       <!-- expandableMedia ? -->

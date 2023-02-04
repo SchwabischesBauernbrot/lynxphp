@@ -28,3 +28,70 @@ details[open].postFile > summary::after {
 details[open].postFile > summary img {
   display: none;
 }
+
+.doubleplus-actions-dropdown {
+  /* make it behave like text */
+  display: inline;
+}
+
+.doubleplus-actions-dropdown.float {
+  /* needed for the expander to float right */
+  position: relative;
+}
+
+.op .doubleplus-actions {
+  background-color: var(--background-rest);
+}
+.doubleplus-actions {
+  background-color: var(--post-color);
+  padding: 5px;
+}
+.float .doubleplus-actions {
+  position: absolute;
+  top: 20px;
+  z-index: 1;
+}
+.non-float .doubleplus-actions {
+  position: relative;
+}
+
+.doubleplus-actions a {
+  white-space:nowrap;
+}
+
+.viewer {
+  display: none;
+  z-index: 1;
+  position: absolute;
+  left: 25px;
+  /*
+  top: 25px;
+  bottom: 25px;
+  right: 25px;
+  */
+}
+
+.useViewer {
+}
+
+/* works for the text but not the entire block line */
+.useViewer.img:hover {
+  z-index: 2;
+  /*
+  doesn't work on a row
+  position: absolute;
+  width: 100%;
+  */
+}
+
+.useViewer.img:hover ~ .viewer {
+  display: block;
+}
+
+/* we have to hide them because z-index needs to be on top to hold the area */
+.useViewer.img:hover span {
+  visibility: hidden;
+}
+.useViewer.img:hover span img {
+  visibility: hidden;
+}
