@@ -85,7 +85,7 @@ function getBoardsParams() {
 
 function renderBoardsTemplate($res, $templates, $params) {
   global $now, $pipelines;
-
+  //echo "<pre>renderBoardsTemplate", htmlspecialchars(print_r($res, 1)), "</pre>\n";
   $pageNum = $params['page'];
   $reverse_list = $params['direction'] === 'desc';
 
@@ -179,9 +179,13 @@ function renderBoardsTemplate($res, $templates, $params) {
     $pipelines[PIPELINE_BOARD_ACTIONS]->execute($action_io);
     // remap output over the top of the input
     $board_actions = $action_io['actions'];
-    $board_actions_html = action_getHtml($board_actions, array(
-      'boardUri' => $boardUri, 'where' => 'boards'
+
+    //
+    $board_actions_html = action_getExpandHtml($board_actions, array(
+      'boardUri' => $boardUri, 'where' => 'boards',
+      'float' => false, 'label' => '...',
     ));
+
     $tags = array(
       'uri' => $boardUri,
       'title' => htmlspecialchars($b['title']),
