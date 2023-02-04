@@ -46,6 +46,7 @@ global $board_settings;
 $board_settings = array(
 );
 
+
 // how do we fake contents?
 global $now;
 $pageData = array(
@@ -178,6 +179,7 @@ if (!function_exists('secondsToTime')) {
 getBoardThreadListingRender($boardUri, $boardThreads, 1, array(
   'noBoardHeaderTmpl' => true,
   'noActions' => true, // prevent BE call
+  'userSettings' => array(), // prevent BE call
   // stop settings http request
   /*
   'settings' => array(
