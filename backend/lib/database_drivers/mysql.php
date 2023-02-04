@@ -198,13 +198,15 @@ class mysql_driver extends database_driver_base_class implements database_driver
         foreach($missing as $fieldName => $f) {
           $sql .= 'ADD ' . $fieldName . modelToSQL($f['type']);
         }
-        $sql = substr($sql, 0, -2);
+        if ($noChanges) {
+          $sql = substr($sql, 0, -2); // strip last ", "
+        }
       }
       if (!$noChanges) {
         foreach($changes as $fieldName => $f) {
           $sql .= 'MODIFY ' . $fieldName . modelToSQL($f['type']);
         }
-        $sql = substr($sql, 0, -2);
+        $sql = substr($sql, 0, -2); // strip last ", "
       }
       $sql .= '';
       //echo "mysql::autoupdate - sql[$sql]<br>\n";
