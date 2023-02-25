@@ -21,7 +21,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
       $this->lockpath = $res['lock'];
       $this->filepath = $res['file'];
     } else {
-      echo "FAILED";
+      echo "<!-- file2 scratch driver - FAILED -->Frontend having some problems, hang tight";
     }
   }
 
