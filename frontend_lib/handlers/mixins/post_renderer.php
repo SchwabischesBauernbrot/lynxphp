@@ -43,6 +43,12 @@ function renderPost($boardUri, $p, $options = false) {
   ), $options));
 
   //$isBO = perms_isBO($boardUri);
+  if (DEV_MODE) {
+    if (!isset($p['threadid'])) {
+      // well I see no thread but posts...
+      echo "<pre>threadid missing[", print_r($p, 1), "]</pre>\n";
+    }
+  }
   $threadId = $p['threadid'] ? $p['threadid'] : $p['no'];
   $isOP = $threadId === $p['no'];
 
@@ -332,13 +338,13 @@ function renderPost($boardUri, $p, $options = false) {
       $shortenSize = 10;
       if (!empty($file['tn_w'])) {
         //$shortenSize = max($shortenSize, (int)($file['tn_w'] / 8));
-      } else {
         // we can make some estimate off the aspect ratio...
         $w = getThumbnailWidth($file, array('type' => $majorMimeType));
         //echo "w[$w]<Br>\n";
         // 154 / 8 = 20190419-_DSF2773.j... ~20 chars
         $shortenSize = max($shortenSize, (int)($w / 8) - 10);
       }
+      //echo "shortenSize[$shortenSize] noext[$noext]<br>\n";
       $tn_w = empty($file['tn_w']) ? 0 : $file['tn_w'];
       $tn_h = empty($file['tn_h']) ? 0 : $file['tn_h'];
       $hover = empty($userSettings['hover']) ? false : true;
