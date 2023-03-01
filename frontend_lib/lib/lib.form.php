@@ -213,7 +213,7 @@ function generateForm($action, $fields, $values, $options = false) {
           'field'   => $field,
           'details' => $details,
         );
-        // generate/store/send captcha challange, image, and possibly an ID
+        // generate/store/send captcha challenge, image, and possibly an ID
         $pipelines[PIPELINE_FORM_CAPTCHA]->execute($io);
         if (isset($io['html'])) {
           $html .= $io['html'];
@@ -226,7 +226,7 @@ function generateForm($action, $fields, $values, $options = false) {
           'details' => $details,
           'value'   => $value,
         );
-        // generate/store/send captcha challange, image, and possibly an ID
+        // generate/store/send captcha challenge, image, and possibly an ID
         $pipelines[PIPELINE_FORM_WIDGET_THEMETHUMBNAILS]->execute($io);
         if (isset($io['html'])) {
           $html .= $io['html'];

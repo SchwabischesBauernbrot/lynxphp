@@ -289,10 +289,8 @@ function renderPost($boardUri, $p, $options = false) {
       // tn_w, tn_h
       //echo "<pre>file[", print_r($file, 1), "]</pre>\n";
       $ftmpl = $file_template;
-      // disbale images until we can mod...
       //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
 
-      // disbale images until we can mod...
       $path = $file['path'];
       $ext = pathinfo($file['filename'], PATHINFO_EXTENSION);
       $noext = str_replace('.'.$ext, '', $file['filename']);
@@ -369,7 +367,7 @@ function renderPost($boardUri, $p, $options = false) {
         'majorMimeType' => $majorMimeType,
         'thumb' => $thumb,
         //'viewer' => getViewer($file, array('type' => $majorMimeType)),
-        // not currently used but we'll include it incase they want to do something different
+        // not currently used but we'll include it in case they want to do something different
         'avmedia' => $avmedia,
         'codec' => empty($file['codec']) ? '' : $file['codec'],
         'codecSpace' => empty($file['codec']) ? '' : ' ',

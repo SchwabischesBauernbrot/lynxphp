@@ -261,7 +261,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
         // can add a type/version key later
         // FIXME: support multiple sheets on one module (an array)
         // FIXME: generate support to drop the need for php call
-        //        well we could internally decode it and diretly reference
+        //        well we could internally decode it and directly reference
         //        but this needs to work with the multi-loader
         // make all the scripts local to webroot
         $p = 'css.php?module=' .$p['module'] . '&sheets=' . $p['sheet'];
@@ -347,7 +347,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
     ),
   );
   // THINK: how do we let JS live in module directories
-  // but be efficently servered by web server?
+  // but be efficiently servered by web server?
   // so that we don't have to fire up php each time
   // make the static generation engine can copy them
   // and then we have PHP fallback
@@ -383,7 +383,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
   }
 
   // we don't get css/style, css/lynxphp or css/expand
-  // beacuse we don't parse the html of header
+  // because we don't parse the html of header
   // though we could move them into here as an array
   // but then the designers custom stylesheet wouldn't be moved in
   return $head_html;

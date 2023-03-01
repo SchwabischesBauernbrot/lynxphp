@@ -149,7 +149,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       //echo "getting fields ", $tableName, "\n";
       $haveFields = array();
       if (is_bool($res)) {
-        echo "pgsql::autoupdate - existing table, didnt like describe?!<br>\n";
+        echo "pgsql::autoupdate - existing table, didn't like describe?!<br>\n";
         return;
       }
       while($row = pg_fetch_assoc($res)) {

@@ -16,7 +16,7 @@ function getUserSettings() {
 
   global $packages;
   if (!empty($packages['user_setting'])) {
-    // cachable?
+    // cacheable?
     $data = $packages['user_setting']->useResource('settings');
     //echo "<pre>", print_r($data, 1), "</pre>\n";
     // loggedIn (1/0)

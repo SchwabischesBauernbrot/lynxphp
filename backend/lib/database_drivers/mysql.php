@@ -144,7 +144,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       //echo "getting fields ", $tableName, "\n";
       $haveFields = array();
       if (is_bool($res)) {
-        echo "mysql::autoupdate - existing table, didnt like describe?!<br>\n";
+        echo "mysql::autoupdate - existing table, didn't like describe?!<br>\n";
         return;
       }
       while($row = mysqli_fetch_assoc($res)) {
@@ -303,7 +303,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       return $this->query($sql);
     } else
     if ($err) {
-      echo "<pre>mysql::query - err[$err]\nSQL[$sql]</ore>\n";
+      echo "<pre>mysql::query - err[$err]\nSQL[$sql]</pre>\n";
       return false;
     }
   }
@@ -320,7 +320,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
     if ($err) {
-      echo "<pre>mysql::find - err[$err]\nSQL[$sql]</ore>\n";
+      echo "<pre>mysql::find - err[$err]\nSQL[$sql]</pre>\n";
       return false;
     }
     return $res;

@@ -249,7 +249,7 @@ function make_thumbnail($fileData, $duration = 1) {
     }
   }
   // get final size?
-  // may not save any writes at all if the size differes
+  // may not save any writes at all if the size differences
   if ($updateThumbSize && $fileData['fileid']) {
     // write thumbnail size to db
     if (empty($fileData['boardUri'])) {
