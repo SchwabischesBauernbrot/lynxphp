@@ -19,14 +19,20 @@ $row = getBoardRaw($boardUri);
 //echo "json[", gettype($settings['json']), "][", print_r($settings['json'], 1), "]<br>\n";
 $dbFields = array('uri', 'title', 'description');
 $row['json'] = json_decode($row['json'], true);
+//echo "<pre>database settings[", gettype($row['json']['settings']), "][", print_r($row['json']['settings'], 1), "]<br>\n";
+//echo "input[", print_r($_POST, 1), "]</pre>\n";
+
+$urow = array();
 foreach($_POST as $k => $v) {
   //echo "set [$k=$v]<br>\n";
   if (in_array($k, $dbFields)) {
-    $row[$k] = $v;
+    $urow[$k] = $v;
   } else {
     $row['json']['settings'][substr($k, 9)] = $v;
   }
 }
+
+// checkbox states are always changed
 foreach($shared['fields'] as $f => $t) {
   //echo "type[", print_r($t, 1), "]<br>\n";
   if ($t['type'] === 'checkbox') {
@@ -34,15 +40,16 @@ foreach($shared['fields'] as $f => $t) {
     $row['json']['settings'][$sf] = getOptionalPostField($f);
   }
 }
+//echo "<pre>merge[", print_r($row['json']['settings'], 1), "]</pre>\n";
 
 // FIXME: move all posts/files if uri changes....
 
 //echo "row[", gettype($row), "][", print_r($row, 1), "]<br>\n";
-$ok = saveBoardSettings($boardUri, $row['json']['settings']);
-//$ok = $db->update($models['board'], $row, array('criteria'=>array('uri'=>$boardUri)));
+$ok1 = saveBoardSettings($boardUri, $row['json']['settings']);
+$ok2 = $db->update($models['board'], $urow, array('criteria'=>array('uri'=>$boardUri)));
 
 sendResponse(array(
-  'success' => $ok ? 'true' : 'false',
+  'success' => ($ok1 && $ok2) ? 'true' : 'false',
   //'settings' => $settings,
 ));
 
