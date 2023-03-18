@@ -12,7 +12,7 @@ class BackendRouter extends Router {
     return parent::import($routes, $module);
   }
   function fromResource($name, $res, $moduleDir) {
-    // DEV_MODE is not availabel on backend...
+    // DEV_MODE is not available on backend...
     if (!isset($res['handlerFile'])) {
       return 'handlerFile is not set';
     }
@@ -82,7 +82,7 @@ class BackendRouter extends Router {
     };
 
     if (!empty($res['cacheSettings'])) {
-      //echo "Setting cacheSettings for $method_$cond<br>\n";
+      //echo "Setting cacheSettings for [$method]_[$cond]<br>\n";
       $this->routeOptions[$method . '_' . $cond]['cacheSettings'] = $res['cacheSettings'];
     }
 

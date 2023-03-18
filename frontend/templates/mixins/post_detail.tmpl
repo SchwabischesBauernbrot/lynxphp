@@ -2,14 +2,19 @@
 <article id="{{no}}" class="post-container {{op}}" data-board="{{uri}}" data-post-id="{{no}}" data-name="{{name}}" data-subject="{{subject}}">
   <header class="post-info">
     {{postmeta}}
+    <!-- why isn't the date part of the label? -->
     <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
     <!-- span class="post-links" -->
     <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}" title="Externally link to this specific post">No. {{no}}</a>
     <!-- a class="no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}_postform" title="Reply in this thread"></a -->
+    {{userid}}
     <span class="post-quoters"></span>
     <!-- endchan put these before... -->
     {{postlinks}}
     <!-- reply is the primary interaction, with "share" being 2nd -->
+    <!-- nojs needs href to jump to form, users always copy this link to clipboard -->
+    <!-- is js is enabled, we can leave the link to be share and override the behavior -->
+    <!-- we can have different behaviors... with extra DOM elements -->
     [<a href="/{{uri}}/thread/{{threadNum}}.html#{{no}}_postform" title="Reply to this post">Reply</a>]
     <span class="replies mt-5 ml-5">{{replies}}</span>
     <!--
@@ -31,6 +36,7 @@
     <!-- leave a place for js to dump these -->
   </div>
 </article>
+<!-- can omitted go here? -->
 <!-- loop -->
         <span class="post-icons">
           {{icons}}
@@ -48,11 +54,14 @@
     </div>
     <span class="post-file-info">
       <a class="filename" href="{{path}}" title="Download {{filename}}" download="{{filename}}">{{shortfilename}}</a>
-      <!-- how would we implement this without js -->
+      <!-- how would we implement this without js? details/summary -->
       <span class="jsonly jsMediaActions"></span>
-      <!-- what about video/audio length ... -->
+      <!-- what about video/audio length, fps ... -->
       (<span class="filesize">{{size}}</span>, <span class="resolution">{{width}}x{{height}}</span>{{codecSpace}}<span class="codec">{{codec}}</span>)
     </span>
+    <!-- div class="post-file-info post-file-download-span" style="width: 100%;">
+      <a style="padding-left: 33%; padding-right: 33%; background-color: #ccc; text-decoration: none; border: solid 1px #20538D; display: block; height: 2em; line-height: 2em;" class="filename" href="{{downloadLink}}" title="Download {{filename}}" download="{{filename}}">Download</a>
+    </div -->
   </div>
 <!-- end -->
 <!-- loop -->
@@ -67,7 +76,7 @@
         <summary>{{replies_omitted}} replies omitted. <!-- a href="{{uri}}/thread/{{threadNum}}.html">View the full thread</a --> Click to expand viewer</summary>
         <div>
           <!-- meta http-equiv="refresh" content="0;URL={{threadUrl}}" / -->
-          <iframe title="expanded thread viwer" name="thread{{threadNum}}View" width=700 style="height: 50vh;" srcdoc='<a id="link" style="display: block; line-height: 100vh; text-align: center; width: 700px; height: 100vh;" target="thread{{threadNum}}View" href="{{threadUrl}}">Please click to load all the html for full thread #{{threadNum}}</a>'>
+          <iframe title="expanded thread viewer" name="thread{{threadNum}}View" width=700 style="height: 50vh;" srcdoc='<a id="link" style="display: block; line-height: 100vh; text-align: center; width: 700px; height: 100vh;" target="thread{{threadNum}}View" href="{{threadUrl}}">Please click to load all the html for full thread #{{threadNum}}</a>'>
           </iframe>
         </div>
       </details>

@@ -22,7 +22,7 @@ function renderPostActions($boardUri, $options = false) {
 
   $captcha_html = '';
   $io = array('field'   => 'captcha', 'details' => false);
-  // generate/store/send captcha challange, image, and possibly an ID
+  // generate/store/send captcha challenge, image, and possibly an ID
   $pipelines[PIPELINE_FORM_CAPTCHA]->execute($io);
   if (isset($io['html'])) {
     //$captcha_html = $io['html'];

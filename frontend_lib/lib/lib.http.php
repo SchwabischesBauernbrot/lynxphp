@@ -148,7 +148,7 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     //curl_setopt($ch, CURLOPT_VERBOSE, 1);
   }
   // to get the request header, but we have those...
-  // but maybe we need to see what's actuall sent on the wire?
+  // but maybe we need to see what's actually sent on the wire?
   //curl_setopt($ch, CURLINFO_HEADER_OUT, 1); // this makes curl_getinfo($ch, CURLINFO_HEADER_OUT) work
 
   // we need this for everything

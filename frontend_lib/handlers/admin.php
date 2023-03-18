@@ -178,7 +178,7 @@ function getAdminModulesPage() {
       $content .= '</ul>';
     }
     // FIXME: we can't trust the backend is here
-    // tho infor on install modules is always good too
+    // though info on install modules is always good too
     /*
     if (is_array($pkg->backend_packages)) {
       $content .= '<li>Backend Packages: '. count($pkg->backend_packages);
@@ -199,7 +199,7 @@ function getAdminModulesPage() {
 }
 
 function getAdminInstallPage() {
-  wrapContent(renderAdminPortal() . '<iframe src="install.php" frameborder=0 width=100%></iframe>');
+  wrapContent(renderAdminPortal() . '<iframe src="install.php" frameborder=0 width=100% style="height: 300px"></iframe>');
 }
 
 ?>

@@ -96,7 +96,7 @@ function renderPostFormHTML($boardUri, $options = false) {
   );
   // CAPTCHA probably hooks in here somewhere
   $pipelines[PIPELINE_POST_FORM_FIELDS]->execute($io);
-  $formfields = $io['formfields']; // map ouptut
+  $formfields = $io['formfields']; // map output
   $pipelines[PIPELINE_POST_FORM_OPTIONS]->execute($formOptions);
   $pipelines[PIPELINE_POST_FORM_VALUES]->execute($values);
 
@@ -110,7 +110,7 @@ function renderPostFormHTML($boardUri, $options = false) {
 // so this function create a link with a collapsed form...
 
 // this template just seems to slap the ,form-wrapper on it...
-// makes it's collapsable (without details/summary)
+// makes it's collapsible (without details/summary)
 // but the js makes it float..
 function renderPostForm($boardUri, $url, $options = false) {
   global $pipelines;

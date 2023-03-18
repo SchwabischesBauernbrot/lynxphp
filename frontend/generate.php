@@ -71,7 +71,7 @@ function routeToFile($route) {
     if (!$route || $route[strlen($route) - 1] === '/') {
       $dir = trim($route, '/'); // just remove all the slashes
       if (count($parts) === 3) {
-        $file = 'index.html'; // probably dont' need to do this
+        $file = 'index.html'; // probably don't need to do this
       }
     } else {
       $dir = ltrim(dirname($route), '/'); // we don't want the first /

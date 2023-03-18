@@ -77,7 +77,7 @@ class db_queue_driver extends queue_implementation_base_class implements queue_i
     global $db;
     // if we passed in an id, then we're signaling the job is done
     /*
-    if (!empty($messsage['id'])) {
+    if (!empty($message['id'])) {
       global $now;
       return $db->update($this->queue_model, array('finished_at'=>$now), array('criteria' => array(
         'id' => $message['id']

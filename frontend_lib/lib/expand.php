@@ -19,7 +19,7 @@ function makeIframeContents($aHref, $aLabel) {
   <summary>{{replies_omitted}} replies omitted. <!-- a href="{{uri}}/thread/{{threadNum}}.html">View the full thread</a --> Click to expand viewer</summary>
   <div>
     <!-- meta http-equiv="refresh" content="0;URL={{threadUrl}}" / -->
-    <iframe title="expanded thread viwer" name="thread{{threadNum}}View" width=700 style="height: 50vh;" srcdoc='<a id="link" style="display: block; line-height: 100vh; text-align: center; width: 700px; height: 100vh;" target="thread{{threadNum}}View" href="{{threadUrl}}">Please click to load all the html for full thread #{{threadNum}}</a>'>
+    <iframe title="expanded thread viewer" name="thread{{threadNum}}View" width=700 style="height: 50vh;" srcdoc='<a id="link" style="display: block; line-height: 100vh; text-align: center; width: 700px; height: 100vh;" target="thread{{threadNum}}View" href="{{threadUrl}}">Please click to load all the html for full thread #{{threadNum}}</a>'>
     </iframe>
   </div>
 </details>
@@ -53,7 +53,7 @@ function getExpander($label, $content, $options = array()) {
     // these two could be moved into $content tbh
     'aLabel' => 'Please click to load all the full html for this section',
     'aHref'  => '/', // almost required
-    // sizes are requied to position / size correctly
+    // sizes are required to position / size correctly
     'tn_sz' => array(),
     'sz'    => array(),
 
@@ -126,7 +126,7 @@ details[open].img#' . $labelId . ' .contentarea {
 </style>';
     }
   }
-  // latest chrome wont let you slip it under
+  // latest chrome won't let you slip it under
 /*
   position: absolute;
   top: 0;
@@ -227,7 +227,7 @@ function getHoverExpander($label, $content, $options = array()) {
     // these two could be moved into $content tbh
     'aLabel' => 'Please click to load all the full html for this section',
     'aHref'  => '/', // almost required
-    // sizes are requied to position / size correctly
+    // sizes are required to position / size correctly
     'tn_sz' => array(),
     'sz'    => array(),
 

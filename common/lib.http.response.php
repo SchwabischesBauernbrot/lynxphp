@@ -7,7 +7,7 @@
 
 // 304 just decreases bandwidth (for slow link/cost)
 
-// returns if we outputed or false if 304
+// returns if we outputted or false if 304
 function sendJson($arr, $options = false) {
   // unpack options
   extract(ensureOptions(array(
@@ -217,7 +217,7 @@ function checkCacheHeaders($mtime, $options = false) {
     header('HTTP/1.1 304 Not Modified');
     header('X-Debug-checkCacheHeaders-HIT: 304');
     // weird chrome can't make etag match here
-    // shift-reload gives one but this always give another formating of a string
+    // shift-reload gives one but this always give another formatting of a string
     _doHeaders($mtime, array('contentType' => $contentType, 'lastMod' => $lastmod, 'etag' => $etag));
     // maybe just exit?
     return true;

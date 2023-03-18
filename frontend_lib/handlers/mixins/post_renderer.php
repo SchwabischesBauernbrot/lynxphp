@@ -74,9 +74,15 @@ function renderPost($boardUri, $p, $options = false) {
     if (DEV_MODE) {
       echo "No userSettings passed to renderPost [", gettrace(), "]<Br>\n";
     }
-    //echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
     $userSettings = getUserSettings();
   }
+  //echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
+
+  // this makes the page more dynamic
+  // but if we can explicit now to omit js, we can save bandwidth
+  // can we explicit omit nojs?
+  // customization makes it hard to cache though...
+  $nojs = empty($userSettings['nojs']) ? false : true;
 
   if ($boardSettings === false) {
     if (DEV_MODE) {
@@ -132,14 +138,17 @@ function renderPost($boardUri, $p, $options = false) {
   */
 
   // how do we set where?
+  // what does nojs do?
   $post_actions_html = action_getExpandHtml($post_actions, array(
-    'boardUri' => $boardUri, 'where' => $where));
+    'boardUri' => $boardUri, 'where' => $where, 'nojs' => $nojs));
 
   // should we have pre and post links around the no #123 part?
   $post_links_html = '';
   $links_io = array(
     'boardUri' => $boardUri,
     'p' => $p,
+    // FIXME: usersettings and boardsettings
+    'nojs' => $nojs,
     'links' => array(
       //array('label' => '[Reply]', 'link' => '/' . $boardUri . '/thread/' . $threadId. '.html#postform')
     ),
@@ -170,6 +179,8 @@ function renderPost($boardUri, $p, $options = false) {
   $icon_io = array(
     'boardUri' => $boardUri,
     'p' => $p,
+    // FIXME: usersettings and boardsettings
+    'nojs' => $nojs,
     'icons' => array(),
   );
   if ($isOP) {
@@ -225,9 +236,6 @@ function renderPost($boardUri, $p, $options = false) {
   if (!empty($p['capcode'])) {
     $postmeta .= ' <span class="post-capcode">' . htmlspecialchars($p['capcode']) . '</span>';
   }
-  if (!empty($p['user-id'])) {
-    $postmeta .= '<span class="user-id">' . htmlspecialchars($p['user-id']) . '</span>';
-  }
 
   // Hook processing for $postmeta
   $meta_io = array(
@@ -235,11 +243,21 @@ function renderPost($boardUri, $p, $options = false) {
     'threadNum' => $threadId,
     'p' => $p,
     'meta' => $postmeta,
+    // FIXME: usersettings and boardsettings
+    'nojs' => $nojs,
     // temp, remove later
     'checkable' => $checkable,
   );
   $pipelines[PIPELINE_POST_META_PROCESS]->execute($meta_io);
   $postmeta = $meta_io['meta'];
+
+  // this (user-id) is bad, needs to be changed
+  // can't dereference in JS
+  $userid_html = '';
+  if (!empty($p['user-id'])) {
+    // min dom check: passed
+    $userid_html .= '<span class="user-id" style="background-color: #' . $p['user-id'] . '">' . htmlspecialchars($p['user-id']) . '</span>';
+  }
 
   $omitted_html = '';
   if ($isOP) {
@@ -295,16 +313,18 @@ function renderPost($boardUri, $p, $options = false) {
       // tn_w, tn_h
       //echo "<pre>file[", print_r($file, 1), "]</pre>\n";
       $ftmpl = $file_template;
-      // disbale images until we can mod...
       //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
 
-      // disbale images until we can mod...
       $path = $file['path'];
       $ext = pathinfo($file['filename'], PATHINFO_EXTENSION);
       $noext = str_replace('.'.$ext, '', $file['filename']);
+      $downloadPath = 'download/' . $path;
+      //$watchLink = 'watch/' . $path;
       // if not an absolute URL
       if (strpos($path, '://') === false) {
         $path = BACKEND_PUBLIC_URL . $path;
+        $downloadPath = BACKEND_PUBLIC_URL . $downloadPath;
+        //$watchLink = BACKEND_PUBLIC_URL . $watchLink;
       }
       $majorMimeType = getFileType($file);
       $fileSha256 = 'f' . uniqid();
@@ -349,10 +369,13 @@ function renderPost($boardUri, $p, $options = false) {
       $tn_h = empty($file['tn_h']) ? 0 : $file['tn_h'];
       $hover = empty($userSettings['hover']) ? false : true;
       $containerId = 'container_' . $fileSha256;
+      //echo "hover[$hover]<br>\n";
       $fTags = array(
         'path' => $path,
         // but matter if audio/video, we can handle that in css
         'postFileClasses' => $hover ? ' useViewer ' : '',
+        'downloadLink' => $downloadPath,
+        //'watchLink' => $watchLink,
         'expander' => getExpander($thumb, $avmedia, array(
           'thumbUrl' => $thumbUrl, // didn't use
           'hover' => $hover,
@@ -363,6 +386,7 @@ function renderPost($boardUri, $p, $options = false) {
           'sz' => array($file['w'], $file['h']),
           'labelId' => 'details_' . $fileSha256,
           'styleContentUrl' => $path,
+          'nojs' => $nojs,
         )),
         'fileid' => $fileSha256,
         'fileId' => ' id="' . $containerId . '"',
@@ -375,7 +399,7 @@ function renderPost($boardUri, $p, $options = false) {
         'majorMimeType' => $majorMimeType,
         'thumb' => $thumb,
         //'viewer' => getViewer($file, array('type' => $majorMimeType)),
-        // not currently used but we'll include it incase they want to do something different
+        // not currently used but we'll include it in case they want to do something different
         'avmedia' => $avmedia,
         'codec' => empty($file['codec']) ? '' : $file['codec'],
         'codecSpace' => empty($file['codec']) ? '' : ' ',
@@ -426,6 +450,7 @@ function renderPost($boardUri, $p, $options = false) {
     'message'   => $p['safeCom'],
     'name'      => empty($p['name']) ? '' : htmlspecialchars($p['name']),
     'postmeta'  => $postmeta,
+    'userid'    => $userid_html,
     'files'     => $files_html,
     'replies'   => $replies_html,
     // for actions details/summary

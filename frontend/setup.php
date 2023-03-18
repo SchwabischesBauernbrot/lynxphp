@@ -30,7 +30,7 @@ $BASE_HREF = BASE_HREF;
 // couldn't do that because we need to navigate the user to the correct place
 // well the backend could...
 
-// connect to scatch
+// connect to scratch
 include '../common/scratch_implementations/' . SCRATCH_DRIVER . '.php';
 $scratch_type_class = SCRATCH_DRIVER . '_scratch_driver';
 $scratch = new $scratch_type_class;

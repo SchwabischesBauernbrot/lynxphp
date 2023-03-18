@@ -38,7 +38,7 @@ $workqueue = new work_queue;
 // reading from db to save db is it really worth it?
 // file might be fine
 /*
-// connect to scatch
+// connect to scratch
 include '../common/scratch_implementations/' . SCRATCH_DRIVER . '.php';
 $scratch_type_class = SCRATCH_DRIVER . '_scratch_driver';
 $scratch = new $scratch_type_class;
