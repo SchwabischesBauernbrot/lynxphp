@@ -8,7 +8,7 @@ echo <<<EOB
 <head>
   <link rel="stylesheet" href="css/style.css">
 <body>
-<h1>PHPLynx Installation Support</h1>
+<h1>Double Plus Installation Support</h1>
 EOB;
 
 // detect webserver
