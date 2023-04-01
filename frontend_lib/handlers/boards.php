@@ -160,6 +160,7 @@ function retryCaptcha($boardUri, $row) {
   wrapContent('Your CAPTCHA was invalid, please try again: <br>' . "\n" . $postform);
 }
 
+// requestValid should be renamed to success
 function makePostHandlerEngine($request) {
   global $pipelines, $max_length;
   $boardUri = $request['params']['uri'];
@@ -169,11 +170,24 @@ function makePostHandlerEngine($request) {
   //echo '<pre>_SERVER: ', print_r($_SERVER, 1), "</pre>\n";
   //echo '<pre>_FILES: ', print_r($_FILES, 1), "</pre>\n";
 
-  $res = processFiles();
-  if ($res && count($res['errors'])) {
-    // actually have to have something set this
-  }
+  //$res = processFiles();
+  $res = processPostFiles();
   //echo '<pre>res: ', print_r($res, 1), "</pre>\n";
+
+  //if ($res && count($res['errors'])) {
+  if ($res['hasErrors']) {
+    // we shoud abort completely
+    // informing the user is good, so they can fix it
+    // and better than leaving crap on the site
+    // FIXME: we could let validation run and compound the errors
+    return array(
+      'requestValid' => false,
+      'boardUri' => $boardUri,
+      'errors'    => $res,
+    );
+  }
+
+  // one field called files, get that list of files
   // it's not always files? getting file... form.js causes this...
   $files = isset($res['handles']['files']) ? $res['handles']['files'] : array();
   //echo '<pre>files: ', print_r($files, 1), "</pre>\n";
@@ -189,6 +203,7 @@ function makePostHandlerEngine($request) {
     'x-forwarded-for' => getip(),
     'sid' => getCookie('session'),
   );
+  // spoilers/strip_filenames might be an array
   $row = array(
     // noFlag
     'name'     => getOptionalPostField('name'),
@@ -198,7 +213,7 @@ function makePostHandlerEngine($request) {
     'boardUri' => $boardUri,
     'password' => getOptionalPostField('postpassword'),
     // captcha
-    'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
+    //'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
     'files'    => json_encode($files),
     // flag
   );
@@ -209,6 +224,7 @@ function makePostHandlerEngine($request) {
     $endpoint = 'lynx/replyThread';
     $redir .= 'thread/' . $_POST['thread'];
   }
+  // future support?
   if (!empty($_POST['files_already_uploaded'])) {
     $already = json_decode($_POST['files_already_uploaded'], true);
     if (!is_array($already)) {
@@ -239,6 +255,7 @@ function makePostHandlerEngine($request) {
   $redir   = $io['redir'];
 
   if (!empty($io['error'])) {
+    // should just push the new errors onto errors array
     return array(
       'requestValid' => false,
       'boardUri' => $boardUri,
@@ -246,6 +263,8 @@ function makePostHandlerEngine($request) {
       'error'    => $io['error'],
     );
   }
+  // ensure no errors
+
   // what's this used for? nothing right now
   if (!empty($io['redirNow'])) {
     return array(
@@ -260,6 +279,7 @@ function makePostHandlerEngine($request) {
   }
 
   // make post...
+  // we could queue this for a worker but then any be validation couldn't be passed to the user
   $json = curlHelper(BACKEND_BASE_URL . $endpoint, $row, $headers);
   // can't use this because we need better handling of results...
   //$result = expectJson($json, $endpoint)
@@ -279,6 +299,9 @@ function makePostHandlerEngine($request) {
     // backend/opt/boards/test/posts/295/media_debug?prettyPrint=1
     //'filesDebugs' => $res,
     //'_FILES' => $_FILES,
+    // good for debug/dev
+    'row' => $row, // validation and what's sent to the BE
+    'filesForBE' => $files, // should be in row but it'll be jsonencoded, so less useful
   );
 }
 
