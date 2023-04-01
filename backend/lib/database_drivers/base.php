@@ -43,6 +43,7 @@ class database_driver_base_class {
     $this->sqlToModel = array();
     $this->subselectCounter = 0;
     $this->registeredTables = array();
+    $this->dontTrackTables = array('table_tracker');
   }
   public function connect_db($host, $user, $pass, $db, $port = 0) {
     if (!$this->connect($host, $user, $pass, $port)) {
@@ -148,6 +149,7 @@ class database_driver_base_class {
     return join(' ', $tokens);
   }
 
+  // sets up table table for tracking writes
   function ensureTables() {
     global $models;
     if (!isset($models['table'])) {
@@ -279,7 +281,7 @@ class database_driver_base_class {
     return $sql;
   }
 
-  // what's the minium in join? model
+  // what's the minimum in join? model
   private function handleJoin($models, $data, $tableName, $useField = '') {
     //echo "tableName[$tableName]<br>\n";
     $originalTableName = $tableName;
@@ -407,6 +409,7 @@ class database_driver_base_class {
     }
     //echo "expandJoin tableName[$tableName]<br>\n";
     if (!empty($rootModel['children']) && is_array($rootModel['children'])) {
+      // subquery?
       if (isset($rootModel['query'])) {
         if (isset($rootModel['model']['query'])) {
           $idf = modelToId($rootModel['model']['model']);
@@ -592,8 +595,10 @@ function modelToId($model) {
     echo "<pre>base::modelToId - model is missing a name[", print_r($model, 1), "] $trace</pre>\n";
     return;
   }
+  // this isn't great, board_users becomes userid, and that's a field...
   $parts = explode('_', $model['name']);
   $name = array_pop($parts);
+  //$name = str_replace('_', '', $model['name']);
   return $name . 'id';
 }
 
