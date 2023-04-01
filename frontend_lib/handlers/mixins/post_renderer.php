@@ -84,6 +84,11 @@ function renderPost($boardUri, $p, $options = false) {
   // customization makes it hard to cache though...
   $nojs = empty($userSettings['nojs']) ? false : true;
 
+  $spoiler = array(
+    'url' => 'images/img/spoiler.png',
+    'w' => 200,
+    'h' => 200,
+  );
   if ($boardSettings === false) {
     if (DEV_MODE) {
       echo "No boardSettings passed to renderPost [", gettrace(), "]<Br>\n";
@@ -93,6 +98,11 @@ function renderPost($boardUri, $p, $options = false) {
       $boardSettings = $boardData['settings'];
     }
     //print_r($boardSettings);
+  }
+
+  // override default spoiler
+  if (isset($boardSettings['customSpoiler'])) {
+    $spoiler = $boardSettings['customSpoiler'];
   }
 
   global $pipelines;
@@ -338,6 +348,8 @@ function renderPost($boardUri, $p, $options = false) {
 
       $thumb   = getThumbnail($file, array(
         'type' => $majorMimeType, 'alt' => 'thumbnail of ' . $file['filename'],
+        // FIXME: db falsish check
+        'spoiler' => (empty($file['spoiler']) || $file['spoiler'] === 'f') ? false : $spoiler,
         // if a list of threads, any way to tell if this is the first?
         // && $firstThread
         'noLazyLoad' => $isOP));
