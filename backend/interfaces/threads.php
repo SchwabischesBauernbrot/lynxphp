@@ -192,7 +192,7 @@ function getThread($boardUri, $threadNum, $options = false) {
     'criteria' => $crit, 'order' => 'created_at')
   );
   // no OP and no replies, consider 404
-  if (!count($posts) && !$db->num_rows($res)) {
+  if (($includeOP && !count($posts)) && ($since_id === alse && !$db->num_rows($res))) {
     return false;
   }
   while($row = $db->get_row($res)) {
