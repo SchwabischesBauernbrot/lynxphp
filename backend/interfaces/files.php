@@ -371,7 +371,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       'tn_w' => (int)$tn_w,
       'tn_h' => (int)$tn_h,
       'filedeleted' => 0,
-      'spoiler' => 0,
+      'spoiler' => empty($file['spoiler']) ? false : true,
     );
 
     // FIXME: thumbnail?
