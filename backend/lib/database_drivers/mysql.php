@@ -107,6 +107,11 @@ class mysql_driver extends database_driver_base_class implements database_driver
     // get name
     $tableName = modelToTableName($model);
     $this->registeredTables[] = $tableName;
+    if (!empty($model['disableTracker'])) {
+      if (!in_array($model['name'], $this->dontTrackTables)) {
+        $this->dontTrackTables[] = $model['name'];
+      }
+    }
     //echo "Checking [$tableName]<br>\n";
     $res = mysqli_query($this->conn, 'describe `' . $tableName. '`');
     $err = mysqli_error($this->conn);
@@ -231,16 +236,19 @@ class mysql_driver extends database_driver_base_class implements database_driver
       return false;
     }
     */
-    $id = mysqli_insert_id($this->conn);
     // how does this handle multiple?
-    $this->markWriten($rootModel);
+    $id = mysqli_insert_id($this->conn);
+    if (!in_array($rootModel['name'], $this->dontTrackTables)) {
+      // multiple won't matter here
+      $this->markWriten($rootModel);
+    }
     return $id;
   }
 
   public function update($rootModel, $urow, $options) {
     $sql = $this->makeUpdateQuery($rootModel, $urow, $options);
     //echo "sql[$sql]<br>\n";
-    if ($rootModel['name'] !== 'table_tracker') {
+    if (!in_array($rootModel['name'], $this->dontTrackTables)) {
       $this->markWriten($rootModel);
     }
     return $this->query($sql);
@@ -258,8 +266,14 @@ class mysql_driver extends database_driver_base_class implements database_driver
   public function delete($rootModel, $options) {
     $sql = $this->makeDeleteQuery($rootModel, $options);
     //echo "sql[$sql]<br>\n";
-    $this->markWriten($rootModel);
-    return $this->query($sql) ? true : false;
+    $res = $this->query($sql);
+    if ($res) {
+      if (!in_array($rootModel['name'], $this->dontTrackTables)) {
+        $this->markWriten($rootModel);
+      }
+      return true
+    }
+    return false;
     /*
     $res = mysqli_query($this->conn, $sql);
     $err = mysqli_error($this->conn);
