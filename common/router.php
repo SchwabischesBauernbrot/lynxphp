@@ -1,7 +1,7 @@
 <?php
 
-ldr_require('lib.units.php');
-ldr_require('lib.http.response.php');
+ldr_require('../common/lib.units.php');
+ldr_require('../common/lib.http.response.php');
 
 // route names - they're named by cond tbh (exec can locate it)
 // route lastMod options - can be done in func
@@ -317,11 +317,11 @@ class Router {
     $cacheSettings = $routeOptions['cacheSettings'];
     //echo "<pre>cacheSettings", print_r($cacheSettings, 1), "</pre><br>\n";
 
-    // have something useable...
+    // have something usable...
     if (!isset($cacheSettings['databaseTables']) && !isset($cacheSettings['files'])
        && !isset($cacheSettings['backend'])) {
       //echo "No cacheSettings keys", print_r($cacheSettings);
-      header('X-Debug-isUncached: ' . $key . '-no_useable_cacheSettings');
+      header('X-Debug-isUncached: ' . $key . '-no_usable_cacheSettings');
       return true; // render content
     }
 
@@ -336,6 +336,22 @@ class Router {
       // since most endpoints aren't going to be json...
       'contentType' => isset($cacheSettings['contentType']) ? $cacheSettings['contentType'] : $this->defaultContentType,
     );
+
+    // no longer a FE only thing
+    // BE can make it to here...
+    // FIXME: if BE then databaseTables and files
+    global $db;
+    if ($db) {
+      if (isset($cacheSettings['databaseTables'])) {
+        // get db data
+        $dbMtime = $db->getLast($cacheSettings['databaseTables']);
+        header('X-Debug-isUncached-BE: ' . $key . '-dbmtime_'.$dbMtime);
+      }
+      if (isset($cacheSettings['files'])) {
+        // get filemtimes
+        header('X-Debug-isUncached-BE: ' . $key . '-files_write_me!');
+      }
+    }
 
     // frontend only thing
     // lets move the HEAD requests upfront here
@@ -388,7 +404,7 @@ class Router {
     if ($BASE_HREF) {
       // mtime matters, we were supposed to check the backend
       // but it doesn't support it, we can't get mtime
-      // so it's not useable
+      // so it's not usable
 
       // this will force no cache
       // because we should be dependent upon backend
@@ -441,6 +457,8 @@ class Router {
           }
         }
 
+        // HEAD? why don't we just get the full data
+        // so we can make the results available later...
         $result = request(array(
           //'url' => 'http://localhost/backend/' . str_replace(array_keys($params), array_values($params), $be['route']),
           'url'     => BACKEND_BASE_URL . $endpoint,
@@ -458,7 +476,7 @@ class Router {
           if (isset($check['ts'])) {
             $ts = $check['ts'];
             $_HEAD_CACHE[$endpoint]['last-modified'] = $headHeaders['If-Modified-Since'];
-            //echo "transfering [", $_HEAD_CACHE[$endpoint]['last-modified'], "]<br>\n";
+            //echo "transferring [", $_HEAD_CACHE[$endpoint]['last-modified'], "]<br>\n";
             $maxMtime = max($maxMtime, $ts);
           }
         } else {
@@ -605,7 +623,7 @@ class Router {
     $func($request);
   }
 
-  // call cachable handler func
+  // call cacheable handler func
   function callCachableHandler($res) {
     $match = $res['match'];
     $request = $res['request'];
@@ -801,6 +819,7 @@ class Router {
     $res = $this->findRoute($method, $path);
     if ($res === false) return false; // 404 passthru
     $key = $res['request']['method'] . '_' . $res['match']['cond'];
+    //echo "sendHeaders - key[$key]<br>\n";
     $uncached = $this->isUncached($key, $res['match']['params'], $res['routeOptions']);
     // we only run in the frontend
     if (DEV_MODE) {
