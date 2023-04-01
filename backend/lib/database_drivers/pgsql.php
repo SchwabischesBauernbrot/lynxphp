@@ -89,6 +89,12 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     // get name
     $tableName = modelToTableName($model);
     $this->registeredTables[] = $tableName;
+    //echo "auto[", $model['name'] ,"]\n";
+    if (!empty($model['disableTracker'])) {
+      if (!in_array($model['name'], $this->dontTrackTables)) {
+        $this->dontTrackTables[] = $model['name'];
+      }
+    }
     // DEV_MODE is only a fe concept atm...
     if (0) {
       // just make things slower...
@@ -200,6 +206,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
 
       // everything in sync?
       if ($haveAll && $noChanges) {
+        //echo "done - no changes\n";
         return true;
       }
       $sql = 'alter table ' . $tableName . ' ';
@@ -278,6 +285,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     }
     $sql = $this->makeInsertQuery($rootModel, $recs);
     //echo "sql[$sql]<br>\n";
+
+    // how does this handle multiple?
     if (0) {
       // doesn't return the id...
       $sqls = array($sql, 'select * from table_trackers;');
@@ -299,7 +308,10 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       $this->markWriten($rootModel);
     }
     //echo "res[$res]<br>\n";
-    // how does this handle multiple?
+    if (!in_array($rootModel['name'], $this->dontTrackTables)) {
+      // multiple won't matter here
+      $this->markWriten($rootModel);
+    }
     return $id;
   }
 
@@ -312,7 +324,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       echo "pgsql::update - err[$err]<br>\nsql[$sql]<br>\n";
       return false;
     }
-    if ($rootModel['name'] !== 'table_tracker') {
+    if (!in_array($rootModel['name'], $this->dontTrackTables)) {
+      // multiple won't matter here
       $this->markWriten($rootModel);
     }
     return true;
@@ -327,7 +340,10 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       echo "pgsql::delete - err[$err]<br>\n";
       return false;
     }
-    $this->markWriten($rootModel);
+    if (!in_array($rootModel['name'], $this->dontTrackTables)) {
+      // multiple won't matter here
+      $this->markWriten($rootModel);
+    }
     return true;
   }
 
