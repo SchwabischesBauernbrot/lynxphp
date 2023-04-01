@@ -1,84 +1,70 @@
 <?php
 
 /** send $_FILES to BE and get handles */
-// filter_fields - which keys in _FILES to process, if false then all
-// FIXME: we should not output at all
-// option to not upload?
-function processFiles($filter_fields = false) {
-  $fields = $filter_fields;
-  if ($fields === false) {
-    // just auto-detect them
-    $fields = array_keys($_FILES);
+function processPostFiles() {
+  $postSpoilers = getOptionalPostField('spoilers');
+  $spoil = array();
+  if (is_array($postSpoilers)) {
+    foreach($postSpoilers as $h) {
+      $spoil[$h] = true;
+    }
   }
-  // normalized fields as an array
-  if (!is_array($fields)) $fields = array($filter_fields);
-
-  $files = array();
-  if (isset($_FILES)) {
-    $phpFileUploadErrors = array(
-        0 => 'There is no error, the file uploaded with success',
-        1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
-        2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
-        3 => 'The uploaded file was only partially uploaded',
-        4 => 'No file was uploaded',
-        6 => 'Missing a temporary folder',
-        7 => 'Failed to write file to disk.',
-        8 => 'A PHP extension stopped the file upload.',
-    );
-    //print_r($_FILES);
-    foreach($fields as $field) {
-      $files[$field] = array();
-      // each field could have multiple file support...
-      if (is_array($_FILES[$field]['tmp_name'])) {
-        foreach($_FILES[$field]['tmp_name'] as $i=>$path) {
-          if (!$path) {
-            if (isset($_FILES[$field]['error'][$i])) {
-              // usually means no file upload...
-              if ($_FILES[$field]['error'][$i] !== 4) {
-                echo "File upload error: ", $phpFileUploadErrors[$_FILES[$field]['error'][$i]], "<br>\n";
-                echo "<pre>empty file[", print_r($_FILES[$field], 1), "</pre>\n";
-              }
-            } else {
-              echo "<pre>empty file[", print_r($_FILES[$field], 1), "</pre>\n";
-            }
-            continue;
-          }
-          // lib.backend, so must upload the file to the BE
-          $res = sendFile($path, $_FILES[$field]['type'][$i], $_FILES[$field]['name'][$i]);
-          // check for error
-          if (empty($res['data']['hash'])) {
-            echo "multifile - file error[", print_r($res, 1), "]<br>\n";
-            return;
-          }
+  $postStrips = getOptionalPostField('strip_filenames');
+  $strip = array();
+  if (is_array($postStrips)) {
+    foreach($postStrips as $h) {
+      $strip[$h] = true;
+    }
+  }
+  $result = processFilesVar(array('files'));
+  $handles = array();
+  $hasErrors = false;
+  foreach($result as $field => $files) {
+    $handles[$field] = array();
+    foreach($files as $f) {
+      if (empty($f['error'])) {
+        // send to BE
+        $res = sendFile($f['tmp_name'], $f['type'], $f['name']);
+        // check for error
+        if ($res['meta']['code'] === 200 && !empty($res['data']['hash'])) {
           // type, name, size, hash
-          $files[$field][] = $res['data'];
+          // js can calculate the sha256...
+          // if it was passed to us, we could verify it
+          $h = $res['data']['hash'];
+          if (!empty($spoil[$h])) {
+            // would prefer
+            //$res['data']['spoil'] = 1;
+            // but lynxchan api
+            $res['data']['spoiler'] = true;
+          }
+          if (!empty($strip[$h])) {
+            // get need to get the extension
+            $ext = pathinfo($res['data']['name'], PATHINFO_EXTENSION);
+            global $now;
+            $res['data']['name'] = str_replace('.', '', $now) . '.' . $ext;
+            // hash could be md5 or sha1?
+            // matching on size / mime is more important
+          }
+          $handles[$field][] = $res['data'];
+        } else {
+          $hasErrors = true;
+          $handles[$field][] = array('error' => $res);
         }
       } else {
-        if ($_FILES[$field]['error'] && $_FILES[$field]['error'] !== 4) {
-          echo "file PHP file upload error[", $phpFileUploadErrors[$_FILES[$field]['error']], "](", $_FILES[$field]['error'], ")<br>\n";
-          return;
-        }
-        // make sure there is a file upload...
-        if ($_FILES[$field]['error'] !== 4) {
-          $res = sendFile($_FILES[$field]['tmp_name'], $_FILES[$field]['type'], $_FILES[$field]['name']);
-          // check for error
-          if ($res['meta']['code'] !== 200) {
-            echo "fe::::lib.files:::processFiles - code[", $res['meta']['code'], "] file error[", print_r($res, 1), "]<br>\n";
-            return;
-          }
-          if (empty($res['data']['hash'])) {
-            echo "fe::::lib.files:::processFiles - no hash, file error[", print_r($res, 1), "]<br>\n";
-            return;
-          }
-          $files[$field][] = $res['data'];
-        }
+        $hasErrors = true;
+        $handles[$field][] = $f; // just passthru error, debug
       }
     }
   }
-  // input errors vs upload errors?
   return array(
-    'errors' => array(),
-    'handles' => $files,
+    'hasErrors' => $hasErrors,
+    'handles' => $handles,
+    'debug' => array(
+      'postSpoilers' => $postSpoilers,
+      'postStrips' => $postStrips,
+      'strips' => $strip,
+      'spoils' => $spoil,
+    )
   );
 }
 
@@ -165,6 +151,7 @@ function getThumbnail($file, $options = false) {
     'maxW' => 0,
     'type' => false,
     'alt' => 'thumbnail',
+    'spoiler' => false,
     'noLazyLoad' => false,
   ), $options));
   if (!$type) $type = getFileType($file);
@@ -195,6 +182,12 @@ function getThumbnail($file, $options = false) {
     $file['tn_w'] = 209;
     $file['tn_h'] = 64;
     $type = 'img';
+  }
+
+  if ($spoiler) {
+    $thumb = $spoiler['url'];
+    $file['tn_w'] = $spoiler['w'];
+    $file['tn_h'] = $spoiler['h'];
   }
 
   // figure out thumb size
@@ -233,6 +226,7 @@ function getThumbnail($file, $options = false) {
   $h = (int)$h;
 
   $loading = $noLazyLoad ? '' : 'loading="lazy"';
+  //$spoilerClass = $spoiler ? ' spoilerimg' : '';
   return '<img class="file-thumb" src="' . $thumb . '" width="'.$w.'" height="'.$h.'" ' . $loading . ' alt="' . $alt . '" />';
 }
 
