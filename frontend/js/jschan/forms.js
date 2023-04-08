@@ -577,12 +577,13 @@ class formHandler {
             });
             */
           } else if (json) {
+            var ref = this
             function checkMsg(err) {
-              if (!this.captchaField && err === 'Incorrect captcha answer') {
+              if (!ref.captchaField && err === 'Incorrect captcha answer') {
                 captchaController.addMissingCaptcha();
-                this.captchaField = true;
+                ref.captchaField = true;
               } else if (err === 'Captcha expired') {
-                const captcha = this.form.querySelector('.captcharefresh');
+                const captcha = ref.form.querySelector('.captcharefresh');
                 if (captcha) {
                   captcha.dispatchEvent(new Event('click'));
                 }
