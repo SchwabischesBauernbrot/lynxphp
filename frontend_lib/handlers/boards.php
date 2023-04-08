@@ -451,6 +451,8 @@ function makePostHandlerJson($request) {
     // for XHR (we're not going to get this in the page report because there is no page report)
     $arr['POST'] = $_POST;
   }
+  // the status code is enough
+  unset($arr['requestValid']);
   sendJson($arr, array('code' => $code));
 }
 
