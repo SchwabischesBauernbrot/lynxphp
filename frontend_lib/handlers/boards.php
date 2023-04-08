@@ -175,16 +175,26 @@ function makePostHandlerEngine($request) {
   //echo '<pre>res: ', print_r($res, 1), "</pre>\n";
 
   //if ($res && count($res['errors'])) {
+  $errors = array();
   if ($res['hasErrors']) {
     // we shoud abort completely
     // informing the user is good, so they can fix it
     // and better than leaving crap on the site
-    // FIXME: we could let validation run and compound the errors
+    // we could let validation run and compound the errors
+    /*
     return array(
       'requestValid' => false,
       'boardUri' => $boardUri,
       'errors'    => $res,
     );
+    */
+    if (isset($res['handles']['files']) && is_array($res['handles']['files'])) {
+      foreach($res['handles']['files'] as $i => $row) {
+        $errors[] = 'file #' . $i . ' had error: ' . $row['error'];
+      }
+    } else {
+      $errors[] = 'file handle is missing or wrong type, let a dev know';
+    }
   }
 
   // one field called files, get that list of files
@@ -238,6 +248,22 @@ function makePostHandlerEngine($request) {
     $row['files'] = json_encode(array_merge($already, $files));
   }
 
+  // basic validation that we have some type of new content of value
+  // empty message AND empty file
+  $noFiles = (!$row['files'] || $row['files'] === '[]');
+  if (!$row['message'] && $noFiles) {
+    /*
+    return array(
+      'requestValid' => false,
+      'boardUri' => $boardUri,
+      'row'      => $row,
+      'error'    => 'content (message/comment or file) required',
+    );
+    */
+    $errors[] = 'content (message/comment or file) required';
+  }
+
+
   $io = array(
     'boardUri' => $boardUri,
     'endpoint' => $endpoint,
@@ -255,6 +281,7 @@ function makePostHandlerEngine($request) {
   $redir   = $io['redir'];
 
   if (!empty($io['error'])) {
+    /*
     // should just push the new errors onto errors array
     return array(
       'requestValid' => false,
@@ -262,8 +289,24 @@ function makePostHandlerEngine($request) {
       'row'      => $row,
       'error'    => $io['error'],
     );
+    */
+    if (is_array($io['error'])) {
+      foreach($io['error'] as $e) {
+        $errors[] = $e;
+      }
+    } else {
+      $errors[] = $io['error'];
+    }
   }
   // ensure no errors
+  if (count($errors)) {
+    return array(
+      'requestValid' => false,
+      'boardUri' => $boardUri,
+      'row'      => $row,
+      'errors'   => $errors,
+    );
+  }
 
   // what's this used for? nothing right now
   if (!empty($io['redirNow'])) {
@@ -319,21 +362,22 @@ function makePostHandlerHtml($request) {
     // didn't pass validation
 
     // error handling
-    $error = $arr['error'];
+    $errors = $arr['errors'];
     //print_r($io);
 
     // FIXME: clean this up better
 
+    // 230408 do we still need this?
     // special error handlers:
-    if ($error === 'CAPTCHA is required') {
+    if (in_array('CAPTCHA is required', $errors)) {
       // was there a CAPTCHA present in the previous form?
       retryCaptcha($boardUri, $arr['row']);
       return;
     }
 
     // default error
-    echo "error";
-    wrapContent($error);
+    //echo "error";
+    wrapContent("Error:\n" . join("\n", $errors));
     return;
   }
   $result = $arr['result'];
