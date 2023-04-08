@@ -121,7 +121,8 @@ class formHandler {
     form.addEventListener('paste', e => this.paste(e));
     form.addEventListener('submit', e => this.formSubmit(e));
     // just add .json
-    this.form.setAttribute('action', this.form.getAttribute('action') + '.json')
+    // why? could do it around line 621...
+    //this.form.setAttribute('action', this.form.getAttribute('action') + '.json')
   }
 
   reset() {
@@ -576,28 +577,36 @@ class formHandler {
             });
             */
           } else if (json) {
-            if (!this.captchaField && json.message === 'Incorrect captcha answer') {
-              captchaController.addMissingCaptcha();
-              this.captchaField = true;
-            } else if (json.message === 'Captcha expired') {
-              const captcha = this.form.querySelector('.captcharefresh');
-              if (captcha) {
-                captcha.dispatchEvent(new Event('click'));
+            function checkMsg(err) {
+              if (!this.captchaField && err === 'Incorrect captcha answer') {
+                captchaController.addMissingCaptcha();
+                this.captchaField = true;
+              } else if (err === 'Captcha expired') {
+                const captcha = this.form.querySelector('.captcharefresh');
+                if (captcha) {
+                  captcha.dispatchEvent(new Event('click'));
+                }
               }
             }
-            /*
-            doModal(json, () => {
-              this.formSubmit(e);
-            });
-            */
-            alert(JSON.stringify(json))
+
+            if (json.errors) {
+              for(var i in json.errors) {
+                checkMsg(json.errors[i])
+              }
+              /*
+              doModal(json, () => {
+                this.formSubmit(e);
+              });
+              */
+              alert("Error(s):\n" + json.errors.join("\n"))
+            }
             //this.formSubmit(e)
           } else {
             // call it at least once per file tbh
             for(var i = 0; i < this.files.length; i++) {
               doWork() // generate thumb
             }
-//for bans, post form to show TODO: make modal support bans json and send dynamicresponse from it (but what about appeals, w/ captcha, etc?)
+            //for bans, post form to show TODO: make modal support bans json and send dynamicresponse from it (but what about appeals, w/ captcha, etc?)
             this.clearFiles(); //dont resubmit files
             this.banned = true;
             // does this submit the form
@@ -617,7 +626,7 @@ class formHandler {
       this.submit.disabled = false;
       this.submit.value = this.originalSubmitText;
     }
-    xhr.open(this.form.getAttribute('method'), this.form.getAttribute('action'), true);
+    xhr.open(this.form.getAttribute('method'), this.form.getAttribute('action') + '.json', true);
     //if (!this.minimal) {
       //xhr.setRequestHeader('x-using-xhr', true);
     //}
