@@ -271,7 +271,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
       if (!in_array($rootModel['name'], $this->dontTrackTables)) {
         $this->markWriten($rootModel);
       }
-      return true
+      return true;
     }
     return false;
     /*
