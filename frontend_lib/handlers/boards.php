@@ -278,6 +278,7 @@ function makePostHandlerEngine($request) {
   //print_r($io);
   $row     = $io['values'];
   $headers = $io['headers'];
+  // FIGURE OUT: is this right?
   $redir   = $io['redir'];
 
   if (!empty($io['error'])) {
@@ -324,28 +325,56 @@ function makePostHandlerEngine($request) {
   // make post...
   // we could queue this for a worker but then any be validation couldn't be passed to the user
   $json = curlHelper(BACKEND_BASE_URL . $endpoint, $row, $headers);
+  // backend errors?
   // can't use this because we need better handling of results...
   //$result = expectJson($json, $endpoint)
   //echo "json[$json]<br>\n";
   $result = json_decode($json, true);
-  return array(
+
+  $retval = array(
     'requestValid' => true,
     'boardUri' => $boardUri,
     'result'   => $result,
-    'json'     => $json,
-    // needed for (yous) apparently on the json side
-    'redirect' => $redir,
-    // we could get the hashes from $res (handles.files[].hash)
-    // nah it's a refresh issue...
-    // this is really handy
-    // but maybe not as handy as
-    // backend/opt/boards/test/posts/295/media_debug?prettyPrint=1
-    //'filesDebugs' => $res,
-    //'_FILES' => $_FILES,
-    // good for debug/dev
-    'row' => $row, // validation and what's sent to the BE
-    'filesForBE' => $files, // should be in row but it'll be jsonencoded, so less useful
   );
+
+  // maybe should have a better name like created id...
+  if ($redir) {
+    // needed for (yous) apparently on the json side
+    // looks like "/test/#5730"
+    $retval['redirect'] = $redir;
+  }
+  if (DEV_MODE) {
+    $retval['debug'] = array(
+      // we could get the hashes from $res (handles.files[].hash)
+      // nah it's a refresh issue...
+      // this is really handy
+      // but maybe not as handy as
+      // backend/opt/boards/test/posts/295/media_debug?prettyPrint=1
+      //'filesDebugs' => $res,
+      //'_FILES' => $_FILES,
+      // good for debug/dev
+      'backendInput' => $row, // validation and what's sent to the BE
+      'filesForBE' => $files, // should be in row but it'll be jsonencoded, so less useful
+    );
+    if (empty($result)) {
+      // json decoding errors if result is messed..
+      $retval['debug']['json'] = $json;
+    }
+  }
+
+  // usually file issues, plugins or bridge (CAPTCHA)
+  // probably should escalate them to errors
+  if (!empty($result['issues'])) {
+    // is the request still valid? probably not...
+    // manage type
+    if (is_array($results['issues'])) {
+      $retval['errors'] = $results['issues'];
+    } else {
+      $retval['errors'] = array($results['issues']);
+    }
+  }
+
+  return $retval;
 }
 
 // nojs handler
@@ -433,6 +462,9 @@ EOB;
     }
   }
 }
+
+// both routes have the same input interface
+// just different output...
 function makePostHandlerJson($request) {
   $arr = makePostHandlerEngine($request);
   $code = $arr['requestValid'] ? 200 : 400;
