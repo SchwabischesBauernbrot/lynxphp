@@ -8,7 +8,7 @@ $_POST['captcha_id'] = $cid;
 $err = validate_captcha_field(array('remove' => false));
 
 header('Content-Type: application/json');
-$res = array('ok' => $err === '');
+$res = array('ok' => $err === '' ? "ok" : "error");
 
 if (DEV_MODE) {
   global $persist_scratch, $now;
