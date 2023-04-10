@@ -316,6 +316,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       'js/jschan/expand.js',
       // yous
       'js/jschan/yous.js',
+      // forms
       // broken because it doesn't handle the output of new posts
       // queues, refused, success, error...
       // breaks post actions (can't handle array checkboxes)
@@ -326,11 +327,12 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       //'js/jschan/hideimages.js',
       // password?
       // threadstat?
+      'js/jschan/threadstat.js',
       // time?
-      // yous
+      'js/jschan/time.js',
       // viewfulltext
+      'js/jschan/viewfulltext.js',
       // theme
-      // forms
       // filters
 
       // lynxphp
@@ -373,6 +375,8 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
   $head_html .= $io['head_html'] . "\n" . '<script>
     const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
     const DISABLE_JS = false
+    // assume UTC for now
+    const SERVER_TIMEZONE = "UTC"
   </script>' . "\n" . $scripts_html;
 
   if (!empty($row['canonical'])) {
