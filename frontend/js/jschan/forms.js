@@ -200,14 +200,20 @@ class formHandler {
         container.className = "row captchaRow"
         // get fresh captcha
         // we need img.src, fieldname _id for the captcha id
-        container.innerHTML = '<span class="col"><img class="captcha" src="images/awaiting_thumbnail.png"><input style="font-size: 2em;" type=text maxlength=6 size=6 name="captcha"></span>' +
+        container.innerHTML = '<span class="col"><img class="captcha" src="images/awaiting_thumbnail.png"><input style="font-size: 1.65em;" type=text maxlength=6 size=6 name="captcha" placeholder="type the characters above"></span>' +
           '<span class="col"><button class="active-captcha-reload">reload</button><button class="active-captcha-cancel">cancel</button></span>'
         // insert before the submit button
         this.submit.parentNode.insertBefore(container, this.submit)
+        var cInputElem = this.form.querySelector('.col input[name=captcha]')
+        //console.debug('inputElem', cInputElem)
         //this.form.appendChild(container)
+        cInputElem.onkeyup = e => {
+          //console.log('onchange', inputElem.value.length)
+          this.submit.disabled = cInputElem.value.length === 6 ? false : true
+          this.submit.style.cursor = cInputElem.value.length === 6 ? 'pointer' : 'not-allowed'
+        }
 
-        const cInputElem = this.form.querySelector('.col input[name=captcha]')
-        const img = this.form.querySelector('.col img.captcha')
+        var img = this.form.querySelector('.col img.captcha')
         var ref = this
         function reloadCaptcha() {
           //console.log('CAPTCHA loading')
@@ -260,7 +266,9 @@ class formHandler {
           console.log('captcha loaded')
         }
         */
-        this.submit.disabled = false
+        //this.submit.disabled = false
+        this.submit.title = "Please fill out CAPTCHA answer fully"
+        this.submit.style.cursor = 'not-allowed'
         e.preventDefault()
         return false
       } else
@@ -282,7 +290,8 @@ class formHandler {
           return response.json()
         }).then(function(data) {
           //console.debug('solve', data)
-          if (data.ok) {
+          // lynxchan can be {ok: "error"} or ok: "ok"
+          if (data.ok === "ok") {
             ref.inCaptcha = 2
             ref.captcha = cInputElem.value
             clearTimeout(ref.captchaRefreshTimer)
@@ -302,8 +311,10 @@ class formHandler {
             });
             */
             alert('incorrect captcha')
+            // let them fix a slightly off one
+            //cInputElem.value = ''
             // unlock form
-            ref.submit.disabled = false
+            //ref.submit.disabled = false
           }
         })
         e.preventDefault()
@@ -502,7 +513,7 @@ class formHandler {
               // something to coordinate with addPost events
               // forms set window.location.hash
               // you uses to detect if it's ours or not
-              window.myPostId = json.postId;
+              window.myPostId = json.postId
             }
             // add to yous
             if (json.redirect) {
