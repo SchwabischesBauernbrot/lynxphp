@@ -201,7 +201,11 @@ function wrapContentData($options = false) {
 //
 // why don't we fastout?
 
+// would be good if this could work with the router better
+// so router options could inject pipeline/head elements...
+
 // closes HEAD tag but doesn't open it...
+// fullHead means include <head>template&css</head> or not
 function wrapContentGetHeadHTML($row, $fullHead = false) {
   global $pipelines;
 
@@ -236,6 +240,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
   $pipelines[PIPELINE_SITE_HEAD]->execute($io);
 
   $term = DEV_MODE ? "\n" : '';
+  // $io['head_html'] is injected later
   $head_html = $term;
 
   if ($fullHead) {
@@ -437,6 +442,7 @@ EOB;
 
   $boardsItem = array('label' => 'Boards', 'destinations' => 'boards.html');
 
+  // did no one like this?
   if (0) {
     // build the board expander
     $board_expander_html = getExpander('Boards', 'borads.html', array(
