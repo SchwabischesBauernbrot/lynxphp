@@ -18,9 +18,10 @@ function renderPostFormHTML($boardUri, $options = false) {
     'values'    => array(),
     'formId'    => 'postform',
     'maxMessageLength' => false,
+    // what is this used for
+    // looks like protection/captcha_lynxim and the field is showCAPTCHA
     'pipelineOptions' => false,
   ), $options));
-
 
   if ($reply) {
     $type = 'Reply on thread #<a href="' . $boardUri . '/thread/' . $reply .'.html">' . $reply . '</a>';
