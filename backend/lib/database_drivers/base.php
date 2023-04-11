@@ -32,6 +32,7 @@ interface database_driver_base {
   public function num_rows($res);
   public function get_row($res);
   public function toArray($res);
+  public function free($res);
   public function groupAgg($field);
   public function randOrder();
 }
@@ -447,6 +448,7 @@ class database_driver_base_class {
         $tableAlias = $tableName;
       }
     }
+    // not used...
     $groupbys = array();
     if (!empty($options['groupby'])) {
       $groupbys = $options['groupby'];
