@@ -6,6 +6,9 @@ return array(
     array(
       'name' => 'content_actions',
       'params' => array(
+        // form api
+        // POST multipart/form
+        // https://gitgud.io/InfinityNow/LynxChan/-/blob/master/doc/Form.txt#L266
         'endpoint' => 'lynx/contentActions.js',
         'method' => 'POST',
         'unwrapData' => true,
