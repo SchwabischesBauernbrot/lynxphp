@@ -86,8 +86,25 @@ switch($action) {
       $postFields[$boardUri . '-' . $threadNum . '-' . $_POST['checkedposts']] = true;
     }
     //echo "<pre>", print_r($postFields, 1), "</pre>\n";
+    //echo "level[", $_POST['level'], "]<br>\n";
+    // "" => not sure
+    // cancer
+    // spam
+    // flood
+    // board
+    // global
+    // copyright
+    // illegal
+    // other
+    $global_enable = array('global', 'copyright', 'illegal', 'spam', 'flood');
     $result = $pkg->useResource('content_actions',
-      array('action' => 'report'),
+      array(
+        'action' => 'report',
+        'reason' => $_POST['report_reason'],
+        'global' => in_array($_POST['level'], $global_enable),
+        //captcha
+        //$_POST['level'],
+      ),
       array('addPostFields' => $postFields)
     );
   break;
