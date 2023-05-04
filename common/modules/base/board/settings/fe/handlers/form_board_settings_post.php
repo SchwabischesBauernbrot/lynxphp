@@ -2,15 +2,17 @@
 
 $params = $getHandler();
 
-$fields = $shared['fields']; // imported from fe/common.php
-
 // do we own this board?
 $boardUri = boardOwnerMiddleware($request);
 if (!$boardUri) return;
 
+//$fields = $shared['fields']; // imported from fe/common.php
+$section = empty($params['request']['params']['section']) ? 'board' : $params['request']['params']['section'];
+$fields = getBoardFields($section);
+
 // handle hooks for additionl settings
-global $pipelines;
-$pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
+//global $pipelines;
+//$pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
 
 // just pass all the _POST data to save_settings...
 // maybe we could do some validation...
