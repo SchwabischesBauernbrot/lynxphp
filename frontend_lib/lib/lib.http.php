@@ -34,6 +34,7 @@ function parseHeaders($response) {
 // but ultimately we should rather aim for one curl request per page total
 
 // router::getMaxMtime uses this
+// probably should be something like http_client_request
 function request($options = array()) {
   extract(ensureOptions(array(
     'url' => '',
