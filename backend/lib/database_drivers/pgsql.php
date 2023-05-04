@@ -387,6 +387,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     return $res;
   }
   public function count($rootModel, $options = false) {
+    // in postgres, if you try to order the count, you'll need a group by
     $res = $this->find($rootModel, $options, 'count(*)');
     list($cnt) = pg_fetch_row($res);
     pg_free_result($res);
