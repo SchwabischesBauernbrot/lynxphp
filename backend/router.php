@@ -11,7 +11,7 @@ class BackendRouter extends Router {
   function import($routes, $module = 'backend', $dir = 'handlers') {
     return parent::import($routes, $module);
   }
-  function fromResource($name, $res, $moduleDir) {
+  function fromResource($name, $res, $moduleDir, $shared) {
     // DEV_MODE is not available on backend...
     if (!isset($res['handlerFile'])) {
       return 'handlerFile is not set';
@@ -31,7 +31,7 @@ class BackendRouter extends Router {
       }
     }
 
-    $func = function($request) use ($res, $moduleDir) {
+    $func = function($request) use ($res, $moduleDir, $shared) {
       // get session
       $user_id = null;
       if (!empty($res['sendSession'])) {
@@ -49,9 +49,11 @@ class BackendRouter extends Router {
         $ip = getip();
       }
 
+      /*
       if (is_readable($moduleDir . 'shared.php')) {
         $shared = include $moduleDir . 'shared.php';
       }
+      */
       if (is_readable($moduleDir . 'be/common.php')) {
         $common = include $moduleDir . 'be/common.php';
       }
