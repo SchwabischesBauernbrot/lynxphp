@@ -299,6 +299,10 @@ class pipeline_module extends orderable_module {
 }
 
 //include 'lib.loader.php';
-ldr_require('lib.packages.php');
+// is it the other way around that uses us?
+// well we don't use package class at all here..
+// but I don't think it uses anything in here either...
+// it uses pipeline_module
+//ldr_require('lib.packages.php');
 
 ?>
