@@ -43,6 +43,8 @@ $newpost_process_io = array(
   'bumpBoard' => true,
   'bumpThread' => true,
   'returnId' => true,
+  'issues'   => array(),
+  'createPostOptions' => array(),
 );
 $pipelines[PIPELINE_NEWPOST_PROCESS]->execute($newpost_process_io);
 
@@ -52,7 +54,7 @@ if ($newpost_process_io['addToPostsDB']) {
   $files = $newpost_process_io['files']; // update files
 
   // can be an array (issues,id) if file errors
-  $data = createPost($boardUri, $post, $files, $privPost);
+  $data = createPost($boardUri, $post, $files, $privPost, $newpost_process_io['createPostOptions']);
 
   /*
   $posts_model = getPostsModel($boardUri);
@@ -80,5 +82,10 @@ if ($newpost_process_io['addToPostsDB']) {
 
   sendResponse($data);
 } else {
-  sendResponse($newpost_process_io['returnId']);
+  $data = $newpost_process_io['returnId'];
+  // inject error messages
+  if (count($newpost_process_io['issues'])) {
+    $data['issues'] = $newpost_process_io['issues'];
+  }
+  sendResponse($data);
 }
