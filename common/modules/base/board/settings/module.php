@@ -52,5 +52,55 @@ return array(
     ),
 */
   ),
+  'settings' => array(
+    array(
+      'level' => 'bo', // constant?
+      'location' => 'board', // /tab/group
+      'addFields' => array(
+        'uri' => array(
+          'label' => 'URI',
+          'type'  => 'text',
+        ),
+        'title' => array(
+          'label' => 'Title',
+          'type'  => 'text',
+        ),
+        'description' => array(
+          'label' => 'Description',
+          'type'  => 'text',
+        ),
+        'settings_nsfw' => array(
+          'label' => 'Allow Not Safe For Work content',
+          'type'  => 'checkbox',
+        ),
+        'settings_notpublic' => array(
+          'label' => 'Not publicly indexed',
+          'type'  => 'checkbox',
+        ),
+        // disable thread-wise ids
+        // require file for new threads
+        // don't allow users to delete their post
+        // allow code tags
+        // force anon
+        // early404
+        // location flags
+        // unique files
+        // unique post
+        // hourly thread limit
+        // enable captcha after threads per hour hit
+        // tags
+        // file whitelist?
+        // filters
+        // custom css?
+        //
+        // language
+        // custom spoiler
+        // attachment deleted
+        // overboard icon
+
+      )
+    ),
+  ),
+
 );
 ?>
