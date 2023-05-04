@@ -62,7 +62,8 @@ $persist_scratch = new file_scratch_driver;
 // js settings...
 //
 
-require '../common/lib.modules.php'; // module functions and classes
+// lib.loader should load this?
+//ldr_require('../common/lib.modules.php'); // module functions and classes
 
 require '../common/lib.pipeline.php';
 // we could move these into a pipelines.php file...
