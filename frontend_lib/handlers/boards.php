@@ -324,17 +324,23 @@ function makePostHandlerEngine($request) {
 
   // make post...
   // we could queue this for a worker but then any be validation couldn't be passed to the user
-  $json = curlHelper(BACKEND_BASE_URL . $endpoint, $row, $headers);
+  $json = request(array(
+    'url' => BACKEND_BASE_URL . $endpoint,
+    'body' => $row, // an array
+    'headers' => $headers,
+  ));
+  //$json = curlHelper(BACKEND_BASE_URL . $endpoint, $row, $headers);
+
   // backend errors?
   // can't use this because we need better handling of results...
   //$result = expectJson($json, $endpoint)
   //echo "json[$json]<br>\n";
-  $result = json_decode($json, true);
+  $results = json_decode($json, true);
 
   $retval = array(
     'requestValid' => true,
     'boardUri' => $boardUri,
-    'result'   => $result,
+    'result'   => $results,
   );
 
   // maybe should have a better name like created id...
@@ -356,7 +362,7 @@ function makePostHandlerEngine($request) {
       'backendInput' => $row, // validation and what's sent to the BE
       'filesForBE' => $files, // should be in row but it'll be jsonencoded, so less useful
     );
-    if (empty($result)) {
+    if (empty($results)) {
       // json decoding errors if result is messed..
       $retval['debug']['json'] = $json;
     }
@@ -364,15 +370,16 @@ function makePostHandlerEngine($request) {
 
   // usually file issues, plugins or bridge (CAPTCHA)
   // probably should escalate them to errors
-  if (!empty($result['issues'])) {
+  if (!empty($results['data']['issues'])) {
     // is the request still valid? probably not...
     // manage type
-    if (is_array($results['issues'])) {
-      $retval['errors'] = $results['issues'];
+    if (is_array($results['data']['issues'])) {
+      $retval['errors'] = $results['data']['issues'];
     } else {
-      $retval['errors'] = array($results['issues']);
+      $retval['errors'] = array($results['data']['issues']);
     }
   }
+  //print_r($retval);
 
   return $retval;
 }
