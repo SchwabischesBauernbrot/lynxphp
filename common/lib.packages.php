@@ -1,4 +1,5 @@
 <?php
+ldr_require('../common/lib.modules.php');
 
 /*
 class backend_resource {
@@ -36,6 +37,7 @@ class package {
     // we should understand the path of the module...
     $this->dir = $dir . '/'; // ends in trailing slash...
     $this->resources = array();
+    $this->resourcesCache = array();
     $this->settingsBlocks = array();
     // should we register with something? not now...
     $this->frontend_packages = array();
@@ -50,6 +52,7 @@ class package {
     // and we don't load the dep or the pipelines
     // if they aren't enable or don't exist
     $this->dependencies = array(); // set in module.php
+    $this->shared = false;
   }
 
   // should we make a frontend_package/backend_package
@@ -90,7 +93,7 @@ class package {
    *     expectJson
    *     unwrapData
    */
-  function addResource($label, $rsrcArr) {
+  function addResource($label, $rsrcArr, $cacheSettings) {
     $label = strtolower($label); // must be lowercase since it's a filename
     // what's this about?
     if (!isset($rsrcArr['handlerFile'])) {
@@ -110,6 +113,7 @@ class package {
     }
     //echo "Adding [$label] to [", $this->name, "]<br>\n";
     $this->resources[$label] = $rsrcArr;
+    $this->resourcesCache[$label] = $cacheSettings;
   }
   function useResource($label, $params = false, $options = false) {
     $label = strtolower($label); // UX but also camelcase is nice to make something clear
@@ -350,7 +354,13 @@ class package {
       // might be included from frontend...
       if (isset($routers[$router])) {
         //echo "Adding [$label][", $rsrc['endpoint'], "] to [$router]<br>\n";
-        $res = $routers[$router]->fromResource($label, $rsrc, $this->dir);
+        if ($this->resourcesCache[$label]) {
+          //echo "Adding [$label][", $rsrc['endpoint'], "] to [$router]<br>\n";
+          $key = (empty($res['method']) ? 'GET' : $res['method']) . '_' . $rsrc['endpoint'];
+          $routers[$router]->routeOptions[$key]['cacheSettings'] = $this->resourcesCache[$label];
+        }
+        $res = $routers[$router]->fromResource($label, $rsrc, $this->dir, $pkg->shared);
+
         if ($res !== true) {
           echo "Problem building routes for : $res<br>\n";
         }
@@ -605,6 +615,7 @@ class frontend_package {
   // ttl is a safe bet...
   // most data sources are going to be the backend
   // so we'll need enough set up to talk to it
+  // we communicate these handlers with the router later...
   function addHandler($method, $cond, $file, $options = false) {
     $method = strtoupper($method);
     if (!isset($this->handlers[$method])) {
@@ -661,11 +672,13 @@ class frontend_package {
       // $this is the bsn...
       if (!$ref->ranOnce) {
         //echo "module_path[$module_path]<Br>\n";
-        if (is_readable($module_path . 'shared.php')) {
-          $ref->shared = include $module_path . 'shared.php';
-        } else {
-          if (file_exists($module_path . 'shared.php')) {
-            echo "perms? [$module_path]shared.php<br>\n";
+        if ($ref->pkg->shared === false) {
+          if (is_readable($module_path . 'shared.php')) {
+            $ref->pkg->shared = include $module_path . 'shared.php';
+          } else {
+            if (file_exists($module_path . 'shared.php')) {
+              echo "perms? [$module_path]shared.php<br>\n";
+            }
           }
         }
         if (is_readable($module_path . 'fe/common.php')) {
@@ -676,6 +689,7 @@ class frontend_package {
             echo "perms? [$module_path]fe/common.php<br>\n";
           }
         }
+        //echo "addModule runOnce[$module_path]<br>\n";
         $ref->ranOnce = true;
       }
       //$common = false;
@@ -683,8 +697,8 @@ class frontend_package {
         $common = $ref->common;
       }
       //$shared = false;
-      if (isset($ref->shared)) {
-        $shared = $ref->shared;
+        if ($ref->pkg->shared !== false) {
+        $shared = $ref->pkg->shared;
       }
 
       $getModule = function() use ($pipeline_name, $options, &$ref, $module_path) {
@@ -731,11 +745,24 @@ class frontend_package {
         // as configured by ...
         echo "handler[$path] does not exist<br>\n";
       };
+      //echo "path[$path]<br>\n";
       if (file_exists($path)) {
+        //if ($ref->pkg->shared !== false) echo "shared[", print_r($ref->pkg->shared, 1), "]<br>\n";
+        //if ($this->pkg->shared !== false) echo "this[", print_r($this->pkg->shared, 1), "]<br>\n";
+        // we could inject the router too
+        // but it should be contextualized to this specific route ($row)
+        // it also needs the general access to the router though ($router)
+        // and then handler could communicate with row in a way
         $func = function($request) use ($path, $pkg, $row, $module_path, $ref) {
           if (!$ref->ranOnce) {
-            if (is_readable($module_path . 'shared.php')) {
-              $ref->shared = include $module_path . 'shared.php';
+            // is now loaded is shared
+            if ($ref->pkg->shared === false) {
+              if (is_readable($module_path . 'shared.php')) {
+                echo "two<br>\n";
+                $ref->pkg->shared = include $module_path . 'shared.php';
+                //echo "done<br>\n";
+                //ldr_require($module_path . 'shared.php')
+              }
             }
             if (is_readable($module_path . 'fe/common.php')) {
               $ref->common = include $module_path . 'fe/common.php';
@@ -744,6 +771,7 @@ class frontend_package {
                 echo "lulwat [$module_path]fe/common.php<br>\n";
               }
             }
+            //echo "buildRoutes runOnce[$module_path]<br>\n";
             $ref->ranOnce = true;
           }
           // unpack them
@@ -751,8 +779,8 @@ class frontend_package {
             $common = $ref->common;
           }
           //$shared = false;
-          if (isset($ref->shared)) {
-            $shared = $ref->shared;
+          if ($ref->pkg->shared !== false) {
+            $shared = $ref->pkg->shared;
           }
 
           // upload portals into $request if set in options
