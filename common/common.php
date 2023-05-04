@@ -1,5 +1,22 @@
 <?php
 
+// built-in permission levels
+define('PERM_ALL', 'all');
+define('PERM_LOGGEDIN', 'user');
+define('PERM_BO', 'bo');
+// or should these be roles...
+// these are locked into action structures rn
+// and we want to use them for settings...
+// with roles we don't want constants
+// strings should be fine...
+// but the system needs a standard permissions engine
+define('PERM_BVOL', 'bv');
+define('PERM_BJAN', 'bj');
+define('PERM_GLOBAL', 'global');
+define('PERM_GVOL', 'gvol');
+define('PERM_GJAN', 'gjan');
+define('PERM_ADMIN', 'admin');
+
 // should we require lib.loader.php
 // and then ldr_require('lib.http.server.php')
 // here?
