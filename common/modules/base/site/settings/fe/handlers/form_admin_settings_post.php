@@ -2,11 +2,12 @@
 
 $params = $getHandler();
 
-$fields = $common['fields']; // imported from fe/common.php
+//$fields = $common['fields']; // imported from fe/common.php
+$fields = getAdminFields($section);
 
 // handle hooks for additionl settings
 global $pipelines;
-$pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
+//$pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
 
 // just pass all the _POST data to save_settings...
 // maybe we could do some validation...
@@ -38,7 +39,7 @@ $res = $pkg->useResource('save_settings', array('logo' => json_encode($files)),
 if ($res['success']) {
   // maybe a js alert?
   echo "Success<br>\n";
-  redirectTo('/admin/settings.html', array('header' => false));
+  redirectTo('/admin.php', array('header' => false));
 } else {
   wrapContent('Something went wrong...' . print_r($res, 1), array('header' => false));
 }
