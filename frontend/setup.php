@@ -98,7 +98,6 @@ require '../frontend_lib/handlers/mixins/global_portal.php';
 require '../frontend_lib/handlers/mixins/user_portal.php';
 require '../frontend_lib/handlers/mixins/post_renderer.php';
 require '../frontend_lib/handlers/mixins/post_form.php';
-require '../frontend_lib/handlers/mixins/post_actions.php';
 require '../frontend_lib/handlers/mixins/tabs.php'; // maybe more of a lib...
 
 registerPackages();
