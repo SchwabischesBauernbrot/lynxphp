@@ -1,5 +1,7 @@
 <?php
 
+// post/actions
+
 $fePkgs = array(
   array(
     'handlers' => array(
@@ -72,6 +74,11 @@ $fePkgs = array(
       array(
         'pipeline' => 'PIPELINE_POST_META_PROCESS',
         'module' => 'post_meta_label',
+      ),
+      // inject post_actions tags
+      array(
+        'pipeline' => 'PIPELINE_BOARD_FOOTER_TMPL',
+        'module' => 'board_footer',
       ),
     ),
   ),
