@@ -10,15 +10,8 @@ Post(s) action: {{actions}}
     <div class="actions">
       <label>
         <select name="level">
-          <option value="">Not sure
-          <option value="cancer">Cancer
-          <option value="spam">Spam / Advertisement
-          <option value="flood">Flood
-          <option value="board">Board Rule Violation
-          <option value="global">Site Rule Violation
-          <option value="copyright">Copyright Violation
-          <option value="illegal">Illegal Content
-          <option value="other">Other
+          <!-- these don't belong here because they have specific software meanings -->
+          {{levels}}
         </select>
       </label>
       <label>
