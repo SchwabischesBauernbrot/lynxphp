@@ -179,74 +179,6 @@ $frontendRouterData = array(
           ),
         ),
       ),
-      /*
-      'view' => array(
-        'route'  => '/:uri/',
-        'func'   => 'getBoardThreadListingHandler',
-        'options' => array(
-          'cacheSettings' => array(
-            'backend' => array(
-              array(
-                'route' => 'opt/boards/:uri/:page?portals=board',
-                'method' => 'GET',
-              ),
-            ),
-            'files' => array(
-              // theme is also would affect this caching
-              'templates/header.tmpl', // wrapContent
-              'templates/footer.tmpl', // wrapContent
-              'templates/thread_listing.tmpl', // boards
-              'templates/mixins/board_header.tmpl', // board_portal
-              'templates/mixins/board_footer.tmpl', // board_portal
-              'templates/mixins/post_detail.tmpl', // renderPost
-              'templates/mixins/post_actions.tmpl', // renderPostActions
-            ),
-            'sets' => array(
-              'wrapContent',
-              'board_portal',
-              'renderPost',
-              'renderPostActions',
-            ),
-          ),
-        ),
-      ),
-      'page' => array(
-        'route'  => '/:uri/page/:page.html',
-        'func'   => 'getBoardThreadListingPageHandler',
-        'options' => array(
-          'cacheSettings' => array(
-            'files' => array(
-              // theme is also would affect this caching
-              'templates/header.tmpl', // wrapContent
-              'templates/footer.tmpl', // wrapContent
-              'templates/mixins/board_header.tmpl', // board_portal
-              'templates/mixins/board_footer.tmpl', // board_portal
-              'templates/mixins/post_detail.tmpl', // renderPost
-              'templates/mixins/post_actions.tmpl', // renderPostActions
-            ),
-          ),
-        ),
-      ),
-      */
-      /*
-      'thread' => array(
-        'route'  => '/:uri/thread/:num.html',
-        'func'   => 'getThreadHandler',
-        'options' => array(
-          'cacheSettings' => array(
-            'files' => array(
-              // theme is also would affect this caching
-              'templates/header.tmpl', // wrapContent
-              'templates/footer.tmpl', // wrapContent
-              'templates/mixins/board_header.tmpl', // board_portal
-              'templates/mixins/board_footer.tmpl', // board_portal
-              'templates/mixins/post_detail.tmpl', // renderPost
-              'templates/mixins/post_actions.tmpl', // renderPostActions
-            ),
-          ),
-        ),
-      ),
-      */
       'newPost' => array(
         'method' => 'POST',
         'route'  => '/:uri/post',
@@ -257,25 +189,6 @@ $frontendRouterData = array(
         'route'  => '/:uri/post.json',
         'func'   => 'makePostHandlerJson',
       ),
-      /*
-      'catalog' => array(
-        'route'  => '/:uri/catalog.html',
-        'func'   => 'getBoardCatalogHandler',
-        'options' => array(
-          'cacheSettings' => array(
-            'files' => array(
-              // theme is also would affect this caching
-              'templates/header.tmpl', // wrapContent
-              'templates/footer.tmpl', // wrapContent
-              'templates/mixins/board_header.tmpl', // board_portal
-              'templates/mixins/board_footer.tmpl', // board_portal
-              'templates/mixins/post_detail.tmpl', // renderPost
-              'templates/mixins/post_actions.tmpl', // renderPostActions
-            ),
-          ),
-        ),
-      ),
-      */
       // needs to go last
       'fileRedirect' => array(
         'route'  => '/:uri',
@@ -285,19 +198,5 @@ $frontendRouterData = array(
       ),
     ),
   ),
-  /*
-  'board_settings' => array(
-    'file'   => 'board_settings',
-    'portals' => array('board_settings'),
-    'routes' => array(
-      'settings' => array(
-        // need to pass :uri into the script somehow...
-        // also how will the non-router version know?
-        'route'  => '/:uri/board_settings.php',
-        'func'   => 'getBoardSettingsHandler',
-      ),
-    ),
-  ),
-  */
 );
 $router->import($frontendRouterData);
