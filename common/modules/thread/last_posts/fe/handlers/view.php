@@ -44,6 +44,7 @@ $pipelines[PIPELINE_POST_POSTPREPROCESS]->execute($data);
 
 $posts_html = '';
 $files = 0;
+$userSettings = getUserSettings();
 //echo "checking[$boardUri][", print_r($boards_settings[$boardUri], 1), "]<br>\n";
 foreach($boardData['posts'] as $post) {
   //echo "<pre>", print_r($post, 1), "</pre>\n";
@@ -51,6 +52,7 @@ foreach($boardData['posts'] as $post) {
   //echo "checking[", print_r($boards_settings[$boardUri], 1), "]<br>\n";
   $posts_html .= renderPost($boardUri, $post, array(
     'checkable' => true, 'boardSettings' => $boards_settings[$boardUri],
+    'userSettings' => $userSettings,
   ));
   if (isset($post['files'])) {
     $files += count($post['files']);
