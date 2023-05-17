@@ -173,7 +173,13 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
     array('uri', '=', $boardUri),
   )));
 
-  if ($threadid) {
+  // only need to bump replies
+  $bumpThread = !!$threadid;
+  if ($options && $options['sage']) {
+    $bumpThread = false;
+  }
+
+  if ($bumpThread) {
     // bump thread
     $urow = array();
     $db->update($posts_model, $urow, array('criteria'=>array(

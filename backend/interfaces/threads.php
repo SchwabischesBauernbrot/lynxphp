@@ -99,6 +99,41 @@ function threadDBtoAPI(&$row, $boardUri) {
   // decode user_id
 }
 
+function getThreadPostCount($boardUri, $threadNum, $options = false) {
+  // unpack options
+  extract(ensureOptions(array(
+    'posts_model' => false,
+    //'post_files_model' => false,
+    'since_id'    => false,
+    //'includeOP'   => true,
+    'includeDeleted'   => false,
+  ), $options));
+
+  global $db;
+  if ($posts_model === false) {
+    $posts_model = getPostsModel($boardUri);
+    if ($posts_model === false) {
+      // this board does not exist
+      return false;
+    }
+  }
+  $posts = array();
+  $crit = array(
+    array('threadid', '=', $threadNum),
+  );
+  if (!$includeDeleted) {
+    $crit[] = array('deleted', '=', 0);
+  }
+  if ($since_id !== false) {
+    $crit[] = array('postid', '>', $since_id);
+  }
+  // , 'order' => 'created_at'
+  // can't use order by on a count
+  return $db->count($posts_model, array(
+    'criteria' => $crit)
+  );
+}
+
 // false means thread does not exist
 // and also means no replies (since)
 // FIXME: we need differentiate because all sorts of error codes
@@ -192,7 +227,7 @@ function getThread($boardUri, $threadNum, $options = false) {
     'criteria' => $crit, 'order' => 'created_at')
   );
   // no OP and no replies, consider 404
-  if (($includeOP && !count($posts)) && ($since_id === alse && !$db->num_rows($res))) {
+  if (($includeOP && !count($posts)) && ($since_id === false && !$db->num_rows($res))) {
     return false;
   }
   while($row = $db->get_row($res)) {

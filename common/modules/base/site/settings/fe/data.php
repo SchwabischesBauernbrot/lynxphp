@@ -9,6 +9,14 @@ return array(
         'route'   => '/admin/settings/:section',
         'handler' => 'admin_settings',
       ),
+      array(
+        'route'   => '/admin/settings/:section/add',
+        'handler' => 'admin_settings_add',
+      ),
+      array(
+        'route'   => '/admin/settings/:section/remove',
+        'handler' => 'admin_settings_remove',
+      ),
     ),
     'modules' => array(
       /*

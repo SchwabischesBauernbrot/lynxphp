@@ -43,6 +43,7 @@ if (is_array($result)) {
     ));
   }
 } else {
+  // false means the thread does not exist
   /*
   echo "boardUri[$boardUri] id[$id]<br>\n";
   echo "<pre>be", htmlspecialchars(print_r($result, 1)), "</pre>\n";

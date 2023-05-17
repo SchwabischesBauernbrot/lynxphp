@@ -1,5 +1,7 @@
 <?php
 
+require '../frontend_lib/lib/lib.listing.php'; // a component for SCRUD
+
 $params = $getHandler();
 
 $data = $pkg->useResource('settings');
@@ -10,12 +12,7 @@ global $pipelines;
 //echo "<pre>[", print_r($params, 1), "]</pre>\n";
 $section = $params['request']['params']['section'];
 
-$adminSettings = getCompiledSettings('admin');
-if (isset($adminSettings[$section])) {
-  $fields = $adminSettings[$section];
-} else {
-  $fields = $common['fields']; // imported from fe/common.php
-}
+$fields = getAdminFields($section);
 
 // handle hooks for additionl settings
 //$pipelines[PIPELINE_ADMIN_SETTING_GENERAL]->execute($fields);
@@ -23,7 +20,17 @@ if (isset($adminSettings[$section])) {
 //echo "<pre>fields:", print_r($fields, 1), "</pre>\n";
 //echo "<pre>values:", print_r($values, 1), "</pre>\n";
 
-$html = generateForm($params['action'], $fields, $values);
+if ($fields) {
+  $html = generateForm($params['action'], $fields, $values);
+} else {
+  // FIXME: template
+  $header = '<br>';
+  //
+  $footer = '';
+  $template = array('header' => $header, 'footer' => $footer);
+  $fields = array();
+  $html = component_listing($template, '/admin/settings/' . $section . '/add', 'URL', $fields);
+}
 
 wrapContent(renderAdminPortal() . ucfirst($section) . ' Settings'. $html);
 

@@ -1,14 +1,17 @@
 <?php
 
+// load this file when needed, the entire system shouldn't need this
+
 function tagPost_getAll() {
   global $pipelines;
+  // would be nice to show what module this comes from...
   $io = array(
     'tags' => array(
       'thread' => array('description' => 'post is a new thread',),
       'reply'  => array('description' => 'post is a new reply'),
     ),
   );
-  // maybe; the order of these matter
+  // maybe; the order of these matter, why?
   $pipelines[PIPELINE_POSTTAG_REGISTER]->execute($io);
   return $io['tags'];
 }

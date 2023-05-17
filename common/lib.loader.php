@@ -10,13 +10,23 @@ $module_base = 'common/modules/';
 
 $_loader_data = array();
 function ldr_require($file) {
+  $f = realpath($file);
+  //echo "loading[$file]=>[$f]<br>\n";
+  if (!$f) {
+    if (DEV_MODE) {
+      echo "Path[$file] isn't great<br>\n";
+    }
+    $f = $file;
+  }
   global $_loader_data;
   // normalize file path / name?
-  if (empty($_loader_data[$file])) {
-    include $file;
-    $_loader_data[$file] = true;
+  if (empty($_loader_data[$f])) {
+    $res = include $file;
+    $_loader_data[$f] = true;
   }
 }
+
+ldr_require('../common/lib.packages.php');
 
 function ldr_done() {
   global $_loader_data;
@@ -93,6 +103,21 @@ function compileSettingsBlock($loc, $block) {
       $settingsBlock[$level][$loc][$f] = $d;
     }
   }
+  if (isset($block['list'])) {
+    if (count($settingsBlock[$level][$loc])) {
+      $msg = "$level $loc is already has fields: <pre>" . print_r($settingsBlock[$level][$loc], 1) . "</pre>";
+      if (isBackend()) {
+        echo $msg;
+      } else {
+        wrapContent($msg);
+      }
+      exit(1);
+    }
+    $settingsBlock[$level][$loc] = json_encode(array(
+      'type' => 'form',
+      'fields' => array()
+    ));
+  }
   // modified field
   // remove field
 }
@@ -113,79 +138,13 @@ function registerPackage($pkg_path) {
   $shared = false;
   if (is_readable($full_pkg_path . 'shared.php')) {
     // make $share available to the next include
+    // hack used to load themes into settings
+    // this will load it twice, we need to communicate with the yet to be made pkg
+    //echo "one<br>\n";
     $shared = include $full_pkg_path . 'shared.php';
+    //echo "has shared[", $shared !== false, "]<br>\n";
   }
-  if (is_readable($full_pkg_path . 'module.php')) {
-    //echo "Loading [$full_pkg_path] module<br>\n";
-    // we want to keep these to pure data as much as possible (no calculation to get result)
-    $data = include $full_pkg_path . 'module.php';
-    // handle empty module.php
-    // maybe version should be assumed
-    if (
-      !empty($data) && (empty($data['name']) || empty($data['version']))
-    ) {
-      echo "[$full_pkg_path] module.php did not return correct data, make sure name and version are set<br>\n";
-      return $pkg;
-    }
-    global $packages;
-    // handle already loaded
-    if (isset($packages[$data['name']])) {
-      //echo "already loaded[", $data['name'], "]<bR>\n";
-      // really no harm here if two objects made, just wastes memory
-      // and causes confusion
-      return $packages[$data['name']];
-    }
-    $pkg = new package($data['name'], $data['version'], substr($full_pkg_path, 0, -1));
-
-    if (!empty($data['dependencies'])) {
-      //echo "<pre>has depends [", print_r($data['dependencies'], 1), "]</pre>\n";
-
-      // FIXME: now what if this module is disabled
-      // well right we only disable on the frontend...
-      // because all backendRoutes are basically inert unless called
-      // so everything on the backend will be attached and executing
-      // even if the frontend does nothing with it
-
-      // probably should be doing this inside buildBackendRoutes
-      // but buildBackendRoutes can't access dependencies
-      $pkg->dependencies = $data['dependencies'];
-      foreach($data['dependencies'] as $depPkgName) {
-        // front or back?
-        if (isBackend()) {
-          // make sure we have it
-
-          // we still need this for js.php I think
-          $depPkg = registerPackage($depPkgName);
-          $depPkg->buildBackendRoutes();
-          // register package with $packages global
-          $packages[$depPkg->name] = $depPkg;
-        } else {
-          // do nothing for now
-
-          // we do need to do make sure pipelines are established
-        }
-      }
-    }
-
-    // not all module.php will have resources
-    if (!empty($data['resources'])) {
-      foreach($data['resources'] as $rsrcHdr) {
-        if (!isset($rsrcHdr['name'])) {
-          echo "<pre>Weird name not set", print_r($rsrcHdr, 1), "in [$full_pkg_path]</pre>\n";
-        }
-        $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params']);
-      }
-    }
-
-    if (!empty($data['settings'])) {
-      foreach($data['settings'] as $block) {
-        // level, actions: addFields
-        // location: where this action is happening...
-        compileSettingsBlock($block['location'], $block);
-        $pkg->addSettingsBlock($block['location'], $block);
-      }
-    }
-  } else {
+  if (!is_readable($full_pkg_path . 'module.php')) {
     //echo "module_base[$module_base]<br>\n";
     if (!file_exists($full_pkg_path . 'module.php')) {
       echo "No module.php in [$full_pkg_path]<br>\n";
@@ -197,6 +156,78 @@ function registerPackage($pkg_path) {
       if (!is_readable('../' . $module_base)) {
         echo "../$module_base isn't readable<br>\n";
       }
+    }
+    return $pkg;
+  }
+  //echo "Loading [$full_pkg_path] module<br>\n";
+  // we want to keep these to pure data as much as possible (no calculation to get result)
+  $data = include $full_pkg_path . 'module.php';
+  // handle empty module.php
+  // maybe version should be assumed
+  if (
+    !empty($data) && (empty($data['name']) || empty($data['version']))
+  ) {
+    echo "[$full_pkg_path] module.php did not return correct data, make sure name and version are set<br>\n";
+    return $pkg;
+  }
+  global $packages;
+  // handle already loaded
+  if (isset($packages[$data['name']])) {
+    //echo "already loaded[", $data['name'], "]<bR>\n";
+    // really no harm here if two objects made, just wastes memory
+    // and causes confusion
+    return $packages[$data['name']];
+  }
+  $pkg = new package($data['name'], $data['version'], substr($full_pkg_path, 0, -1));
+  $pkg->shared = $shared;
+
+  if (!empty($data['dependencies'])) {
+    //echo "<pre>has depends [", print_r($data['dependencies'], 1), "]</pre>\n";
+
+    // FIXME: now what if this module is disabled
+    // well right we only disable on the frontend...
+    // because all backendRoutes are basically inert unless called
+    // so everything on the backend will be attached and executing
+    // even if the frontend does nothing with it
+
+    // probably should be doing this inside buildBackendRoutes
+    // but buildBackendRoutes can't access dependencies
+    $pkg->dependencies = $data['dependencies'];
+    foreach($data['dependencies'] as $depPkgName) {
+      // front or back?
+      if (isBackend()) {
+        // make sure we have it
+
+        // we still need this for js.php I think
+        $depPkg = registerPackage($depPkgName);
+        $depPkg->buildBackendRoutes();
+        // register package with $packages global
+        $packages[$depPkg->name] = $depPkg;
+      } else {
+        // do nothing for now
+
+        // we do need to do make sure pipelines are established
+      }
+    }
+  }
+
+  // not all module.php will have resources
+  if (!empty($data['resources'])) {
+    foreach($data['resources'] as $rsrcHdr) {
+      if (!isset($rsrcHdr['name'])) {
+        echo "<pre>Weird name not set", print_r($rsrcHdr, 1), "in [$full_pkg_path]</pre>\n";
+      }
+      $cacheSettings = empty($rsrcHdr['cacheSettings']) ? false : $rsrcHdr['cacheSettings'];
+      $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params'], $cacheSettings);
+    }
+  }
+
+  if (!empty($data['settings'])) {
+    foreach($data['settings'] as $block) {
+      // level, actions: addFields
+      // location: where this action is happening...
+      compileSettingsBlock($block['location'], $block);
+      $pkg->addSettingsBlock($block['location'], $block);
     }
   }
   return $pkg;
@@ -253,7 +284,7 @@ function registerPackages() {
   // data
   $groups = array(
     'base/base', 'base/board', 'base/user', 'base/site', 'base/thread',
-    'board', 'thread', 'post', 'user', 'admin', 'global', 'site', 'protection');
+    'board', 'thread', 'post', 'media', 'user', 'admin', 'global', 'site', 'protection');
   foreach($groups as $group) {
     registerPackageGroup($group);
   }

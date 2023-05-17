@@ -39,6 +39,9 @@ function boardMiddleware($request, $options = false) {
 }
 
 // way more useful if we just pass boardUri in...
+// FIXME: bring on par with boardMiddleware
+// but we don't always need that data
+// so options?
 function boardOwnerMiddleware($request) {
   $boardUri = getQueryField('boardUri');
   // also accept uri in request.params

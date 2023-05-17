@@ -35,12 +35,19 @@ function action_redirectToWhere($options = false) {
 
 function action_getLinkHTML($a, $options) {
   $link = $a['link'];
-  if (isset($a['includeWhere'])) {
+  if (!empty($a['includeWhere'])) {
     if (isset($options['where'])) {
       $link .= '&from=' . urlencode($options['where']);
     }
   }
-  return '<a href="' . $link . '">' . $a['label'] . '</a>';
+  // but some actions we want them to be indexed
+  // FIXME: make option to index the action...
+  // or I wonder if we could query the router about this link...
+  $index = 'rel=noindex ';
+  if (!empty($a['index'])) {
+    $index = '';
+  }
+  return '<a ' . $index . 'href="' . $link . '">' . $a['label'] . '</a>';
 }
 
 // decode permissions

@@ -526,9 +526,12 @@ class formHandler {
               // if new thread, we need to either clear the message
               // or redirect to the new thread?
             }
-            if (json.message || json.messages || json.error || json.errors) {
+            // message(s),error
+            // maybe a warning that's displayed but not a pop up
+            // for things like this post was auto-saged
+            if (json.errors) {
               //doModal(json);
-              alert(JSON.stringify(json))
+              alert(json.errors.join("\n"))
             // we're not likely going to use websockets
             // however some ajax polling might be good
             //} else if (socket && socket.connected) {

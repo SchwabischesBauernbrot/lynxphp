@@ -64,6 +64,13 @@ function getBoardThreadListing($q, $boardUri, $pagenum = 1) {
 
 // refactored out so theme demo can use this
 function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOptions = '') {
+
+  // unpack options
+  extract(ensureOptions(array(
+    'userSettings'  => false,
+  ), $wrapOptions));
+
+
   $pageData = $boardThreads['page1'];
   $pages = $boardThreads['pageCount'];
   $boardData = $boardThreads['board'];
@@ -124,7 +131,9 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
 
   $threads_html = '';
   // hack for now
-  $userSettings = getUserSettings();
+  if ($userSettings === false) {
+    $userSettings = getUserSettings();
+  }
   //echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
   foreach($pageData as $thread) {
     //echo "<pre>", print_r($thread, 1), "</pre>\n";
@@ -132,8 +141,13 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
     if (!isset($thread['posts'])) continue;
     $posts = $thread['posts'];
     // a thread can have no replies
-    //$threadId = $posts[0]['no'];
-    $threadId = $thread['no'];
+    if (!isset($thread['no'])) {
+      // non-overboard
+      $threadId = $posts[0]['no'];
+    } else {
+      // overboard style
+      $threadId = $thread['no'];
+    }
     //echo "count[", count($posts), "]<br>\n";
     $threads_html .= $threadHdr_tmpl;
     // we only include 6...

@@ -40,7 +40,7 @@ return array(
       ),
     ),
     'modules' => array(
-      // add [users] to admin nav
+      // add [users] and [boards] to admin nav
       array(
         'pipeline' => 'PIPELINE_ADMIN_NAV',
         'module'   => 'nav',

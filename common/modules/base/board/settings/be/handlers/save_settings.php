@@ -6,6 +6,16 @@ $params = $get();
 $boardUri = boardOwnerMiddleware($request);
 if (!$boardUri) return;
 
+/*
+this back and forth is horrible
+we need to restructure these formats to use less loops
+we can preprocess but the post processing and form should be way more straight forward
+
+settings_ or not
+it's good to denote a special but these are the default
+board_ makes more sense for dbFields, they're the exception not the rule
+*/
+
 global $db, $models;
 $row = getBoardRaw($boardUri);
 //if (!is_array($settings['json'])) $settings['json'] = array();
@@ -28,19 +38,27 @@ foreach($_POST as $k => $v) {
   if (in_array($k, $dbFields)) {
     $urow[$k] = $v;
   } else {
-    $row['json']['settings'][substr($k, 9)] = $v;
+    // could require settings_
+    $row['json']['settings'][$k] = $v;
   }
 }
 
+$section = empty($params['request']['params']['section']) ? 'board' : $params['request']['params']['section'];
+$fields = getBoardFields($section);
+
 // checkbox states are always changed
-foreach($shared['fields'] as $f => $t) {
+//foreach($shared['fields'] as $f => $t) {
+foreach($fields as $f => $t) {
   //echo "type[", print_r($t, 1), "]<br>\n";
   if ($t['type'] === 'checkbox') {
-    $sf = substr($f, 9); // just assuming no checkbox dbFields
-    $row['json']['settings'][$sf] = getOptionalPostField($f);
+    //$sf = substr($f, 9); // just assuming no checkbox dbFields
+    $row['json']['settings'][$f] = getOptionalPostField($f);
   }
 }
 //echo "<pre>merge[", print_r($row['json']['settings'], 1), "]</pre>\n";
+
+// FIXME: check if they can be a bigger or lower number than master site setting
+// make sure it's in range...
 
 // FIXME: move all posts/files if uri changes....
 

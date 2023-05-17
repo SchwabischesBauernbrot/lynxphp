@@ -58,7 +58,7 @@ if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
 }
 // maybe don't output SQL if devmode is off
 
-include '../common/lib.modules.php'; // module functions and classes
+ldr_require('../common/lib.modules.php'); // module functions and classes
 // transformations (x => y)
 // access list (remove this, add this)
 // change input, output (aren't these xforms tho)
@@ -107,18 +107,19 @@ function buildRouters($routeConfig) {
 
 $routers = buildRouters($routeConfig);
 
-include 'lib/lib.board.php';
-include 'lib/lib.ffmpeg.php';
-include 'lib/middlewares.php';
-include 'interfaces/boards.php';
-include 'interfaces/posts.php';
-include 'interfaces/replies.php';
-include 'interfaces/threads.php';
-include 'interfaces/post_tags.php';
-include 'interfaces/users.php';
-include 'interfaces/files.php';
-include 'interfaces/sessions.php';
-include 'interfaces/settings.php';
+require 'lib/lib.board.php';
+require 'lib/lib.ffmpeg.php';
+require 'lib/middlewares.php';
+require 'interfaces/boards.php';
+require 'interfaces/posts.php';
+require 'interfaces/replies.php';
+require 'interfaces/threads.php';
+require 'interfaces/users.php';
+require 'interfaces/files.php';
+require 'interfaces/sessions.php';
+require 'interfaces/settings.php';
+//ldr_require('../common/lib.post_tags.php');
+require '../common/lib.post_tags.php';
 
 /*
 $router->all('/4chan/*', $routers['4chan']);
