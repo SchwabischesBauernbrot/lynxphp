@@ -73,6 +73,22 @@ if ($newpost_process_io['addToPostsDB']) {
   // can be an array (issues,id) if file errors
   $data = createPost($boardUri, $post, $files, $privPost, $newpost_process_io['createPostOptions']);
 
+  // issues are usually file upload problems...
+  if (empty($data['issues']) && !empty($data['id'])) {
+    // bump thread
+    $threadid = $post['threadid'];
+    if ($threadid) {
+      $posts_model = getPostsModel($boardUri);
+      // FIXME: sage processing
+      // at least make it hoookable
+      // bump thread
+      $urow = array();
+      $db->update($posts_model, $urow, array('criteria'=>array(
+        array('postid', '=', $threadid),
+      )));
+    }
+  }
+
   sendResponse($data);
 } else {
   $data = $newpost_process_io['returnId'];
