@@ -34,7 +34,7 @@ function modelToSQL($type) {
 }
 
 // FIXME: convert to array
-function sqlToType($sqlType) {
+function sqlToType($sqlType, $f, $desired) {
   //echo "sqlToType[$sqlType]<br>\n";
   $type = 'true';
   switch($sqlType) {
@@ -42,9 +42,11 @@ function sqlToType($sqlType) {
       $type = 'str';
     break;
     case 'bigint(20)':
+    case 'bigint':
       $type = 'int';
     break;
     case 'tinyint(3) unsigned':
+    case 'tinyint unsigned':
       $type = 'bool';
     break;
     case 'mediumtext':
@@ -52,6 +54,13 @@ function sqlToType($sqlType) {
     break;
     case 'datetime':
       $type = 'datetime';
+    break;
+    case 'int unsigned':
+      // created_at
+      //$type = '';
+    break;
+    default:
+      //echo "Defaulting to true for[", $sqlType, "] [$f] [$desired]<br>\n";
     break;
   }
   return $type;
@@ -112,7 +121,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
         $this->dontTrackTables[] = $model['name'];
       }
     }
-    //echo "Checking [$tableName]<br>\n";
+    //echo "Checking [$tableName]", gettrace(), "<br>\n";
     $res = mysqli_query($this->conn, 'describe `' . $tableName. '`');
     $err = mysqli_error($this->conn);
     // do we need to create table?
@@ -154,8 +163,9 @@ class mysql_driver extends database_driver_base_class implements database_driver
       }
       while($row = mysqli_fetch_assoc($res)) {
         // Field, Type, Null, Key, Default, Extra
-        //print_r($row);
-        $haveFields[ $row['Field'] ] = sqlToType($row['Type']);
+        //echo "<pre>describe", print_r($row), "</pre>\n";
+        // 8.x still has Field and Type
+        $haveFields[ $row['Field'] ] = sqlToType($row['Type'], $row['Field'], $model['fields'][$row['Field']]);
       }
       mysqli_free_result($res);
       $haveAll = true;
@@ -172,6 +182,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
         } else {
           // change type...
           //echo "Checking sql[", $haveFields[$fieldName], "!=", $f['type'], "]<br>\n";
+          // f['type'] is the type we should be
           if ($haveFields[$fieldName] !== $f['type']) {
             $noChanges = false;
             $changes[$fieldName] = $f;
@@ -198,7 +209,8 @@ class mysql_driver extends database_driver_base_class implements database_driver
       if ($haveAll && $noChanges) {
         return true;
       }
-      $sql = 'alter table ' . $tableName . ' ';
+      //echo "<pre>$tableName: Changes", print_r($changes, 1), "</pre>\n";
+      $sql = 'alter table `' . $tableName . '` ';
       if (!$haveAll) {
         foreach($missing as $fieldName => $f) {
           $sql .= 'ADD ' . $fieldName . modelToSQL($f['type']);
