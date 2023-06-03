@@ -28,6 +28,33 @@ PIPELINE_PORTALS_DATA - pass BE data to FE to use in various portals (index:::se
   portals [array of strings]
   *out.PORTAL [object]
 
+  PIPELINE_BE_\*_PORTAL - a more pinpointed pipeline (* is a portal name, BOARD_SETTINGS)
+  PIPELINE_BE_BOARD_PORTAL
+  PIPELINE_BE_BOARD_SETTINGS_PORTAL
+    data [array]
+    mtime [integer]
+    err [string]
+    meta [array]
+    portals [array]
+    out [array]
+    resp [array]
+    portal [string]
+    portalOptions [array]
+    *out [object]
+
+PIPELINE_ACCOUNT_DATA
+  userid [integer]
+  *account
+    noCaptchaBan [boolean]
+    login [string]
+    email [string]
+    globalRole [integer]
+    boardCreationAllowed [boolean]
+    ownedBoards [string[]]
+    groups [string[]]
+    reportFilter [array]
+    username [string]
+    publickey [string]
 WorkQueue pipelines:
 PIPELINE_FILE
   boardUri
@@ -57,6 +84,9 @@ Queueing started to mock these out:
 
 Module specific ones:
   PIPELINE_BE_ADMIN_QUEUE_DATA (post_queue row)
+  base/board/users
+  PIPELINE_BOARD_USER_DATA
+    * [array]
 
 Defined but not used
   PIPELINE_POST_DATA
