@@ -3,6 +3,8 @@
 $curlLog = array();
 
 // if you have count you need ?
+// params is expected to be a key/value array
+// we return a joinable array of querystring sets
 function paramsToQuerystringGroups($params) {
   if (!$params) return array();
   $qarr = array();
@@ -10,6 +12,18 @@ function paramsToQuerystringGroups($params) {
     $qarr[] = $k . '=' . $v;
   }
   return $qarr;
+}
+
+function parseQuerystringFromStr($url) {
+  if (strpos($url, '?') === false) return array();
+  list($before, $after) = explode('?', $url, 2);
+  $sets = explode('&', $after);
+  $qs = array();
+  foreach($sets as $set) {
+    list($k, $v) = explode('=', $set, 2);
+    $qs[$k] = $v;
+  }
+  return $qs;
 }
 
 function parseHeaders($response) {
@@ -109,6 +123,13 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   // an array will set "Content-type to multipart/form-data"
   // if you send files, this has to be an array
   // https://stackoverflow.com/a/15200804
+  // got array to string conversion, wtf...
+  // could only support an array before php5 it seems
+  // https://stackoverflow.com/a/5224895
+  if (is_array($fields)) {
+    //echo "<pre>fields", print_r($fields, 1), "</pre>\n";
+    $fields = http_build_query($fields);
+  }
   curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
   //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
