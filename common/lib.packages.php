@@ -19,6 +19,47 @@ class backend_resource {
 }
 */
 
+function snakeToCamel($str) {
+  $parts = explode('_', $str);
+  $str = '';
+  // FIXME: array_map?
+  foreach($parts as $i => $chunk) {
+    $str .= $i ? ucfirst($chunk) : $chunk;
+  }
+  return $str;
+}
+
+function camelToSnake($istr) {
+  $str = '';
+  // find all uppercase letters
+  foreach(str_split($istr) as $c) {
+    if (ctype_upper($c)) {
+      $str .= '_' . strtolower($c);
+    } else {
+      $str .= $c;
+    }
+  }
+  return $str;
+}
+
+// mainly for objects
+// slower but cleaner for the framework
+function satelite($key, $val = null) {
+  static $store;
+  if ($val === null) {
+    // get
+    //  = [", print_r(isset($store[$key]) ? $store[$key] : null, 1), "]
+    //echo "<pre>get [$key][", (isset($store[$key]) ? "set" : "null"), "]</pre>\n";
+    return isset($store[$key]) ? $store[$key] : null;
+  } else {
+    // set
+    // = [", print_r($val, 1), "]
+    //echo "<pre>set [$key]</pre>\n";
+    $store[$key] = $val;
+  }
+}
+
+
 // frontend usually routes wrap around these...
 // so we can't just add more frontend resources
 // we need to attach a frontend to it?
@@ -53,6 +94,9 @@ class package {
     // if they aren't enable or don't exist
     $this->dependencies = array(); // set in module.php
     $this->shared = false;
+    $this->activeRoutePackage = false;
+    //
+    $this->ranOnce = false;
   }
 
   // should we make a frontend_package/backend_package
@@ -115,7 +159,15 @@ class package {
     $this->resources[$label] = $rsrcArr;
     $this->resourcesCache[$label] = $cacheSettings;
   }
+
+  // maybe we can directly communicate with router to get the active portals
+  // when we make the route, we can incorporate data that we can retrieve here
+  // if we can make this communicate with router, then we don't need to
+  // do wiring through all the modules
+  // this is only used by the frontend
   function useResource($label, $params = false, $options = false) {
+    global $router;
+
     $label = strtolower($label); // UX but also camelcase is nice to make something clear
     if (empty($this->resources[$label])) {
       echo "<pre>lib.package:::package::useResource - Cannot call [$label] no such resource: ", print_r(array_keys($this->resources), 1), "</pre>\n";
@@ -235,9 +287,84 @@ class package {
     }
     //echo "<pre>lib.package:::package::useResource - cookie: ", print_r($_COOKIE, 1), "</pre>\n";
     //echo "<pre>lib.package:::package::useResource - out: ", print_r($rsrc, 1), "</pre>\n", gettrace();
+    //$router->modifyResource($rsrc, $params);
+    //echo "<pre>useResource rsrc[", print_r($rsrc, 1), "]</pre>\n";
+
+    //global $sendPortals;
+    //if (empty($sendPortals)) {
+    $portals = array();
+      if ($this->activeRoutePackage) {
+        //echo "<pre>useResource[", print_r($this->activeRoutePackage->activeHandler, 1), "]</pre>\n";
+        $portals = empty($this->activeRoutePackage->activeHandler['options']['portals']) ? array() : $this->activeRoutePackage->activeHandler['options']['portals'];
+        //echo "<pre>lib.package:::package::useResource - portals: ", print_r($portals, 1), "</pre>\n", gettrace();
+        //echo "<pre>useResource[", print_r($portals, 1), "]</pre>\n";
+      } else {
+        // this is because we're called from another package
+        $activePkg = satelite('activePkg');
+        global $packages;
+        // control_panel.php has some issues here... $activePkg is not set...
+        // because there's no pkg to set when it's imported like that...
+        if ($activePkg) {
+          //echo "lib.package:::package::useResource - in[", $this->name,"] active[", $activePkg->name, "]<br>\n";
+          //echo "<pre>lib.package:::package::useResource - activeRoutePackage: ", print_r($packages[$activePkg->name]->activeRoutePackage->activeHandler, 1), "</pre>\n"; // , gettrace();
+          $portals = empty($packages[$activePkg->name]->activeRoutePackage->activeHandler['options']['portals']) ? array() : $packages[$activePkg->name]->activeRoutePackage->activeHandler['options']['portals'];
+        }
+      }
+    //} else {
+      //$portals = array();
+    //}
+    // handle noBackendData option
+    //echo "<pre>useResource in[", print_r($portals, 1), "]</pre>\n";
+    $portals = array_filter($portals, function($v, $k) {
+      return empty($v['noBackendData']);
+    }, ARRAY_FILTER_USE_BOTH);
+    //echo "<pre>useResource out[", print_r($portals, 1), "]</pre>\n";
+    if (count($portals)) {
+      //echo "<pre>portals[", print_r($portals, 1), "]</pre>\n";
+      //echo "<pre>querystring[", print_r($rsrc['querystring'] , 1), "]</pre>\n";
+
+      // so a page is may make multiple calls to the BE
+      // so it's ok to always include the portal
+      // but on the backend we don't need to duplicate the process
+      // so either it only needs to activate on certain endpoints
+      // or we only send it once..
+
+      // normalize $rsrc['querystring']
+      if (empty($rsrc['querystring'])) {
+        $rsrc['querystring'] = array();
+      }
+      $portalStr = join(',', array_keys($portals));
+      if (is_array($rsrc['querystring'])) {
+        $rsrc['querystring']['portals'] = $portalStr;
+      } else {
+        // never includes ?
+        $rsrc['querystring'] .= '&portals=' . $portalStr;
+      }
+      // do we need to send SID?
+      foreach($portals as $portalName => $opts) {
+        $filename = camelToSnake($portalName);
+        global $portalResources;
+        $pr = $portalResources[$portalName];
+        // nah this isn't cool using mixins...
+        //ldr_require('../frontend_lib/handlers/mixins/' . $filename . '_portal.php');
+        //echo "dir[", $this->dir, "]<br>\n";
+        //echo "<pre>opts[", print_r($opts, 1), "]</pre>\n";
+        //echo "<pre>opts[", print_r($pr, 1), "]</pre>\n";
+
+        // this->dir might not be where the potal is located...
+        // ldr_require because a BE might be called more than once
+        // really tho?
+        ldr_require($pr['modulePath']  . 'fe/portals/'. $filename . '.php');
+        //$codeName = ucfirst($portalName);
+        portal_modifyBackend($portalName, $rsrc);
+      }
+    }
 
     // make the call
+    //echo "<pre>useResource rsrc[", print_r($rsrc, 1), "]</pre>\n";
     $result = consume_beRsrc($rsrc, $params);
+    // FIXME: mark that we have recieved backend data
+    // so we don't re-request it in next reuqest
     return $result;
   }
 
@@ -273,6 +400,7 @@ class package {
     global $routers, $pipelines;
 
     // activate backend hooks
+    $bePkg = false;
     if (file_exists($this->dir . 'be/data.php')) {
       $bePkgs = include $this->dir . 'be/data.php';
       if (empty($bePkgs) || !is_array($bePkgs)) {
@@ -359,7 +487,17 @@ class package {
           $key = (empty($res['method']) ? 'GET' : $res['method']) . '_' . $rsrc['endpoint'];
           $routers[$router]->routeOptions[$key]['cacheSettings'] = $this->resourcesCache[$label];
         }
-        $res = $routers[$router]->fromResource($label, $rsrc, $this->dir, $this->shared);
+        // pass this so we can coordinate about common... if this resource is called
+        // bePkg if theres module...
+        // but module resources aren't tied to a bePkg...
+        // maybe we can loop and match the common.php...
+        // need a data file to determine how many common
+        if ($bePkg) {
+          // flawed when a backend has more than one package
+          $res = $routers[$router]->fromResource($label, $rsrc, $bePkg);
+        } else {
+          $res = $routers[$router]->fromResource($label, $rsrc, $this);
+        }
 
         if ($res !== true) {
           echo "Problem building routes for : $res<br>\n";
@@ -378,6 +516,8 @@ class package {
   function frontendPrepare($router = false, $method = 'GET', $options = false) {
     if ($this->frontendPackagesLoaded) return; // already processed
     //echo "buildFrontendRoutes<br>\n";
+
+    // going to relay these to unpack
     $ensuredOptions = ensureOptions(array(
       'loadHandlers'  => true,
       'loadForms'     => true,
@@ -387,6 +527,7 @@ class package {
       'loadPipelines' => true,
       'router' => $router, // false
       'method' => $method, // GET
+      // maybe a load methods array('GET'=>true)
     ), $options);
 
     // activate frontend hooks
@@ -425,6 +566,30 @@ class package {
   }
   function exec($label, $params) {
   }
+  function toString() {
+    $content ='<ul>';
+    if (is_array($this->frontend_packages) && count($this->frontend_packages)) {
+      global $models;
+      $content .= '<li>FE<ul>';
+      foreach($this->frontend_packages as $fePkg) {
+        $content .= '<li>' . $fePkg->toString();
+      }
+      $content .= '</ul>';
+    }
+    // these won't be loaded on the frontend...
+    //$this->buildBackendRoutes();
+    if (is_array($this->backend_packages) && count($this->backend_packages)) {
+      global $models;
+      $content .= '<li>BE<ul>';
+      foreach($this->backend_packages as $fePkg) {
+        $content .= '<li>' . $fePkg->toString();
+      }
+      $content .= '</ul>';
+    }
+
+    $content .= '</ul>';
+    return $content;
+  }
 }
 
 class backend_package {
@@ -434,7 +599,11 @@ class backend_package {
     $this->models = array();
     $this->modules = array();
     $this->ranOnce = false;
+    //
+    $this->shared = false;
+    $this->dir = $this->pkg->dir;
   }
+
   function addModel($model, $potentialName) {
     global $db, $models;
     // each of these are required to be unique
@@ -461,6 +630,7 @@ class backend_package {
     $path = $module_path . 'be/modules/' . strtolower($file) . '.php';
     $this->modules[] = $file;
     $ref = &$this;
+    //echo "adding [$path]<br>\n";
     $bsn->attach($pipeline_name, function(&$io) use ($pipeline_name, $path, $pkg, $module_path, &$ref) {
       $getModule = function() use ($pipeline_name) {
         //echo "Set up module for [$pipeline_name]<br>\n";
@@ -535,6 +705,7 @@ class frontend_package {
     $this->js = array();
     $this->css = array();
     $this->ranOnce = false;
+    $this->activeHandler = false;
   }
 
   function unpack($pData, $ensuredOptions) {
@@ -575,6 +746,15 @@ class frontend_package {
       if ($loadForms && isset($pData['forms'])) {
         foreach($pData['forms'] as $f) {
           // FIXME: skip adding the methods we don't need...
+
+          // it'd be nice if we didn't have to preprocess some much input...
+          // a lot of it is (dev) UX though
+          // could filter out (methods?) to reduce processing
+          if (!empty($f['portals'])) {
+            //if (empty($f['options']))  $f['options'] = array();
+            $f['options']['get_options']['portals'] = $f['portals'];
+            $f['options']['post_options']['portals'] = $f['portals'];
+          }
           $this->addForm($f['route'], $f['handler'], empty($f['options']) ? false : $f['options']);
         }
       }
@@ -616,6 +796,8 @@ class frontend_package {
   // most data sources are going to be the backend
   // so we'll need enough set up to talk to it
   // we communicate these handlers with the router later...
+  // actually the data comes from this package
+  // we just need to know what
   function addHandler($method, $cond, $file, $options = false) {
     $method = strtoupper($method);
     if (!isset($this->handlers[$method])) {
@@ -630,10 +812,21 @@ class frontend_package {
 
   function addForm($cond, $file, $options = false) {
     if ($options === false) $options = array();
+    /*
+    $options = array(
+      'cacheSettings' => empty($h['cacheSettings']) ? false : $h['cacheSettings'],
+      'loggedIn' => empty($h['loggedIn']) ? false : $h['loggedIn'],
+      'portals' => empty($h['portals']) ? false : $h['portals'],
+    );
+    */
+    //echo "<pre>addForm - [", print_r($options, 1), "]</pre>\n";
+
     if (!isset($options['get_options'])) $options['get_options'] = array();
     //else echo "addForm - [", print_r($options['get_options'], 1), "]\n";
+    // what is this used for?
     $options['get_options']['form'] = true;
     if (!isset($options['post_options'])) $options['post_options'] = false;
+
     $this->addHandler('GET', $cond . '.html', 'form_'.$file.'_get', $options['get_options']);
     $this->addHandler('POST', $cond . '.php', 'form_'.$file.'_post', $options['post_options']);
   }
@@ -672,7 +865,7 @@ class frontend_package {
     $bsn->attach($pipeline_name, function(&$io, $options = false) use ($pipeline_name, $path, $pkg, &$ref, $module_path) {
       // $this is the bsn...
       if (!$ref->ranOnce) {
-        //echo "module_path[$module_path]<Br>\n";
+        //echo "module_path[$module_path] for [$pipeline_name]<Br>\n";
         if ($ref->pkg->shared === false) {
           if (is_readable($module_path . 'shared.php')) {
             $ref->pkg->shared = include $module_path . 'shared.php';
@@ -717,7 +910,9 @@ class frontend_package {
         return;
       }
       */
-      //echo "Running path[$path]<br>\n";
+      // modules should only include functions if they can only be called once
+      // oh two wrapContent calls will eat this alive...
+      //echo "Running [$pipeline_name] path[$path]<br>\n", gettrace() , "<br>\n";
       include $path;
     });
     return $bsn;
@@ -755,11 +950,22 @@ class frontend_package {
         // it also needs the general access to the router though ($router)
         // and then handler could communicate with row in a way
         $func = function($request) use ($path, $pkg, $row, $module_path, $ref) {
+          //echo "lib.package::frontend_package:buildRoutes<br>\n";
+          //global $router;
+          //$router->setPkg($pkg, $ref, $row);
+          // no sense burdening router
+          // but we need some sort of singleton or wiring to the handler
+          global $_activePkg;
+          $_activePkg = $pkg;
+          satelite('activePkg', $pkg);
+          $pkg->activeRoutePackage = $ref;
+          $ref->activeHandler = $row;
+          $ref->activeRequest = $request;
           if (!$ref->ranOnce) {
             // is now loaded is shared
             if ($ref->pkg->shared === false) {
               if (is_readable($module_path . 'shared.php')) {
-                echo "two<br>\n";
+                //echo "two<br>\n";
                 $ref->pkg->shared = include $module_path . 'shared.php';
                 //echo "done<br>\n";
                 //ldr_require($module_path . 'shared.php')
@@ -769,7 +975,7 @@ class frontend_package {
               $ref->common = include $module_path . 'fe/common.php';
             } else {
               if (file_exists($module_path . 'fe/common.php')) {
-                echo "lulwat [$module_path]fe/common.php<br>\n";
+                echo "file not found [$module_path]fe/common.php<br>\n";
               }
             }
             //echo "buildRoutes runOnce[$module_path]<br>\n";
@@ -784,9 +990,12 @@ class frontend_package {
             $shared = $ref->pkg->shared;
           }
 
+          //echo "<pre>active options", print_r($row['options'], 1), "</pre>\n";
+
           // upload portals into $request if set in options
           if (!empty($row['options']['portals'])) {
             $request['portals'] = $row['options']['portals'];
+            //$pkg->activePortal = $request['portals'];
           }
 
           // lastMod function?
