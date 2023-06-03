@@ -91,7 +91,7 @@ EOB;
 }
 
 function wrapContentData($options = false) {
-  global $packages;
+  global $packages, $router;
   // how do we hook in our admin group?
   // the data is only there if we asked for it...
   // could be a: global, pipeline or ??
@@ -107,10 +107,59 @@ function wrapContentData($options = false) {
     // maybe a more generic name
     'overrideTheme' => '',
     // wth passes this in?
-    'canonical'   => false,
+    'canonical'    => false,
     'userSettings' => false,
   ), $options));
+  // key this?
 
+  /*
+  $routerOptions = $router->getHandlerOptions();
+  extract(ensureOptions(array(
+    'portal' => '',
+  ), $routerOptions));
+  */
+  global $_activePkg;
+  //echo "<pre>wrapContentData::_handlerComms[", print_r($_activePkg->activeRoutePackage->activeHandler, 1), "]</pre>\n";
+  //echo "<pre>wrapContentData::_handlerComms[", print_r($_activePkg->activeRoutePackage->activeRequest, 1), "]</pre>\n";
+  $portals = empty($_activePkg->activeRoutePackage->activeHandler['options']['portals']) ? array() : $_activePkg->activeRoutePackage->activeHandler['options']['portals'];
+  $portalsData = array();
+  if (count($portals)) {
+    //echo "Portals are active!<br>\n";
+    global $portalResources;
+    // configuration by convention
+    foreach($portals as $portalName => $opts) {
+      //echo "<pre>wrapContentData::_handlerComms[", print_r($opts, 1), "]</pre>\n";
+      //$portalName = $prow['portal'];
+      // setup.php used to include them but we'll do it here, so it's scoped
+      $filename = camelToSnake($portalName);
+      // echo "Loading portal[$portalName] via [$filename]<br>\n";
+      $pr = $portalResources[$portalName];
+      //ldr_require('../frontend_lib/handlers/mixins/' . $filename . '_portal.php');
+      ldr_require($pr['modulePath'] . 'fe/portals/' . $filename . '.php');
+      $codeName = ucfirst($portalName);
+      $dataFuncName = 'getPortal' . $codeName;
+      // how do we get the board name?
+      // how do we get the options...
+      // - some from the route definition
+      // - but some will be more dynamic maybe
+      // can't be backend drive, though we might have that data at this point
+      // if we have BE data from the portals QS, we need to be able to hook it
+      if (!function_exists($dataFuncName)) {
+        if (DEV_MODE) {
+          echo $portalName . ' portal is missing ' . $dataFuncName . "<br>\n";
+        }
+        continue;
+      }
+      // only run it once, since it's key by the incoming request...
+      //if (!satelite('portalsData_' . $codeName)) {
+        //echo "wrapContentData - portal[$codeName]", gettrace(), "<br>\n";
+        // has to be before, because we'll end up back here if BE has an error
+        // which it can't because we need the result...
+        $portalsData[$codeName] = $dataFuncName($opts, $_activePkg->activeRoutePackage->activeRequest);
+        //satelite('portalsData_' . $codeName, $portalsData[$codeName]);
+      //}
+    }
+  }
   //echo "settings[", print_r($settings, 1), "]<bR>\n";
 
   /*
@@ -174,10 +223,11 @@ function wrapContentData($options = false) {
 
     // we need this for hover now
     //'userSettings' => $userSettings,
-    'enableJs' => $enableJs,
-    'doWork' => !$noWork,
-    'closeHeader' => $closeHeader,
-    'canonical' => $canonical,
+    'enableJs'      => $enableJs,
+    'closeHeader'   => $closeHeader,
+    'canonical'     => $canonical,
+    'portalsData'    => $portalsData,
+    'doWork'        => !$noWork,
     'overrideTheme' => $overrideTheme,
     //'mtime' => $mtime,
   );
@@ -236,6 +286,9 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
     }
   }
   */
+  // be nice to have some type of which page this is
+  // as some extension only are active on certain pages
+  // no need to polluate all pages...
 
   $pipelines[PIPELINE_SITE_HEAD]->execute($io);
 
@@ -527,6 +580,14 @@ EOB;
 
   // we could place the open body tag here...
   echo replace_tags($templates['header'], $tags);
+
+  if (count($row['portalsData'])) {
+    foreach($row['portalsData'] as $pName => $pData) {
+      //echo "pname[$pName]<br>\n";
+      $headerFuncName = 'getPortal' . $pName . 'Header';
+      $headerFuncName($pData);
+    }
+  }
   /*
   global $sentBump;
   if (!$sentBump) {
@@ -544,6 +605,13 @@ function wrapContentFooter($row) {
   $doWork = $row['doWork'];
   $closeHeader = $row['closeHeader'];
 
+  if (count($row['portalsData'])) {
+    foreach(array_reverse($row['portalsData']) as $pName => $pData) {
+      //echo "pname[$pName]<br>\n";
+      $footerFuncName = 'getPortal' . $pName . 'Footer';
+      $footerFuncName($pData);
+    }
+  }
 
   $io = array('scripts' => array());
   // THINK: how do we let JS live in module directories
@@ -677,9 +745,14 @@ function wrapContentFooter($row) {
     if (count($_GET)) echo "GET <pre>", print_r($_GET, 1), "</pre><br>\n";
     if (count($_POST)) echo "POST <pre>", print_r($_POST, 1), "</pre><br>\n";
     //if (count($_REQUEST)) echo "POST", print_r($_REQUEST, 1), "<br>\n";
+    // static pages don't include the router
+    if (function_exists('router_log_report')) {
+      router_log_report();
+    }
   }
 }
 
+// this is not always called!
 function wrapContent($content, $options = false) {
   extract(ensureOptions(array(
     'header' => true,
