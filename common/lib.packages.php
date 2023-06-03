@@ -359,7 +359,7 @@ class package {
           $key = (empty($res['method']) ? 'GET' : $res['method']) . '_' . $rsrc['endpoint'];
           $routers[$router]->routeOptions[$key]['cacheSettings'] = $this->resourcesCache[$label];
         }
-        $res = $routers[$router]->fromResource($label, $rsrc, $this->dir, $pkg->shared);
+        $res = $routers[$router]->fromResource($label, $rsrc, $this->dir, $this->shared);
 
         if ($res !== true) {
           echo "Problem building routes for : $res<br>\n";
@@ -629,6 +629,7 @@ class frontend_package {
   }
 
   function addForm($cond, $file, $options = false) {
+    if ($options === false) $options = array();
     if (!isset($options['get_options'])) $options['get_options'] = array();
     //else echo "addForm - [", print_r($options['get_options'], 1), "]\n";
     $options['get_options']['form'] = true;
