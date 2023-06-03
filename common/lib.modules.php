@@ -298,6 +298,19 @@ class pipeline_module extends orderable_module {
   }
 }
 
+// this is a lot cleaner than the above
+class portal_pipeline_module extends orderable_module {
+  function __construct($name) {
+    parent::__construct();
+    $this->name = $name;
+  }
+  function attach($plRegistry, $code) {
+    // deps and preempt are set
+    $plRegistry->register($this->name, $this);
+    $this->code = $code;
+  }
+}
+
 //include 'lib.loader.php';
 // is it the other way around that uses us?
 // well we don't use package class at all here..
