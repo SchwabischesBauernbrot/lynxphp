@@ -35,6 +35,7 @@ $backEndPipelines = array(
   'PIPELINE_NEWPOST_TAG',
   'PIPELINE_NEWPOST_PROCESS',
   'PIPELINE_USER_LOGIN',
+  'PIPELINE_ACCOUNT_DATA',
   'PIPELINE_SESSION_EXPIRATION',
 );
 // we don't need to necessarily call this here
