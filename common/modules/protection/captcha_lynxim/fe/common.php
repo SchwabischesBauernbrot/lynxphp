@@ -16,7 +16,7 @@ function getDistorts($w, $h) {
   $portionSize = $w / $amountOfDistorts;
   for($i = 0; $i < $amountOfDistorts; $i++) {
     $distortOrigin = array(
-      'x'=>rand($portionSize * $i, $portionSize * ($i + 1)),
+      'x'=>rand((int)($portionSize * $i), (int)($portionSize * ($i + 1))),
       'y'=>rand(0, $h)
     );
     $minWidthDestiny = $distortOrigin['x'] - 30;
