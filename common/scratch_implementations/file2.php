@@ -48,11 +48,27 @@ class file2_scratch_driver extends scratch_implementation_base_class {
 
   function lockAndOpen($filepath) {
     $lockpath = $filepath . '.lock';
+    global $now;
     if (file_exists($lockpath)) {
       // FIXME: check content for expiration...
-      return false;
+      // these seemed to be caused by fatal errors
+      // https://www.php.net/manual/en/function.register-shutdown-function.php
+      // might help
+      $contents = file_get_contents($lockpath);
+      list($n, $p) = explode('_', $contents, 2);
+      // is p running, if not, clear this lock
+      // is old?
+      $diff = $now - $n;
+      $clearLock = false;
+      //echo "lockAndOpen - [$filepath][$diff]<br>\n";
+      if ($diff > 300) {
+        // clear lock
+        $clearLock = true;
+      }
+      if (!$clearLock) return false;
+      // we're just about to stomp on it anyways
+      //unlink($lockpath);
     }
-    global $now;
     $pid = posix_getpid();
     file_put_contents($lockpath, $now . '_' . $pid);
     if (!file_exists($lockpath)) {
