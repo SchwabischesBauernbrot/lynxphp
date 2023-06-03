@@ -19,15 +19,17 @@ function responseToText($response) {
 }
 
 // backend support
+// FIXME: we can just use this->dev now...
 if (!defined('DEV_MODE')) define('DEV_MODE', false);
 
 class Router {
   function __construct() {
     $this->methods = array();
+    // FIXME only address _SERVER method
     $this->methods['GET']  = array();
     $this->methods['POST'] = array();
     $this->methods['HEAD'] = array();
-    $this->methods['PUT'] = array();
+    $this->methods['PUT']  = array();
     $this->methods['DELETE'] = array();
     $this->routeOptions = array();
     $this->debug = array();
@@ -36,6 +38,10 @@ class Router {
     $this->defaultContentType = 'text/html';
     $this->max_length = 0;
     $this->headersSent = false;
+    $this->dev = false;
+    $this->debugLog = false;
+    $this->activeRoute = '';
+    $this->foundRoute = false;
   }
 
   // used for attaching subrouters
@@ -97,7 +103,7 @@ class Router {
   }
   */
 
-  // FIXME: routes need unique names...
+  // FIXME: routes need unique dev-defined names...
 
   // dynamic vs static (captcha/banners)
   // expiration: backend routes, files
@@ -109,6 +115,7 @@ class Router {
   //   we'd just need to define the querystring
   // also cleaning off .html or .json can be useful
   // providing db, models, tpp
+  // used by the non-module system?
   function import($routes, $module = 'unknown', $dir = 'handlers') {
     // foreach group
     foreach($routes as $group => $groupData) {
@@ -135,7 +142,10 @@ class Router {
         $methodRoute = $method . '_' . $route;
         // create a function that loads and calls the route func from the group file
         // capture state
+
+        // why does this show up on the backend?
         $this->methods[$method][$route] = function($request) use ($routeData, $groupData, $adjDir, $methodRoute) {
+          //echo "router::import<br>\n";
           //echo "request[", print_r($request, 1), "]<br>\n";
           //echo gettrace();
           if (isset($routeData['file'])) {
@@ -202,6 +212,7 @@ class Router {
     //echo "<pre>routeOption keys[", print_r(array_keys($this->routeOptions), 1), "]</pre>\n";
   }
 
+  // Just lists all the routes for this method
   function debug($method = false) {
     if (!$method) {
       return print_r($this->methods, 1);
@@ -231,7 +242,13 @@ class Router {
 
   function getMaxMtime($cacheSettings, $routeParams) {
     $mtime = 0;
+    // only BE EPs can use databaseTables
+
+    // how do we do posts/files when the uri is in params?
     if (isset($cacheSettings['databaseTables'])) {
+      // FIXME: refactor this up
+      // support getting params
+      // we'll need them for posts/files
       global $db;
       $mtime = $db->getLast($cacheSettings['databaseTables']);
     }
@@ -618,6 +635,10 @@ class Router {
     $request['params'] = $match['params'];
     //$request['routeOptions'] = $this->routeOptions[$key];
     $func = $match['func'];
+
+    // at this point we should be able to release a lot of memory
+    // with an option to not release...
+
     // if we pushed a response handler
     // we could attach additional layout stuff and processing
     $func($request);
@@ -685,6 +706,8 @@ class Router {
     $matches = array();
     foreach($methods as $cond => $func) {
       //echo "rule[$cond]<br>\n";
+
+      // for routes without variables/params (:thingies)
       if ($path === $cond) {
         // kill warning
         if (!isset($this->routeOptions[$method . '_' . $cond])) $this->routeOptions[$method . '_' . $cond] = false;
@@ -697,6 +720,7 @@ class Router {
           'routeOptions' => $this->routeOptions[$method . '_' . $cond],
         );
       }
+
       $csegs = explode('/', $cond);
       //echo "router::exec[$level] - Rule has router[", strpos($cond, '*') !== false, "]<br>\n";
       //echo "router::exec[$level] - Rule[$cond] condCnt[", count($csegs), "] vs reqeustCnt[", count($segments), "]<br>\n";
@@ -712,43 +736,48 @@ class Router {
       //echo "Checking [$path] against [$cond]<br>\n";
       foreach($csegs as $i => $c) {
         //echo "[$i] [", $segments[$i], "] vs [$c]<br>\n";
-        if (strlen($c) && $c === '*') {
-          //echo "Router check<br>\n";
-          $this->debug['router'] = $cond;
-          // auto match the rest
-          // could treat $func as a router and exec it here
-          if (is_object($func)) {
-            //$request['params'] = $params;
-            $tsegs = array();
-            for($j = 0; $j < $i; $j++) {
-              $tsegs[] = $segments[$j];
+
+        if (strlen($c)) {
+          // handle routers
+          if ($c === '*') {
+            //echo "Router check<br>\n";
+            $this->debug['router'] = $cond;
+            // auto match the rest
+            // could treat $func as a router and exec it here
+            if (is_object($func)) {
+              //$request['params'] = $params;
+              $tsegs = array();
+              for($j = 0; $j < $i; $j++) {
+                $tsegs[] = $segments[$j];
+              }
+              $usedPath = join('/', $tsegs) . '/'; // + 1 for the current
+              // make sure it starts with /
+              // even tho we just stripped it
+              // since we can't remove / from /*
+              $newPath = '/' . substr($path, strlen($usedPath));
+              //$request['path'] = $newPath;
+              //echo "newPath[$newPath]<br>\n";
+              $res = $func->findRoute($request['method'], $newPath, $level + 1);
+              return $res;
             }
-            $usedPath = join('/', $tsegs) . '/'; // + 1 for the current
-            // make sure it starts with /
-            // even tho we just stripped it
-            // since we can't remove / from /*
-            $newPath = '/' . substr($path, strlen($usedPath));
-            //$request['path'] = $newPath;
-            //echo "newPath[$newPath]<br>\n";
-            $res = $func->findRoute($request['method'], $newPath, $level + 1);
-            return $res;
+            break;
+          } else
+          // handle params
+          if ($c[0] === ':') {
+            $paramName = substr($c, 1);
+            // ignore extensions
+            $pos = strpos($paramName, '.');
+            if ($pos !== false) {
+              $ext = substr($paramName, $pos);
+              $paramName = substr($paramName, 0, $pos);
+              // remove extension from value too
+              $segments[$i] = str_replace($ext, '', $segments[$i]);
+            }
+            //print_r($segments);
+            //echo "[$i] Building[$paramName] c[$c] seg[", $segments[$i], "]<br>\n";
+            $params[$paramName] = $segments[$i];
+            continue;
           }
-          break;
-        } else
-        if (strlen($c) && $c[0] === ':') {
-          $paramName = substr($c, 1);
-          // ignore extensions
-          $pos = strpos($paramName, '.');
-          if ($pos !== false) {
-            $ext = substr($paramName, $pos);
-            $paramName = substr($paramName, 0, $pos);
-            // remove extension from value too
-            $segments[$i] = str_replace($ext, '', $segments[$i]);
-          }
-          //print_r($segments);
-          //echo "[$i] Building[$paramName] c[$c] seg[", $segments[$i], "]<br>\n";
-          $params[$paramName] = $segments[$i];
-          continue;
         }
         /*
         echo "condCnt[", count($csegs), "] vs reqeustCnt[", count($segments), "]<br>\n";
@@ -757,10 +786,33 @@ class Router {
           break;
         }
         */
+        // MAYBE: we should only strip extensions if asked
+        // we need to be have the same route with different extensions
+        // and have them have different handlers
+        // but do we?
         // is segment is missing or they don't match...
         //echo "[$i] segment[", $segments[$i], "] =? [", $c, "]<br>\n";
-        if (!isset($segments[$i]) || $segments[$i] !== $c) {
-          //echo "router - path[$path] did not matched[$cond]<br>\n";
+        // ok we don't take extensions into account here...
+        $tc = $c;
+        // c might have an extension
+        $pos = strpos($c, '.');
+        if ($pos !== false) {
+          $ext = substr($c, $pos);
+          // remove extension from value too
+          $tc = str_replace($ext, '', $c);
+        }
+
+        if (!isset($segments[$i]) || ($segments[$i] !== $tc && $segments[$i] !== $c)) {
+          if (0) { // test point
+            echo "router - path[$path] did not matched[$cond] at segment $i - ";
+            //echo "[", (!isset($segments[$i]) ? 'segment missing' : ''), "][", ($segments[$i] !== $c ? 'segment not match' : ''), "]<br>\n";
+            if (!isset($segments[$i])) {
+              echo "segment [$i] missing<br>\n";
+            } else
+            if ($segments[$i] !== $c) {
+              echo "segment not match [", $segments[$i], "]==[", $tc, "]<br>\n";
+            }
+          }
           $match = false;
           break; // stop cseg check
         }
@@ -772,6 +824,8 @@ class Router {
           'params' => $params,
           'func' => $func
         );
+      //} else {
+        //echo "router - path[$path] not matched[$cond]<br>\n";
       }
     }
     if (count($matches)) {
@@ -782,6 +836,12 @@ class Router {
           echo '<li>', $m['cond'], '<pre>', print_r($m['params'], 1), '</pre>', "\n";
         }
         echo '</ul>', "\n";
+      }
+      // if DEV_MODE would be nice to store debug info
+      // and display a report at the bottom of the page
+      // and give actual module information about the page you're on
+      if ($this->dev) {
+        $this->debugLog['matching'] = $matches;
       }
 
       // default to first
@@ -800,7 +860,7 @@ class Router {
       //echo "key[", $method . '_' . $match['cond'], "]<br>\n";
       //echo "<pre>[", print_r($this->routeOptions, 1), "]</pre>\n";
       $routeOptions = isset($this->routeOptions[$method . '_' . $match['cond']]) ? $this->routeOptions[$method . '_' . $match['cond']] : array();
-      return array(
+      $selected = array(
         'match' => $match,
         'isHead' => $isHead,
         'request' => $request,
@@ -808,15 +868,20 @@ class Router {
         //'method' => $method,
         'routeOptions' => $routeOptions,
       );
-
+      if ($this->dev) {
+        $this->debugLog['match'] = $selected;
+      }
+      return $selected;
     }
     // can't handle 404 here because sometimes we return to another router
     return false;
   }
 
   // index calls this to see if our output is cacheable
+  // if it's cacheable and request match, then'll we request stop processing
   function sendHeaders($method, $path) {
     $res = $this->findRoute($method, $path);
+    $this->foundRoute = $res;
     if ($res === false) return false; // 404 passthru
     $key = $res['request']['method'] . '_' . $res['match']['cond'];
     //echo "sendHeaders - key[$key]<br>\n";
@@ -842,12 +907,14 @@ class Router {
   // primary function of the router
   // FIXME: option to release all other methods (maybe set in the route definition itself)
   function exec($method, $path) {
-    $res = $this->findRoute($method, $path);
-    if ($res === false) return false; // 404 passthru
     if ($this->headersSent) {
+      $res = $this->foundRoute;
       // definitely not a 304
       $this->callHandlerFunc($res['match'], $res['request']);
     } else {
+      $res = $this->findRoute($method, $path);
+      $this->foundRoute = $res;
+      if ($res === false) return false; // 404 passthru
       // potentially handle 304s
       $this->callCachableHandler($res);
     }
