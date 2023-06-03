@@ -324,6 +324,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     $finalPath = $threadPath . '/' . $postid . '_' . $num . '.' . $ext;
 
     if ($isImage) {
+      // FIXME: we don't always want to remove EXIF
       removeExif($srcPath, $finalPath);
     } else {
       copy($srcPath, $finalPath);
@@ -373,8 +374,6 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       'filedeleted' => 0,
       'spoiler' => empty($file['spoiler']) ? false : true,
     );
-
-    // FIXME: thumbnail?
 
     $id = $db->insert($post_files_model, array($fileData));
     if (!$id) {
