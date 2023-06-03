@@ -73,6 +73,7 @@ require 'pipelines.php';
 // frontend libraries
 require '../frontend_lib/lib/lib.http.php'; // comms lib
 require '../frontend_lib/lib/lib.backend.php'; // comms lib
+require '../frontend_lib/lib/lib.getters.php'; // comms/caching helper
 ldr_require('../frontend_lib/lib/lib.template.php'); // template functions
 ldr_require('../frontend_lib/lib/lib.handler.php'); // output functions
 require '../frontend_lib/lib/lib.captcha.php'; // load captcha infrastructure
@@ -81,6 +82,7 @@ require '../frontend_lib/lib/lib.form.php'; // form helper
 require '../frontend_lib/lib/lib.perms.php'; // permission helper
 require '../frontend_lib/lib/lib.actions.php'; // UI helper
 require '../frontend_lib/lib/lib.fe.settings.php'; // user settings stuff
+require '../frontend_lib/lib/lib.portals.php'; // UI helper
 // structures
 require '../frontend_lib/lib/nav.php'; // nav structure
 require '../frontend_lib/lib/expand.php'; // maybe more of a lib...
@@ -91,12 +93,15 @@ require '../frontend_lib/lib/middlewares.php';
 
 // mixins
 // it would be nice to scope these somehow...
+/*
 require '../frontend_lib/handlers/mixins/board_portal.php';
 // maybe only include if SID is set?
 require '../frontend_lib/handlers/mixins/board_settings_portal.php';
 require '../frontend_lib/handlers/mixins/admin_portal.php';
 require '../frontend_lib/handlers/mixins/global_portal.php';
 require '../frontend_lib/handlers/mixins/user_portal.php';
+*/
+//
 require '../frontend_lib/handlers/mixins/post_renderer.php';
 require '../frontend_lib/handlers/mixins/post_form.php';
 require '../frontend_lib/handlers/mixins/tabs.php'; // maybe more of a lib...
