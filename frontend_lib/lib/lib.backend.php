@@ -61,10 +61,13 @@ function consume_beRsrc($options, $params = '') {
     //print_r($options['querystring']);
     // endpoint shouldn't have a querystring yet
     if (is_array($options['querystring'])) {
+      /*
       $strs = array();
       foreach($options['querystring'] as $k => $v) {
         $strs[] = $k . '=' . $v;
       }
+      */
+      $strs = paramsToQuerystringGroups($options['querystring']);
       $querystring = '?' . join('&', $strs);
     } else {
       $querystring = '?' . $options['querystring'];
@@ -188,7 +191,6 @@ function consume_beRsrc($options, $params = '') {
     //echo "rawHeaders[", print_r($rawHeaders, 1), "]<br>\n";
     $is304 = strpos($rawHeaders, '304 Not Modified') !== false;
 
-    $respHeaders = parseHeaders($rawHeaders);
     // only need to save if we don't already have it
 
     //$log = request_getLastLog();
@@ -204,6 +206,7 @@ function consume_beRsrc($options, $params = '') {
       // basically a 304
       return postProcessJson($check['res'], $options);
     } else {
+      $respHeaders = parseHeaders($rawHeaders);
       // actually have content?
       $outTs = isset($respHeaders['last-modified']) ? strtotime($respHeaders['last-modified']) : $ts;
       $outEtag = isset($respHeaders['etag']) ? $respHeaders['etag'] : $etag;
@@ -281,6 +284,52 @@ function expectJson($json, $endpoint = '', $options = array()) {
       global $portalData;
       //echo "<pre>uploaded portal data", print_r($obj['meta']['portals'], 1), "]</pre>\n";
       $portalData = $obj['meta']['portals'];
+      // need to know uri to make this work
+
+      // may need to call these even if meta.portals isn't set... (banners)
+      $portals = array_keys($portalData);
+      global $_PortalPipelines, $portalResources, $pipelines;
+      foreach($portals as $p) {
+        //echo "running[$p]<br>\n";
+        $portal_io = array(
+          'name' => $p,
+          'resp' => $obj,
+          'ep' => $endpoint,
+          'portalData' => $portalData[$p],
+        );
+        $r = false;
+        if (isset($portalResources[$p])) {
+          // so it's documented
+          $r = $portalResources[$p];
+          $portal_io['portalOptions'] = $r;
+        }
+        //echo "<pre>portal options", print_r($portal_io, 1), "]</pre>\n";
+        if (isset($_PortalPipelines[$p])) {
+          // main (non-extensible) portal definition pipeline
+          $_PortalPipelines[$p]->execute($portal_io);
+        } else if (DEV_MODE) {
+          echo "lib.backend::expectJson - portal pipeline[$p] is missing from _PortalPipelines<br>\n";
+        }
+        if ($r) {
+          // portal extensions pipeline
+          $pipelines[$r['pipeline']]->execute($portal_io);
+        }
+        // we should communicate something back
+        // but expectjson can't communicate it...
+        // could put this in the router to avoid the global...
+        // maybe pkg can be the anchor
+        // pkg injects function into router
+        // pkg->useResource
+        // pkg->wrapContent
+        global $_portalData;
+        $_portalData[$p] = $portalData[$p];
+      }
+      /*
+      if (isset($portalData['boardSettings']['settings'])) {
+        // I have no clue which board this is...
+        global $boards_setting;
+      }
+      */
     }
     // singular
     if (isset($obj['meta']['board'])) {
@@ -361,6 +410,8 @@ function postExpectJson($endpoint, $postData) {
 */
 
 function getBoard($boardUri) {
+  // probably should find the pkg and use the resource
+  // so we get 304 and portal systems...
   $boardData = getExpectJson('opt/' . $boardUri . '.json');
   if (!isset($boardData['data'])) {
     return false;
@@ -373,18 +424,6 @@ function getBoard($boardUri) {
     $boards_settings[$boardUri] = $boardData['data']['settings'];
   }
   return $boardData['data'];
-}
-
-function getPortalsToUrl($q) {
-  return join(',', $q['portals']);
-}
-
-function addPortalsToUrl($q, $url) {
-  // some portal BE stuff will need IP and probably SID
-  // so we're have to send those for all requests
-  // isn't the end of the world but meh...
-  // if (!empty($options['sendIP'])) $headers['HTTP_X_FORWARDED_FOR'] = getip();
-  return $url . '?portals=' . join(',', $q['portals']);
 }
 
 // calls that eventually call getboardportal needs a optional flag
@@ -410,6 +449,7 @@ function getBoardCatalog($boardUri) {
 }
 
 function getBoardThread($boardUri, $threadNum) {
+  // the rss case doesn't need the portal
   $result = getExpectJson('opt/' . $boardUri . '/thread/' . $threadNum . '.json?portals=board');
   if ($result === false) {
     // 404
