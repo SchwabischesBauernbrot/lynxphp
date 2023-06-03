@@ -23,6 +23,13 @@ return array(
       'boardThread' => array(
         'route' => '/:board/thread/:thread',
         'file'  => 'board_thread',
+        'cacheSettings' => array(
+          // PIPELINE_BOARD_QUERY_MODEL could modify boards
+          // posts/files
+          // well boards will get bumped when there's a bump...
+          // should be good enough for now
+          'databaseTables' => array('boards'),
+        ),
       ),
       'myBoards' => array(
         'route' => '/myBoards',
