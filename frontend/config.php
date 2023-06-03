@@ -43,6 +43,7 @@ if (!defined('BASE_HREF')) {
 }
 
 // includes :PORT if needed
+// why don't we utilize $HTTP_HOST?
 if (!defined('BASE_HOST')) define('BASE_HOST', getServerField('HTTP_HOST'));
 // BASE_PATH is basically BASE_HREF
 if (!defined('DEV_MODE')) define('DEV_MODE', false);
