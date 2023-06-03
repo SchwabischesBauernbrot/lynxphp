@@ -14,7 +14,7 @@ function ldr_require($file) {
   //echo "loading[$file]=>[$f]<br>\n";
   if (!$f) {
     if (DEV_MODE) {
-      echo "Path[$file] isn't great<br>\n";
+      echo "Path[$file] isn't great", gettrace(), "<br>\n";
     }
     $f = $file;
   }
@@ -65,10 +65,26 @@ function isBackend() {
   return $db ? true : false;
 }
 
-global $settingsBlock;
+global $settingsBlock, $sectionNames, $portalResources;
+// level is like security level (perm/role)
+// location is where we aggregate the blocks
+// location is the section (site, homepage)
+// can be english like but shouldn't be...
+//
+// FIXME: we're going to need a validation stage
+// FIXME: a way to order the labels for sections/locations
 function initSettingsBlock() {
-  global $settingsBlock;
+  global $settingsBlock, $sectionNames;
   $settingsBlock = array(
+    'all' => array(),
+    'loggedin' => array(),
+    'bo' => array(),
+    //'bv' => array(),
+    //'bj' => array(),
+    'global' => array(),
+    'admin' => array(),
+  );
+  $sectionNames = array(
     'all' => array(),
     'loggedin' => array(),
     'bo' => array(),
@@ -87,6 +103,11 @@ function compileSettingsBlock($loc, $block) {
   if (!isset($settingsBlock[$level][$loc])) $settingsBlock[$level][$loc] = array();
   //echo "compiling[$level] [", print_r($block, 1), "]<br>\n";
   //$cLevel = $settingsBlock[$level][$loc];
+  if (isset($block['locationLabel'])) {
+    // english link for nav links...
+    global $sectionNames;
+    $sectionNames[$level][$loc] = $block['locationLabel'];
+  }
   if (isset($block['addFields'])) {
     foreach($block['addFields'] as $f => $d) {
       // what if we add and the field is already there? meh
@@ -122,9 +143,121 @@ function compileSettingsBlock($loc, $block) {
   // remove field
 }
 
+// section aka loc
+function getCompiledSettingsSectionLabel($level, $section) {
+  global $sectionNames;
+  return $sectionNames[$level][$section];
+}
+
 function getCompiledSettings($level) {
   global $settingsBlock;
+  //echo "<pre>", print_r($settingsBlock, 1), "</pre>\n";
   return $settingsBlock[$level];
+}
+
+// maybe put into lib.portals
+// these are a little simple to warrant their own functions...
+// just some scaffolding for the future
+
+// maybe we should be building a pipeline that index can just execute...
+// unlike PIPELINE_PORTALS_DATA, it one a pipeline per portal
+// how separate? this is fine, maybe less chance of a collision this way
+global $_PortalPipelines;
+$_PortalPipelines = array();
+$portalResources = array();
+
+// has mp been realpath'd?
+function compilePortalResource($mp, $n, $o, $pkg) {
+  global $portalResources, $_PortalPipelines;
+
+  // each $n can only be registered once
+  if (isset($_PortalPipelines[$n])) {
+    // be might hate this...
+    if (DEV_MODE) {
+      echo "compilePortalResource [$n] claimed multiple times<br>\n";
+    }
+    return;
+  }
+  // a whole pipeline
+  $_PortalPipelines[$n] = new pipeline_registry;
+  // for a single module
+  // we could just make one registry
+  // and attach at different portals on it
+  $ppm = new portal_pipeline_module($n);
+  $snake = camelToSnake($n);
+  // n[boardSettings] snake[board_settings]
+  //echo "n[$n] snake[$snake]<br>\n";
+  global $db;
+  $type = 'fe';
+  if ($db) {
+    $type = 'be';
+    $cpn = 'PIPELINE_BE_' . strtoupper($snake) . '_PORTAL';
+  } else {
+    $cpn = 'PIPELINE_FE_' . strtoupper($snake) . '_PORTAL';
+    //echo "<pre>o[", print_r($o, 1), "]</pre>\n";
+    if (isset($o['fePipelines'])) {
+      if (is_array($o['fePipelines'])) {
+        definePipelines($o['fePipelines']);
+      } else {
+        echo "portal[$n] fePipelines is not an array<br>\n";
+      }
+    }
+  }
+
+  $ppm->attach($_PortalPipelines[$n], function(&$io) use ($n, $mp, $snake, $pkg, $type) {
+    $getModule = function() use ($n) {
+      //echo "Set up module for portal pipeline[$n]<br>\n";
+      return array();
+    };
+    // portal don't belong to a be_pkg
+    // so we can't use common or shared
+    // if they need it, they'll have to include it on their own
+    /*
+    if (!$ref->ranOnce) {
+      if (is_readable($module_path . 'be/common.php')) {
+        // ref isn't defined...
+        //$ref->common =
+        $ref->common = include $module_path . 'be/common.php';
+      } else {
+        if (file_exists($module_path . 'be/common.php')) {
+          echo "perms? [$module_path]be/common.php<br>\n";
+        }
+      }
+      $ref->ranOnce = true;
+      if (isset($ref->common)) {
+        $common = $ref->common;
+      }
+    }
+    */
+
+    /*
+    if (!file_exists($path)) {
+      echo "This module [$pipeline_name], [$path] is not found<br>\n";
+      return;
+    }
+    */
+    $path = $mp . $type . '/portals/' . $snake . '_module.php';
+    //echo "Running path[$path]<br>\n";
+    include $path;
+  });
+  definePipeline($cpn);
+  $o['pipeline'] = strtolower($cpn);
+
+  // snakeName, modulePath
+  $portalResources[$n] = array_merge($o, array(
+    'modulePath' => $mp,
+    'snakeName' => $snake,
+    //'pipeline' => strtolower($cpn),
+  ));
+}
+
+// defined the pipeline
+// add module that loads it
+// io can be defined...
+function getCompiledPortalResource($n) {
+  global $portalResources;
+  // return
+  return $portalResources[$n];
 }
 
 function registerPackage($pkg_path) {
@@ -135,15 +268,6 @@ function registerPackage($pkg_path) {
   // FIXME: could reduce diskio if we had a $pkg_path lock
 
   $pkg = false;
-  $shared = false;
-  if (is_readable($full_pkg_path . 'shared.php')) {
-    // make $share available to the next include
-    // hack used to load themes into settings
-    // this will load it twice, we need to communicate with the yet to be made pkg
-    //echo "one<br>\n";
-    $shared = include $full_pkg_path . 'shared.php';
-    //echo "has shared[", $shared !== false, "]<br>\n";
-  }
   if (!is_readable($full_pkg_path . 'module.php')) {
     //echo "module_base[$module_base]<br>\n";
     if (!file_exists($full_pkg_path . 'module.php')) {
@@ -159,6 +283,27 @@ function registerPackage($pkg_path) {
     }
     return $pkg;
   }
+  global $packages;
+  foreach($packages as $pkg) {
+    if ($pkg->dir === $full_pkg_path) {
+      // already loaded...
+      return $pkg;
+    }
+  }
+
+  // has to happen before module.php is included
+  $shared = false;
+  if (is_readable($full_pkg_path . 'shared.php')) {
+    // make $share available to the next include
+    // hack used to load themes into settings
+    // this will load it twice, we need to communicate with the yet to be made pkg
+    //echo "one<br>\n";
+    // maybe we use ldr_require since they can have functions
+    // and we can't load them twice...
+    $shared = include $full_pkg_path . 'shared.php';
+    //echo "has shared[", $shared !== false, "]<br>\n";
+  }
+
   //echo "Loading [$full_pkg_path] module<br>\n";
   // we want to keep these to pure data as much as possible (no calculation to get result)
   $data = include $full_pkg_path . 'module.php';
@@ -170,13 +315,21 @@ function registerPackage($pkg_path) {
     echo "[$full_pkg_path] module.php did not return correct data, make sure name and version are set<br>\n";
     return $pkg;
   }
-  global $packages;
+  //global $packages;
   // handle already loaded
   if (isset($packages[$data['name']])) {
-    //echo "already loaded[", $data['name'], "]<bR>\n";
+    //echo "already loaded[", $data['name'], "] in [$full_pkg_path]<bR>\n";
     // really no harm here if two objects made, just wastes memory
     // and causes confusion
-    return $packages[$data['name']];
+    // though if a package isn't labeled right, devs need to know
+    // and we can't reference a package resources if it's shadowed
+    //
+    // this makes it so the module has to have a unique name
+    // for it's functionality to work
+    // a warning seems prudent
+    // but because of dependency loading, doesn't really indicate
+    // if why it's already loaded...
+    //return $packages[$data['name']];
   }
   $pkg = new package($data['name'], $data['version'], substr($full_pkg_path, 0, -1));
   $pkg->shared = $shared;
@@ -193,20 +346,23 @@ function registerPackage($pkg_path) {
     // probably should be doing this inside buildBackendRoutes
     // but buildBackendRoutes can't access dependencies
     $pkg->dependencies = $data['dependencies'];
-    foreach($data['dependencies'] as $depPkgName) {
-      // front or back?
-      if (isBackend()) {
-        // make sure we have it
+    if (isBackend()) { // for now until we need fe
+      foreach($data['dependencies'] as $depPkgName) {
+        // front or back?
+        //if (isBackend()) {
+          // make sure we have it
 
-        // we still need this for js.php I think
-        $depPkg = registerPackage($depPkgName);
-        $depPkg->buildBackendRoutes();
-        // register package with $packages global
-        $packages[$depPkg->name] = $depPkg;
-      } else {
-        // do nothing for now
+          // we still need this for js.php I think
+          //echo "doing dep [$depPkgName]<br>\n";
+          $depPkg = registerPackage($depPkgName);
+          $depPkg->buildBackendRoutes();
+          // register package with $packages global
+          $packages[$depPkg->name] = $depPkg;
+        //} else {
+          // do nothing for now
 
-        // we do need to do make sure pipelines are established
+          // we do need to do make sure pipelines are established
+        //}
       }
     }
   }
@@ -221,12 +377,18 @@ function registerPackage($pkg_path) {
       $pkg->addResource($rsrcHdr['name'], $rsrcHdr['params'], $cacheSettings);
     }
   }
+  if (!empty($data['portals'])) {
+    foreach($data['portals'] as $n => $o) {
+      compilePortalResource($full_pkg_path, $n, $o, $pkg);
+    }
+  }
 
   if (!empty($data['settings'])) {
     foreach($data['settings'] as $block) {
       // level, actions: addFields
       // location: where this action is happening...
       compileSettingsBlock($block['location'], $block);
+      // I don't think this is used
       $pkg->addSettingsBlock($block['location'], $block);
     }
   }
