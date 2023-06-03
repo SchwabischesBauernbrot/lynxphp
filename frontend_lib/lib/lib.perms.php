@@ -9,6 +9,7 @@ function isLoggedIn() {
   return isset($_COOKIE['session']);
 }
 
+// checks session
 function loggedIn() {
   // cache for this page load
   global $loggedIn;
@@ -18,6 +19,8 @@ function loggedIn() {
   }
   if (!isLoggedIn()) return false;
   // have session
+  // might be better to just call backendLynxAccount
+  // so we can test and get data
   $res = checkSession(); // this actually goes out and validates session
   if ($res && isset($res['meta']) && $res['meta']['code'] == 401) {
   //if ($res && isset($res['data']) && is_array($res['data']) && !count($res['data'])) {
@@ -41,6 +44,7 @@ function loggedIn() {
   }
 */
 
+// getter
 function getUserData() {
   global $persist_scratch;
   $key = 'user_session' . $_COOKIE['session'];
@@ -107,6 +111,7 @@ function perms_isBO($boardUri) {
   return in_array($boardUri, $myBoards);
 }
 
+// global
 function perms_inGroups($groups) {
   // handles 401 badly...
   if (!isLoggedIn()) return false;
