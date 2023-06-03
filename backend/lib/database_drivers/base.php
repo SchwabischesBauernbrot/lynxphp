@@ -29,6 +29,7 @@ interface database_driver_base {
   public function deleteById($rootModel, $id, $options = false);
   public function deleteByIds($rootModel, $ids, $options = false);
   // result functions
+  // FIXME: no snake case?
   public function num_rows($res);
   public function get_row($res);
   public function toArray($res);
