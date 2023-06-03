@@ -18,11 +18,12 @@ function replace_tags($template, $tags) {
     echo "lib.template::replace_tags - Tags isn't an array\n";
     return $template;
   }
+  // check to make sure all tags values are strings?
   return str_replace(array_map('tagify', array_keys($tags)), array_values($tags), $template);
 }
 
 // os disk cache will handle caching
-function loadTemplatesFile($path) {
+function loadTemplatesFile($path, $options = false) {
   $lines = @file($path);
   if (!is_array($lines)) {
     echo "lib.template::loadTemplatesFile - Can't read [$path]<br>\n";
@@ -31,7 +32,7 @@ function loadTemplatesFile($path) {
   $section = 'header';
   $loop = -1;
   $templates = array('header' => '');
-  if (DEV_MODE) {
+  if (DEV_MODE && $options && !$options['noDev']) {
     $templates = array('header' => '<!-- DEV_MODE: included from ' . $path . ' -->' . "\n");
   }
   foreach($lines as $line) {
@@ -83,7 +84,7 @@ function loadTemplates($template) {
   return loadTemplatesFile('templates/' . $template . '.tmpl');
 }
 
-function moduleLoadTemplates($template, $dir) {
+function moduleLoadTemplates($template, $dir, $options = false) {
   // this will be called from the frontend_handlers dir
-  return loadTemplatesFile($dir . '/../views/' . $template . '.tmpl');
+  return loadTemplatesFile($dir . '/../views/' . $template . '.tmpl', $options);
 }
