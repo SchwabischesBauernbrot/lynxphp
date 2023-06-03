@@ -12,7 +12,11 @@ global $packages, $now;
 // can put a timer around this...
 $result = $packages['user_setting']->useResource('settings');
 //echo "<pre>", print_r($result, 1), "</pre>\n";
-$userSettings = $result['settings'];
+if (!$result) {
+  $userSettings = array();
+} else {
+  $userSettings = $result['settings'];
+}
 
 // normalize $theme
 
