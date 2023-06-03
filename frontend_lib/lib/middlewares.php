@@ -7,6 +7,10 @@ function boardOwnerMiddleware($request) {
   $boardUri = $request['params']['uri'];
   $ok = false;
   // FIXME: board vols...
+
+  // probably faster to let the backend check...
+  // then doing a potential call here
+  // fine on when not BO but if you are it's two BE calls
   if (perms_isBO($boardUri) || perms_inGroups(array('admin', 'global'))) {
     $ok = true;
   }
