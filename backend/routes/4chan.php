@@ -6,6 +6,8 @@ Do not make more than one request per second.
 Thread updating should be set to a minimum of 10 seconds, preferably higher.
 Use If-Modified-Since when doing your requests.
 Make API requests using the same protocol as the app. Only use SSL when a user is accessing your app over HTTPS.
+
+need to move this to a module but what directory? board? site?
 */
 
 return array(
