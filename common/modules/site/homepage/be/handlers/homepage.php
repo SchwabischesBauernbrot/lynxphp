@@ -14,6 +14,7 @@ foreach($boards as $b) {
   if ($b['threads']) {
     $newestThreadRes = $db->find($posts_model, array('criteria'=>array(
       array('threadid', '=', 0), // 1 query
+      array('deleted', '=', 0), // 1 query
     ), 'limit' => '1', 'order'=>'updated_at desc'));
     $newestThread = $db->toArray($newestThreadRes);
     $db->free($newestThreadRes);
