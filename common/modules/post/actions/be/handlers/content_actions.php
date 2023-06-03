@@ -149,6 +149,23 @@ switch($action) {
   break;
 }
 
+$didSomething = count($removedThreads) + count($removedPosts) + count($added);
+
+sendRawResponse(array(
+  'auth' => null,
+  'status' => $didSomething ? 'ok' : 'error',
+  'data' => $didSomething ? null : join("\n", $issues),
+  'debug'=> array(
+    'removedThreads' => $removedThreads,
+    'removedPosts' => $removedPosts,
+    'reportsAdded' => $added,
+    'request' => $posts,
+    'hasDeleteAccess' => $hasDeleteAccess,
+    'issues' => $issues,
+  )
+));
+
+/*
 sendResponse(array(
   'removedThreads' => $removedThreads,
   'removedPosts' => $removedPosts,
@@ -157,4 +174,6 @@ sendResponse(array(
   'hasDeleteAccess' => $hasDeleteAccess,
   'issues' => $issues,
 ));
+*/
+
 ?>

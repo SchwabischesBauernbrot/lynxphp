@@ -1,5 +1,7 @@
 <?php
 
+// post/actions
+
 $fePkgs = array(
   array(
     'handlers' => array(
@@ -53,21 +55,30 @@ $fePkgs = array(
     ),
     'forms' => array(),
     'modules' => array(
+      // add to board settings nav "reports"
       array(
         'pipeline' => 'PIPELINE_BOARD_SETTING_NAV',
         'module' => 'nav_settings',
       ),
+      // add to globals' nav "reports"
       array(
         'pipeline' => 'PIPELINE_GLOBALS_NAV',
         'module' => 'global_nav',
       ),
+      // add checkbox to a list of posts
       array(
         'pipeline' => 'PIPELINE_POST_META_PROCESS',
         'module' => 'post_meta_check',
       ),
+      // label
       array(
         'pipeline' => 'PIPELINE_POST_META_PROCESS',
         'module' => 'post_meta_label',
+      ),
+      // inject post_actions tags
+      array(
+        'pipeline' => 'PIPELINE_BOARD_FOOTER_TMPL',
+        'module' => 'board_footer',
       ),
     ),
   ),

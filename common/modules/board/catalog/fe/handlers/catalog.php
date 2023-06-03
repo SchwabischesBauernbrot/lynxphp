@@ -101,11 +101,19 @@ if (is_array($catalog)) {
 //$boardData['pageCount'] = $boardThreads['pageCount'];
 $boardData['pageCount'] = $maxPage;
 // but no footer...
-
+// why no footer?
 
 $boardHeader = renderBoardPortalHeader($boardUri, $boardData, array(
   'isCatalog' => true,
 ));
+
+// this is for postactions
+$io = array(
+  'boardUri' => $boardUri,
+  'beforeFormEndHtml' => '',
+  'tags' => array()
+);
+$pipelines[PIPELINE_BOARD_FOOTER_TMPL]->execute($io);
 
 $p = array(
   'boardUri' => $boardUri,
@@ -116,7 +124,9 @@ $p = array(
     'boardNav' => $boardnav_html,
     // mixin
     //'postform' => renderPostForm($boardUri, $boardUri . '/catalog'),
-    'postactions' => renderPostActions($boardUri),
+    //'postactions' => renderPostActions($boardUri),
+    // quick hack for now
+    'postactions' => $io['beforeFormEndHtml'],
   ),
 );
 global $pipelines;

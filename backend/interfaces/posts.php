@@ -139,7 +139,7 @@ function getPost($boardUri, $postNo, $posts_model) {
 }
 
 // board,permissions checks must be done by here
-//
+// FIXME: take posts_model as an option
 function createPost($boardUri, $post, $files, $privPost, $options = false) {
   global $db, $models, $now;
 
@@ -163,6 +163,9 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
   $issues = processFiles($boardUri, $files, $threadid ? $threadid : $id, $id);
 
   // bump board
+  // FIXME: sage processing
+  // at least make it hookable
+  // maybe an option to disable this...
   $inow = (int)$now;
   $urow = array('last_post' => $inow);
   if (!$threadid) {
@@ -173,6 +176,8 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
     array('uri', '=', $boardUri),
   )));
 
+  // ec.wt pulled these out and put them into reply_thread
+  /*
   // only need to bump replies
   $bumpThread = !!$threadid;
   if ($options && $options['sage']) {
@@ -186,7 +191,7 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
       array('postid', '=', $threadid),
     )));
   }
-
+  */
   if ($issues) {
     return array(
       'issues' => $issues,

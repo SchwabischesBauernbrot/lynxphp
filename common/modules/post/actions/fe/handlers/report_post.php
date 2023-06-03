@@ -18,12 +18,21 @@ if (!$postNo) {
 // FIXME: maybe a captcha
 
 $templates = loadTemplates('mixins/post_actions');
+
+$levels = $common['levels'];
+
+$levelsHtml = '';
+foreach($levels as $lbl => $v) {
+  $levelsHtml .= '<option value="' . $v . '">' .  $lbl . "\n";
+}
+
+$actions = replace_tags($templates['loop1'], array('levels' => $levelsHtml));
 $tmpl = 'Reporting Post #' . $postNo . ' on >>>/' . $boardUri . '/<br>
 <form action="/forms/board/' . $boardUri . '/actions" method="POST">
   <!-- page number -->
   <input type=hidden name="checkedposts[]" value="' . $postNo . '">
   <input type=hidden name="action" value="report">
-' . $templates['loop1'] . '
+' . $actions . '
   <input type=submit value="report post">
 </form>';
 wrapContent($tmpl);

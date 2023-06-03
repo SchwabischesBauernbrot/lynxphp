@@ -263,7 +263,10 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
     ));
   }
 
+  // but how do you inject HTML into the template...
   $p = array(
+    'boardUri' => $boardUri,
+    'beforeFormEndHtml' => '',
     'tags' => array()
   );
   $pipelines[PIPELINE_BOARD_FOOTER_TMPL]->execute($p);
@@ -273,7 +276,8 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
     'url' => $_SERVER['REQUEST_URI'],
     'boardNav' => $row['boardNav'],
     'threadstats' => $threadstats_html,
-    'postactions' => renderPostActions($boardUri),
+    'beforeFormEnd' => $p['beforeFormEndHtml'],
+    //'postactions' => renderPostActions($boardUri),
     'enabler' => $enabler_html,
     'enableAutoRefresh' => $row['threadClosed'] ? '' : 'checked',
     'postForm' => $row['postForm'] ? str_replace('{{postForm}}', $row['postForm'], $postForm_tmpl) : '',
