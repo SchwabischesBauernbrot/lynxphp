@@ -11,7 +11,7 @@ class BackendRouter extends Router {
   function import($routes, $module = 'backend', $dir = 'handlers') {
     return parent::import($routes, $module);
   }
-  function fromResource($name, $res, $moduleDir, $shared) {
+  function fromResource($name, $res, $bePkg) {
     // DEV_MODE is not available on backend...
     if (!isset($res['handlerFile'])) {
       return 'handlerFile is not set';
@@ -31,7 +31,7 @@ class BackendRouter extends Router {
       }
     }
 
-    $func = function($request) use ($res, $moduleDir, $shared) {
+    $func = function($request) use ($res, $bePkg) {
       // get session
       $user_id = null;
       if (!empty($res['sendSession'])) {
@@ -49,13 +49,24 @@ class BackendRouter extends Router {
         $ip = getip();
       }
 
-      /*
-      if (is_readable($moduleDir . 'shared.php')) {
-        $shared = include $moduleDir . 'shared.php';
-      }
-      */
-      if (is_readable($moduleDir . 'be/common.php')) {
-        $common = include $moduleDir . 'be/common.php';
+      $moduleDir = $bePkg->dir;
+      $shared = $bePkg->shared;
+      $module_path = $moduleDir;
+      // coordinate with bePkg
+      if (!$bePkg->ranOnce) {
+        if (is_readable($module_path . 'be/common.php')) {
+          // ref isn't defined...
+          //$ref->common =
+          $bePkg->common = include $module_path . 'be/common.php';
+        } else {
+          if (file_exists($module_path . 'be/common.php')) {
+            echo "perms? [$module_path]be/common.php<br>\n";
+          }
+        }
+        $bePkg->ranOnce = true;
+        if (isset($bePkg->common)) {
+          $common = $bePkg->common;
+        }
       }
 
       // make pass a callback to handle response
