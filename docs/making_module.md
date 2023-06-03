@@ -3,6 +3,17 @@
 module
   name
   version
+  portals
+    name
+      fePipelines
+      requires
+  settings
+    level - (bo,)
+    location - tab or group
+    addFields
+      name
+        label
+        type
   resources
     resource
       name
