@@ -3,6 +3,7 @@
 return array(
   array(
     'handlers' => array(
+      // does thumbnail exist
       array(
         'route'   => '/:uri/thread/:threadid/post/:postid/thumbnail.json',
         'handler' => 'thumbnail',
