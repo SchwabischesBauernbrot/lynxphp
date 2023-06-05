@@ -17,7 +17,7 @@ if (isset($_POST['publickey']) || isset($_POST['email'])) {
 //print_r($users);
 // userid, username, email, created_at, updated_at
 
-$adminPortalHdr = renderAdminPortal();
+//$adminPortalHdr = renderAdminPortal();
 
 $templates = moduleLoadTemplates('listing', __DIR__);
 
@@ -51,6 +51,7 @@ $tags = array(
   'searchForm' => simpleForm('admin/users', $formFields, 'search'),
   'users' => $users_html,
 );
-wrapContent($adminPortalHdr . replace_tags($tmpl, $tags));
+// $adminPortalHdr .
+wrapContent(replace_tags($tmpl, $tags));
 
 ?>

@@ -20,7 +20,7 @@ if (isset($_POST['publickey']) || isset($_POST['email'])) {
 // boardid, uri, owner_id, title, description, json, created_at, updated_at
 // posts, last_thread, last_post
 
-$adminPortalHdr = renderAdminPortal();
+//$adminPortalHdr = renderAdminPortal();
 
 $templates = moduleLoadTemplates('boards_listing', __DIR__);
 
@@ -32,6 +32,7 @@ $templates = moduleLoadTemplates('boards_listing', __DIR__);
 $header = $templates['header'];
 $board_html = $templates['loop0'];
 $footer = $templates['loop1'];
+
 // put loop1 into header
 //$tmpl = str_replace('{{boards}}', $header, $templates['loop1']);
 // add link
@@ -48,10 +49,12 @@ if (is_array($boards)) {
       'uri' => $b['uri'],
       'title' => $b['title'],
       // this might be not set...
-      'posts' => empty($b['posts']) ? array() : $b['posts'],
+      // our posts has to be a string dude...
+      'posts' => empty($b['posts']) ? '0' : $b['posts'],
       'created_at' => date('Y-m-d H:i:s', $b['created_at']),
       'updated_at' => date('Y-m-d H:i:s', $b['updated_at']),
     );
+    //echo "<pre>tags[", htmlspecialchars(print_r($tags, 1)), "]</pre>\n";
     $boards_html .= replace_tags($board_html, $tags);
   }
   $formFields = array(
@@ -65,6 +68,7 @@ $tags = array(
   'boards' => $boards_html,
 );
 // no footer?
-wrapContent($adminPortalHdr . replace_tags($header, $tags) . $footer);
+// $adminPortalHdr .
+wrapContent(replace_tags($header, $tags) . $footer);
 
 ?>
