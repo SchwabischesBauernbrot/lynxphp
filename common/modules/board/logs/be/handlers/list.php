@@ -31,5 +31,5 @@ $posts_model = getPostsModel($boardData['uri']);
 $boardData['threadCount'] = getBoardThreadCount($boardData['uri'], $posts_model);
 $boardData['pageCount'] = ceil($boardData['threadCount']/$tpp);
 
-sendResponse($reports, 200, '', array('board' => $boardData));
+sendResponse2($reports, array('meta' => array('board' => $boardData)));
 ?>
