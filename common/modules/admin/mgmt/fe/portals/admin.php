@@ -1,5 +1,14 @@
 <?php
 
+global $portalsConfig;
+$portalsConfig['admin'] = array(
+  'params' => array()
+);
+
+function getPortalAdmin($opts) {
+
+}
+
 // FIXME: split into header/footer functions
 function renderAdminPortal() {
   $navItems = array(
@@ -39,5 +48,14 @@ function renderAdminPortal() {
     'navItems2'       => $navItems2,
   ));
 }
+
+function getPortalAdminHeader($row) {
+  echo renderAdminPortal();
+}
+
+function getPortalAdminFooter($row) {
+
+}
+
 
 ?>
