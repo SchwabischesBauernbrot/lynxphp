@@ -6,6 +6,8 @@
 return array(
   'name' => 'post_actions',
   'version' => 1,
+  // for PIPELINE_BE_BOARD_SETTINGS_PORTAL?
+  'dependencies' => array('base/board/settings'),
   'resources' => array(
     array(
       'name' => 'content_actions',
