@@ -6,6 +6,9 @@ $fePkgs = array(
       array(
         'route'   => '/:uri/board_settings.php',
         'handler' => 'landing',
+        'portals' => array('boardSettings' => array(
+          'paramsCode' => array('uri' => array('type' => 'params', 'name' => 'uri'))
+        )),
       ),
       /*
       array(
@@ -17,9 +20,18 @@ $fePkgs = array(
     ),
     'forms' => array(
       array(
+        'route'   => '/:uri/settings/:section',
+        'handler' => 'board_settings',
+        'portals' => array('boardSettings' => array(
+          'paramsCode' => array('uri' => array('type' => 'params', 'name' => 'uri'))
+        )),
+      ),
+      /*
+      array(
         'route' => '/:uri/settings/board',
         'handler' => 'board_settings',
       ),
+      */
     ),
     'modules' => array(
       /*
