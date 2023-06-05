@@ -7,6 +7,10 @@ $fePkgs = array(
         'method'  => 'GET',
         'route'   => '/:uri/logs.html',
         'handler' => 'public_list',
+        'portals' => array('board' => array(
+          'noPosts' => true,
+          'paramsCode' => array('uri' => array('type' => 'params', 'name' => 'uri'))
+        )),
         // needs backend resources
         /*
         'cacheSettings' => array(
