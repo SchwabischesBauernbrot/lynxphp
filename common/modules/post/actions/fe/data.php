@@ -20,6 +20,9 @@ $fePkgs = array(
         'route'   => '/:uri/settings/reports',
         'handler' => 'report_list',
         'loggedIn' => true,
+        'portals' => array('boardSettings' => array(
+          'paramsCode' => array('uri' => array('type' => 'params', 'name' => 'uri'))
+        )),
       ),
       array(
         'method'  => 'POST',
