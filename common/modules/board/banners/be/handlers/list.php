@@ -14,12 +14,14 @@ $banners = $db->toArray($res);
 // FIXME: boardData doesn't have json now
 
 // just pass through the settings for now...
-boardRowFilter($boardData, $boardData['json'], array('jsonFields' => 'settings'));
+$json = empty($boardData['json']) ? '{}' : $boardData['json'];
+boardRowFilter($boardData, $json, array('jsonFields' => 'settings'));
 // I don't think this is required
 $posts_model = getPostsModel($boardData['uri']);
 $boardData['threadCount'] = getBoardThreadCount($boardData['uri'], $posts_model);
 $boardData['pageCount'] = ceil($boardData['threadCount']/$tpp);
 
-sendResponse($banners, 200, '', array('board' => $boardData));
-
+sendResponse2($banners, array(
+  'meta' => array('board' => $boardData)
+));
 ?>
