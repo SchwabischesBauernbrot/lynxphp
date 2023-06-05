@@ -5,8 +5,11 @@ $params = $getHandler();
 // FIXME: do we own this board?
 $boardUri = $request['params']['uri'];
 
-$data = getBoardCatalog($boardUri);
+// change to resource
+//$data = getBoardCatalog($boardUri);
+$data = $pkg->useResource('catalog', array('boardUri' => $boardUri));
 $catalog = $data['pages'];
+global $boardData;
 $boardData = $data['board'];
 if (!empty($catalog['meta']['err'])) {
   if ($catalog['meta']['err'] === 'Board not found') {
@@ -103,9 +106,9 @@ $boardData['pageCount'] = $maxPage;
 // but no footer...
 // why no footer?
 
-$boardHeader = renderBoardPortalHeader($boardUri, $boardData, array(
-  'isCatalog' => true,
-));
+//$boardHeader = renderBoardPortalHeader($boardUri, $boardData, array(
+//  'isCatalog' => true,
+//));
 
 // this is for postactions
 $io = array(
@@ -132,4 +135,4 @@ $p = array(
 global $pipelines;
 $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
 $tmpl = replace_tags($tmpl, $p['tags']);
-wrapContent($boardHeader . $tmpl);
+wrapContent($tmpl);
