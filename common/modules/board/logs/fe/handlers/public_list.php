@@ -45,6 +45,7 @@ if (is_array($logs)) {
 $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
 $tmpl = str_replace('{{logs}}', $logs_html, $tmpl);
 
-$boardHeader = renderBoardPortalHeader($boardUri, $boardData);
-wrapContent($boardHeader . $tmpl);
+//$boardHeader = renderBoardPortalHeader($boardUri, $boardData);
+// $boardHeader .
+wrapContent($tmpl);
 ?>
