@@ -23,11 +23,11 @@ function getAdminPage() {
     ),
   );
 
-  $boardnav_html = renderAdminPortal();
+  //$boardnav_html = renderAdminPortal();
 
-  $content = $boardnav_html;
-  $content .= <<< EOB
-You're an admin, what do you want a cookie?
+  //$content = $boardnav_html;
+  $content = <<< EOB
+You're an admin, what do you want, a cookie?
 EOB;
   wrapContent($content);
 }
@@ -94,6 +94,7 @@ function getAdminBERoutesPage() {
   $beRouterData['4chan'] = include $be_path . 'routes/4chan.php'; // set up BE pipelines
   $beRouterData['lynxchan_minimal'] = include $be_path . 'routes/lynxchan_minimal.php'; // set up BE pipelines
   $beRouterData['opt'] = include $be_path . 'routes/opt.php'; // set up BE pipelines
+  // doubleplus? I don't think it has it's own router tbh
   foreach($beRouterData as $n => $data) {
     foreach($data[$n]['routes'] as $name => $p) {
       //echo $name, print_r($p, 1), "<br>\n";
