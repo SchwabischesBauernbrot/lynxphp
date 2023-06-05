@@ -6,6 +6,10 @@ $fePkgs = array(
       array(
         'route'   => '/:uri/catalog.html',
         'handler' => 'catalog',
+        'portals' => array('board' => array(
+          'isCatalog' => true,
+          'paramsCode' => array('uri' => array('type' => 'params', 'name' => 'uri')),
+        )),
         'cacheSettings' => array(
           'files' => array(
             'templates/header.tmpl', // wrapContent
