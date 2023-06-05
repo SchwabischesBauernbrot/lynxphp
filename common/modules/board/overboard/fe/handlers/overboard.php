@@ -76,14 +76,14 @@ if (isset($overboardData['threads'])) {
   }
 }
 
-if (1) {
+$pagenum = 1; // FIXME:
+if (0) {
   $boardData = array(
     'pageCount' => 1,
     'title' => 'All Boards',
     'description' => 'posts across the site',
     'settings' => array(),
   );
-  $pagenum = 1; // FIXME:
 
   $boardPortal = getBoardPortal('overboard', $boardData, array(
     'pagenum' => $pagenum,
