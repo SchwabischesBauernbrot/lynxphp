@@ -50,7 +50,7 @@ if (is_array($banners)) {
 $tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
 $tmpl = str_replace('{{banners}}', $banners_html, $tmpl);
 
-$boardHeader = renderBoardPortalHeader($boardUri, $boardData);
-
-wrapContent($boardHeader . $tmpl);
+//$boardHeader = renderBoardPortalHeader($boardUri, $boardData);
+//$boardHeader .
+wrapContent($tmpl);
 ?>
