@@ -44,11 +44,16 @@ function getBoardThreadListing($q, $boardUri, $pagenum = 1) {
   // will this upload $threadListing['data']['board']['settings']
   // probably
   // also we know the portals because of the nature of the groupdata and where this file is
-  $boardThreads = $packages['base_board_view']->useResource('board_page', array('uri' => $boardUri, 'page' => $pagenum, 'portals' => join(',', $q['portals'])));
+  // well this has the advantage of going through the resource/package system
+  $boardThreads = $packages['base_board_view']->useResource('board_page', array('uri' => $boardUri, 'page' => $pagenum, 'portals' => join(',', array_keys($q['portals']))));
   if (!$boardThreads) {
     wrapContent("There is a problem with the backend [$boardUri]");
     return;
   }
+
+  global $boardData;
+  $boardData = $boardThreads['board'];
+
   //echo "<pre>", print_r($boardThreads, 1), "</pre>\n";
   // lynxbridge
   // pageCount can be 0 meaning the board exists in doubleplus
@@ -89,7 +94,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   $thread_tmpl = $templates['loop5']; // not used
 
   extract(ensureOptions(array(
-    'noBoardHeaderTmpl' => false,
+    //'noBoardHeaderTmpl' => false,
     'noActions' => false,
   ), $wrapOptions));
 
@@ -104,9 +109,11 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   // but how do we normally get this? boardData['settings']
   // getBoardPortal promotes it internally
 
+  /*
   $boardData['pageCount'] = $boardThreads['pageCount'];
   $boardPortal = getBoardPortal($boardUri, $boardData, array(
     'pagenum' => $pagenum, 'noBoardHeaderTmpl' => $noBoardHeaderTmpl));
+  */
   $boardnav_html = '';
 
   // used to look at text, so we can queue up another backend query if needed
@@ -202,7 +209,8 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   );
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
   $tmpl = replace_tags($templates['header'], $p['tags']);
-  wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer'], $wrapOptions);
+  // $boardPortal['header'] . . $boardPortal['footer']
+  wrapContent($tmpl, $wrapOptions);
 }
 
 // allow export of data as $common in your handlers and modules
