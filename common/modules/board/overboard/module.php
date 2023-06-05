@@ -8,7 +8,7 @@ return array(
       'params' => array(
         'endpoint' => 'lynx/overboard.json',
         'sendSession' => true,
-        'querystring' => array('portals' => 'overboard'),
+        //'querystring' => array('portals' => 'overboard'),
         'unwrapData' => true,
         //'requires' => array('boardUri'),
         //'params' => 'querystring',
