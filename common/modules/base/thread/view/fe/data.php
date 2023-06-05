@@ -7,6 +7,24 @@ $fePkgs = array(
         'route'   => '/:uri/thread/:num.html',
         'handler' => 'view',
         //'func'   => 'getThreadHandler',
+        'portals' => array(
+          'board' => array(
+            'paramsCode' => array(
+              // allows remapping
+                // uri => params but then not extensible
+                // what else would we need?
+                // processing options can come after the extraction?
+              'uri' => array('type' => 'params', 'name' => 'uri'),
+              'page' => array('type' => 'params', 'name' => 'num'),
+            ),
+          ),
+          'posts' => array(
+            'paramsCode' => array(
+              'uri' => array('type' => 'params', 'name' => 'uri'),
+              'page' => array('type' => 'params', 'name' => 'num'),
+            ),
+          ),
+        ),
         'options' => array(
           'cacheSettings' => array(
             'files' => array(
