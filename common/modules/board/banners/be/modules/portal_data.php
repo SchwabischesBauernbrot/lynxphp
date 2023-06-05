@@ -7,6 +7,10 @@ if (in_array('board', $io['portals'])) {
   // need to access request but all we got is response
   // response isn't going to have boardid
   $boardUri = false;
+  //echo "<pre>", htmlspecialchars(print_r($io['out'], 1)), "</pre>\n";
+  if (isset($io['out']['board']['uri'])) {
+    $boardUri = $io['out']['board']['uri'];
+  } else
   if (isset($io['data']['board'])) {
     $boardUri = $io['data']['board']['uri'];
   } else
