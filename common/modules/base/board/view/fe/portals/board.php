@@ -1,11 +1,100 @@
 <?php
 
+global $portalsConfig;
+$portalsConfig['board'] = array(
+  // 'uri' => array('type' => 'params', 'name' => 'uri')
+  'params' => array()
+);
+
+// a handler(router) adapter
+function getPortalBoard($opts, $request) {
+  global $portalData;
+  //echo "<pre>getPortalBoard opts[", print_r($opts, 1), "]</pre>\n";
+  //echo "<pre>getPortalBoard request[", print_r($request, 1), "]</pre>\n";
+  //echo "<pre>getPortalBoard portalData[", print_r($portalData, 1), "]</pre>\n";
+  //echo "<pre>getPortalBoard paramsCode[", print_r($opts['paramsCode'], 1), "]</pre>\n";
+  //$config = getPortalBoardConfig();
+  //global $portalsConfig;
+  // meta coding
+  $params = portal_getParamsFromContext($opts['paramsCode'], $request);
+  //echo "<pre>getPortalBoard params[", print_r($params, 1), "]</pre>\n";
+
+  //global $boardData;
+  //echo "<pre>getPortalBoard boardData[", print_r($boardData, 1), "]</pre>\n";
+
+  // boardData['pageCount']
+  $options = array(
+    'board' => '',
+    'pagenum' => empty($params['page']) ? 1 : $params['page'],
+    'noBoardHeaderTmpl' => empty($opts['noBoardHeaderTmpl']) ? false : true,
+    'isThread' => empty($opts['isThread']) ? false : true,
+    'threadClosed' => empty($opts['threadClosed']) ? false : true,
+    // FIXME: this should default to on tbh
+    'noPosts' => empty($opts['noPosts']) ? false : true,
+  );
+  // get page count
+  // so on board_view this comes from a specific custom endpoint
+  // maybe better solved by a portal linkage...
+  // implying moving portals into common
+  // so we can couple BE and FE coordination together
+  // so header/footer can rely on data coming from BE EPs
+  // should be similar to a BE handler
+  // so if the page has no BE calls, we can just get what we need
+  global $_portalData;
+  //echo "<pre>_portalData", print_r($_portalData['board'], 1), "</pre>\n";
+  $pageCount = 0;
+  if (isset($_portalData['board']['pageCount'])) {
+    $pageCount = $_portalData['board']['pageCount'];
+    $uri = $params['uri'];
+  } // else how? which EP
+  else {
+    if (!empty($opts['uri'])) {
+      $pageCount = $opts['pageCount'];
+      $uri = $opts['uri'];
+    } else {
+      global $packages;
+      // without portals=board we're missing the banner data
+      // this hangs shit...
+      // , 'portals' => 'boards'
+      // should already auto-matically add it... right?
+      $boardThreads = $packages['base_board_view']->useResource('board_page', array('uri' => $params['uri'], 'page' => $options['pagenum']));
+      //echo "<pre>boardThreads", print_r($boardThreads, 1), "</pre>\n";
+      global $boardData;
+      if (!$boardData) {
+        $boardData = $boardThreads['board'];
+      }
+      //echo "<pre>boardThreads", print_r($boardThreads, 1), "</pre>\n";
+      $pageCount = $boardThreads['pageCount'];
+      $uri = $params['uri'];
+    }
+  }
+  // FIXME: pipelinable
+  if ($uri !== 'overboard') {
+    $boardSettings = getter_getBoardSettings($uri);
+  } else {
+    $boardSettings = array();
+  }
+  $row = renderBoardPortalData($uri, $pageCount, array(
+    'noBoardHeaderTmpl' => $options['noBoardHeaderTmpl'],
+    'isThread' => $options['isThread'],
+    'threadClosed' => $options['threadClosed'],
+    'boardSettings' => $boardSettings,
+    'noPosts' => $options['noPosts'],
+  ));
+  return array(
+    'uri' => $uri,
+    'portalSettings' => $row,
+    //'noPosts' => $options['noPosts'],
+  );
+}
+
 // separate so overboard can inject multiple times
 function generateJsBoardInfo($boardUri, $boardSettings, $options = false) {
   extract(ensureOptions(array(
     'first' => true,
   ), $options));
   $json = json_encode($boardSettings);
+  // why not drop first option?
   $firstJs = $first ? 'const boardData = {}' : 'if (typeof(boardData) === \'undefined\') boardData = {}';
   // header/footer can be stripped here
   // could be passed as data-attributes too
@@ -29,6 +118,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'isCatalog' => false,
     // isn't isThread and ThreadNum the samething?
     'isThread'  => false,
+    'noPosts'   => false,
     'threadNum' => 0,
     'noBoardHeaderTmpl' => false,
     // turns off post_form:
@@ -58,11 +148,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     if (DEV_MODE) {
       echo "No boardSettings passed to renderBoardPortalData<Br>\n";
     }
-    $boardData = getBoard($boardUri);
-    if (isset($boardData['settings'])) {
-      $boardSettings = $boardData['settings'];
-    }
-    //print_r($boardSettings);
+    $boardSettings = getter_getBoardSettings($boardUri);
   }
   $nav_io = array(
     'boardUri' => $boardUri,
@@ -162,10 +248,13 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   }
 
   // if threadNum, is it locked?
-  $form_html = $threadClosed ? '' : renderPostFormHTML($boardUri, array(
-    'showClose' => false, 'formId' => 'bottom_postform',
-    'reply' => $threadNum, 'maxMessageLength' => $maxMessageLength,
-  ));
+  $form_html = '';
+  if (!$noPosts) {
+    $form_html = $threadClosed ? '' : renderPostFormHTML($boardUri, array(
+      'showClose' => false, 'formId' => 'bottom_postform',
+      'reply' => $threadNum, 'maxMessageLength' => $maxMessageLength,
+    ));
+  }
 
   return array(
     'tmpl' => $tmpl,
@@ -178,8 +267,24 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     // used in footer
     'boardNav' => $boardNav,
     'postForm' => $form_html,
+    'noPosts'  => $noPosts,
     'maxMessageLength' => $maxMessageLength,
   );
+}
+
+function getPortalBoardHeader($data) {
+  //global $boardData; // better than nothing
+  if ($data['uri'] === 'overboard') {
+    $boardData = array(
+      'pageCount' => 1,
+      'title' => 'All Boards',
+      'description' => 'posts across the site',
+      'settings' => array(),
+    );
+  } else {
+    $boardData = getter_getBoard($data['uri']);
+  }
+  echo renderBoardPortalHeaderEngine($data['portalSettings'], $data['uri'], $boardData);
 }
 
 function renderBoardPortalHeaderEngine($row, $boardUri, $boardData) {
@@ -230,18 +335,35 @@ function renderBoardPortalHeaderEngine($row, $boardUri, $boardData) {
   )));
 }
 
+function getPortalBoardFooter($data) {
+  //global $boardData; // better than nothing
+  if ($data['uri'] === 'overboard') {
+    $boardData = array(
+      'pageCount' => 1,
+      'title' => 'All Boards',
+      'description' => 'posts across the site',
+      'settings' => array(),
+    );
+  } else {
+    $boardData = getter_getBoard($data['uri']);
+  }
+  echo renderBoardPortalFooterEngine($data['portalSettings'], $data['uri'], $boardData);
+}
+
 function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
   global $pipelines;
+  //echo "<pre>", htmlspecialchars(print_r($row, 1)), "</pre>\n";
 
   $templates = loadTemplates('mixins/board_footer');
   $tmpl = $templates['header'];
-  $threadstats_tmpl = $templates['loop0'];
-  $postForm_tmpl = $templates['loop1'];
-
-  $threadstats_html = '';
+  //$threadstats_tmpl = $templates['loop0'];
+  //$postForm_tmpl = $templates['loop1'];
+  //$liveText_tmpl = $templates['loop2'];
 
   $enabler_html = '';
+  /*
   if (!$row['threadNum']) {
+    // turn it off, why?
     $enabler_html = '<style>
 #autoRefreshEnable {
   display: none;
@@ -249,7 +371,8 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
 </style>';
   }
 
-  if (isset($boardData['posts']) && is_array($boardData['posts'])) {
+  $threadstats_html = '';
+  if (!$row['noPosts'] && isset($boardData['posts']) && is_array($boardData['posts'])) {
     $files = 0;
     //echo "[", print_r($boardData['posts'], 1), "]<br>\n";
     foreach($boardData['posts'] as $post) {
@@ -262,6 +385,7 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
       'files'   => $files,
     ));
   }
+  */
 
   // but how do you inject HTML into the template...
   $p = array(
@@ -271,16 +395,28 @@ function renderBoardPortalFooterEngine($row, $boardUri, $boardData) {
   );
   $pipelines[PIPELINE_BOARD_FOOTER_TMPL]->execute($p);
 
+  /*
+  $liveText_html = '';
+  if (!$row['noPosts']) {
+    $liveText_html = replace_tags($liveText_tmpl, array(
+      'enabler' => $enabler_html,
+      'enableAutoRefresh' => $row['threadClosed'] ? '' : 'checked',
+      'url' => $_SERVER['REQUEST_URI'],
+    ));
+  }
+  */
+
   return replace_tags($tmpl, array_merge($p['tags'], array(
     'uri' => $boardUri,
     'url' => $_SERVER['REQUEST_URI'],
     'boardNav' => $row['boardNav'],
-    'threadstats' => $threadstats_html,
-    'beforeFormEnd' => $p['beforeFormEndHtml'],
-    //'postactions' => renderPostActions($boardUri),
-    'enabler' => $enabler_html,
-    'enableAutoRefresh' => $row['threadClosed'] ? '' : 'checked',
-    'postForm' => $row['postForm'] ? str_replace('{{postForm}}', $row['postForm'], $postForm_tmpl) : '',
+    'board_footer_top' => '',
+    'board_footer_bottom' => '',
+    //'threadstats' => $threadstats_html,
+    // pipeline?
+    //'postactions' => $row['noPosts'] ? '' : renderPostActions($boardUri),
+    //'postForm' => $row['postForm'] ? str_replace('{{postForm}}', $row['postForm'], $postForm_tmpl) : '',
+    //'liveText' => $liveText_html,
   )));
 }
 
@@ -315,7 +451,9 @@ function getBoardPortal($boardUri, $boardData = false, $options = false) {
 // is this function responsible for boardData? can't be if we're to be efficient
 function renderBoardPortalHeader($boardUri, $boardData = false, $options = false) {
   if ($boardData === false) {
-    // FIXME: look up board data on-demand
+    // look up board data on-demand
+    // FIXME: probably should bitch
+    $boardData = getter_getBoard($boardUri);
   } else {
     if (!isset($options['boardSettings'])) {
       if (isset($boardData['settings'])) {
@@ -330,7 +468,9 @@ function renderBoardPortalHeader($boardUri, $boardData = false, $options = false
 
 function renderBoardPortalFooter($boardUri, $boardData = false, $options = false) {
   if ($boardData === false) {
-    // FIXME: look up board data on-demand
+    // look up board data on-demand
+    // FIXME: probably should bitch
+    $boardData = getter_getBoard($boardUri);
   }
   $row = renderBoardPortalData($boardUri, $boardData['pageCount'], $options);
   echo renderBoardPortalFooterEngine($row, $boardUri, $boardData);
