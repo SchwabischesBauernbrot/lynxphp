@@ -47,6 +47,8 @@ if (!isset($boardData['posts'])) {
 }
 //echo "<pre>", $boardData['sageLimit'], "</pre>\n";
 
+// FIXME: wired this up with the new existing modules for these...
+// maybe even move this functionality into that module...
 $sageLimit  = empty($boardData['sageLimit']) ? 500 : $boardData['sageLimit'];
 $replyLimit = empty($boardData['replyLimit']) ? 1000 : $boardData['replyLimit'];
 
@@ -108,9 +110,11 @@ $p = array(
   )
 );
 global $pipelines;
+
 $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
 $tmpl = replace_tags($tmpl, $p['tags']);
 
+/*
 $boardPortal = getBoardPortal($boardUri, $boardData, array(
   'isThread' => true,
   'threadNum' => $threadNum,
@@ -118,8 +122,9 @@ $boardPortal = getBoardPortal($boardUri, $boardData, array(
   'threadSaged'  => $saged,
   'maxMessageLength' => $boardData['maxMessageLength'],
 ));
+*/
 
 // this will include all scripts, not just this one...
 js_add_script($pkg, 'refresh_thread.js');
-
-wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer']);
+// $boardPortal['header'] .  . $boardPortal['footer']
+wrapContent($tmpl);
