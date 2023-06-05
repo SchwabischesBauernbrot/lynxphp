@@ -1,6 +1,6 @@
 <?php
 return array(
-  'user_mgmt' => array(
+  'admin_mgmt' => array(
   ),
 );
 ?>
