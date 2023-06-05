@@ -4,18 +4,62 @@ return array(
   'user_mgmt' => array(
     'handlers' => array(
       array(
+        'route'   => '/admin.php',
+        'handler' => 'home',
+        'portals' => array(
+          'admin' => array()
+        ),
+      ),
+      array(
+        'route'   => '/admin/modules.php',
+        'handler' => 'modules',
+        'portals' => array(
+          'admin' => array()
+        ),
+      ),
+      array(
+        'route'   => '/admin/install.php',
+        'handler' => 'install',
+        'portals' => array(
+          'admin' => array()
+        ),
+      ),
+      array(
+        'route'   => '/admin/fe_routes.php',
+        'handler' => 'fe_routes',
+        'portals' => array(
+          'admin' => array()
+        ),
+      ),
+      array(
+        'route'   => '/admin/be_routes.php',
+        'handler' => 'be_routes',
+        'portals' => array(
+          'admin' => array()
+        ),
+      ),
+      array(
         'route'   => '/admin/users',
         'handler' => 'list',
+        'portals' => array(
+          'admin' => array()
+        ),
       ),
       // search
       array(
         'route'   => '/admin/users',
         'method'  => 'POST',
         'handler' => 'list',
+        'portals' => array(
+          'admin' => array()
+        ),
       ),
       array(
         'route'   => '/admin/boards',
         'handler' => 'boards_list',
+        'portals' => array(
+          'admin' => array()
+        ),
       ),
     ),
     'forms' => array(
