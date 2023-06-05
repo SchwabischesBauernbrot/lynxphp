@@ -1,0 +1,42 @@
+  <hr size="1">
+  <div class="wrapbar">
+    {{threadstats}}
+  </div>
+  <!-- postactions -->
+  {{beforeFormEnd}}
+</form>
+  {{postForm}}
+  {{liveText}}
+<!-- loop -->
+  <div id="threadstats">
+    <span>{{replies}} replies</span> | <span>{{files}} file</span>
+  </div>
+<!-- end -->
+<!-- loop -->
+  <center>
+    <!-- details>
+      <!-- new thread / new reply ? -->
+      <!-- summary>Post Form</summary>
+    </details -->
+    <div class="lpPostForm" style="max-width: 500px">
+      {{postForm}}
+    </div>
+  </center>
+<!-- end -->
+<!-- loop -->
+  <div id="livetext">
+    <!-- div class="dot" id="livecolor"></div>
+    Connecting... -->
+    <!-- input class="postform-style ml-5 di" type="button" value="Update" -->
+    <!-- this should be style like it's own button -->
+    <div id="refresh">
+      {{enabler}}
+      <input type=checkbox {{enableAutoRefresh}} id="autoRefreshEnable" class="jsonly">
+      <a id="updatePage" href="{{url}}">Refresh</a>
+      <span id="labelRefresh"></span>
+    </div>
+    <div id="refreshing" style="display: none">
+      Refreshing...
+    </div>
+  </div>
+<!-- end -->

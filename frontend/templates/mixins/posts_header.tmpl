@@ -1,0 +1,22 @@
+<style>
+.vichanBanner {
+  color: var(--input-background);
+  background-color: /*#ffb0aa*/ var(--pinktext-color);
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 1em 0;
+  padding-bottom: 2px;
+}
+.vichanUnimportant {
+  font-size: 10px;
+  text-decoration: none;
+  color: /*#2b0f51*/ var(--alt-font-color);
+}
+</style>
+<div class="vichanBanner" {{vichanBanner}}>
+  Posting mode: {{mode}}
+  <a class="vichanUnimportant" href="{{uri}}/">[Return]</a>
+</div>
+<br>
+<!-- need to hidden if js is enable -->
