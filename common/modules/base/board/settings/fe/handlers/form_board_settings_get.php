@@ -6,7 +6,10 @@ $params = $getHandler();
 $boardUri = boardOwnerMiddleware($request);
 if (!$boardUri) return;
 
+// why isn't $boardData = getBoard($boardUri); good enough?
 $values = $pkg->useResource('list', array('boardUri' => $boardUri));
+
+$settings = $values['settings'];
 
 global $pipelines;
 //$fields = $shared['fields']; // imported from shared.php
@@ -51,6 +54,10 @@ foreach($values as $k => $v) {
 
 $html = generateForm($params['action'], $fields, $values);
 
-wrapContent('Board Settings'. $html);
+//$portal = getBoardSettingsPortal($boardUri, false, array(
+//  'boardSettings' => $settings,
+//));
+// $portal['header'] .  . $portal['footer']
+wrapContent('Board Settings' . $html);
 
 ?>
