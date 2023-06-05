@@ -9,9 +9,10 @@ if (!function_exists('getBoardFields')) {
   echo "included once<br>\n";
 */
   function getBoardFields($section) {
+    global $shared;
     $fields = false;
     $boardSettings = getCompiledSettings('bo');
-    //print_r($boardSettings);
+    //echo "<pre>", print_r($boardSettings, 1), "</pre>\n";
 
     if (isset($boardSettings[$section])) {
       if (is_array($boardSettings[$section])) {
@@ -19,7 +20,7 @@ if (!function_exists('getBoardFields')) {
       } else {
       }
     } else {
-      $fields = $shared['fields']; // imported from fe/shared.php
+      $fields = $boardSettings['board'];
     }
     return $fields;
   }
