@@ -197,6 +197,77 @@ function sendResponse2($data, $options = array()) {
   // actually the query matters less
   if (isset($_GET['portals'])) {
     //$resp['meta']['portals'] = array();
+    global $_PortalPipelines, $portalResources, $pipelines;
+
+    $portalsRequested = explode(',', $_GET['portals']);
+    // FIXME: make the list unique?
+    $out = array();
+    //echo "<ore>portalsRequested", print_r($portalsRequested, 1), "</pre>\n";
+    // should be faster than PIPELINE_PORTALS_DATA
+    // which would tax all responses
+    // FIXME: limit this
+    foreach($portalsRequested as $portal) {
+      /*
+      $portalOpt = getCompiledPortalResource($portal);
+      if ($portalOpt) {
+        // do we have access to resp
+        $incPath = include $portalOpt['modulePath'] . 'be/portals/' . $portalOpt['snakeName'] . '.php';
+        // it shouldn't output for damn sure
+        continue;
+      }
+      */
+      //echo "checking [$portal]<br>\n";
+      if (isset($_PortalPipelines[$portal])) {
+        // we need to get to the request params some how
+        // ask the router? package?
+        $portal_io = array(
+          'data'    => $data,
+          'mtime'   => $mtime,
+          'err'     => $err,
+          'meta'    => $meta,
+          'portals' => $portalsRequested,
+          'out'     => $out,
+          // we already gave meta and data though
+          'resp'    => $resp, // pass in response data
+          'portal'  => $portal,
+          // why not just let them use a global
+          // then it's not documented
+          // snake, modulePath, pipeline (and options like paramsCode?)
+          // not even used rn
+          'portalOptions' => $portalResources[$portal],
+        );
+        //echo "running [$portal]<br>\n";
+        $_PortalPipelines[$portal]->execute($portal_io);
+        // attachment points for the pipeline
+        //echo "test[", $portal_io['portalOptions']['pipeline'], "]<br>\n";
+        $pipelines[$portal_io['portalOptions']['pipeline']]->execute($portal_io);
+        $out = $portal_io['out']; // update accumulator
+        continue;
+      } else {
+        echo "be index - portal[$portal] is not defined in _PortalPipelines<br>\n";
+      }
+      /*
+      // FIXME: move these into files somewhere
+      switch($portal) {
+        case 'board':
+          // try to get page count
+
+
+          // just move it up out of the data stream
+          // so it's consistent for portal request
+          // we duplicate data by pulling out of the $out
+          if (!empty($data['pageCount'])) {
+            $out[$portal]['pageCount'] = $data['pageCount'];
+          }
+          if (!empty($data['pages'])) {
+            $out[$portal]['pageCount'] = count($data['pages']);
+          }
+        break;
+      }
+      */
+    }
+    //echo "<pre>out", print_r($out, 1), "</pre>\n";
+
     global $pipelines;
     $io = array(
       // would be nicer if we had request...
@@ -204,15 +275,26 @@ function sendResponse2($data, $options = array()) {
       'mtime'   => $mtime,
       'err'     => $err,
       'meta'    => $meta,
-      'portals' => explode(',', $_GET['portals']),
-      'out' => array(),
+      'portals' => $portalsRequested,
+      'out' => $out,
     );
+    // whatever this is
+    // it can't be like this...
+    // not every portal request is going to be requesting board...
+    // can't just test for numeric keys
+    /*
     if (!isset($io['data']['board'])) {
       // how do we note this to the front end..
       // a header?
       // extra key?
       $data['MISSING_BOARD'] = true;
     }
+    */
+
+    // banners still works through this one...
+    // this should be renamed from portals to something like
+    // relevent context hook, it can prove additional lookup tables
+    // to reduce bandwidth (like userboard roles)
     $pipelines[PIPELINE_PORTALS_DATA]->execute($io);
     if ($io['out']) {
       //$resp['meta']['portals'] = $io['out'];
