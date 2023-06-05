@@ -1,12 +1,20 @@
 <?php
 return array(
-  'name' => 'post_files',
+  'name' => 'media_thumbnail',
   'version' => 1,
   'resources' => array(
     array(
       'name' => 'thumbnail_ready',
       'params' => array(
         'endpoint' => 'opt/boards/:uri/posts/:pid/thumbnailReady',
+        'expectJson' => true,
+        'requires' => array('uri', 'pid'),
+      ),
+    ),
+    array(
+      'name' => 'media_debug',
+      'params' => array(
+        'endpoint' => 'opt/boards/:uri/posts/:pid/media_debug',
         'expectJson' => true,
         'requires' => array('uri', 'pid'),
       ),
