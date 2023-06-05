@@ -7,7 +7,24 @@ $fePkgs = array(
       array(
         'route'  => '/:uri/page/:page.html',
         'handler' => 'page',
-        'portals' => array('board'),
+        'portals' => array(
+          'board' => array(
+            'paramsCode' => array(
+              // allows remapping
+                // uri => params but then not extensible
+                // what else would we need?
+                // processing options can come after the extraction?
+              'uri' => array('type' => 'params', 'name' => 'uri'),
+              'page' => array('type' => 'params', 'name' => 'page'),
+            ),
+          ),
+          'posts' => array(
+            'paramsCode' => array(
+              'uri' => array('type' => 'params', 'name' => 'uri'),
+              'page' => array('type' => 'params', 'name' => 'page'),
+            ),
+          ),
+        ),
         //'func'   => 'getBoardThreadListingPageHandler',
         /*
         'options' => array(
@@ -28,7 +45,19 @@ $fePkgs = array(
       array(
         'route'   => '/:uri/',
         'handler' => 'view',
-        'portals' => array('board'),
+        'portals' => array(
+          'board' => array(
+            'paramsCode' => array(
+              'uri' => array('type' => 'params', 'name' => 'uri'),
+            ),
+          ),
+          'posts' => array(
+            'paramsCode' => array(
+              'uri' => array('type' => 'params', 'name' => 'uri'),
+              'page' => array('type' => 'params', 'name' => 'page'),
+            ),
+          ),
+        ),
         //'func'   => 'getBoardThreadListingHandler',
         /*
         'options' => array(
