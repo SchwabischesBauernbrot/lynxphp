@@ -2,6 +2,13 @@
 return array(
   'name' => 'users_mgmt',
   'version' => 1,
+  'portals' => array(
+    'admin' => array(
+      //'fePipelines' => array('PIPELINE_ADMIN_HEADER_TMPL', 'PIPELINE_ADMIN_FOOTER_TMPL'),
+      //'requires' => array(''),
+      // cacheSettings for backend module
+    ),
+  ),
   'resources' => array(
     array(
       'name' => 'list',
