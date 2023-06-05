@@ -14,20 +14,34 @@ $fePkgs = array(
             'templates/footer.tmpl', // wrapContent
           ),
         ),
+        'portals' => array('board' => array(
+          'noPosts' => true,
+          'paramsCode' => array('uri' => array('type' => 'params', 'name' => 'uri'))
+        )),
       ),
       array(
         'route'   => '/:uri/settings/banners',
         'handler' => 'settings_list',
+        // we need to be able to pass options
+        'portals' => array('boardSettings' => array(
+          'paramsCode' => array('uri' => array('type' => 'params', 'name' => 'uri'))
+        )),
       ),
     ),
     'forms' => array(
       array(
         'route' => '/:uri/settings/banners/add',
         'handler' => 'add',
+        'portals' => array('boardSettings' => array(
+          'paramsCode' => array('uri' => array('type' => 'params', 'name' => 'uri'))
+        )),
       ),
       array(
         'route' => '/:uri/settings/banners/:id/delete',
         'handler' => 'delete',
+        'portals' => array('boardSettings' => array(
+          'paramsCode' => array('uri' => array('type' => 'params', 'name' => 'uri'))
+        )),
       ),
     ),
     'modules' => array(
