@@ -8,6 +8,6 @@ if (!$boardUri) {
 
 $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
 
-sendResponse($boardData);
+sendResponse2($boardData);
 
 ?>
