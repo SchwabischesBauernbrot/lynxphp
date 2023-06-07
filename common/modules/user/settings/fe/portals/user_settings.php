@@ -1,5 +1,19 @@
 <?php
 
+global $portalsConfig;
+$portalsConfig['userSettings'] = array(
+  // wouldn't this depend on the route itself... *sigh*
+  'params' => array()
+);
+
+function getPortalUserSettings() {
+  return array();
+}
+
+function getPortalUserSettingsHeader($data) {
+  echo renderUserPortalHeader();
+}
+
 function renderUserPortalHeader() {
   $test = substr($_SERVER['REQUEST_URI'], 1); // strip off first slash character
   $portalOptions = array(
@@ -37,6 +51,9 @@ function getAccountPortal($options = false) {
     'header' => '' . getAccountPortalNav(),
     'footer' => ''
   );
+}
+
+function getPortalUserSettingsFooter($data) {
 }
 
 ?>
