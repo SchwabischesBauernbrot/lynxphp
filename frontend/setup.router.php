@@ -102,6 +102,7 @@ $frontendRouterData = array(
       ),
     ),
   ),
+  /*
   'admins' => array(
     'file'   => 'admin',
     'routes' => array(
@@ -134,6 +135,7 @@ $frontendRouterData = array(
 
     ),
   ),
+  */
   /*
   'site' => array(
     'file'   => 'textfiles',
