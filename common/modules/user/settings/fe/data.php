@@ -8,10 +8,16 @@ return array(
       array(
         'route' => '/user/settings',
         'handler' => 'user_settings',
+        'portals' => array('userSettings' => array(
+          'paramsCode' => array()
+        )),
       ),
       array(
         'route' => '/user/settings/:category',
         'handler' => 'user_settings',
+        'portals' => array('userSettings' => array(
+          'paramsCode' => array()
+        )),
       ),
       /*
       array(
