@@ -21,6 +21,7 @@ $boardnav_html = $tmp;
 */
 
 $boardData = getBoardThread($boardUri, $threadNum);
+//echo "<pre>boardData", print_r($boardData['settings'], 1), "</pre>\n";
 
 foreach($boardData['posts'] as $j => $post) {
   preprocessPost($boardData['posts'][$j]);
@@ -38,14 +39,18 @@ $files = 0;
 $cnt = count($boardData['posts']);
 // remove op
 array_shift($boardData['posts']);
+$userSettings = getUserSettings();
 foreach($boardData['posts'] as $post) {
   //echo "<pre>", print_r($post, 1), "</pre>\n";
   $tmp = $post_template;
   $posts_html .= renderPost($boardUri, $post, array(
     'checkable' => true, 'postCount' => $cnt,
     'noOmit' => true, 'boardSettings' => $boardData['settings'],
+    'userSettings' => $userSettings,
   ));
-  $files += count($post['files']);
+  if (!empty($post['files'])) {
+    $files += count($post['files']);
+  }
 }
 
 $p = array(
@@ -80,8 +85,21 @@ js_add_script($pkg, 'refresh_thread.js');
 
 global $BASE_HREF;
 $row = wrapContentData(array());
-$head_html = wrapContentGetHeadHTML($row);
+// why doesn't this provide the static css sheets?
+$includeCSS = true;
+/*
+  <link rel="stylesheet" href="/css/lynxphp.css">
+  <link rel="stylesheet" href="/css/expand.css">
+  <link rel="stylesheet" href="/css/style.css">
+*/
+$head_html = wrapContentGetHeadHTML($row, $includeCSS);
 
+if ($includeCSS) {
+  echo '<!DOCTYPE html>';
+  echo $head_html;
+  echo '<body id="top">';
+} else {
+  // not sure what the value was here...
 echo <<<EOB
 <!DOCTYPE html>
 <html>
@@ -91,6 +109,7 @@ echo <<<EOB
 </head>
 <body id="top">
 EOB;
+}
 echo $tmpl;
 echo <<<EOB
 EOB;
