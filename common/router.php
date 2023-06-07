@@ -848,13 +848,21 @@ class Router {
       $match = $matches[0];
       if (count($matches) !== 1) {
         $minScore = 99;
+        $pathExt = pathinfo($path, PATHINFO_EXTENSION);
+        //echo "path[$path][$pathExt]<br>\n";
         foreach($matches as $c => $row) {
           $score = levenshtein($row['cond'], $path);
-          if ($score < $minScore) {
+          $routeExt = pathinfo($row['cond'], PATHINFO_EXTENSION);
+          // lets force the ext to match
+          // because req /theme.html
+          // needs to match /:category.html
+          // but not /themephp
+          if ($routeExt === $pathExt && $score < $minScore) {
             $match = $row;
             $minScore = $score;
           }
           //echo "[$c][", print_r($row, 1), "]=[$score]<br>\n";
+          //echo "[$c][", $row['cond'], "][$routeExt]=[$score]<br>\n";
         }
       }
       //echo "key[", $method . '_' . $match['cond'], "]<br>\n";
