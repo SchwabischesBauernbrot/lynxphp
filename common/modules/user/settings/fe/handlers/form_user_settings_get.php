@@ -67,6 +67,7 @@ foreach($io['fields'] as $f => $v) {
 
 $html = generateForm($params['action'], $io['fields'], $values);
 
-wrapContent(renderUserPortalHeader() . 'User Settings'. $html);
+// renderUserPortalHeader() .
+wrapContent('User Settings'. $html);
 
 ?>
