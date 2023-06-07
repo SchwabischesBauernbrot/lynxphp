@@ -8,6 +8,7 @@
 function getter_getBoard($uri) {
   global $boardData;
   $out = $boardData;
+  //print_r($boardData);
   if (!$boardData || $boardData['uri'] !== $uri) {
     $out = getBoard($uri);
     $boardData = $out; // put it back in cache
@@ -17,7 +18,8 @@ function getter_getBoard($uri) {
 
 function getter_getBoardSettings($uri) {
   global $boards_settings;
-  if (isset($boards_settings[$uri])) {
+  if (!empty($boards_settings[$uri])) {
+    //echo "<pre>returning $uri [", print_r($boards_settings[$uri], 1), "]</pre>\n";
     return $boards_settings[$uri];
   }
   $boardData = getter_getBoard($uri);
