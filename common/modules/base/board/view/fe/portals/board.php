@@ -80,6 +80,7 @@ function getPortalBoard($opts, $request) {
     'threadClosed' => $options['threadClosed'],
     'boardSettings' => $boardSettings,
     'noPosts' => $options['noPosts'],
+    'threadNum' => empty($params['num']) ? 0 : $params['num'],
   ));
   return array(
     'uri' => $uri,
@@ -249,6 +250,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
 
   // if threadNum, is it locked?
   $form_html = '';
+  //echo "threadNum[$threadNum]<br>\n";
   if (!$noPosts) {
     $form_html = $threadClosed ? '' : renderPostFormHTML($boardUri, array(
       'showClose' => false, 'formId' => 'bottom_postform',
