@@ -48,7 +48,8 @@ function processPostFiles() {
           $handles[$field][] = $res['data'];
         } else {
           $hasErrors = true;
-          $handles[$field][] = array('error' => $res);
+          // res has to be a string, not array
+          $handles[$field][] = array('error' => $res['meta']['error']);
         }
       } else {
         $hasErrors = true;
@@ -239,7 +240,7 @@ function getAudioVideo($file, $options = false) {
     'type' => false,
   ), $options));
   if (!$type) $type = getFileType($file);
-  // no view if not viewable
+  // no video/audio if an image
   if ($type === 'img') {
     return '';
   }
@@ -260,6 +261,7 @@ function getViewer($file, $options = false) {
   if (!$type) $type = getFileType($file);
 
   // set default, no thumb
+  //$path = 'watch/' . $file['path'];
   $path = $file['path'];
 
   // no view if not viewable
