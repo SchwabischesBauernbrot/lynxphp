@@ -463,9 +463,20 @@ function getBoardThread($boardUri, $threadNum) {
 }
 
 function sendFile($tmpfile, $type, $filename) {
+  /*
   $json  = curlHelper(BACKEND_BASE_URL . 'lynx/files', array(
     'files' => make_file($tmpfile, $type, $filename)
   ), '', '', '', 'POST');
+  */
+  $json = request(array(
+    'url' => BACKEND_BASE_URL . 'lynx/files',
+    'method' => 'POST',
+    'body' => array(
+      'files' => make_file($tmpfile, $type, $filename)
+    ),
+    'multipart' => true,
+    //'headers' => array('Content-Type' => 'multipart/form-data'),
+  ));
   return expectJson($json, 'lynx/files');
 }
 
