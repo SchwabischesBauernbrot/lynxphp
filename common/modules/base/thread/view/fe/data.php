@@ -15,14 +15,16 @@ $fePkgs = array(
                 // what else would we need?
                 // processing options can come after the extraction?
               'uri' => array('type' => 'params', 'name' => 'uri'),
-              'page' => array('type' => 'params', 'name' => 'num'),
+              'num' => array('type' => 'params', 'name' => 'num'),
             ),
+            'isThread' => true,
           ),
           'posts' => array(
             'paramsCode' => array(
               'uri' => array('type' => 'params', 'name' => 'uri'),
-              'page' => array('type' => 'params', 'name' => 'num'),
+              'num' => array('type' => 'params', 'name' => 'num'),
             ),
+            'isThread' => true,
           ),
         ),
         'options' => array(
