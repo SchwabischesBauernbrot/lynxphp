@@ -2,6 +2,8 @@
 
 $curlLog = array();
 
+// lib.url
+
 // if you have count you need ?
 // params is expected to be a key/value array
 // we return a joinable array of querystring sets
@@ -26,6 +28,8 @@ function parseQuerystringFromStr($url) {
   return $qs;
 }
 
+// end lib.url
+
 function parseHeaders($response) {
   $lines = explode("\r\n", $response);
   array_shift($lines);
@@ -49,6 +53,8 @@ function parseHeaders($response) {
 
 // router::getMaxMtime uses this
 // probably should be something like http_client_request
+// probably should take an URL as a parameter since it's required
+// FUPs have to be multipart?
 function request($options = array()) {
   extract(ensureOptions(array(
     'url' => '',
@@ -67,6 +73,9 @@ function request($options = array()) {
       // $body needs to be an array
       if (!is_array($body)) {
         // convert string to array?
+        // probably just should throw an error and not make the call
+        echo gettrace(), " string body given to multipart<br>\n";
+        exit(1);
       }
     } else {
       // $body needs to be a string
@@ -90,6 +99,10 @@ function request($options = array()) {
 }
 
 //open handle
+if (!function_exists('curl_init')) {
+  echo "PHP does not have the curl extension installed<br>\n";
+  exit(1);
+}
 $ch = curl_init();
 
 $curl_headers = array();
@@ -105,10 +118,6 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
     exit(1);
   }
 
-  if (!function_exists('curl_init')) {
-    echo "PHP does not have the curl extension installed<br>\n";
-    exit(1);
-  }
   // maybe only do this if AUTO or POST?
   //if (is_array($fields) && ($method === 'AUTO' || $method === 'POST')) {
   $hasFields = (is_array($fields) ? count($fields) : $fields) ? true : false;
@@ -123,16 +132,20 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
   // an array will set "Content-type to multipart/form-data"
   // if you send files, this has to be an array
   // https://stackoverflow.com/a/15200804
+
   // got array to string conversion, wtf...
   // could only support an array before php5 it seems
   // https://stackoverflow.com/a/5224895
-  if (is_array($fields)) {
+  // but for file uploads we need array lol
+  // we need a hint that's not a class check...
+  //if (is_array($fields)) {
     //echo "<pre>fields", print_r($fields, 1), "</pre>\n";
-    $fields = http_build_query($fields);
-  }
+    //echo "method[$method]<br>\n"; // POST
+    //echo '<pre>headers', print_r($header, 1), '</pre>', "\n"; // no headers
+    //$fields = http_build_query($fields);
+  //}
   curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
   //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   if ($header) {
     $headers = array();
     foreach($header as $k => $v) {
@@ -175,8 +188,8 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
 
   // we need this for everything
   //if (DEV_MODE) {
-    curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_HEADER, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   //}
 
   //curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false);
@@ -204,9 +217,9 @@ function curlHelper($url, $fields='', $header='', $user='', $pass='', $method='A
       'trace' => gettrace(),
       'postData' => $fields,
       'took' => (microtime(true) - $start) * 1000,
-      'requestHeaders' => $header,
+      'requestHeadersIn' => $header,
       // gets the out header...
-      //'responseHeaders' => curl_getinfo($ch, CURLINFO_HEADER_OUT),
+      'requestHeadersOut' => curl_getinfo($ch, CURLINFO_HEADER_OUT),
       'responseHeaders' => $respHeader,
       'result' => $result,
       'curlInfo' => $infos,
@@ -262,7 +275,8 @@ function curl_log_echo_header($l) {
   echo '</table>';
   //echo '  <pre>', htmlspecialchars(print_r($headers, 1)), '</pre>', "\n";
   // FIXME: clean this up and integrate it better
-  echo '  <pre>requestHeaders', htmlspecialchars(print_r($l['requestHeaders'], 1)), '</pre>', "\n";
+  echo '  <pre>requestHeaders', htmlspecialchars(print_r($l['requestHeadersIn'], 1)), '</pre>', "\n";
+  //echo '  <pre>requestHeaders', htmlspecialchars(print_r($l['requestHeadersOut'], 1)), '</pre>', "\n";
   //echo '  <pre>statusCode', htmlspecialchars(print_r($l['statusCode'], 1)), '</pre>', "\n";
   //echo '  <pre>result', htmlspecialchars(print_r($l['result'], 1)), '</pre>', "\n";
 }
@@ -304,6 +318,7 @@ function curl_log_report() {
       }
     }
     echo '  Response headers: <pre>', htmlspecialchars(print_r($l['responseHeaders'], 1)), '</pre>', "\n";
+    //echo '  Request headers: <pre>', htmlspecialchars(print_r($l['requestHeadersOut'], 1)), '</pre>', "\n";
     if (!empty($l['devData'])) {
       echo '  Dev Data: <pre>', htmlspecialchars(print_r($l['devData'], 1)), '</pre>', "\n";
     }
