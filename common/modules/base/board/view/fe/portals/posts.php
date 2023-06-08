@@ -80,6 +80,7 @@ function getPortalPosts($opts, $request) {
     'threadClosed' => $options['threadClosed'],
     'boardSettings' => $boardSettings,
     'noPosts' => $options['noPosts'],
+    'threadNum' => empty($params['num']) ? 0 : $params['num'],
   ));
   return array(
     'uri' => $uri,
