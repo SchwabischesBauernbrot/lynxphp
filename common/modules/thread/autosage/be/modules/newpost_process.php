@@ -1,6 +1,6 @@
 <?php
 
-// strings/be
+// autosage/be
 
 $module = $getModule();
 
@@ -22,7 +22,7 @@ $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
 //print_r($boardData['settings']);
 
 // get board's reply limit
-$limit = $boardData['settings']['bump_limit'];
+$limit = empty($boardData['settings']['bump_limit']) ? 0 : $boardData['settings']['bump_limit'];
 // FIXME: get thread's reply limit?
 
 // if no limit, not need to get ocunt
@@ -32,7 +32,14 @@ if (!$limit) return;
 $cnt = getThreadPostCount($boardUri, $tid);
 
 if ($cnt > $limit) {
-  $io['createPostOptions']['sage'] = true;
+  // for replies only, this is what likely matters here
+  $io['bumpThread'] = false;
+  // for threads and replies
+  // but probably should keep it in sync
+  // we definitely want to bump the board
+  // shows activity on the boards list
+  // and won't affect the thread sorting
+  //$io['createPostOptions']['bumpBoard'] = false;
 }
 
 /*
