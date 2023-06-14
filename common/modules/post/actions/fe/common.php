@@ -32,10 +32,13 @@ function renderPostActions($boardUri, $options = false) {
   $tabs = array(
     array('name'=>'Delete', 'content' => $templates['loop0']),
     array('name'=>'Report', 'content' => $templates['loop1']),
-    // BO, Global or Admin only actions:
-    array('name'=>'Media', 'content' => $templates['loop2']),
-    //array('name'=>'Ban', 'content' => $templates['loop3']),
   );
+
+  // BO, Global or Admin only actions:
+  if (1) {
+    $tabs[]=array('name'=>'Media', 'content' => $templates['loop2']);
+    //array('name'=>'Ban', 'content' => $templates['loop3']),
+  }
 
   $levelsHtml = '';
   foreach($levels as $lbl => $v) {
