@@ -293,30 +293,33 @@ class package {
     //global $sendPortals;
     //if (empty($sendPortals)) {
     $portals = array();
-      if ($this->activeRoutePackage) {
-        //echo "<pre>useResource[", print_r($this->activeRoutePackage->activeHandler, 1), "]</pre>\n";
-        $portals = empty($this->activeRoutePackage->activeHandler['options']['portals']) ? array() : $this->activeRoutePackage->activeHandler['options']['portals'];
-        //echo "<pre>lib.package:::package::useResource - portals: ", print_r($portals, 1), "</pre>\n", gettrace();
-        //echo "<pre>useResource[", print_r($portals, 1), "]</pre>\n";
-      } else {
-        // this is because we're called from another package
-        $activePkg = satelite('activePkg');
-        global $packages;
-        // control_panel.php has some issues here... $activePkg is not set...
-        // because there's no pkg to set when it's imported like that...
-        if ($activePkg) {
-          //echo "lib.package:::package::useResource - in[", $this->name,"] active[", $activePkg->name, "]<br>\n";
-          //echo "<pre>lib.package:::package::useResource - activeRoutePackage: ", print_r($packages[$activePkg->name]->activeRoutePackage->activeHandler, 1), "</pre>\n"; // , gettrace();
-          $portals = empty($packages[$activePkg->name]->activeRoutePackage->activeHandler['options']['portals']) ? array() : $packages[$activePkg->name]->activeRoutePackage->activeHandler['options']['portals'];
-        }
+    if ($this->activeRoutePackage) {
+      //echo "<pre>useResource[", print_r($this->activeRoutePackage->activeHandler, 1), "]</pre>\n";
+      $portals = empty($this->activeRoutePackage->activeHandler['options']['portals']) ? array() : $this->activeRoutePackage->activeHandler['options']['portals'];
+      //echo "<pre>lib.package:::package::useResource - portals: ", print_r($portals, 1), "</pre>\n", gettrace();
+      //echo "<pre>useResource[", print_r($portals, 1), "]</pre>\n";
+    } else {
+      // this is because we're called from another package
+      $activePkg = satelite('activePkg');
+      global $packages;
+      // control_panel.php has some issues here... $activePkg is not set...
+      // because there's no pkg to set when it's imported like that...
+      if ($activePkg) {
+        //echo "lib.package:::package::useResource - in[", $this->name,"] active[", $activePkg->name, "]<br>\n";
+        //echo "<pre>lib.package:::package::useResource - activeRoutePackage: ", print_r($packages[$activePkg->name]->activeRoutePackage->activeHandler, 1), "</pre>\n"; // , gettrace();
+        $portals = empty($packages[$activePkg->name]->activeRoutePackage->activeHandler['options']['portals']) ? array() : $packages[$activePkg->name]->activeRoutePackage->activeHandler['options']['portals'];
       }
+    }
     //} else {
       //$portals = array();
     //}
     // handle noBackendData option
     //echo "<pre>useResource in[", print_r($portals, 1), "]</pre>\n";
     $portals = array_filter($portals, function($v, $k) {
-      return empty($v['noBackendData']);
+      $sendBackendData = empty($v['noBackendData']);
+      $previouslyCalled = satelite('call_portal_' . $k);
+      // allowed conditions
+      return $sendBackendData && !$previouslyCalled;
     }, ARRAY_FILTER_USE_BOTH);
     //echo "<pre>useResource out[", print_r($portals, 1), "]</pre>\n";
     if (count($portals)) {
@@ -334,6 +337,7 @@ class package {
         $rsrc['querystring'] = array();
       }
       $portalStr = join(',', array_keys($portals));
+      //echo "portalStr[$portalStr]<br>\n";
       if (is_array($rsrc['querystring'])) {
         $rsrc['querystring']['portals'] = $portalStr;
       } else {
@@ -356,7 +360,10 @@ class package {
         // really tho?
         ldr_require($pr['modulePath']  . 'fe/portals/'. $filename . '.php');
         //$codeName = ucfirst($portalName);
+        //echo "filename[$filename]<Br>\n";
+        // meant to add SID stuff if needed...
         portal_modifyBackend($portalName, $rsrc);
+        satelite('call_portal_' . $portalName, true);
       }
     }
 
