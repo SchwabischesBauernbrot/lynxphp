@@ -11,6 +11,7 @@ function getPortalPosts($opts, $request) {
   global $portalData;
   //echo "<pre>getPortalPosts opts[", print_r($opts, 1), "]</pre>\n";
   //echo "<pre>getPortalPosts request[", print_r($request, 1), "]</pre>\n";
+  // supposed to be here but the last call is stopming this...
   //echo "<pre>getPortalPosts portalData[", print_r($portalData, 1), "]</pre>\n";
   //echo "<pre>getPortalPosts paramsCode[", print_r($opts['paramsCode'], 1), "]</pre>\n";
   //$config = getPortalBoardConfig();
@@ -25,7 +26,8 @@ function getPortalPosts($opts, $request) {
   // boardData['pageCount']
   $options = array(
     'board' => '',
-    'pagenum' => empty($params['page']) ? 1 : $params['page'],
+    //'pagenum' => empty($params['page']) ? 1 : $params['page'],
+    'threadNum' => empty($params['num']) ? 0 : $params['num'],
     'noBoardHeaderTmpl' => empty($opts['noBoardHeaderTmpl']) ? false : true,
     'isThread' => empty($opts['isThread']) ? false : true,
     'threadClosed' => empty($opts['threadClosed']) ? false : true,
@@ -41,30 +43,35 @@ function getPortalPosts($opts, $request) {
   // should be similar to a BE handler
   // so if the page has no BE calls, we can just get what we need
   global $_portalData;
-  //echo "<pre>_portalData", print_r($_portalData['board'], 1), "</pre>\n";
-  $pageCount = 0;
-  if (isset($_portalData['board']['pageCount'])) {
-    $pageCount = $_portalData['board']['pageCount'];
+  //echo "<pre>posts::_portalData", print_r($_portalData['posts'], 1), "</pre>\n";
+
+  //echo "threadNum[", $options['threadNum'], "]<br>\n";
+
+  //$pageCount = 0;
+  if (isset($_portalData['posts']['pageCount'])) {
+    //$pageCount = $_portalData['posts']['pageCount'];
     $uri = $params['uri'];
   } // else how? which EP
   else {
     if (!empty($opts['uri'])) {
-      $pageCount = $opts['pageCount'];
+      //$pageCount = $opts['pageCount'];
       $uri = $opts['uri'];
     } else {
-      global $packages;
+      //global $packages;
       // without portals=board we're missing the banner data
       // this hangs shit...
       // , 'portals' => 'boards'
       // should already auto-matically add it... right?
+      /*
       $boardThreads = $packages['base_board_view']->useResource('board_page', array('uri' => $params['uri'], 'page' => $options['pagenum']));
       //echo "<pre>boardThreads", print_r($boardThreads, 1), "</pre>\n";
       global $boardData;
       if (!$boardData) {
         $boardData = $boardThreads['board'];
       }
+      */
       //echo "<pre>boardThreads", print_r($boardThreads, 1), "</pre>\n";
-      $pageCount = $boardThreads['pageCount'];
+      //$pageCount = $boardThreads['pageCount'];
       $uri = $params['uri'];
     }
   }
@@ -74,14 +81,21 @@ function getPortalPosts($opts, $request) {
   } else {
     $boardSettings = array();
   }
-  $row = renderPostsPortalData($uri, $pageCount, array(
+  $row = renderPostsPortalData($uri, array(
     'noBoardHeaderTmpl' => $options['noBoardHeaderTmpl'],
     'isThread' => $options['isThread'],
+    'threadNum' => $options['threadNum'],
     'threadClosed' => $options['threadClosed'],
     'boardSettings' => $boardSettings,
     'noPosts' => $options['noPosts'],
     'threadNum' => empty($params['num']) ? 0 : $params['num'],
   ));
+  if (!empty($portalData['posts']['threadPostCnt'])) {
+    $row['postCount'] = $portalData['posts']['threadPostCnt'];
+  }
+  if (isset($portalData['posts']['threadFileCnt'])) {
+    $row['fileCount'] = $portalData['posts']['threadFileCnt'];
+  }
   return array(
     'uri' => $uri,
     'portalSettings' => $row,
@@ -91,7 +105,7 @@ function getPortalPosts($opts, $request) {
 
 // refactored out so we can share data between header/footer
 // without having to recalculate it
-function renderPostsPortalData($boardUri, $pageCount, $options = false) {
+function renderPostsPortalData($boardUri, $options = false) {
   global $pipelines;
 
   extract(ensureOptions(array(
@@ -233,7 +247,8 @@ function getPortalPostsFooter($data) {
 
 function renderPostsPortalFooterEngine($row, $boardUri, $boardData) {
   global $pipelines;
-  //echo "<pre>", htmlspecialchars(print_r($row, 1)), "</pre>\n";
+  //echo "<pre>row[", htmlspecialchars(print_r($row, 1)), "]</pre>\n";
+  //echo "<pre>boardData[", htmlspecialchars(print_r($boardData, 1)), "]</pre>\n";
 
   $templates = loadTemplates('mixins/posts_footer');
   $tmpl = $templates['header'];
@@ -252,7 +267,15 @@ function renderPostsPortalFooterEngine($row, $boardUri, $boardData) {
   }
 
   $threadstats_html = '';
-  if (!$row['noPosts'] && isset($boardData['posts']) && is_array($boardData['posts'])) {
+  // honestly, this probably doesn't belong here
+  // it's only useful on the thread view page
+  // and we can inline it at the top...
+  // maybe can stay here with an option to pass the data...
+  // the data doesn't belong in the be portal data
+  // but we can use fe portal to steal from the expect route if it exists
+  // isset($boardData['posts']) && is_array($boardData['posts'])
+  if (!$row['noPosts'] && (!empty($row['postCount']) || isset($row['fileCount']))) {
+    /*
     $files = 0;
     //echo "[", print_r($boardData['posts'], 1), "]<br>\n";
     foreach($boardData['posts'] as $post) {
@@ -260,9 +283,11 @@ function renderPostsPortalFooterEngine($row, $boardUri, $boardData) {
         $files += count($post['files']);
       }
     }
+    */
     $threadstats_html = replace_tags($threadstats_tmpl, array(
-      'replies' => count($boardData['posts']) - 1,
-      'files'   => $files,
+      //'replies' => count($boardData['posts']) - 1,
+      'replies' => $row['postCount'],
+      'files'   => $row['fileCount'],
     ));
   }
 
