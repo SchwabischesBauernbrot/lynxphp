@@ -16,11 +16,18 @@ class work_queue {
       $this->subscribed[$this->queueName] = true;
     }
   }
+  function getWorkCount() {
+    return $this->queue->getCount($this->queueName);
+  }
+
   function getWork() {
     $this->checkSub();
     // pipeline, params
-    $msg = $this->queue->receive($this->queueName);
-    if ($msg === NULL) {
+    $msgs = $this->queue->receive($this->queueName);
+    // is one or multiple (received says its returning multiple)
+    // it has to be one...
+    //print_r($msgs);
+    if ($msgs === NULL) {
       // nothing in the queue
       return;
     }
@@ -29,14 +36,14 @@ class work_queue {
     // when rn we're just only allowing no output
 
     global $pipelines;
-    if (!isset($pipelines[$msg['pipeline']])) {
+    if (!isset($pipelines[$msgs['pipeline']])) {
       // should we put it back onto the stack?
-      echo "No such pipeline [", $msg['pipeline'], "]<br>\n";
+      echo "No such pipeline [", $msgs['pipeline'], "]<br>\n";
       return;
     }
-    $pipelines[$msg['pipeline']]->execute($msg['params']);
+    $pipelines[$msgs['pipeline']]->execute($msgs['params']);
 
-    return $msg;
+    return $msgs;
   }
   function addWork($pipeline, $params) {
     $this->checkSub();
