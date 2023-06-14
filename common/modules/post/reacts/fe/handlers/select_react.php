@@ -17,7 +17,7 @@ $link = $uri . '/thread/' . $threadId . '/' . $postId . '/react';
 
 $q = getQueryField('q');
 
-$str = '';
+$str = '<meta name="robots" content="noindex">';
 $str .= '<form method="GET" action="' . $link . '">';
 $str .= '<input type="text" name="q" value="' . $q . '">';
 $str .= '<input type="submit" value="Search">';
