@@ -6,7 +6,6 @@
 function postDBtoAPI(&$row) {
   global $db, $models;
 
-
   // filter out any file_ or post_ field
   $row = array_filter($row, function($v, $k) {
     $f5 = substr($k, 0, 5);
@@ -49,6 +48,11 @@ function postDBtoAPI(&$row) {
     } else {
       unset($row[$f]);
     }
+  }
+  // FIXME: should be a pipeline
+  // don't like this N+1 but we don't always need capcode
+  if ($row['capcode']) {
+    // decode value
   }
   // decode user_id
 }
@@ -143,14 +147,33 @@ function getPost($boardUri, $postNo, $posts_model) {
 function createPost($boardUri, $post, $files, $privPost, $options = false) {
   global $db, $models, $now;
 
+  extract(ensureOptions(array(
+    'bumpBoard' => true,
+  ), $options));
+  //echo "bumpBoard[$bumpBoard]<br>\n";
+
+  $inow = (int)$now;
   // thread (0) or reply (!0)
   $threadid = $post['threadid'];
+  $io = array(
+    'boardUri' => $boardUri,
+    'p' => $post,
+    'priv' => $privPost,
+    'files' => $files,
+    'inow' => $inow,
+    'threadNum' => $threadid,
+  );
   // do not insert the tags field
   unset($post['tags']);
 
   // handle post
   $posts_model = getPostsModel($boardUri);
   $id = $db->insert($posts_model, array($post));
+  $io['id'] = $id;
+  if (!$io['threadNum']) {
+    // just created
+    $io['threadNum'] = $io['id'];
+  }
 
   // handle priv
   //echo "boardUri[$boardUri]<br>\n";
@@ -160,38 +183,29 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
   $db->insert($posts_priv_model, array($privPost));
 
   // handle files
-  $issues = processFiles($boardUri, $files, $threadid ? $threadid : $id, $id);
+  $issues = processFiles($boardUri, $files, $io['threadNum'], $id);
 
   // bump board
-  // FIXME: sage processing
-  // at least make it hookable
-  // maybe an option to disable this...
-  $inow = (int)$now;
-  $urow = array('last_post' => $inow);
-  if (!$threadid) {
-    // new thread
-    $urow['last_thread'] = $inow;
-  }
-  $db->update($models['board'], $urow, array('criteria'=>array(
-    array('uri', '=', $boardUri),
-  )));
-
-  // ec.wt pulled these out and put them into reply_thread
-  /*
-  // only need to bump replies
-  $bumpThread = !!$threadid;
-  if ($options && $options['sage']) {
-    $bumpThread = false;
-  }
-
-  if ($bumpThread) {
-    // bump thread
-    $urow = array();
-    $db->update($posts_model, $urow, array('criteria'=>array(
-      array('postid', '=', $threadid),
+  if ($bumpBoard) {
+    $urow = array('last_post' => $inow);
+    if (!$threadid) {
+      // new thread
+      $urow['last_thread'] = $inow;
+    }
+    //echo "Bumping [$boardUri]<br>\n";
+    //print_r($urow);
+    $db->update($models['board'], $urow, array('criteria'=>array(
+      array('uri', '=', $boardUri),
     )));
   }
-  */
+
+  global $pipelines;
+  $pipelines[PIPELINE_POST_ADD]->execute($io);
+
+  // create an option for some tasks to be backgrounded
+  global $workqueue;
+  $workqueue->addWork(PIPELINE_WQ_POST_ADD, $io);
+
   if ($issues) {
     return array(
       'issues' => $issues,
@@ -199,7 +213,9 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
     );
   }
 
-  return $id;
+  return array(
+    'id' => (int)$id,
+  );
 }
 
 // option.deleteReplies:bool
