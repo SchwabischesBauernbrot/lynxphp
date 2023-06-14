@@ -164,7 +164,7 @@ function router_log_report() {
   echo "Module: ", $name, "<br>\n";
   echo "File: ", $router->debugLog['match']['routeOptions']['address'], "<br>\n";
   global $packages;
-  if ($packages[$name]) {
+  if (!empty($packages[$name])) {
     echo $packages[$name]->toString();
   } else {
     echo "Unknown module<br>\n";
