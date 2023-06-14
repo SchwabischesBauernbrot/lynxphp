@@ -91,6 +91,8 @@ function renderBoardsTemplate($res, $templates, $params) {
 
   $boards = $res['data']['boards'];
   // FIXME: not very cacheable like this...
+  // they're board settings, so meh
+  // this page is going to update a lot...
   $settings = $res['data']['settings'];
   /*
   if (BACKEND_TYPE === 'default') {
@@ -111,8 +113,8 @@ function renderBoardsTemplate($res, $templates, $params) {
   foreach($boards as $c=>$b) {
     $last = '';
     $color = ''; // green
-    if (!empty($b['last'])) {
-      $time = $now - $b['last']['updated_at'];
+    if (!empty($b['last_post'])) {
+      $time = $now - $b['last_post'];
 
       $months = floor($time / (60 * 60 * 24 * 30));
       $time -= $months * (60 * 60 * 24 * 30);
@@ -164,7 +166,7 @@ function renderBoardsTemplate($res, $templates, $params) {
         $last = $months  . ' month' . $s . ' ago';
       }
 
-      $color = relativeColor($b['last']['updated_at']);
+      $color = relativeColor($b['last_post']);
     }
     $boardUri = $b['uri'];
 
