@@ -242,10 +242,6 @@ function renderPost($boardUri, $p, $options = false) {
     $flagTitle = empty($p['flagName']) ? '' : $p['flagName'];
     $postmeta .= ' <img src="' . BACKEND_PUBLIC_URL . $p['flag'] . '" alt="'.$flagTitle.'">';
   }
-  // post-
-  if (!empty($p['capcode'])) {
-    $postmeta .= ' <span class="post-capcode">' . htmlspecialchars($p['capcode']) . '</span>';
-  }
 
   // Hook processing for $postmeta
   $meta_io = array(
