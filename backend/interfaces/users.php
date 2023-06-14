@@ -71,6 +71,7 @@ function userInGroup($user_id, $group) {
 
 // allow threadNum to be 0
 // p/boardUri/threadNum/postId
+// $permission is not used...
 function isUserPermitted($user_id, $target = false, $permission = '') {
   // is user a admin or global?
   $isAdmin  = userInGroup($user_id, 'admin');
