@@ -20,7 +20,9 @@ $tmp = str_replace('{{uri}}', $boardUri, $tmp);
 $boardnav_html = $tmp;
 */
 
-$boardData = getBoardThread($boardUri, $threadNum);
+//$boardData = getBoardThread($boardUri, $threadNum);
+// need to git mv handler
+$boardData = $pkg->useResource('board_thread', array('uri' => $boardUri, 'num' => $threadNum));
 if ($boardData === false) {
   http_response_code(404);
   wrapContent('Board ' . $boardUri . ' does not exist');
