@@ -28,7 +28,7 @@ $db = new $driver_name;
 // don't auto-detect, just get configuration
 // FIXME: make configurable
 include '../common/queue_implementations/db.php';
-$queue_type_class = 'db' . '_queue_driver';
+$queue_type_class = QUEUE_DRIVER . '_queue_driver';
 $queue = new $queue_type_class;
 
 // set up workqueue
@@ -37,8 +37,9 @@ $workqueue = new work_queue;
 
 // reading from db to save db is it really worth it?
 // file might be fine
-/*
 // connect to scratch
+// we need some redis caching
+/*
 include '../common/scratch_implementations/' . SCRATCH_DRIVER . '.php';
 $scratch_type_class = SCRATCH_DRIVER . '_scratch_driver';
 $scratch = new $scratch_type_class;
@@ -109,6 +110,7 @@ $routers = buildRouters($routeConfig);
 
 require 'lib/lib.board.php';
 require 'lib/lib.ffmpeg.php';
+require 'lib/lib.perms.php';
 require 'lib/middlewares.php';
 require 'interfaces/boards.php';
 require 'interfaces/posts.php';
@@ -195,6 +197,7 @@ function sendResponse2($data, $options = array()) {
   // since request is gone
   // and we want to inject into the query
   // actually the query matters less
+  //print_r($_GET);
   if (isset($_GET['portals'])) {
     //$resp['meta']['portals'] = array();
     global $_PortalPipelines, $portalResources, $pipelines;
