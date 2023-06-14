@@ -1,5 +1,7 @@
 <?php
 
+// base/thread/view fe
+
 $fePkgs = array(
   array(
     'handlers' => array(
