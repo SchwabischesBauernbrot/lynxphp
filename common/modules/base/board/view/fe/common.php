@@ -3,6 +3,7 @@
 // this data and functions used for all frontend module php code
 
 // function are automatically exported
+//require('../common/modules/post/actions/fe/common.php'); // renderPostActions
 
 /*
 function backendGetBoardThreadListing($q, $boardUri, $pageNum = 1) {
@@ -208,7 +209,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
       'pagenum' => $pagenum,
       // mixin
       //'postform' => renderPostForm($boardUri, $boardUri . '/catalog'),
-      'postactions' => $noActions ? '' : renderPostActions($boardUri),
+      //'postactions' => $noActions ? '' : renderPostActions($boardUri),
     ),
   );
   $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
