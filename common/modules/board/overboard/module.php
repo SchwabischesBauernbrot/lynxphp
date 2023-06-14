@@ -14,7 +14,8 @@ return array(
         //'params' => 'querystring',
       ),
       'cacheSettings' => array(
-        'databaseTables' => array('overboard_threads'),
+        // boards is included incase of a post deletion (last_post should change)
+        'databaseTables' => array('overboard_threads', 'boards'),
       ),
     ),
   ),
