@@ -28,9 +28,9 @@ foreach($boards as $uri => $t) {
   $hasDeleteAccess[$uri] = isUserPermitted($user_id, 'delete_post', 'b/' . $uri);
 }
 
-$removedThreads = array();
-$removedPosts   = array();
-$added  = array();
+$removedThreads = 0;
+$removedPosts   = 0;
+$added  = 0;
 $issues = array();
 
 switch($action) {
@@ -69,6 +69,10 @@ switch($action) {
           $issues[$r['board'].'_'.$r['postid']] = 'deletion failed';
           continue;
         }
+        // what are these supposed to be according to spec?
+        // form doesn't say output
+        // and since not api, I'm not sure it matters
+        // looks like counts though
         if ($post['threadid']) {
           $removedPosts++;
         } else {
@@ -149,7 +153,7 @@ switch($action) {
   break;
 }
 
-$didSomething = count($removedThreads) + count($removedPosts) + count($added);
+$didSomething = $removedThreads + $removedPosts + $added;
 
 sendRawResponse(array(
   'auth' => null,
