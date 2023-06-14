@@ -6,7 +6,7 @@ return array(
     'version' => 1,
     'modules' => array(
       array(
-        'pipeline' => PIPELINE_FILE,
+        'pipeline' => PIPELINE_WQ_FILE_ADD,
         'module'   => 'thumbnail',
       ),
     ),
