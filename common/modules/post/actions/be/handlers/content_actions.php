@@ -28,9 +28,9 @@ foreach($boards as $uri => $t) {
   $hasDeleteAccess[$uri] = isUserPermitted($user_id, 'delete_post', 'b/' . $uri);
 }
 
-$removedThreads = 0;
-$removedPosts   = 0;
-$added  = 0;
+$removedThreads = array();
+$removedPosts   = array();
+$added  = array();
 $issues = array();
 
 switch($action) {
