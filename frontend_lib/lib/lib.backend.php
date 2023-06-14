@@ -160,6 +160,7 @@ function consume_beRsrc($options, $params = '') {
   //echo "feCachable[$feCachable] header[", print_r($headers, 1), "]<br>\n";
 
   // post login/IP
+  //echo "lib.backend::consume_beRsrc [", BACKEND_BASE_URL . $options['endpoint'] . $querystring, "]<br>\n";
   $requestOptions = array(
     'url'    => BACKEND_BASE_URL . $options['endpoint'] . $querystring,
     'method' => empty($options['method']) ? 'AUTO' : $options['method'],
@@ -450,7 +451,7 @@ function getBoardCatalog($boardUri) {
 
 function getBoardThread($boardUri, $threadNum) {
   // the rss case doesn't need the portal
-  $result = getExpectJson('opt/' . $boardUri . '/thread/' . $threadNum . '.json?portals=board');
+  $result = getExpectJson('opt/' . $boardUri . '/thread/' . $threadNum . '.json?portals=board,posts');
   if ($result === false) {
     // 404
     return $result;
