@@ -13,6 +13,9 @@ return array(
         //'requires' => array('boardUri'),
         //'params' => 'querystring',
       ),
+      'cacheSettings' => array(
+        'databaseTables' => array('overboard_threads'),
+      ),
     ),
   ),
 );
