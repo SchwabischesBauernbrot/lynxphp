@@ -1,12 +1,14 @@
 <?php
 
+// list/be
+
 global $db;
 // default is popularity (desc)
 $search = empty($_GET['search']) ? '' : $_GET['search'];
 $sort = empty($_GET['sort']) ? 'activity' : $_GET['sort'];
 
 // updated_at isn't good enough, last
-$sortByField = $sort === 'popularity' ? 'posts' : 'last';
+$sortByField = $sort === 'popularity' ? 'posts' : 'last_post';
 
 $boards = listBoards(array(
   'search'     => $search,
@@ -48,7 +50,12 @@ foreach($boards as $b) {
     $res[$b[$sortByField]] = $b;
   }
 }
-ksort($res);
+$direction = empty($_GET['direction']) ? 'desc' : $_GET['direction'];
+if ($direction === 'desc') {
+  ksort($res);
+} else {
+  krsort($res);
+}
 $res = array_merge($noLast, $res);
 // FIXME: not very cacheable like this...
 sendResponse2(array('settings' => getSettings(), 'boards' => array_values($res)));
