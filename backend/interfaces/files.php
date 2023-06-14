@@ -90,7 +90,7 @@ function fileDBtoAPI(&$row, $boardUri) {
       //echo "Requesting generation of [", $row['path'], "]<br>\n";
       global $workqueue;
       $row['boardUri'] = $boardUri;
-      $workqueue->addWork(PIPELINE_FILE, $row);
+      $workqueue->addWork(PIPELINE_WQ_FILE_ADD, $row);
     }
   }
 
@@ -337,18 +337,18 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
 
     $size = filesize($finalPath);
     $type = 'file';
-    if ($isImage) $type = 'image';
-    if ($isVideo) $type = 'video';
+    if ($isImage) $type = 'image'; else
+    if ($isVideo) $type = 'video'; else
     if ($isAudio) $type = 'audio';
 
     $sizes = array(0, 0);
     if ($isImage) {
       $sizes = getimagesize($finalPath);
-    }
+    } else
     if ($isVideo) {
       $vr = getVideoResolution($finalPath);
       $sizes = array($vr['width'], $vr['height']);
-    }
+    } else
     if ($isAudio) {
       $sizes = array(240, 240);
     }
@@ -385,7 +385,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     global $workqueue;
     $fileData['fileid'] = $id; // set fileid
     $fileData['boardUri'] = $boardUri;
-    $workqueue->addWork(PIPELINE_FILE, $fileData);
+    $workqueue->addWork(PIPELINE_WQ_FILE_ADD, $fileData);
 
   }
   return $issues;
