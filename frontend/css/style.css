@@ -538,7 +538,8 @@ td pre {
 
 .stickynav {
   bottom: 5px;
-  right: 5px;
+  /* moved over for minimized user bar */
+  right: 50px;
   position: fixed;
   z-index: 1;
 }
