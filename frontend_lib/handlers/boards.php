@@ -162,6 +162,7 @@ function retryCaptcha($boardUri, $row) {
 
 // requestValid should be renamed to success
 function makePostHandlerEngine($request) {
+  // where is max_length set?
   global $pipelines, $max_length;
   $boardUri = $request['params']['uri'];
 
@@ -248,6 +249,9 @@ function makePostHandlerEngine($request) {
     $row['files'] = json_encode(array_merge($already, $files));
   }
 
+  // row modification
+  $pipelines[PIPELINE_POST_DATA_PREVALIDATION]->execute($row);
+
   // basic validation that we have some type of new content of value
   // empty message AND empty file
   $noFiles = (!$row['files'] || $row['files'] === '[]');
@@ -262,7 +266,6 @@ function makePostHandlerEngine($request) {
     */
     $errors[] = 'content (message/comment or file) required';
   }
-
 
   $io = array(
     'boardUri' => $boardUri,
@@ -322,13 +325,32 @@ function makePostHandlerEngine($request) {
     //return;
   }
 
-  // make post...
-  // we could queue this for a worker but then any be validation couldn't be passed to the user
-  $json = request(array(
+  // row modification
+  $io = array(
     'url' => BACKEND_BASE_URL . $endpoint,
-    'body' => $row, // an array
+    'row' => $row,
     'headers' => $headers,
+  );
+  $pipelines[PIPELINE_POST_DATA_POSTVALIDATION]->execute($io);
+
+  // make post...
+  // we could queue this for a worker but then any BE validation couldn't be passed to the user
+  $json = request(array(
+    'url' => $io['url'],
+    'body' => $io['row'], // an array
+    'headers' => $io['headers'],
   ));
+  if (!$json) {
+    // this means something...
+    // ok this CAN mean backend had a FATAL error (before any output?)
+    return array(
+      'requestValid' => true, // can be retried
+      'boardUri' => $boardUri,
+      'row' => $row,
+      'errors' => array('Unknown engine error, tell admin to check their error logs')
+      //'redirect' => $io['redirNow'],
+    );
+  }
   //$json = curlHelper(BACKEND_BASE_URL . $endpoint, $row, $headers);
 
   // backend errors?
@@ -359,7 +381,11 @@ function makePostHandlerEngine($request) {
       //'filesDebugs' => $res,
       //'_FILES' => $_FILES,
       // good for debug/dev
-      'backendInput' => $row, // validation and what's sent to the BE
+      'url' => $io['url'],
+      'headers' => $io['headers'],
+      'validated' => $row, // exact data that passed validation
+      'backendInput' => $io['row'], // validation and what's sent to the BE
+      'backendOutput' => $json,
       'filesForBE' => $files, // should be in row but it'll be jsonencoded, so less useful
     );
     if (empty($results)) {
