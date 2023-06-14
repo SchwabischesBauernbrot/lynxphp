@@ -48,7 +48,10 @@ switch($action) {
         array('addPostFields' => $postFields)
       );
       if (is_array($result)) {
-        if ($result['removedPosts'] + $result['removedThreads'] === count($postFields)) {
+        // guard around these
+        $removedPosts = empty($result['removedPosts']) ? 0 : $result['removedPosts'];
+        $removedThreads = empty($result['removedThreads']) ? 0 : $result['removedThreads'];
+        if ($removedPosts + $removedThreads === count($postFields)) {
           echo "Successful!<bR>\n"; flush();
           if (!empty($_POST['page'])) {
             return redirectTo('/' . $boardUri . '/page/' . $_POST['page']);
