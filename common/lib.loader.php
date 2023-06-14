@@ -19,6 +19,9 @@ function ldr_require($file) {
     $f = $file;
   }
   global $_loader_data;
+  if ($_loader_data === false && DEV_MODE) {
+    echo "loader marked down but [$file]", gettrace(), "<Br>\n";
+  }
   // normalize file path / name?
   if (empty($_loader_data[$f])) {
     $res = include $file;
@@ -30,7 +33,10 @@ ldr_require('../common/lib.packages.php');
 
 function ldr_done() {
   global $_loader_data;
-  $_loader_data = false;
+  // can't do this
+  // lib.handler wrapContent / lib.packages useResource portal system
+  // now needs to make sure
+  //$_loader_data = false;
 }
 
 // uid and gid can be string (doesn't have be numeric)
