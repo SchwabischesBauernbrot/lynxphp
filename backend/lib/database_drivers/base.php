@@ -203,6 +203,7 @@ class database_driver_base_class {
       return false;
     }
     $tableName = modelToTableName($rootModel);
+    // FIXME: we could queue all these and flush them on exit
     $this->update($models['table'], array(), array('criteria' => array(
       'table_name' => $tableName
     )));
@@ -262,6 +263,10 @@ class database_driver_base_class {
     $sql = 'update ' .$sTableName . ' set '. join(', ', $sets);
     if (isset($options['criteria'])) {
       $sql .= ' where ' . $this->build_where($options['criteria']);
+    }
+    if (0) {
+      $trace = gettrace();
+      echo "<pre>sql[$sql] $trace</pre>\n";
     }
     return $sql;
   }
