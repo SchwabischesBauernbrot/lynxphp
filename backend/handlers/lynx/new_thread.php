@@ -40,11 +40,10 @@ $newpost_process_io = array(
   'files'        => $files,
   'addToPostsDB' => true,
   'processFilesDB' => true,
-  'bumpBoard' => true,
-  'bumpThread' => true,
+  'bumpThread' => false, // doesn't do anything for a new thread...
   'returnId' => true,
   'issues'   => array(),
-  'createPostOptions' => array(),
+  'createPostOptions' => array('bumpBoard' => true),
 );
 $pipelines[PIPELINE_NEWPOST_PROCESS]->execute($newpost_process_io);
 
@@ -56,36 +55,17 @@ if ($newpost_process_io['addToPostsDB']) {
   // can be an array (issues,id) if file errors
   $data = createPost($boardUri, $post, $files, $privPost, $newpost_process_io['createPostOptions']);
 
-  /*
-  $posts_model = getPostsModel($boardUri);
-  $id = $db->insert($posts_model, array($post));
-  $posts_priv_model = getPrivatePostsModel($boardUri);
-  $privPost['postid'] = $id; // update postid
-  $db->insert($posts_priv_model, array($privPost));
-  $issues = processFiles($boardUri, $_POST['files'], $id, $id);
-
-  // bump board
-  $inow = (int)$now;
-  $urow = array('last_thread' => $inow, 'last_post' => $inow);
-  $db->update($models['board'], $urow, array('criteria'=>array(
-    array('uri', '=', $boardUri),
-  )));
-
-  $data = (int)$id;
-  if (count($issues)) {
-    return sendResponse(array(
-      'issues' => $issues,
-      'id' => $data
-    ));
+  $noIssues = empty($data['issues']);
+  if (!$noIssues) {
+    return sendResponse2($data);
   }
-  */
 
-  sendResponse($data);
+  sendResponse2($data['id']);
 } else {
   $data = $newpost_process_io['returnId'];
   // inject error messages
   if (count($newpost_process_io['issues'])) {
     $data['issues'] = $newpost_process_io['issues'];
   }
-  sendResponse($data);
+  sendResponse2($data);
 }
