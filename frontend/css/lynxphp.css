@@ -58,6 +58,7 @@ any modifications to existing will go directly into style.css with notes
 /* navigation selection */
 .active {
   font-weight: bold;
+  text-decoration: underline;
 }
 
 #trigger {
