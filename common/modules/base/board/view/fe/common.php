@@ -45,7 +45,11 @@ function getBoardThreadListing($q, $boardUri, $pagenum = 1) {
   // probably
   // also we know the portals because of the nature of the groupdata and where this file is
   // well this has the advantage of going through the resource/package system
-  $boardThreads = $packages['base_board_view']->useResource('board_page', array('uri' => $boardUri, 'page' => $pagenum, 'portals' => join(',', array_keys($q['portals']))));
+  //
+  // why aren't we use $pkg->useResource('board_page');
+  // because this function could be called from another $pkg
+  $boardThreads = $packages['base_board_view']->useResource('board_page', array('uri' => $boardUri, 'page' => $pagenum));
+
   if (!$boardThreads) {
     wrapContent("There is a problem with the backend [$boardUri]");
     return;
