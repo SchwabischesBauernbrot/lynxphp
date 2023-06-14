@@ -30,8 +30,8 @@ if (!$boardUri && isset($router->foundRoute['match']['params']['uri'])) {
 }
 
 if (!$boardUri) {
-  $io['out']['board']['issue'] = 'no boardUri found';
-  $io['out']['board']['debug'] = $router->foundRoute;
+  $io['out']['posts']['issue'] = 'no boardUri found';
+  $io['out']['posts']['debug'] = $router->foundRoute;
 }
 
 $io['boardUri'] = $boardUri;
@@ -39,7 +39,7 @@ $io['boardUri'] = $boardUri;
 if ($boardUri) {
   // kind of a waste but we need to recover this...
   // since expectJson has no comms with useResource or router...
-  $io['out']['board']['uri'] = $boardUri;
+  $io['out']['posts']['uri'] = $boardUri;
 }
 
 // well we assume their logged in
@@ -68,9 +68,20 @@ if (!$boardSettings) {
 }
 $io['board'] = $boardSettings;
 
+if (!empty($io['data']['posts'])) {
+  $io['out']['posts']['threadPostCnt'] = count($io['data']['posts']);
+  $files = 0;
+  foreach($io['data']['posts'] as $p) {
+    if (isset($p['files'])) {
+      $files += count($p['files']);
+    }
+  }
+  $io['out']['posts']['threadFileCnt'] = $files;
+}
+
 // board data? only if settings is missing
 if (!is_bool($boardSettings)) {
-  $io['out']['board']['settings'] = $boardSettings;
+  $io['out']['posts']['settings'] = $boardSettings;
 }
 
 /*
@@ -87,11 +98,11 @@ global $tpp;
 if ($boardUri) {
   $posts_model = getPostsModel($boardUri);
   $tc = getBoardThreadCount($boardUri, $posts_model);
-  $io['out']['board']['pageCount'] = ceil($tc / $tpp);
+  $io['out']['posts']['pageCount'] = ceil($tc / $tpp);
 }
 
 // bandwidth saver
-if (!count($io['out']['board'])) {
-  unset($io['out']['board']);
+if (!count($io['out']['posts'])) {
+  unset($io['out']['posts']);
 }
 ?>
