@@ -359,6 +359,8 @@ class package {
         // ldr_require because a BE might be called more than once
         // really tho?
         ldr_require($pr['modulePath']  . 'fe/portals/'. $filename . '.php');
+        // can't use ldr because already done by now
+        //require($pr['modulePath']  . 'fe/portals/'. $filename . '.php');
         //$codeName = ucfirst($portalName);
         //echo "filename[$filename]<Br>\n";
         // meant to add SID stuff if needed...
