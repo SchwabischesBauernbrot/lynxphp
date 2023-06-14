@@ -1,5 +1,9 @@
 <?php
 
+// requires ensureOptions (currently in: common/common.php)
+// also need DEV_MODE defined
+if (!defined('DEV_MODE')) define('DEV_MODE', false);
+
 $curlLog = array();
 
 // lib.url
@@ -53,8 +57,11 @@ function parseHeaders($response) {
 
 // router::getMaxMtime uses this
 // probably should be something like http_client_request
+
 // probably should take an URL as a parameter since it's required
 // FUPs have to be multipart?
+
+// should take a form option that throws it into application/x-www-form-urlencoded mode
 function request($options = array()) {
   extract(ensureOptions(array(
     'url' => '',
