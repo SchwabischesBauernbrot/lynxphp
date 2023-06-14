@@ -479,6 +479,7 @@ EOB;
       wrapContent('Post Refused');
     } else {
       // valid json
+      // CAPTCHA is required
       if ($result['data'] === 'Expired captcha.' || $result['data'] === 'Wrong captcha.') {
         //print_r($row);
         retryCaptcha($boardUri, $row);
