@@ -35,6 +35,11 @@ class db_queue_driver extends queue_implementation_base_class implements queue_i
     }
   }
 
+  function getCount($queue) {
+    global $db;
+    return $db->count($this->queue_model);
+  }
+
   // limit? get one? get all?
   // it's getting one rn
   function receive($queue, $waitformsg = false) {
@@ -76,6 +81,8 @@ class db_queue_driver extends queue_implementation_base_class implements queue_i
   function send($queue, $message) {
     global $db;
     // if we passed in an id, then we're signaling the job is done
+    // we change to delete on job fetch
+    // can be re-inserted on failure
     /*
     if (!empty($message['id'])) {
       global $now;
