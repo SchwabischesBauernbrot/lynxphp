@@ -32,9 +32,15 @@ if (!defined('DB_DRIVER')) define('DB_DRIVER', 'mysql');
 if (!defined('IN_TEST')) define('IN_TEST', false);
 if (!defined('DISABLE_MODULES')) define('DISABLE_MODULES', array());
 
+if (!defined('SCRATCH_DRIVER')) define('SCRATCH_DRIVER', 'db');
+if (!defined('QUEUE_DRIVER')) define('QUEUE_DRIVER', 'db');
+
+
 // scratch file would need this
 if (!defined('USER')) define('USER', 'www-data'); // debian
 if (!defined('IN_GENERATE')) define('IN_GENERATE', false);
+
+// archive module would like to know our BASE_HOST and BASE_HREF
 
 // only frontend needs to check this...
 //define('BACKEND', true); // need to set this on the FE too
