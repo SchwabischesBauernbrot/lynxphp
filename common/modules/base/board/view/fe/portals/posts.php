@@ -241,7 +241,16 @@ function renderPostsPortalHeaderEngine($row, $boardUri, $boardData) {
 
 function getPortalPostsFooter($data) {
   //global $boardData; // better than nothing
-  $boardData = getter_getBoard($data['uri']);
+  if ($data['uri'] === 'overboard') {
+    $boardData = array(
+      'pageCount' => 1,
+      'title' => 'All Boards',
+      'description' => 'posts across the site',
+      'settings' => array(),
+    );
+  } else {
+    $boardData = getter_getBoard($data['uri']);
+  }
   echo renderPostsPortalFooterEngine($data['portalSettings'], $data['uri'], $boardData);
 }
 
