@@ -192,6 +192,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
 
       if (isset($model['seed']) && is_array($model['seed'])) {
         $inserts = array();
+        // FIXME: optimize to IN query ...
         foreach($model['seed'] as $row) {
           $cnt = $this->count($model, array('criteria'=>$row));
           if (!$cnt) {
@@ -305,13 +306,13 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       }
       list($id) = pg_fetch_row($res);
       pg_free_result($res);
-      $this->markWriten($rootModel);
+      if (!in_array($rootModel['name'], $this->dontTrackTables)) {
+        // multiple won't matter here
+        //echo "insert[", $rootModel['name'], "]<br>\n";
+        $this->markWriten($rootModel);
+      }
     }
     //echo "res[$res]<br>\n";
-    if (!in_array($rootModel['name'], $this->dontTrackTables)) {
-      // multiple won't matter here
-      $this->markWriten($rootModel);
-    }
     return $id;
   }
 
@@ -324,8 +325,11 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       echo "pgsql::update - err[$err]<br>\nsql[$sql]<br>\n";
       return false;
     }
+    //echo "[", $rootModel['name'], "]" , print_r($this->dontTrackTables, 1), "\n";
     if (!in_array($rootModel['name'], $this->dontTrackTables)) {
+      //echo "tracking[", $rootModel['name'], "]<br>\n";
       // multiple won't matter here
+      //echo "update[", $rootModel['name'], "]<br>\n";
       $this->markWriten($rootModel);
     }
     return true;
@@ -342,6 +346,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     }
     if (!in_array($rootModel['name'], $this->dontTrackTables)) {
       // multiple won't matter here
+      //echo "delete[", $rootModel['name'], "]<br>\n";
       $this->markWriten($rootModel);
     }
     return true;
