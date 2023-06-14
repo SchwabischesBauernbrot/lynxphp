@@ -92,6 +92,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $this->hostname = $host;
     $this->username = $user;
     $this->password = $pass;
+    mysqli_report(MYSQLI_REPORT_OFF);
     return true;
   }
   // direct
