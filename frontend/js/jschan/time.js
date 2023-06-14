@@ -121,11 +121,14 @@ window.addEventListener('settingsReady', function(event) {
 window.addEventListener('addPost', function(e) {
 
   const newPostDates = e.detail.post.querySelectorAll('.reltime');
-  for (let date of newPostDates) {
-    if (!e.detail.hover) {
-      dates.push(date);
+  for(var i in newPostDates) {
+    if (newPostDates.hasOwnProperty(i)) {
+      var date = newPostDates[i]
+      if (!e.detail.hover) {
+        dates.push(date)
+      }
+      changeDateFormat(date)
     }
-    changeDateFormat(date);
   }
 
 });
