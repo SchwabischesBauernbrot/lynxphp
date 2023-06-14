@@ -18,7 +18,7 @@ if (isset($board_settings['captcha_mode'])) {
   $mode = $board_settings['captcha_mode']; // posts / thread / no
   $enable = false;
   if ($io['endpoint'] === 'lynx/newThread') {
-    if ($mode !== 'no') {
+    if ($mode !== 'No captcha') {
       $enable = true;
     }
   } else {
@@ -27,6 +27,7 @@ if (isset($board_settings['captcha_mode'])) {
       $enable = true;
     }
   }
+  //echo "mode[$mode] ep[", $io['endpoint'],"] enable[$enable]<br>\n";
 
   if ($enable) {
     $captchaErr = validate_captcha_field();
