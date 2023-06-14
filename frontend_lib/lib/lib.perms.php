@@ -69,8 +69,10 @@ function perms_getBoards() {
   //echo "<pre>", print_r($user, 1), "</pre>\n";
   // ensure $user['account']
   $getAccount = false;
-  if ($user === false) $getAccount = true;
-  else
+  if ($user === false) {
+    $getAccount = true;
+    $user = array();
+  } else
   if (!isset($user['account'])) $getAccount = true;
   else
   if (isset($user['account_ts']) && $now - $user['account_ts'] > 60) {
