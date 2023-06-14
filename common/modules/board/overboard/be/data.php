@@ -3,25 +3,18 @@
 return array(
   array(
     'models' => array(
-      /*
       array(
-        'name'   => 'board_banner',
+        'name'   => 'overboard_thread',
         'fields' => array(
-          'board_id' => array('type' => 'int'),
-          'image'    => array('type' => 'str'),
-          'w'        => array('type' => 'int'),
-          'h'        => array('type' => 'int'),
-          'weight'   => array('type' => 'int'),
+          'uri'      => array('type' => 'str'),
+          'thread_id' => array('type' => 'int'),
+          // timestamp are already included
         ),
       ),
-      */
     ),
     'modules' => array(
-      /*
-      // is this needed?
-      // well we could inject this data into some other endpoints...
-      array('pipeline' => PIPELINE_BOARD_DATA, 'module' => 'boardData'),
-      */
+      // track threads ourself
+      array('pipeline' => PIPELINE_POST_ADD, 'module' => 'post_add'),
     ),
   ),
 );
