@@ -4,104 +4,89 @@
 
 $params = $get();
 
-// we have to look at ALL threads
-$boards = listBoards();
-// if there are a ton of boards this will be really slow...
-$threadTimes = array();
-foreach($boards as $i => $b) {
-  //echo "<pre>b[", print_r($b, 1), "]</pre>\n";
-  $uri = $b['uri'];
-  $boards[$i]['threads'] = boardCatalog($uri);
-  // make a list of threads
-  foreach($boards[$i]['threads'] as $pageThreads) {
-    //echo "<pre>t[", print_r($t, 1), "]</pre>\n";
-    //if (!count($p)) continue; // no threads on this board
-    foreach($pageThreads as $t) {
-      // could push it off
-      $time = $t['updated_at'];
-      //echo "time[$time]<br>\n";
-      if (!isset($threads[$time])) {
-        $threadTimes[$time] = array();
-      }
+global $db, $models;
 
-      //$thread = $t;
-      //$thread['post'] = array_slice($t, 1);
-      $t['boardUri'] = $uri;
-      $threadTimes[$time][] = $t;
-    }
-  }
-}
-krsort($threadTimes);
-
-$threads = array();
-foreach($threadTimes as $times) {
-  foreach($times as $t) {
-    $threads[] = $t;
-  }
+// need to join board to get the settings
+$ob_extended = $models['overboard_thread'];
+$boardTable = modelToTableName($models['overboard_thread']);
+if ($db->btTables) {
+  $boardTable = '`' . $boardTable . '`';
 }
 
-// a limit
-// FIXME paging?
-$threads = array_slice($threads, 0, 50);
+$ob_extended['children'] = array(
+  array(
+    'model' => $models['board'],
+    'pluck' => array('ALIAS.json as board_json'),
+    'on' => array(
+      array('uri', '=', $db->make_direct($boardTable . '.uri')),
+    ),
+  ),
+);
 
-/*
-$models = array();
-foreach($threads as $i => $t) {
-  if (!isset($models[$t['boardUri']])) {
-    $models[$t['boardUri']] = array(
-      'posts' => getPostsModel($t['boardUri']),
-      'files' => getPostFilesModel($t['boardUri']),
-    );
-  }
-}
-*/
-
-//print_r($threads);
+$res = $db->find($ob_extended, array(
+  'order' => 'updated_at desc',
+  'limit' => 50, // FIXME: make adjustable
+));
 
 $boardSettings = array();
-foreach($threads as $i => $t) {
-  $uri = $t['boardUri'];
-  if (!isset($boardSettings[$uri])) {
-    // anything we need to filter out?
-    // do we just want/need the settings field?
-    $boardData = getBoard($uri, array('jsonFields' => 'settings'));
-    // settings isn't always set?
-    $boardSettings[$uri] = empty($boardData['settings']) ? array() : $boardData['settings'];
-  }
-}
+$threads = array();
+$modelSets = array();
+while($row = $db->get_row($res)) {
+  // thread_id, uri, board_json
+  $uri = $row['uri'];
+  // it is possible a board gets deleted and leaves a reference in this table
+  // so we can check another field in the pluck to ensure it exists...
+  // we have a full join, so we're fine
 
-// now load in the posts
-foreach($threads as $i => $t) {
-  /*
-  if (!isset($t['boardUri']) {
-    echo "Threads missing boardUri\n";
+  if (!isset($modelSets[$uri])) {
+    $modelSets[$uri] = array(
+      'posts' => getPostsModel($uri, array('checkBoard' => false)),
+      'files' => getPostFilesModel($uri, array('checkBoard' => false)),
+    );
   }
-  if (!isset($models[$t['boardUri']])) {
-    continue;
-  }
-  $model = $models[$t['boardUri']];
-  */
 
-  // there's tpp but it's like 10...
-  $threads[$i]['posts'] = getThread($t['boardUri'], $t['no'], array(
+  // I think we basically have to N+1 this because of the tables...
+  // otherwise we'd need a massive union
+  $model = $modelSets[$uri];
+  $posts = getThread($uri, $row['thread_id'], array(
     // weird unexpected results if we turn this off...
    'includeOP' => true,
-    //'posts_model' => $model['post'],
-    //'post_files_model' => $model['files'],
+    'posts_model' => $model['posts'],
+    'post_files_model' => $model['files'],
   ));
-  $threads[$i]['thread_reply_count'] = count($threads[$i]['posts']);
-  // post previw = 5
+  $op = $posts[0];
+  if ($op['threadid']) {
+    // if someone puts a replyid in here instead of thread, we can catch it
+    //echo "There's a problem with ", $uri, ' ', $row['thread_id'], "<br>\n";
+    continue;
+  }
+
+  if ($row['board_json'] && !isset($boardSettings[$uri])) {
+    $json = json_decode($row['board_json'], true);
+    if (!empty($json['settings'])) {
+      $boardSettings[$uri] = $json['settings'];
+    } else {
+      $boardSettings[$uri] = array();
+    }
+  }
+
+  // unlimited amount
+  $thdPstCnt = count($posts);
+  $thread = $op;
+  $thread['boardUri'] = $uri;
+  $thread['thread_reply_count'] = $thdPstCnt - 1; // op isn't a reply
+  // post preview = 5
   // we want the last 5 posts, not the first 5
-  $thdPstCnt = count($threads[$i]['posts']);
   // thread has the op and that contains these posts
   // we have to filter the out if it's included...
   if ($thdPstCnt > 6) {
     // we can't include the op, so we need at least 6 posts count
-    $threads[$i]['posts'] = array_slice($threads[$i]['posts'], $thdPstCnt - 5, 5);
+    $thread['posts'] = array_slice($posts, $thdPstCnt - 5, 5);
   } else {
     // just skip op, show the rest
-    $threads[$i]['posts'] = array_slice($threads[$i]['posts'], 1);
+    $thread['posts'] = array_slice($posts, 1);
   }
+  $threads[]= $thread;
 }
 
 sendResponse2(array(
