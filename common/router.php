@@ -22,6 +22,12 @@ function responseToText($response) {
 // FIXME: we can just use this->dev now...
 if (!defined('DEV_MODE')) define('DEV_MODE', false);
 
+// https://stackoverflow.com/a/61079134
+function fileExtension($name) {
+  $n = strrpos($name, '.');
+  return ($n === false) ? '' : substr($name, $n + 1);
+}
+
 class Router {
   function __construct() {
     $this->methods = array();
@@ -848,11 +854,11 @@ class Router {
       $match = $matches[0];
       if (count($matches) !== 1) {
         $minScore = 99;
-        $pathExt = pathinfo($path, PATHINFO_EXTENSION);
+        $pathExt = fileExtension($path);
         //echo "path[$path][$pathExt]<br>\n";
         foreach($matches as $c => $row) {
           $score = levenshtein($row['cond'], $path);
-          $routeExt = pathinfo($row['cond'], PATHINFO_EXTENSION);
+          $routeExt = fileExtension($row['cond']);
           // lets force the ext to match
           // because req /theme.html
           // needs to match /:category.html
