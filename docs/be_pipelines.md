@@ -2,19 +2,30 @@ PIPELINE_NEWPOST_PROCESS - controls what happens to new posts
   p (post)
   addToPostsDB [bool]
   processFilesDB [bool]
-  bumpBoard [bool]
   bumpThread [bool]
   returnId [mixed]
+  issues [array]
+  createPostOptions
+    bumpBoard [bool]
 
 PIPELINE_POSTTAG_REGISTER
   *tags [array of tag objects] (has a key)
 
 PIPELINE_NEWPOST_TAG
-  boardUri
+  boardUri [string]
   p [post object]
   priv [private post object]
   files [array of files]
   *tags [array of tag key strings]
+
+PIPELINE_POST_ADD
+  boardUri [string]
+  p [post object]
+  priv [private post object]
+  files [array of files]
+  inow [integer]
+  threadNum [integer]
+  id [integer]
 
 PIPELINE_REPLY_ALLOWED
   p (post)
@@ -56,7 +67,15 @@ PIPELINE_ACCOUNT_DATA
     username [string]
     publickey [string]
 WorkQueue pipelines:
-PIPELINE_FILE
+PIPELINE_WQ_POST_ADD
+  boardUri [string]
+  p [post object]
+  priv [private post object]
+  files [array of files]
+  inow [integer]
+  threadNum [integer]
+  id [integer]
+PIPELINE_WQ_FILE_ADD
   boardUri
   fileid
   sha256
