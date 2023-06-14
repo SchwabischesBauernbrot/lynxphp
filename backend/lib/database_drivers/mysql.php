@@ -165,7 +165,8 @@ class mysql_driver extends database_driver_base_class implements database_driver
         // Field, Type, Null, Key, Default, Extra
         //echo "<pre>describe", print_r($row), "</pre>\n";
         // 8.x still has Field and Type
-        $haveFields[ $row['Field'] ] = sqlToType($row['Type'], $row['Field'], $model['fields'][$row['Field']]);
+        // was getting a lot of warnings about last param...
+        $haveFields[ $row['Field'] ] = sqlToType($row['Type'], $row['Field'], empty($model['fields'][$row['Field']]) ? '' : $model['fields'][$row['Field']]);
       }
       mysqli_free_result($res);
       $haveAll = true;
