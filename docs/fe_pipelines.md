@@ -60,6 +60,16 @@ PIPELINE_POST_FORM_TAGS*
   tag => value
 PIPELINE_POST_FORM_VALUES*
   thread
+PIPELINE_POST_DATA_PREVALIDATION
+  *
+    name
+    email
+    message
+    subject
+    boardUri
+    password
+    files
+    threadId
 PIPELINE_POST_VALIDATION
   boardUri
   endpoint
@@ -68,6 +78,11 @@ PIPELINE_POST_VALIDATION
   *redir
   error
   redirNow
+PIPELINE_POST_DATA_POSTVALIDATION
+  *
+    url
+    row (see PIPELINE_POST_VALIDATION)
+    headers
 PIPELINE_POST_ACTIONS
   boardUri
   p
