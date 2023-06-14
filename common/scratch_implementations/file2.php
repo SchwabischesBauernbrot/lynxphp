@@ -58,7 +58,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
       list($n, $p) = explode('_', $contents, 2);
       // is p running, if not, clear this lock
       // is old?
-      $diff = $now - $n;
+      $diff = $now - (float)$n;
       $clearLock = false;
       //echo "lockAndOpen - [$filepath][$diff]<br>\n";
       if ($diff > 300) {
