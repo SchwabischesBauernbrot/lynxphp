@@ -23,7 +23,7 @@ if (!$db->connect_db(DB_HOST, DB_USER, DB_PWD, DB_NAME)) {
 
 // maybe don't output SQL if devmode is off
 
-include '../common/lib.modules.php'; // module functions and classes
+//include '../common/lib.modules.php'; // module functions and classes
 // transformations (x => y)
 // access list (remove this, add this)
 // change input, output (aren't these xforms tho)
@@ -46,7 +46,7 @@ include 'interfaces/boards.php';
 include 'interfaces/posts.php';
 include 'interfaces/replies.php';
 include 'interfaces/threads.php';
-include 'interfaces/post_tags.php';
+include '../common/lib.post_tags.php';
 include 'interfaces/users.php';
 include 'interfaces/files.php';
 include 'interfaces/sessions.php';
@@ -68,6 +68,11 @@ $workqueue = new work_queue;
 // do one unit of work...
 // loop until specified time?
 // probably should move into it's own route so it's more controlled
-$workqueue->getWork();
+$cnt = $workqueue->getWorkCount();
+while($cnt) {
+  $workqueue->getWork();
+  $cnt--;
+  if ($cnt % 100 === 0) echo "$cnt left\n";
+}
 
 ?>
