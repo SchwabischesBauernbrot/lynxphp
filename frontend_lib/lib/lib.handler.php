@@ -136,6 +136,8 @@ function wrapContentData($options = false) {
       $pr = $portalResources[$portalName];
       //ldr_require('../frontend_lib/handlers/mixins/' . $filename . '_portal.php');
       ldr_require($pr['modulePath'] . 'fe/portals/' . $filename . '.php');
+      // can't use ldr_require because ldr_done by this point
+      //require($pr['modulePath'] . 'fe/portals/' . $filename . '.php');
       $codeName = ucfirst($portalName);
       $dataFuncName = 'getPortal' . $codeName;
       // how do we get the board name?
