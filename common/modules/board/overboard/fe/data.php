@@ -1,21 +1,32 @@
 <?php
 // we need to be able to pass options
 // probably separate the layout options from the backend otpions
-$obPortals = array('board' => array(
-  // special overboard boardData
-  'pageCount' => 1,
-  'uri' => 'overboard',
-  'title' => 'All Boards',
-  'description' => 'posts across the site',
-  'settings' => array(),
-  'noBackendData' => true,
-  //'pagenum' => $pagenum,
-  'noBoardHeaderTmpl' => true, // controls banner
-  'isThread' => true, // turn off paging
-  //'isCatalog' => true, // prefix title
-  'threadClosed' => true, // turn off post form
-  'paramsCode' => array('page' => array('type' => 'params', 'name' => 'page'))
-));
+$obPortals = array(
+  'board' => array(
+    // special overboard boardData
+    'pageCount' => 1,
+    'uri' => 'overboard',
+    'title' => 'All Boards',
+    'description' => 'posts across the site',
+    'settings' => array(),
+    'noBackendData' => true,
+    //'pagenum' => $pagenum,
+    'noBoardHeaderTmpl' => true, // controls banner
+    'isThread' => true, // turn off paging
+    //'isCatalog' => true, // prefix title
+    'threadClosed' => true, // turn off post form
+    'paramsCode' => array('page' => array('type' => 'params', 'name' => 'page'))
+  ),
+  'posts' => array(
+    'uri' => 'overboard',
+    'settings' => array(),
+    'noBackendData' => true,
+    //'noBoardHeaderTmpl' => true, // controls banner
+    //'isCatalog' => true, // prefix title
+    'threadClosed' => true, // turn off post form
+    'paramsCode' => array(),
+  ),
+);
 
 $fePkgs = array(
   array(
