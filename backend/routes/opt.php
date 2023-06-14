@@ -20,6 +20,7 @@ return array(
           'databaseTables' => array('user_sessions'),
         ),
       ),
+      /*
       'boardThread' => array(
         'route' => '/:board/thread/:thread',
         'file'  => 'board_thread',
@@ -31,6 +32,7 @@ return array(
           'databaseTables' => array('boards'),
         ),
       ),
+      */
       'myBoards' => array(
         'route' => '/myBoards',
         'file'  => 'my_boards',
