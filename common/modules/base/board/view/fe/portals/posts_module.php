@@ -48,6 +48,10 @@ if (!$boardSettings && isset($io['portalData']['settings'])) {
 //echo "uri[$boardUri]<br>\n";
 //echo "<pre>found", print_r($boardSettings, 1), "</pre>\n";
 
+// we can extract from data
+// but what's the standard of how we communicate things?
+// returning them?
+
 // upload so all other functions can access
 global $boards_settings;
 $boards_settings[$boardUri] = $boardSettings;
