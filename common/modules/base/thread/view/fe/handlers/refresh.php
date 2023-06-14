@@ -39,7 +39,8 @@ if (is_array($result)) {
       // empty($boards_settings[$boardUri]) ? false :
       'boardSettings' => $boards_settings[$boardUri],
       'userSettings' => $userSettings,
-      //'checkable' => false,
+      // why was this off?
+      'checkable' => true,
     ));
   }
 } else {
