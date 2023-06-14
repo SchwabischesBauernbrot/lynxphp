@@ -29,15 +29,21 @@ $backEndPipelines = array(
   'PIPELINE_REPLY_DATA',
   'PIPELINE_USER_DATA',
   'PIPELINE_POST',
-  'PIPELINE_FILE',
   'PIPELINE_REPLY_ALLOWED',
+  'PIPELINE_POST_ADD',
   'PIPELINE_POSTTAG_REGISTER',
   'PIPELINE_NEWPOST_TAG',
   'PIPELINE_NEWPOST_PROCESS',
   'PIPELINE_USER_LOGIN',
   'PIPELINE_ACCOUNT_DATA',
   'PIPELINE_SESSION_EXPIRATION',
+  // Non-target work queue pipelines
+  'PIPELINE_WQ_POST_ADD',
+  // really used mor like FILE_EXISTS...
+  'PIPELINE_WQ_FILE_ADD',
 );
+// renaming a pipeline will cause everything in queue to not execute
+
 // we don't need to necessarily call this here
 definePipelines($backEndPipelines);
 
