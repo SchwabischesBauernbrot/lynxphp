@@ -92,7 +92,7 @@ function make_image_thumbnail_ffmpeg($filePath, $width, $height, $duration = 1) 
   }
 
   $sFileOut = escapeshellarg($fileOut);
-  $ffmpegPath = '/usr/bin/ffmpeg';
+  $ffmpegPath = '/usr/bin/ffmpeg'; // debian default
 
   $width = (int)$width;
   $height = (int)$height;
@@ -101,7 +101,9 @@ function make_image_thumbnail_ffmpeg($filePath, $width, $height, $duration = 1) 
   $try = floor($duration / 2);
   //exec('$ffmpegPath -strict -2 -ss ' . $try . ' -i ' . $fileIn . ' -v quiet -an -vframes 1 -f mjpeg -vf scale=' . $width . ':' . $height .' ' . $fileOut . ' 2>&1', $ffmpeg_out, $ret);
   // webm may need -frames:v 1 or -update
-  exec($ffmpegPath . ' -i ' . $sFileIn . ' -vf scale=' . $width . ':' . $height .' ' . $sFileOut . ' -frames:v 1 2>&1', $ffmpeg_out, $ret);
+  $cmdline = $ffmpegPath . ' -i ' . $sFileIn . ' -vf scale=' . $width . ':' . $height .' -frames:v 1 ' . $sFileOut . ' 2>&1';
+  echo "cmdline[$cmdline]<br>\n";
+  exec($cmdline, $ffmpeg_out, $ret);
   echo "ret[$ret]<br>\n";
   // failure seems to be 1 (if the file already exists)
   // ret === 0 on success
