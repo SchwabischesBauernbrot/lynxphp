@@ -1,7 +1,8 @@
 <?php
 
-// FIXME: we need access to package
 $params = $getHandler();
+
+//echo "<pre>", print_r($params, 1), "</pre>\n";
 
 // do we own this board?
 $boardUri = boardOwnerMiddleware($request);
@@ -12,25 +13,29 @@ $banners = $pkg->useResource('list', array('boardUri' => $boardUri));
 
 $templates = moduleLoadTemplates('banner_listing', __DIR__);
 
-// FIXME: include board header...
-// FIXME: include paged board nav...
-
 $header = $templates['header'];
 $banner_tmpl = $templates['loop1'];
+
+// insert loop2 into header
 $tmpl = str_replace('{{banners}}', $header, $templates['loop2']);
+
 // add link
 // list
 $banners_html = '';
 foreach($banners as $banner) {
-  $tmp = $banner_tmpl;
-  $tmp = str_replace('{{backend}}', 'backend', $tmp);
-  $tmp = str_replace('{{uri}}', $boardUri, $tmp);
-  $tmp = str_replace('{{id}}', $banner['bannerid'], $tmp);
-  $tmp = str_replace('{{image}}', $banner['image'], $tmp);
-  $banners_html .= $tmp;
+  $banners_html .= replace_tags($banner_tmpl, array(
+    //'backend' =>
+    'uri'   => $boardUri,
+    'id'    => $banner['bannerid'],
+    'image' => BACKEND_PUBLIC_URL . $banner['image'],
+  ));
 }
-$tmpl = str_replace('{{uri}}', $boardUri, $tmpl);
-$tmpl = str_replace('{{banners}}', $banners_html, $tmpl);
+
+$tmpl = replace_tags($tmpl, array(
+  'uri' => $boardUri,
+  'banners' => $banners_html,
+));
+
 wrapContent($tmpl);
 
 ?>
