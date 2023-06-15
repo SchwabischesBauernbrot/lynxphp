@@ -147,6 +147,24 @@ function renderPost($boardUri, $p, $options = false) {
   $post_actions_html = join('<br>' . "\n", $post_actions_html_parts);
   */
 
+  //echo "<pre>", print_r($post_actions, 1), "</pre>\n";
+
+  // when is includeWhere not needed?
+  // seems like any thread or posts can appear on the thread listing, details or overboard
+  // so it's seemingly should always be on
+  // it's only needed on links that need to return
+  // so items that actually navigate away
+  // and don't intend to return
+  // either way it should be opt-out and we can add that when we actually need it
+  /*
+  foreach($post_actions as $type=>$actions) {
+    foreach($actions as $i => $a) {
+      // opt-out? add when needed
+      $actions[$i]['includeWhere'] = true;
+    }
+  }
+  */
+
   // how do we set where?
   // what does nojs do?
   $post_actions_html = action_getExpandHtml($post_actions, array(
