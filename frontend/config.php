@@ -20,6 +20,10 @@ if (file_exists($localConfig)) {
 // defaults
 //
 
+// includes :PORT if needed
+// why don't we utilize $HTTP_HOST?
+if (!defined('BASE_HOST')) define('BASE_HOST', getServerField('HTTP_HOST'));
+
 // backend_url
 // needs to be HTTPS if the backend is not on the same server
 // must have trailing slash
@@ -42,9 +46,6 @@ if (!defined('BASE_HREF')) {
   define('BASE_HREF', rtrim(dirname(getServerField('SCRIPT_NAME', __FILE__)), '/') . '/');
 }
 
-// includes :PORT if needed
-// why don't we utilize $HTTP_HOST?
-if (!defined('BASE_HOST')) define('BASE_HOST', getServerField('HTTP_HOST'));
 // BASE_PATH is basically BASE_HREF
 if (!defined('DEV_MODE')) define('DEV_MODE', false);
 if (!defined('SCRATCH_DRIVER')) define('SCRATCH_DRIVER', 'auto');
