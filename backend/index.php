@@ -35,6 +35,8 @@ $queue = new $queue_type_class;
 include '../common/workqueue.php';
 $workqueue = new work_queue;
 
+require '../common/lib.http.php'; // comms lib
+
 // reading from db to save db is it really worth it?
 // file might be fine
 // connect to scratch
