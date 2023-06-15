@@ -18,7 +18,7 @@ if (isset($board_settings['captcha_mode'])) {
   $mode = $board_settings['captcha_mode']; // posts / thread / no
   $enable = false;
   if ($io['endpoint'] === 'lynx/newThread') {
-    if ($mode !== 'No captcha') {
+    if ($mode !== 'No captcha' && $mode !== 'no') {
       $enable = true;
     }
   } else {
