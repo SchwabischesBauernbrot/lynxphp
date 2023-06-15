@@ -189,10 +189,13 @@ function getBoardThreadsModel($boardUri, $posts_model = false) {
 
   $postTable = modelToTableName($posts_model);
   $posts_extended_model = $posts_model;
+  // DESIGN: things like this shouldn't be necessary
   if ($db->btTables) {
     $postTable = '`' . $postTable . '`';
   }
 
+  // DESIGN: joins are always a mess
+  // but is this any better than a hand written query?
   $posts_extended_model['children'] = array(
     array(
       'type' => 'left',
