@@ -30,14 +30,19 @@ $res = $pkg->useResource('save_settings', array('boardUri' => $boardUri),
   array('addPostFields' => $_POST)
 );
 
-// only place in the system where the boardUri changes
-$boardUri = $_POST['uri'];
+// only change it if we rename it in the _POST data
+// since most settings won't change this
+if (!empty($_POST['uri'])) {
+  // only place in the system where the boardUri changes
+  $boardUri = $_POST['uri'];
+}
 
 if ($res['success'] && $res['success'] !== 'false') {
   // maybe a js alert?
   echo "Success<br>\n";
   //wrapContentFooter($row);
   // redirect dev mode does it's own weird header thing...
+  // FIXME: go back to the section if there was one...
   redirectTo('/' . $boardUri . '/settings/board.html', array('header' => false));
 } else {
   //wrapContent();
