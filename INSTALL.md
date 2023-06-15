@@ -146,10 +146,12 @@ then backend config will need some database settings set
 define('DB_HOST', 'localhost');
 define('DB_USER', 'x');
 define('DB_PWD', 'y');
-define('DB_NAME', 'lynxphp');
+define('DB_NAME', 'doubleplus');
 define('BACKEND_KEY', RANDOM_STRING);
 ?>
 ```
+
+The complete configuration documentation is [here](docs/config.md)
 
 Change RANDOM_STRING to something random with quotes around it!
 
@@ -164,8 +166,8 @@ also you'll need to make these directories and make sure they're web server writ
 
 You'll likely need to go into mysql, create the db and user:
 ```
-create database lynxphp;
-grant all on lynxphp.* to x@localhost identified by 'y';
+create database doubleplus;
+grant all on doubleplus.* to x@localhost identified by 'y';
 flush privileges;
 ```
 
@@ -176,7 +178,7 @@ You'll likely need to go into postgres, create the db and user:
 `su postgres`
 `psql`
 `CREATE USER x WITH PASSWORD 'y';`
-`CREATE DATABASE lynxphp;`
+`CREATE DATABASE doubleplus;`
 `\q` to quit
 
 then you need to make config_HOSTNAME.php in frontend and backend
@@ -189,11 +191,13 @@ then backend config will need some database settings set
 define('DB_HOST', 'localhost');
 define('DB_USER', 'x');
 define('DB_PWD', 'y');
-define('DB_NAME', 'lynxphp');
+define('DB_NAME', 'doubleplus');
 define('DB_DRIVER', 'pgsql');
 define('BACKEND_KEY', RANDOM_STRING);
 ?>
 ```
+
+The complete configuration documentation is [here](docs/config.md)
 
 Change RANDOM_STRING to something random with quotes around it!
 
