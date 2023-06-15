@@ -35,6 +35,7 @@ if (!defined('DISABLE_MODULES')) define('DISABLE_MODULES', array());
 if (!defined('SCRATCH_DRIVER')) define('SCRATCH_DRIVER', 'db');
 if (!defined('QUEUE_DRIVER')) define('QUEUE_DRIVER', 'db');
 
+// won't be set right for worker.php tbh...
 if (!defined('FRONTEND_BASE_URL')) define('FRONTEND_BASE_URL', 'https://' . getServerField('HTTP_HOST') . '/');
 
 // scratch file would need this
