@@ -1,6 +1,6 @@
 <?php
 
-// strings/be
+// reply_limit/be
 
 $module = $getModule();
 
@@ -22,8 +22,7 @@ $boardData = getBoard($boardUri, array('jsonFields' => 'settings'));
 //print_r($boardData['settings']);
 
 // get board's reply limit
-$limit = $boardData['settings']['reply_limit'];
-// FIXME: get thread's reply limit?
+$limit = empty($boardData['settings']['reply_limit']) ? 0 : $boardData['settings']['reply_limit'];
 
 // if no limit, not need to get ocunt
 if (!$limit) return;
