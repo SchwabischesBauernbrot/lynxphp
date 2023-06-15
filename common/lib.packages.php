@@ -440,6 +440,9 @@ class package {
         // and we don't want situation
         if (isset($pData['modules']) && is_array($pData['modules'])) {
           foreach($pData['modules'] as $m) {
+            // frontend takes quotes around the constant
+            // we don't...
+            // maybe be a design issue (cause for confusion)
             if (!isset($pipelines[$m['pipeline']])) {
               // need to load dependency
               // yea we won't know where the pipeline lives yet...
