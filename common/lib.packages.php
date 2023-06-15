@@ -433,6 +433,11 @@ class package {
             $bePkg->addPipeline($m);
           }
         }
+        // ifmodules (ifpipelines) are optional modules that enhanced functional
+        // if the base pipeline's module is not disable
+        // or we just module if it's enable or not
+        // nah because can't tell from a not-loaded-yet situation
+        // and we don't want situation
         if (isset($pData['modules']) && is_array($pData['modules'])) {
           foreach($pData['modules'] as $m) {
             if (!isset($pipelines[$m['pipeline']])) {
@@ -451,10 +456,13 @@ class package {
               // pipeline isn't defined, likely modules admin interface
               // or dependency isn't loaded yet...
 
+              // if you put a FE pipeline in BE data you'll end up here
+
               // we can't attach if it doesn't exist I think
               //echo "deps[", print_r($this->dependencies, 1), "]<bR>\n";
               echo "<pre>[", $this->dir . 'be/data.php', "]pipeline[", $m['pipeline'], "] is not defined in module[", $m['module'], "] complete entry:[", print_r($m, 1), "]</pre>\n" . gettrace();
-              echo "<pre>Missing[", $m['pipeline'], "] [", print_r($pipelines, 1), "]</pre>\n";
+              // this output is causing a loop
+              //echo "<pre>Missing[", $m['pipeline'], "] [", print_r($pipelines, 1), "]</pre>\n";
             }
           }
         }
