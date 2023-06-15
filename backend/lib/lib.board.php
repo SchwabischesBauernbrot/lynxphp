@@ -97,7 +97,6 @@ function updateBoardJson($boardUri, $json) {
   )));
 }
 
-
 $rateLimitsTTL['type'] = 0;
 function checkLimit($type, $ip = '') {
   global $db, $models;
@@ -111,7 +110,7 @@ function recordRequest($type, $ip = '') {
   if ($ip === '') $ip = getip();
 }
 
-// what uses this?
+// what uses this? nothing
 function boardDealer($connections, $boardUri) {
   $mc = strlen($boardUri);
   $v = 0;
@@ -122,8 +121,12 @@ function boardDealer($connections, $boardUri) {
 }
 
 //$getPostsModel = array();
-function getPostsModel($boardUri) {
+function getPostsModel($boardUri, $options = false) {
   global $db, $models, $getPostsModel;
+
+  extract(ensureOptions(array(
+    'checkBoard' => true,
+  ), $options));
 
   // FIXME: just implement a cache here...
   /*
@@ -133,13 +136,14 @@ function getPostsModel($boardUri) {
     $getPostsModel[$boardUri] = gettrace();
   }
   */
-
-  $cnt = $db->count($models['board'], array('criteria'=>array(
-      array('uri', '=', $boardUri),
-  )));
-  if (!$cnt) {
-    //echo "getPostsModel no such [$boardUri]<br>\n";
-    return false;
+  if ($checkBoard) {
+    $cnt = $db->count($models['board'], array('criteria'=>array(
+        array('uri', '=', $boardUri),
+    )));
+    if (!$cnt) {
+      //echo "getPostsModel no such [$boardUri]<br>\n";
+      return false;
+    }
   }
   $public_post_model = array(
     'name' => 'board_' . $boardUri . '_public_post',
@@ -202,7 +206,7 @@ function getPrivatePostsModel($boardUri) {
 }
 
 $getPostFilesModel = array();
-function getPostFilesModel($boardUri) {
+function getPostFilesModel($boardUri, $options = false) {
   global $db, $models, $getPostFilesModel;
 
   // just use an internal cache
@@ -215,12 +219,17 @@ function getPostFilesModel($boardUri) {
     $getPostFilesModel[$boardUri] = $boardUri . '_' . gettrace();
   }
   */
+  extract(ensureOptions(array(
+    'checkBoard' => true,
+  ), $options));
 
-  $cnt = $db->count($models['board'], array('criteria'=>array(
+  if ($checkBoard) {
+    $cnt = $db->count($models['board'], array('criteria'=>array(
       array('uri', '=', $boardUri),
-  )));
-  if (!$cnt) {
-    return false;
+    )));
+    if (!$cnt) {
+      return false;
+    }
   }
   $public_post_file_model = array(
     'name' => 'board_' . $boardUri . '_public_post_file',
