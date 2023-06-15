@@ -66,12 +66,12 @@ $persist_scratch = new file_scratch_driver;
 //ldr_require('../common/lib.modules.php'); // module functions and classes
 
 require '../common/lib.pipeline.php';
+require '../common/lib.http.php'; // comms lib
 // we could move these into a pipelines.php file...
 
 require 'pipelines.php';
 
 // frontend libraries
-require '../frontend_lib/lib/lib.http.php'; // comms lib
 require '../frontend_lib/lib/lib.backend.php'; // comms lib
 require '../frontend_lib/lib/lib.getters.php'; // comms/caching helper
 ldr_require('../frontend_lib/lib/lib.template.php'); // template functions
