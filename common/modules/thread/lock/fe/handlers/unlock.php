@@ -15,10 +15,9 @@ $result = $pkg->useResource('unlock', array(
 
 
 if (isset($result['success']) && $result['success'] === 'ok') {
-  global $BASE_HREF;
-  redirectTo($BASE_HREF . $boardUri . '/');
-} else {
-  wrapContent('<pre>' . print_r($result, 1) . "</pre>\n");
+  action_redirectToWhere();
+  return;
 }
+wrapContent('<pre>' . print_r($result, 1) . "</pre>\n");
 
 ?>
