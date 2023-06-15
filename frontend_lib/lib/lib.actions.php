@@ -37,7 +37,14 @@ function action_getLinkHTML($a, $options) {
   $link = $a['link'];
   if (!empty($a['includeWhere'])) {
     if (isset($options['where'])) {
-      $link .= '&from=' . urlencode($options['where']);
+      // is a separator needed
+      $lastChar = $link[strlen($link) - 1];
+      if ($lastChar !== '?' && $lastChar !== '&') {
+        // which separator is apt
+        $missingQ = strpos($link, '?') === false;
+        $link .= $missingQ ? '?' : '&';
+      }
+      $link .= 'from=' . urlencode($options['where']);
     }
   }
   // but some actions we want them to be indexed
