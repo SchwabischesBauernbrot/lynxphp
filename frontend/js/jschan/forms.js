@@ -478,6 +478,7 @@ class formHandler {
         }
         //console.debug('response status code', xhr.status)
         //console.log('json', json)
+        var resetForm = false
         if (xhr.status == 200) {
           //console.log('json', json)
           if (!json) {
@@ -500,6 +501,7 @@ class formHandler {
             // maybe a metatag refresh
             //console.log('no responseText, loading html', xhr.response)
             //document.innerHTML = xhr.response
+            resetForm = true
           } else {
             // has json
             if (json.postId) {
@@ -538,7 +540,7 @@ class formHandler {
               //window.location.hash = json.postId
             } else {
               // success
-
+              resetForm = true
               // clear all message boxes
               const messageBoxes = document.querySelectorAll('textarea[name=message]')
               for(var i in messageBoxes) {
@@ -572,7 +574,7 @@ class formHandler {
               }
             }
           }
-          if (this.form.getAttribute('action') !== '/forms/editpost'
+          if (resetForm && this.form.getAttribute('action') !== '/forms/editpost'
             && !this.form.getAttribute('action').endsWith('/settings')) { //dont reset on edit, keep the new values in there. todo: add exceptions/better handling for this situation
             this.reset();
           }
@@ -614,6 +616,8 @@ class formHandler {
               });
               */
               alert("Error(s):\n" + json.errors.join("\n"))
+            //} else {
+              //resetForm = true
             }
             //this.formSubmit(e)
           } else {
@@ -626,6 +630,7 @@ class formHandler {
             this.banned = true;
             // does this submit the form
             this.form.dispatchEvent(new Event('submit'));
+            //resetForm = true
           }
         }
         // done on ajax onload too
