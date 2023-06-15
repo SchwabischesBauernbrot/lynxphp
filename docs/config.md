@@ -16,16 +16,19 @@ an array of modules names (site/userbar) to disable
 USER string
 Which user does your webserver run as
 
-FRONTEND_BASE_URL url defaults to: http://HOST/
+FRONTEND_BASE_URL url defaults to: https://HOST/
 Where to locate a frontend for various utilities
+REQUIRES A TRAILING SLASH
 
 # FE config
 
 BASE_HOST string defaults to: FRONTEND_HOST
-What domain and port the frontend is located
+What domain (and maybe port if not default) the frontend is located
 
 BACKEND_BASE_URL url defaults to: http://localhost/backend/
+REQUIRES A TRAILING SLASH
 BACKEND_PUBLIC_URL url defaults to: https://FRONTEND_HOST/backend/
+REQUIRES A TRAILING SLASH
 
 BASE_HREF string defaults to: what it detects
 Where's the app is located on the domain (in / or like /imageboard)
