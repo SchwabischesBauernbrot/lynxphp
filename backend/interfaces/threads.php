@@ -99,6 +99,7 @@ function threadDBtoAPI(&$row, $boardUri) {
   // decode user_id
 }
 
+// getThreadReplyCount
 function getThreadPostCount($boardUri, $threadNum, $options = false) {
   // unpack options
   extract(ensureOptions(array(
@@ -109,7 +110,6 @@ function getThreadPostCount($boardUri, $threadNum, $options = false) {
     'includeDeleted'   => false,
   ), $options));
 
-  global $db;
   if ($posts_model === false) {
     $posts_model = getPostsModel($boardUri);
     if ($posts_model === false) {
@@ -129,6 +129,7 @@ function getThreadPostCount($boardUri, $threadNum, $options = false) {
   }
   // , 'order' => 'created_at'
   // can't use order by on a count
+  global $db;
   return $db->count($posts_model, array(
     'criteria' => $crit)
   );
@@ -137,6 +138,9 @@ function getThreadPostCount($boardUri, $threadNum, $options = false) {
 // false means thread does not exist
 // and also means no replies (since)
 // FIXME: we need differentiate because all sorts of error codes
+// - board (posts/files/board) 404
+// - thread 404
+// - no replies since array()
 // board/thread not found needs to be separate from results like no post
 function getThread($boardUri, $threadNum, $options = false) {
   // unpack options
@@ -145,9 +149,9 @@ function getThread($boardUri, $threadNum, $options = false) {
     'post_files_model' => false,
     'since_id'    => false,
     'includeOP'   => true,
+    'includeReplies' => true,
   ), $options));
 
-  global $db;
   if ($posts_model === false) {
     $posts_model = getPostsModel($boardUri);
     if ($posts_model === false) {
@@ -172,7 +176,6 @@ function getThread($boardUri, $threadNum, $options = false) {
     'type', 'filename', 'size', 'ext', 'w', 'h', 'filedeleted', 'spoiler',
     'tn_w', 'tn_h', 'fileid');
 
-
   $posts_model['children'] = array(
     array(
       'type' => 'left',
@@ -180,6 +183,7 @@ function getThread($boardUri, $threadNum, $options = false) {
       'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
     )
   );
+  global $db;
 
   // get OP
   // FIXME: only gets first image on OP
@@ -214,41 +218,45 @@ function getThread($boardUri, $threadNum, $options = false) {
   }
 
   // get replies
-
-  $crit = array(
-    array('threadid', '=', $threadNum),
-    array('deleted', '=', 0),
-  );
-  if ($since_id !== false) {
-    $crit[] = array('postid', '>', $since_id);
-  }
-
-  $res = $db->find($posts_model, array(
-    'criteria' => $crit, 'order' => 'created_at')
-  );
-  // no OP and no replies, consider 404
-  if (($includeOP && !count($posts)) && ($since_id === false && !$db->num_rows($res))) {
-    return false;
-  }
-  while($row = $db->get_row($res)) {
-    //echo "<pre>", print_r($row, 1), "</pre>\n";
-    $orow = $row;
-    if (!isset($posts[$row['postid']])) {
-      postDBtoAPI($row);
-      $posts[$row['no']] = $row;
-      $posts[$row['no']]['files'] = array();
+  if ($includeReplies) {
+    $crit = array(
+      array('threadid', '=', $threadNum),
+      array('deleted', '=', 0),
+    );
+    if ($since_id !== false) {
+      $crit[] = array('postid', '>', $since_id);
     }
-    if (!empty($orow['file_fileid'])) {
-      if (!isset($posts[$orow['postid']]['files'][$orow['file_fileid']])) {
-        $frow = $orow;
-        fileDBtoAPI($frow, $boardUri);
-        $posts[$orow['postid']]['files'][$orow['file_fileid']] = $frow;
+
+    $res = $db->find($posts_model, array(
+      'criteria' => $crit, 'order' => 'created_at')
+    );
+    // no OP and no replies, consider 404
+    if (($includeOP && !count($posts)) && ($since_id === false && !$db->num_rows($res))) {
+      return false;
+    }
+    while($row = $db->get_row($res)) {
+      //echo "<pre>", print_r($row, 1), "</pre>\n";
+      $orow = $row;
+      if (!isset($posts[$row['postid']])) {
+        postDBtoAPI($row);
+        $posts[$row['no']] = $row;
+        $posts[$row['no']]['files'] = array();
+      }
+      if (!empty($orow['file_fileid'])) {
+        if (!isset($posts[$orow['postid']]['files'][$orow['file_fileid']])) {
+          $frow = $orow;
+          fileDBtoAPI($frow, $boardUri);
+          $posts[$orow['postid']]['files'][$orow['file_fileid']] = $frow;
+        }
       }
     }
+    $db->free($res);
   }
+  // simplify files
   foreach($posts as $pk => $p) {
     $posts[$pk]['files'] = array_values($posts[$pk]['files']);
   }
+  // simplify posts
   $posts = array_values($posts);
   return $posts;
 }
