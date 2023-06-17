@@ -73,14 +73,23 @@ return array(
       array(
         'route' => '/admin/users/:id/groups',
         'handler' => 'editgroups',
+        'portals' => array(
+          'admin' => array()
+        ),
       ),
       array(
         'route' => '/admin/users/:id/delete',
         'handler' => 'delete',
+        'portals' => array(
+          'admin' => array()
+        ),
       ),
       array(
         'route' => '/admin/boards/:id/delete',
         'handler' => 'boards_delete',
+        'portals' => array(
+          'admin' => array()
+        ),
       ),
     ),
     'modules' => array(
