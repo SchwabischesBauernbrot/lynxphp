@@ -24,8 +24,6 @@ $board = $boards[$keys[0]];
 // get a list of available groups...
 //$groups = $pkg->useResource('listgroups');
 
-$adminPortalHdr = renderAdminPortal();
-
 //print_r($board);
 
 $tmpl = '<form action="' . $params['action'] . '" method="POST">';
@@ -46,6 +44,6 @@ $tmpl .= '</ul>';
 $tmpl .= '<input type=submit value=delete>';
 $tmpl .= '</form>';
 
-wrapContent($adminPortalHdr . $tmpl);
+wrapContent($tmpl);
 
 ?>
