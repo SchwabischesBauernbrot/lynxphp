@@ -112,12 +112,14 @@ function hover_addHandler(info, elem, overlay) {
         }
         el.loaded = true
       }
-      const pp = el.play()
-      pp.then(() => {
-        //console.log('playing')
-      }).catch(e => {
-        console.log('video playing aborted', e)
-      })
+      if (isVideo) {
+        const pp = el.play()
+        pp.then(() => {
+          //console.log('playing')
+        }).catch(e => {
+          console.log('video playing aborted', e)
+        })
+      }
       console.log('expand_hover_media.js - appending')
       overlay.append(el)
     }
