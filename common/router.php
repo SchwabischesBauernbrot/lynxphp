@@ -256,6 +256,16 @@ class Router {
       // support getting params
       // we'll need them for posts/files
       global $db;
+      //echo "<pre>", print_r($cacheSettings['databaseTables'], 1), "</pre>\n";
+      foreach($cacheSettings['databaseTables'] as $i => $table) {
+        if (strpos($table, '{{uri}}') !== false) {
+          //echo "<pre>cacheSettings", print_r($cacheSettings, 1), "</pre>\n";
+          //echo "<pre>routeParams", print_r($routeParams, 1), "</pre>\n";
+          //echo "need to decode[$table] [", $routeParams['uri'], "]<br>\n";
+          $cacheSettings['databaseTables'][$i] = str_replace('{{uri}}', $routeParams['uri'], $table);
+        }
+      }
+      //echo "<pre>", print_r($cacheSettings['databaseTables'], 1), "</pre>\n";
       $mtime = $db->getLast($cacheSettings['databaseTables']);
     }
 /*
@@ -367,6 +377,14 @@ class Router {
     if ($db) {
       if (isset($cacheSettings['databaseTables'])) {
         // get db data
+        foreach($cacheSettings['databaseTables'] as $i => $table) {
+          if (strpos($table, '{{uri}}') !== false) {
+            //echo "<pre>cacheSettings", print_r($cacheSettings, 1), "</pre>\n";
+            //echo "<pre>routeParams", print_r($routeParams, 1), "</pre>\n";
+            //echo "need to decode[$table] [", $routeParams['uri'], "]<br>\n";
+            $cacheSettings['databaseTables'][$i] = str_replace('{{uri}}', $routeParams['uri'], $table);
+          }
+        }
         $dbMtime = $db->getLast($cacheSettings['databaseTables']);
         header('X-Debug-isUncached-BE: ' . $key . '-dbmtime_'.$dbMtime);
       }
