@@ -94,7 +94,8 @@ function getControlPanel() {
 
 function getAccountSettingsHandler() {
   $msg = getQueryField('message');
-  wrapContent($msg . getAccountPortalNav());
+  // getAccountPortalNav()
+  wrapContent('under construction. ' . $msg);
 }
 
 ?>
