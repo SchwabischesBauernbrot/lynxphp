@@ -92,6 +92,7 @@ function generateField($field, $value, $details, $labelId) {
   if (isset($details['placeholder'])) {
     $ph = ' placeholder="' . $details['placeholder'] . '"';
   }
+  global $pipelines;
   switch($details['type']) {
     case 'hidden':
       // using single quotes so you can pass JSON encoded data easily
