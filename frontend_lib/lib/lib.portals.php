@@ -79,5 +79,28 @@ function addPortalsToUrl($q, $url) {
   return $url . '?portals=' . join(',', $q['portals']);
 }
 */
+// unused but decent design
+/*
+  $portal = array(
+    'header'=>array(
+      'file' => '',
+      // tag => code/constant
+      'replaces' => array(),
+      'nav' => array(
+        'items' => array(
+        ),
+        'replaces' => array(),
+        'selected' => '',
+        'displayOpts' => array(
+          'list' => true
+        )
+      )
+    ),
+    'footer'=>array(
+      'file' => '',
+      'replaces' => array(),
+    ),
+  );
 
+*/
 ?>
