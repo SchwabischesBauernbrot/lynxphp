@@ -68,6 +68,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     clone.appendChild(post.cloneNode(true));
     document.body.appendChild(clone);
     setFloatPos(quote, clone, xpos, ypos);
+    return clone
   };
 
   const toggleHighlightPost = function (e) {
@@ -117,6 +118,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       let hoverHTMLcache = localStorage.getItem(`hoverhtmlcache-${htmlPath}`);
       let postJson
       let postHTML
+      let hoveredPost
       if (0 && hovercache) {
         hovercache = JSON.parse(hovercache);
         postJson = hovercache.posts.filter(p => p.no == hash)[0]
@@ -177,7 +179,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         toggleDottedUnderlines(hoveredPost, thisId);
 
         if (hovering && !isVisible(hoveredPost)) {
-          floatPost(ref, hoveredPost, e.clientX, e.clientY);
+          hoveredPost = floatPost(ref, hoveredPost, e.clientX, e.clientY);
         } else {
           hovering ? hoveredPost.classList.add('hoverhighlighted') : hoveredPost.classList.remove('hoverhighlighted');
         }
@@ -302,7 +304,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       window.dispatchEvent(newPostEvent);
       */
     }
-    toggleDottedUnderlines(hoveredPost, thisId);
+    hoveredPost = toggleDottedUnderlines(hoveredPost, thisId);
     if (hovering && !isVisible(hoveredPost)) {
       floatPost(this, hoveredPost, e.clientX, e.clientY);
     } else {
