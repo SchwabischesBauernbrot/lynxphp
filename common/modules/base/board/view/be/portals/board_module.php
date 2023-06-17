@@ -3,6 +3,7 @@
 // be side as a module for sendResponse2
 $params = $getModule();
 
+// we own this
 $io['out']['board'] = array();
 
 // so what you header need?
@@ -19,6 +20,10 @@ if (!$boardUri && isset($io['data']['board_uri'])) {
 // queueing
 if (!$boardUri && isset($io['meta']['boardUri'])) {
   $boardUri = $io['meta']['boardUri'];
+}
+// board page
+if (!$boardUri && isset($io['data']['board']['uri'])) {
+  $boardUri = $io['data']['board']['uri'];
 }
 
 global $router;
