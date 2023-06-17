@@ -152,10 +152,16 @@ function parsePath($filePath) {
   );
 }
 
-function getPostFiles($boardURI, $post_id) {
-  $post_files_model = getPostFilesModel($boardURI);
+function getPostFiles($boardUri, $post_id, $options = false) {
+  // unpack options
+  extract(ensureOptions(array(
+    'post_files_model' => false,
+  ), $options));
   if (!$post_files_model) {
-    return false;
+    $post_files_model = getPostFilesModel($boardUri);
+    if (!$post_files_model) {
+      return false;
+    }
   }
   global $db;
   $res = $db->find($post_files_model, array('criteria' => array('postid' => $post_id)));
