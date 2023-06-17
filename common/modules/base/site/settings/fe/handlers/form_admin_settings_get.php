@@ -32,6 +32,6 @@ if ($fields) {
   $html = component_listing($template, '/admin/settings/' . $section . '/add', 'URL', $fields);
 }
 
-wrapContent(renderAdminPortal() . ucfirst($section) . ' Settings'. $html);
+wrapContent(ucfirst($section) . ' Settings'. $html);
 
 ?>
