@@ -24,9 +24,7 @@ $user = $users[$keys[0]];
 // get a list of available groups...
 $groups = $pkg->useResource('listgroups');
 
-$adminPortalHdr = renderAdminPortal();
-
-print_r($user);
+//print_r($user);
 
 $tmpl = '<form action="' . $params['action'] . '" method="POST">';
 $tmpl .= '<input type=hidden name=userid value="' . $user['userid'] . '">';
@@ -46,6 +44,6 @@ $tmpl .= '</ul>';
 $tmpl .= '<input type=submit value=delete>';
 $tmpl .= '</form>';
 
-wrapContent($adminPortalHdr . $tmpl);
+wrapContent($tmpl);
 
 ?>
