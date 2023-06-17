@@ -314,6 +314,7 @@ function curl_log_report() {
     echo '<details>';
     echo '  <summary>Response [', number_format($l['curlInfo']['size_download']), ' bytes]</summary>', "\n";
     //echo "<pre>", htmlspecialchars(print_r($l['curlInfo'], 1)), "</pre>\n";
+    // response body could be the most information
     if (isset($l['result'][0]) && ($l['result'][0] === '[' || $l['result'][0] === '{')) {
       echo '  <pre>', htmlspecialchars(json_encode(json_decode($l['result'], true), JSON_PRETTY_PRINT)), '</pre>', "\n";
     } else {
@@ -329,6 +330,9 @@ function curl_log_report() {
     if (!empty($l['devData'])) {
       echo '  Dev Data: <pre>', htmlspecialchars(print_r($l['devData'], 1)), '</pre>', "\n";
     }
+
+    // would be good to decode where this route lives in the backend...
+
     //echo '  <pre>', htmlspecialchars(print_r($l, 1)), '</pre>', "\n";
     echo '</details>';
     // we can't get the headers unless it's a HEAD...
