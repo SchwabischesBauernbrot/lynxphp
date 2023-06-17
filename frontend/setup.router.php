@@ -99,43 +99,10 @@ $frontendRouterData = array(
         'route'  => '/global.php',
         'func'   => 'getGlobalPage',
         'loggedIn' => true,
+        'portals' => array(),
       ),
     ),
   ),
-  /*
-  'admins' => array(
-    'file'   => 'admin',
-    'routes' => array(
-      'page' => array(
-        'route'  => '/admin.php',
-        'func'   => 'getAdminPage',
-        'loggedIn' => true,
-      ),
-      'modules' => array(
-        'route'  => '/admin/modules.php',
-        'func'   => 'getAdminModulesPage',
-        'loggedIn' => true,
-      ),
-      'install' => array(
-        'route'  => '/admin/install.php',
-        'func'   => 'getAdminInstallPage',
-        'loggedIn' => true,
-      ),
-
-      'fe_routes' => array(
-        'route'  => '/admin/fe_routes.php',
-        'func'   => 'getAdminFERoutesPage',
-        'loggedIn' => true,
-      ),
-      'be_routes' => array(
-        'route'  => '/admin/be_routes.php',
-        'func'   => 'getAdminBERoutesPage',
-        'loggedIn' => true,
-      ),
-
-    ),
-  ),
-  */
   /*
   'site' => array(
     'file'   => 'textfiles',
