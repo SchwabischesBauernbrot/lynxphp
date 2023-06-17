@@ -3,7 +3,8 @@
 // be side as a module for sendResponse2
 $params = $getModule();
 
-$io['out']['board'] = array();
+// we own this
+$io['out']['posts'] = array();
 
 // so what you header need?
 // input: we need to know which board (uri) context
