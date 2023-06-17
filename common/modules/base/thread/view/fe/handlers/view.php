@@ -22,6 +22,7 @@ $boardnav_html = $tmp;
 
 //$boardData = getBoardThread($boardUri, $threadNum);
 // need to git mv handler
+global $boardData; // make it cachable
 $boardData = $pkg->useResource('board_thread', array('uri' => $boardUri, 'num' => $threadNum));
 if ($boardData === false) {
   http_response_code(404);
