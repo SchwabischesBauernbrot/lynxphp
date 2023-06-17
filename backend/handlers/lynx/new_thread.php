@@ -19,8 +19,8 @@ $post = array(
   'password' => md5(BACKEND_KEY . getOptionalPostField('password')),
   'sticky' => 0,
   'closed' => 0,
-  'trip' => '',
-  'capcode' => '',
+  'trip' => '', // role is not a tripcode
+  'capcode' => getOptionalPostField('role'),
   'country' => '',
   'deleted' => 0,
 );
