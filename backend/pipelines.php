@@ -32,6 +32,10 @@ $backEndPipelines = array(
   'PIPELINE_REPLY_ALLOWED',
   'PIPELINE_POST_ADD',
   'PIPELINE_POSTTAG_REGISTER',
+  //'PIPELINE_DELETE_POST', // not needed/implemented yet but not a bad idea
+  'PIPELINE_THREAD_PRE_DELETE',
+  'PIPELINE_THREAD_POST_DELETE',
+  //'PIPELINE_DELETE_REPLY', // not needed/implemented yet but not a bad idea
   'PIPELINE_NEWPOST_TAG',
   'PIPELINE_NEWPOST_PROCESS',
   'PIPELINE_USER_LOGIN',
@@ -41,6 +45,7 @@ $backEndPipelines = array(
   'PIPELINE_WQ_POST_ADD',
   // really used mor like FILE_EXISTS...
   'PIPELINE_WQ_FILE_ADD',
+  'PIPELINE_WQ_REQUEST_DELETE_THREAD',
 );
 // renaming a pipeline will cause everything in queue to not execute
 
