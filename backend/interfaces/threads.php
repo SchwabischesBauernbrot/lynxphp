@@ -135,14 +135,8 @@ function getThreadPostCount($boardUri, $threadNum, $options = false) {
   );
 }
 
-// false means thread does not exist
-// and also means no replies (since)
-// FIXME: we need differentiate because all sorts of error codes
-// - board (posts/files/board) 404
-// - thread 404
-// - no replies since array()
-// board/thread not found needs to be separate from results like no post
-function getThread($boardUri, $threadNum, $options = false) {
+// could be a cacheable getter
+function getThreadEngine($boardUri, $threadNum, $options = false) {
   // unpack options
   extract(ensureOptions(array(
     'posts_model' => false,
@@ -184,35 +178,27 @@ function getThread($boardUri, $threadNum, $options = false) {
     )
   );
   global $db;
+  // UNION? maybe with subqueries?
 
   // get OP
-  // FIXME: only gets first image on OP
-  // why? /:board/thread/:thread uses this too
   $posts = array();
   if ($includeOP) {
     $res = $db->find($posts_model, array('criteria' => array(
       array('postid', '=', $threadNum),
     )));
     // OP does not exist (no tombstone)
-    if (!$db->num_rows($res)) {
+    $cnt = $db->num_rows($res);
+    if (!$cnt) {
       return false;
     }
+    /*
+    if ($cnt !== 1) {
+      // if dev mode warn?
+    }
+    */
     while($row = $db->get_row($res)) {
-      //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
-      if (!isset($posts[$row['postid']])) {
-        //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
-        $posts[$row['postid']] = $row;
-        threadDBtoAPI($posts[$row['postid']], $boardUri);
-        //echo "<pre>4chan", print_r($row, 1), "</pre>\n";
-        $posts[$row['postid']]['files'] = array();
-      }
-      if (!empty($row['file_fileid'])) {
-        if (!isset($posts[$row['postid']]['files'][$row['file_fileid']])) {
-          $frow = $row;
-          fileDBtoAPI($frow, $boardUri);
-          $posts[$row['postid']]['files'][$row['file_fileid']] = $frow;
-        }
-      }
+      // could key/gather on postid
+      $posts[] = $row;
     }
     $db->free($res);
   }
@@ -227,6 +213,8 @@ function getThread($boardUri, $threadNum, $options = false) {
       $crit[] = array('postid', '>', $since_id);
     }
 
+    // FIXME: make sort an option
+    // deletion gather doesn't need it
     $res = $db->find($posts_model, array(
       'criteria' => $crit, 'order' => 'created_at')
     );
@@ -236,29 +224,185 @@ function getThread($boardUri, $threadNum, $options = false) {
     }
     while($row = $db->get_row($res)) {
       //echo "<pre>", print_r($row, 1), "</pre>\n";
-      $orow = $row;
-      if (!isset($posts[$row['postid']])) {
-        postDBtoAPI($row);
-        $posts[$row['no']] = $row;
-        $posts[$row['no']]['files'] = array();
-      }
-      if (!empty($orow['file_fileid'])) {
-        if (!isset($posts[$orow['postid']]['files'][$orow['file_fileid']])) {
-          $frow = $orow;
-          fileDBtoAPI($frow, $boardUri);
-          $posts[$orow['postid']]['files'][$orow['file_fileid']] = $frow;
-        }
-      }
+      $posts[] = $row;
     }
     $db->free($res);
   }
-  // simplify files
+  return $posts;
+}
+
+// false means thread does not exist
+// and also means no replies (since)
+// FIXME: we need differentiate because all sorts of error codes
+// - board (posts/files/board) 404
+// - thread 404
+// - no replies since array()
+// board/thread not found needs to be separate from results like no post
+function getThread($boardUri, $threadNum, $options = false) {
+
+  $iposts = getThreadEngine($boardUri, $threadNum, $options);
+  $posts = array();
+  foreach($iposts as $row) {
+    //echo "<pre>", print_r($row, 1), "</pre>\n";
+    // ensure we don't already have ot
+    $pid = $row['postid'];
+    if (!isset($posts[$pid])) {
+      $posts[$pid] = $row;
+      if (!$row['threadid']) {
+        //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
+        threadDBtoAPI($posts[$pid], $boardUri);
+      } else {
+        postDBtoAPI($posts[$pid]);
+      }
+      $posts[$pid]['files'] = array();
+    }
+    if (!empty($row['file_fileid'])) {
+      $fid = $row['file_fileid'];
+      if (!isset($posts[$pid]['files'][$fid])) {
+        $frow = $row;
+        fileDBtoAPI($frow, $boardUri);
+        $posts[$pid]['files'][$fid] = $frow;
+      }
+    }
+  }
+
+  // simplify files (strip out fileids)
   foreach($posts as $pk => $p) {
     $posts[$pk]['files'] = array_values($posts[$pk]['files']);
   }
-  // simplify posts
+  // simplify posts (strip out postids)
   $posts = array_values($posts);
   return $posts;
 }
+
+function requestDeleteThread($boardUri, $threadNum, $options = false) {
+  // unpack options
+  extract(ensureOptions(array(
+    'posts_model' => false,
+    'post_files_model' => false,
+  ), $options));
+
+  if ($posts_model === false) {
+    $posts_model = getPostsModel($boardUri);
+    if ($posts_model === false) {
+      // this board does not exist
+      return false;
+    }
+  }
+  if ($post_files_model === false) {
+    $post_files_model = getPostFilesModel($boardUri);
+    if ($post_files_model === false) {
+      // this board does not exist
+      return false;
+    }
+  }
+
+  // any verification or validation we need to do?
+  // uri/num need to exist and not already nuked
+    // uri verification is done above
+  // do we do the permissions check at this level?
+
+  global $pipelines;
+  $io = array(
+    'boardUri'  => $boardUri,
+    'threadNum' => $threadNum,
+    'thread' => false, // if one needs it, they could at least communicate it to prevent any additionan calls or we could do a getter with caching layer
+    'posts_model' => $posts_model,
+    'post_files_model' => $posts_model,
+    'deleteNow' => true,
+    'deleteOptions' => array(),
+  );
+
+  global $workqueue;
+  $workqueue->addWork(PIPELINE_WQ_REQUEST_DELETE_THREAD, $io);
+
+  if ($io['deleteNow']) {
+    // upload cache if we already have it
+    if (empyt($io['deleteOptions']['posts_model'])) $io['deleteOptions']['posts_model'] = $io['posts_model'];
+    if (empyt($io['deleteOptions']['post_files_model'])) $io['deleteOptions']['post_files_model'] = $io['post_files_model'];
+    if (empyt($io['deleteOptions']['thread'])) $io['deleteOptions']['thread'] = $io['thread'];
+    // doesn't make much sense to allow change to uri/num
+    deleteThread($boardUri, $threadNum, $io['deleteOptions']);
+  }
+  // do we return if there was an error
+  // or if we actually nuked it or not
+  // our responsibility is just to make sure it eventually gets deleted
+  // so maybe if there was an error
+  return true;
+}
+
+function deleteThread($boardUri, $threadNum, $options = false) {
+  // unpack options
+  extract(ensureOptions(array(
+    'posts_model' => false,
+    'post_files_model' => false,
+    'thread' => false,
+  ), $options));
+  global $db, $models, $pipelines;
+
+  if ($posts_model === false) {
+    $posts_model = getPostsModel($boardUri);
+    if ($posts_model === false) {
+      // this board does not exist
+      return false;
+    }
+  }
+  if ($post_files_model === false) {
+    $post_files_model = getPostFilesModel($boardUri);
+    if ($post_files_model === false) {
+      // this board does not exist
+      return false;
+    }
+  }
+
+  // we don't need to load it if we don't already have it
+  //if ($thread === false)
+
+  $io = array(
+    'boardUri'  => $boardUri,
+    'threadNum' => $threadNum,
+    'thread' => $thread, // if one needs it, they could at least communicate it to prevent any additionan calls or we could do a getter with caching layer
+    'posts_model' => $posts_model,
+    'post_files_model' => $post_files_model,
+  );
+
+  // we soft delete posts, do we soft thread threads
+  // definitely should be an option (delete vs scrub)
+  $pipelines[PIPELINE_THREAD_PRE_DELETE]->execute($io);
+
+  // could we check thread to see if we have
+  // op and replies?
+  // count of posts...
+
+  // remove from overboard
+  // delete files / storage folder
+  // clean files records
+  // I think we need a list of posts first
+  $iposts = getThreadEngine($boardUri, $threadNum, array(
+    'includeOP' => true, // explicit
+    'includeReplies' => true, // explicit
+    //'since_id'    => false, // expectation
+    'posts_model' => $posts_model,
+    'post_files_model' => $post_files_model,
+  ));
+  $postids = array();
+  $fileids = array();
+  foreach($iposts as $row) {
+    $postids[] = $row['postid'];
+    if (!empty($row['file_fileid'])) {
+      $fileids[] = $row['file_fileid'];
+    }
+  }
+  $fres = $db->delete($post_files_model, array(
+    array('fileids', 'IN', $fileids)
+  ));
+  // clean posts records
+  $pres = $db->delete($post_model, array(
+    array('postids', 'IN', $postids)
+  ));
+  $pipelines[PIPELINE_THREAD_POST_DELETE]->execute($io);
+  return true;
+}
+
 
 ?>
