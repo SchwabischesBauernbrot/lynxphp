@@ -177,8 +177,7 @@ function checkCacheHeaders($mtime, $options = false) {
     }
   }
 
-  $headers = getallheaders();
-
+  $headers = getLowercaseHeaders();
   // we don't always know the size
   if ($fileSize && !$etag && $mtime) { // don't generate if not needed
     $etag = dechex($mtime) . '-' . dechex($fileSize);
@@ -191,25 +190,29 @@ function checkCacheHeaders($mtime, $options = false) {
   }
 
   // 304 processing
-  $allowCacheCheck = !isset($headers['Cache-Control']) || (isset($headers['Cache-Control']) && $headers['Cache-Control'] !== 'no-cache');
-  $etagPass = $etag && !empty($headers['If-None-Match'])
+  $allowCacheCheck = !isset($headers['cache-control']) || (isset($headers['cache-control']) && $headers['cache-control'] !== 'no-cache');
+  $etagPass = $etag && !empty($headers['if-none-match'])
               // do we need a string search instead of a compare?
-           && strpos($headers['If-None-Match'], $etag) !== false;
+           && strpos($headers['if-none-match'], $etag) !== false;
   // FIXME: datetime comparison!
-  $mtimePass = $lastmod && !empty($headers['If-Modified-Since'])
-           && $lastmod == $headers['If-Modified-Since'];
+  $mtimePass = $lastmod && !empty($headers['if-modified-since'])
+           && $lastmod == $headers['if-modified-since'];
   if (0) {
-    //header('X-Debug-checkCacheHeaders-cc: ' . $headers['Cache-Control']);
+    //header('X-Debug-checkCacheHeaders-cc: ' . $headers['cache-control']);
     header('X-Debug-checkCacheHeaders-acc: ' . ($allowCacheCheck ? 'allowed' : 'blocked'));
-    //header('X-Debug-checkCacheHeaders-in: ' . isset($headers['If-None-Match']) ? $headers['If-None-Match'] : '');
-    //header('X-Debug-checkCacheHeaders-im: ' . isset($headers['If-Modified-Since']) ? $headers['If-Modified-Since'] : '');
+    //header('X-Debug-checkCacheHeaders-in: ' . isset($headers['if-none-match']) ? $headers['if-none-match'] : '');
+    //header('X-Debug-checkCacheHeaders-im: ' . isset($headers['if-modified-since']) ? $headers['if-modified-since'] : '');
     if ($etag) {
       header('X-Debug-checkCacheHeaders-ep: ' . ($etagPass ? 'accepted' : 'unmatched'));
       header('X-Debug-checkCacheHeaders-server: ' . $etag);
-      header('X-Debug-checkCacheHeaders-browser: ' . isset($headers['If-None-Match']) ? $headers['If-None-Match'] : '');
+      header('X-Debug-checkCacheHeaders-browser: ' . isset($headers['if-none-match']) ? $headers['if-none-match'] : '');
     }
     if ($lastmod) {
       header('X-Debug-checkCacheHeaders-me: ' . ($mtimePass ? 'accepted' : 'unmatched'));
+      if (!$mtimePass) {
+        header('X-Debug-checkCacheHeaders-me-ep: ' . $lastmod . '_' . $mtime);
+        header('X-Debug-checkCacheHeaders-me-browser: ' . $headers['if-modified-since']);
+      }
     }
   }
   // CF will hide these
