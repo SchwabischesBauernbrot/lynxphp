@@ -59,7 +59,7 @@ return array(
         'unwrapData' => true,
         'sendSession' => true,
         'cacheSettings' => array(
-          // FIXME: all public posts...
+          // board table should be updated on new post
           // user settings?
           'databaseTables' => array('boards', 'site_settings'),
           //'files' => array(),
