@@ -2,21 +2,31 @@
 // for getting data from apache/nginx
 ldr_require('../common/lib.units.php');
 
-// apache polyfill for nginx
-if (!function_exists('getallheaders')) {
-  function getallheaders() {
-    $headers = array();
+function isNginx() {
+  return stripos(getServerField('SERVER_SOFTWARE'), 'nginx') !== false;
+}
+
+// should only use this
+function getLowercaseHeaders() {
+  $headers = array();
+  if (isNginx()) {
     foreach($_SERVER as $name => $value) {
       if (substr($name, 0, 5) == 'HTTP_') {
-        $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+        $headers[str_replace(' ', '-', strtolower(str_replace('_', ' ', substr($name, 5))))] = $value;
       }
     }
     return $headers;
   }
-}
-
-function isNginx() {
-  return stripos(getServerField('SERVER_SOFTWARE'), 'nginx') !== false;
+  // apache
+  $unnormalizedHeaders = getallheaders();
+  foreach($unnormalizedHeaders as $k=>$v) {
+    // if-modified-since (was If-modified-since)
+    $nk = strtolower($k);
+    $headers[$nk] = $v;
+    //header('X-Debug-checkCacheHeaders-browser-header-' . $k . ': ' . $k. ' => ' . $nk);
+    //$headers[$k] = $v;
+  }
+  return $headers;
 }
 
 function ensureQuerystring() {
