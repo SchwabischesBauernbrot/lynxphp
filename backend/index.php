@@ -386,7 +386,7 @@ function wrapContent($error) {
 //echo "method[$req_method]<br>\n";
 
 //print_r($_SERVER);
-//$headers = getallheaders();
+//$headers = getLowercaseHeaders();
 //$txt = $req_method . ' ' . $req_path . ' ' . print_r($headers, 1);
 //$txt = $req_method . ' ' . $req_path;
 //file_put_contents('log.txt', $txt.PHP_EOL , FILE_APPEND | LOCK_EX);
