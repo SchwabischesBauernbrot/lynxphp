@@ -409,7 +409,14 @@ class Router {
     $maxMtime = 0;
     $compoundEtags = array();
 
-    if (BACKEND_HEAD_SUPPORT && isset($cacheSettings['resource'])) {
+    // upgrade resources to backend
+    // turning this off because we're just going to do the GET later
+    // but this might help calculate the headers
+    // so the browser can do a 304
+    // well we'll save the bandwidth for now and optimize for the speed later
+    // we'd need to be able to do the GET with portals
+    // AND cache that result so lib.backend could also access that data...
+    if (0 && BACKEND_HEAD_SUPPORT && isset($cacheSettings['resource'])) {
       // upgrade resources to backend...
       //print_r($cacheSettings);
       foreach($cacheSettings['resource'] as $r) {
@@ -455,6 +462,7 @@ class Router {
     }
 
     // why don't we get a warning about BACKEND_HEAD_SUPPORT not being set?
+    // what else sets backend beyond the loop above?
     if (BACKEND_HEAD_SUPPORT && isset($cacheSettings['backend'])) {
       $params = array();
       foreach($routeParams as $k => $v) {
@@ -509,7 +517,9 @@ class Router {
         // if we get a 304, we may not have the headers...
         $code = substr($result, 9, 3);
         //echo "code[$code]<br>\n";
+        // back up headers in _HEAD_CACHE if we have them
         if ($code === '304' && $check) {
+          // avoid parsing headers to back them up
           if (isset($check['etag'])) {
             $etag = $check['etag'];
             $_HEAD_CACHE[$endpoint]['etag'] = $etag;
@@ -521,7 +531,9 @@ class Router {
             $maxMtime = max($maxMtime, $ts);
           }
         } else {
+          // parse
           $headers = parseHeaders($result);
+          // pass them all
           $_HEAD_CACHE[$endpoint] = $headers;
           //echo "<pre>header", htmlspecialchars(print_r($headers, 1)), "</pre>\n";
 
