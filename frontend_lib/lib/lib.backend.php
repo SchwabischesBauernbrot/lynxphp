@@ -116,7 +116,8 @@ function consume_beRsrc($options, $params = '') {
   $feCachable = empty($options['method']) && empty($options['dontCache']);
   if ($feCachable) {
     // what's our caching key?
-    $key = BACKEND_BASE_URL . $options['endpoint'] . $querystring;
+    $hckey = $options['endpoint'] . $querystring;
+    $key = BACKEND_BASE_URL . $hckey;
     // uhm this defeats passing SID to backend
     if (!empty($headers['sid'])) {
       // maybe it should be prefixed...
@@ -131,11 +132,13 @@ function consume_beRsrc($options, $params = '') {
       global $_HEAD_CACHE;
       //echo "<pre>_HEAD_CACHE", htmlspecialchars(print_r($_HEAD_CACHE, 1)), "</pre>\n";
       // $_HEAD_CACHE &&  needed?
-      if (isset($_HEAD_CACHE[$options['endpoint'] . $querystring])) {
-        //if (DEV_MODE) echo "Using head cache<br>\n";
-        if (doWeHaveHeader($_HEAD_CACHE[$options['endpoint'] . $querystring], $check)) {
+      if (isset($_HEAD_CACHE[$hckey])) {
+        //if (DEV_MODE) echo "<pre>Using head cache key[$hckey] [", print_r($_HEAD_CACHE[$hckey], 1), "]</pre>\n";
+        if (doWeHaveHeader($_HEAD_CACHE[$hckey], $check)) {
+          //if (DEV_MODE) echo "WeHaveHeader<br>\n";
           return postProcessJson($check['res'], $options);
         }
+        if (DEV_MODE) echo "<pre>WeDontHaveHeader key[$hckey] [", print_r($_HEAD_CACHE[$hckey], 1), "]</pre>\n";
       } else {
         // FIXME: should be contains
         if (empty($_SERVER['HTTP_CACHE_CONTROL']) || $_SERVER['HTTP_CACHE_CONTROL'] !== 'no-cache') {
