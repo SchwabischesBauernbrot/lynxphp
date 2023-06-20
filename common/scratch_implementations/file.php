@@ -5,11 +5,11 @@ include_once 'base.php';
 // the size of the file caused more contention
 // do we need pooling and/or multiple files
 class file_scratch_driver extends scratch_implementation_base_class {
-  function __construct() {
+  function __construct($prefix = '') {
     // we need to protect information, such as IP addresses
     // so we'll use the php extension so that only PHP can access this info
-    $this->file = '../frontend_storage/cache_v2.php';
-    $this->lock = '../frontend_storage/cache_v2.lock';
+    $this->file = '../frontend_storage/'.$prefix.'cache_v2.php';
+    $this->lock = '../frontend_storage/'.$prefix.'cache_v2.lock';
     if (!file_exists($this->file)) {
       if (!touch($this->file)) {
         echo "Can't create[", getcwd(), '/', $this->file, "] webserver can't create files or write to data?<br>\n";
@@ -30,6 +30,7 @@ class file_scratch_driver extends scratch_implementation_base_class {
 
   function getlock() {
     $lock = $this->lock;
+    /*
     if (file_exists($lock)) {
       // wait until unlocked
       $stilllocked = 1;
@@ -46,11 +47,27 @@ class file_scratch_driver extends scratch_implementation_base_class {
         return false;
       }
     }
+    */
+    // wait until lock acquired
+    $stilllocked = 1;
+    for($i = 0; $i < 30; $i++) {
+      if (@mkdir($lock)) {
+        $stilllocked = 0;
+        break;
+      }
+      # optional wait between lock attempts, could use usleep()
+      usleep(100);
+      # may want to return early if reach a max number of tries to get lock
+    }
+    if ($stilllocked) {
+      echo "can't get lock[$lock] <!-- ", gettrace(), " --><br>\n";
+      return false;
+    }
     global $ts;
-    file_put_contents($lock, $ts . '_' . posix_getpid());
+    file_put_contents($lock . '/lock', $ts . '_' . posix_getpid());
     // why bother checking the perms on the non-lock file?
     //$this->checkPerms();
-    if (!file_exists($lock)) {
+    if (!file_exists($lock . '/lock')) {
       echo "cant create lock[$lock]<br>\n";
       return false;
     }
@@ -58,16 +75,35 @@ class file_scratch_driver extends scratch_implementation_base_class {
     return true;
   }
 
+  function waitForFileExists() {
+    if (!file_exists($this->file)) {
+      $dne = 1;
+      for($i = 0; $i < 30; $i++) {
+        if (file_exists($this->file)) {
+          return true;
+          break;
+        }
+        usleep(100);
+      }
+      return false;
+    }
+    return true;
+  }
+
   function clear($key) {
     if (!$this->getlock()) {
+      return false;
+    }
+    if (!$this->waitForFileExists()) {
       return false;
     }
     $fp = fopen($this->file, 'r');
     $tmpfname = tempnam('/tmp', 'lynxphp');
     $wfp = fopen($tmpfname, 'w');
     if (!$fp || !$wfp) {
-      unlink($this->lock);
-      return true;
+      unlink($this->lock . '/lock');
+      rmdir($this->lock);
+      return false;
     }
     $found = 0;
     while(($line = fgets($fp)) !== false) {
@@ -83,14 +119,18 @@ class file_scratch_driver extends scratch_implementation_base_class {
     rename($tmpfname, $this->file);
     $this->checkPerms();
     // unlock
-    unlink($this->lock);
+    unlink($this->lock . '/lock');
+    rmdir($this->lock);
     return true;
   }
 
   function get($key) {
+    if (!$this->waitForFileExists()) {
+      return false;
+    }
+    $fp = fopen($this->file, 'r');
     //$lines=file($this->file);
     //foreach($lines as $line) {
-    $fp = fopen($this->file, 'r');
     if (!$fp) return false;
     while(($line = fgets($fp)) !== false) {
       $tline = trim($line);
@@ -109,12 +149,16 @@ class file_scratch_driver extends scratch_implementation_base_class {
     if (!$this->getlock()) {
       return false;
     }
+    if (!$this->waitForFileExists()) {
+      return false;
+    }
     $fp = fopen($this->file, 'r');
     $tmpfname = tempnam('/tmp', 'doubleplus');
     $wfp = fopen($tmpfname, 'w');
     if (!$fp || !$wfp) {
-      unlink($this->lock);
-      return true;
+      unlink($this->lock . '/lock');
+      rmdir($this->lock);
+      return false;
     }
     $found = 0;
     while(($line = fgets($fp)) !== false) {
@@ -141,7 +185,8 @@ class file_scratch_driver extends scratch_implementation_base_class {
     unlink($tmpfname);
     $this->checkPerms();
     // unlock
-    unlink($this->lock);
+    unlink($this->lock . '/lock');
+    rmdir($this->lock);
     return true;
   }
 }
