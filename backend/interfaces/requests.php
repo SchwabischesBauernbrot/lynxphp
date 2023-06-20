@@ -34,14 +34,23 @@ function logRequest($ip) {
   if ($row['requestid']) {
     $sdiff = $now - $row['created_at'];
     $limit = ceil($sdiff / 60) * $readsPerMinPerIP;
-    $ldiff = $now - $row['updated_at'];
+    //$ldiff = $now - $row['updated_at'];
     //echo "started [$sdiff]s ago limit[$limit]<br>\n";
     //echo "last    [$ldiff]s ago count[$count]<br>\n";
+    $db->update($models['request'], array('count' => $count), array('criteria' => array('requestid'=>$row['requestid'])));
     if ($limit < $count) {
       //echo "Delay<br>\n";
-      sleep(1);
+      // by holding the socket open we waste server resources
+      if (0) {
+        sleep(1);
+      } else {
+        http_response_code(429);
+        //header('X-RateLimit-ip');
+        header('Retry-After: 600');
+        echo "Too Many Requests";
+        exit();
+      }
     }
-    $db->update($models['request'], array('count' => $count), array('criteria' => array('requestid'=>$row['requestid'])));
   } else {
     $db->insert($models['request'], array(array('ip'=>$ip, 'type'=>'backend', 'count'=>1)) );
   }
