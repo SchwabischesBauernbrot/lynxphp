@@ -1,7 +1,9 @@
 <?php
+
 require '../common/lib.loader.php';
 ldr_require('../common/common.php');
 ldr_require('../common/lib.http.server.php');
+
 ldr_require('../frontend_lib/lib/lib.handler.php'); // sendBump() and output functions
 
 // REQUEST_URI seems to be more accurate in NGINX
@@ -17,7 +19,7 @@ if ($router->sendHeaders($req_method, $req_path)) {
 }
 
 // this lives in lib.handler
-sendBump($req_method, $req_path); // deal with template's static nav
+//sendBump($req_method, $req_path); // deal with template's static nav
 
 // work around nginx weirdness with PHP and querystrings
 ensureQuerystring();
