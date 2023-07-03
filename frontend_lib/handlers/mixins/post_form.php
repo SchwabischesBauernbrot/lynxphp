@@ -95,9 +95,10 @@ function renderPostFormHTML($boardUri, $options = false) {
     'formfields' => $formfields,
     'pipelineOptions' => $pipelineOptions,
   );
-  // CAPTCHA probably hooks in here somewhere
+  // CAPTCHA probably hooks in PIPELINE_POST_FORM_FIELDS
   $pipelines[PIPELINE_POST_FORM_FIELDS]->execute($io);
   $formfields = $io['formfields']; // map output
+  // nothing uses these yet, not sure what they're for...
   $pipelines[PIPELINE_POST_FORM_OPTIONS]->execute($formOptions);
   $pipelines[PIPELINE_POST_FORM_VALUES]->execute($values);
 
