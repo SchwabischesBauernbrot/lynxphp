@@ -7,7 +7,9 @@ if (!empty($io['pipelineOptions']['showCAPTCHA'])) {
 
   // should this be enabled?
   global $board_settings;
+  $board_settings = getter_getBoardSettings($io['boardUri']);
   //echo "Settings [", gettype($board_settings), print_r($board_settings, 1),"]<br>\n";
+  /*
   if ($board_settings === false) {
     // get board settings...
     $boardData = getBoard($io['boardUri']);
@@ -16,6 +18,7 @@ if (!empty($io['pipelineOptions']['showCAPTCHA'])) {
       $board_settings = $boardData['settings'];
     }
   }
+  */
 
   if (isset($board_settings['captcha_mode'])) {
     $mode = $board_settings['captcha_mode']; // posts / thread / no
