@@ -88,14 +88,17 @@ if (count($boardData['posts'])) {
 }
 //echo "checking[$boardUri]3[", print_r($boards_settings[$boardUri], 1), "]<br>\n";
 
+/*
 $boardPortal = getBoardPortal($boardUri, $boardData, array(
   'isThread' => true,
   'threadNum' => $threadNum,
   'threadClosed' => $closed,
   'boardSettings' => $boards_settings[$boardUri],
 ));
+*/
 
 // this will include all scripts, not just this one...
 js_add_script($pkg, 'refresh_thread.js');
 
-wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer']);
+//wrapContent($boardPortal['header'] . $tmpl . $boardPortal['footer']);
+wrapContent($tmpl);
