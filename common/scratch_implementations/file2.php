@@ -55,6 +55,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
       // https://www.php.net/manual/en/function.register-shutdown-function.php
       // might help
       $contents = file_get_contents($lockpath);
+      // might not have a _
       list($n, $p) = explode('_', $contents, 2);
       // is p running, if not, clear this lock
       // is old?
