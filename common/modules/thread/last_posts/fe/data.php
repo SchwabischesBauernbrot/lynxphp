@@ -6,6 +6,26 @@ $fePkgs = array(
       array(
         'route'   => '/:uri/thread/:num/last50.html',
         'handler' => 'view',
+        'portals' => array(
+          'board' => array(
+            'paramsCode' => array(
+              // allows remapping
+                // uri => params but then not extensible
+                // what else would we need?
+                // processing options can come after the extraction?
+              'uri' => array('type' => 'params', 'name' => 'uri'),
+              'num' => array('type' => 'params', 'name' => 'num'),
+            ),
+            'isThread' => true,
+          ),
+          'posts' => array(
+            'paramsCode' => array(
+              'uri' => array('type' => 'params', 'name' => 'uri'),
+              'num' => array('type' => 'params', 'name' => 'num'),
+            ),
+            'isThread' => true,
+          ),
+        ),
         /*
         'options' => array(
           'cacheSettings' => array(
