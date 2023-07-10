@@ -331,7 +331,14 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
 
     if ($isImage) {
       // FIXME: we don't always want to remove EXIF
-      removeExif($srcPath, $finalPath);
+      // this was corrupting PNGs...
+      // JPEG, TIFF, WAV and more: https://www.php.net/manual/en/function.exif-imagetype.php
+      $strip_mimes = array('image/jpeg');
+      if (in_array($mime, $strip_mimes)) {
+        removeExif($srcPath, $finalPath);
+      } else {
+        copy($srcPath, $finalPath);
+      }
     } else {
       copy($srcPath, $finalPath);
     }
