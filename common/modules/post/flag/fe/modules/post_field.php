@@ -45,8 +45,10 @@ $params = $getModule();
       // id=customflag name=customflag
       // img class=jsonly selected-flag
       // data-src on the option
+  if (count($flags) > 1) {
       $io['formfields']['flag'] = array( 'type' => 'select', 'label' => 'Flag', 'options' => $options);
       // options? load them from?
+  }
     //}
   //}
 //}
