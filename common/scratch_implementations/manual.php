@@ -70,8 +70,8 @@ class manual_scratch_driver extends scratch_implementation_base_class {
       return false;
     }
     // acquire lock
-    global $ts;
-    file_put_contents($lock . '/lock', $ts . '_' . posix_getpid());
+    global $now;
+    file_put_contents($lock . '/lock', $now . '_' . posix_getpid());
     // why bother checking the perms on the non-lock file?
     //$this->checkPerms();
     if (!file_exists($lock . '/lock')) {
