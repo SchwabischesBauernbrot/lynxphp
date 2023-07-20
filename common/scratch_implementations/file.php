@@ -63,8 +63,8 @@ class file_scratch_driver extends scratch_implementation_base_class {
       echo "can't get lock[$lock] <!-- ", gettrace(), " --><br>\n";
       return false;
     }
-    global $ts;
-    file_put_contents($lock . '/lock', $ts . '_' . posix_getpid());
+    global $now;
+    file_put_contents($lock . '/lock', $now . '_' . posix_getpid());
     // why bother checking the perms on the non-lock file?
     //$this->checkPerms();
     if (!file_exists($lock . '/lock')) {
