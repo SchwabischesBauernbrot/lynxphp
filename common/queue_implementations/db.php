@@ -35,6 +35,49 @@ class db_queue_driver extends queue_implementation_base_class implements queue_i
     }
   }
 
+/*
+{
+  "pipeline":"pipeline_wq_file_add",
+  "params":{
+    "postid":"515",
+    "sha256":"ff13a784118058022f3d402646e17b9b5d1f2795c1252a262891e1057cd62724",
+    "path":"storage\/boards\/endchan\/75\/515_0.png",
+    "browser_type":"image\/png",
+    "mime_type":"image\/png",
+    "type":"image",
+    "filename":"1685698269724.png",
+    "size":"743836",
+    "ext":"png",
+    "w":"890",
+    "h":"890",
+    "filedeleted":"0",
+    "spoiler":"0",
+    "tn_w":"226",
+    "tn_h":"226",
+    "fileid":"188",
+    "boardUri":"endchan"
+  }
+}
+*/
+  function getAnalytics($queue) {
+    global $db;
+    // queue/type ('queue'/'direct') are all the same
+    // job is different...
+    // select type, count(*) from queues group by type;
+    $res = $db->find($this->queue_model, array(
+      'fields' => array('job'),
+    ));
+    $qByPipe = array();
+    while($row = $db->get_row($res)) {
+      $data = json_decode($row['job'], true);
+      $pl = $data['pipeline'];
+      //print_r($data);
+      if (!isset($qByPipe[$pl])) $qByPipe[$pl] = 0;
+      $qByPipe[$pl]++;
+    }
+    return $qByPipe;
+  }
+
   function getCount($queue) {
     global $db;
     return $db->count($this->queue_model);
