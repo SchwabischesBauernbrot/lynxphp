@@ -16,6 +16,11 @@ class work_queue {
       $this->subscribed[$this->queueName] = true;
     }
   }
+
+  function getAnalytics() {
+    return $this->queue->getAnalytics($this->queueName);
+  }
+
   function getWorkCount() {
     return $this->queue->getCount($this->queueName);
   }
