@@ -31,6 +31,10 @@ include '../common/queue_implementations/db.php';
 $queue_type_class = QUEUE_DRIVER . '_queue_driver';
 $queue = new $queue_type_class;
 
+// what's the difference between queue or workqueue
+// workqueue is be only, db driven, single implementation
+// it's a wrapper around the db (template above, not the instance)
+
 // set up workqueue
 include '../common/workqueue.php';
 $workqueue = new work_queue;
