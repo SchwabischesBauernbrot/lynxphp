@@ -14,6 +14,11 @@ if (!$row) {
     'err'  => 'Board does not exist',
   ));
 }
+// board hasn't set anything up yet
+// but we need to make sure we do
+if (!isset($boardData['settings'])) {
+  $boardData['settings'] = array();
+}
 // json fields to pull in the settings, to avoid future calls
 $posts_model = getPostsModel($boardUri);
 
