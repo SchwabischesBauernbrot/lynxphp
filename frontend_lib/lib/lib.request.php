@@ -27,6 +27,8 @@ function logRequest($ip) {
   $key = 'request_' . $ip;
   //if (DEV_MODE) echo "key[$key]<br>\n";
 
+  // if this lock fails (stays open)
+  // then the rate limiting completely fails...
   $havelock = false;
   for($i = 0; $i < 30; $i++) {
     if ($persist_scratch->getlock()) {
@@ -53,18 +55,17 @@ function logRequest($ip) {
   }
   // check
   $cnt = $persist_scratch->get($key . '_count');
+  $persist_scratch->set($key . '_last', $now);
   if (!$cnt) {
     //if (DEV_MODE) echo "new count[$cnt]<br>\n";
     $persist_scratch->set($key . '_first', $now);
     $persist_scratch->set($key . '_count', '1');
-    $persist_scratch->set($key . '_last', $now);
     logRequest_unlock($persist_scratch);
   } else {
     // get period
     $start = $persist_scratch->get($key . '_first');
     // set
     $persist_scratch->inc($key . '_count');
-    $persist_scratch->set($key . '_last', $now);
     logRequest_unlock($persist_scratch);
 
     // check
