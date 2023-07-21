@@ -20,9 +20,15 @@ $overboardData = $pkg->useResource('overboard');
 $nPosts = array();
 if (isset($overboardData['threads'])) {
   foreach($overboardData['threads'] as $i => $t) {
+    if (0 && DEV_MODE) {
+      echo "<pre>thread[", print_r($t, 1), "]</pre>\n";
+    }
     if (!isset($t['posts'])) continue;
     foreach($t['posts'] as $j => $post) {
-      //echo "<pre>post[", print_r($post, 1), "]</pre>\n";
+      if (0 && DEV_MODE) {
+        echo "<pre>post[", print_r($post, 1), "]</pre>\n";
+      }
+      $overboardData['threads'][$i]['posts'][$j]['boardUri'] = $t['boardUri'];
       preprocessPost($overboardData['threads'][$i]['posts'][$j]);
       $nPosts[] = $post;
     }

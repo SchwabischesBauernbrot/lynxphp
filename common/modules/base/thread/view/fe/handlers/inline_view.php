@@ -24,6 +24,7 @@ $boardData = getBoardThread($boardUri, $threadNum);
 //echo "<pre>boardData", print_r($boardData['settings'], 1), "</pre>\n";
 
 foreach($boardData['posts'] as $j => $post) {
+  $boardData['posts'][$j] = $boardUri;
   preprocessPost($boardData['posts'][$j]);
 }
 global $pipelines;

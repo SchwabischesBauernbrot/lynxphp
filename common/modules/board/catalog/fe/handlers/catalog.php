@@ -37,6 +37,7 @@ if (is_array($catalog)) {
       echo "<pre>No page set in [", print_r($obj, 1), "]</pre>\n";
     }
     foreach($obj['threads'] as $j => $post) {
+      $catalog[$i]['threads'][$j] = $boardUri;
       preprocessPost($catalog[$i]['threads'][$j]);
       $posts[] = $post;
     }

@@ -552,6 +552,7 @@ function renderBoardCatalog($boardUri) {
         echo "<pre>No page set in [", print_r($obj, 1), "]</pre>\n";
       }
       foreach($obj['threads'] as $j => $post) {
+        $catalog[$i]['threads'][$j]['boardUri'] = $boardUri;
         preprocessPost($catalog[$i]['threads'][$j]);
         $posts[] = $post;
       }

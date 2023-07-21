@@ -128,6 +128,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
     if (!isset($thread['posts'])) continue;
     $posts = $thread['posts'];
     foreach($posts as $j => $post) {
+      $pageData[$i]['posts'][$j]['boardUri'] = $boardUri;
       preprocessPost($pageData[$i]['posts'][$j]);
       $nPosts[] = $post;
     }
@@ -169,7 +170,7 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
       $topReply = isset($posts[1]) ? $posts[1]['no'] : false;
       $threads_html .= renderPost($boardUri, $post, array(
         'checkable' => true, 'postCount' => empty($thread['thread_reply_count']) ? -1 : $thread['thread_reply_count'],
-        'topReply' => $topReply, 'where' => $boardUri . '/', 'boardSettings' => $boardData['settings'],
+        'topReply' => $topReply, 'where' => $boardUri . '/', 'boardSettings' => isset($boardData['settings']) ? $boardData['settings'] : false,
         'userSettings' => $userSettings, 'noActions' => $noActions,
       ));
       //if ($i === count($posts) - 1) $threads_html .= $threadFtr_tmpl;
