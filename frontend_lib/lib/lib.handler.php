@@ -109,6 +109,7 @@ function wrapContentData($options = false) {
     // wth passes this in?
     'canonical'    => false,
     'userSettings' => false,
+    'addToHead'    => '',
   ), $options));
   // key this?
 
@@ -231,6 +232,7 @@ function wrapContentData($options = false) {
     'portalsData'    => $portalsData,
     'doWork'        => !$noWork,
     'overrideTheme' => $overrideTheme,
+    'addToHead'     => $addToHead,
     //'mtime' => $mtime,
   );
 }
@@ -270,7 +272,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
     //'siteSettings' => $siteSettings,
     //'userSettings' => $userSettings,
     'overrideTheme' => $row['overrideTheme'],
-    'head_html' => '',
+    'head_html' => $row['addToHead'],
   );
   // we're just going to use overrideTheme for now
   /*
