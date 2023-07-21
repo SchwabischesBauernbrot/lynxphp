@@ -55,7 +55,22 @@ if (!isset($boardData['posts'])) {
 $sageLimit  = empty($boardData['sageLimit']) ? 500 : $boardData['sageLimit'];
 $replyLimit = empty($boardData['replyLimit']) ? 1000 : $boardData['replyLimit'];
 
+/*
+if (DEV_MODE) {
+  //echo "<pre>", print_r($boardData['posts'], 1),"</pre>\n";
+  global $pipelines;
+
+  $pipelines[PIPELINE_POST_PREPROCESS]->debug();
+}
+*/
+
 foreach($boardData['posts'] as $j => $post) {
+  //if (DEV_MODE) {
+    //echo "<pre>2", print_r($boardData['posts'][$j], 1),"</pre>\n";
+  //}
+  // inject uri for >> quotes
+  $boardData['posts'][$j]['boardUri'] = $boardUri;
+  // PIPELINE_POST_PREPROCESS
   preprocessPost($boardData['posts'][$j]);
 }
 global $pipelines;
