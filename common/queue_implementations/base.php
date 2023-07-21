@@ -19,6 +19,12 @@ class queue_implementation_base_class implements queue_implementation_interface 
   // are these storaged or not?
   // maybe an event vs task?
 
+  function getAnalytics($queue) {
+  }
+
+  function getCount($queue) {
+  }
+
   // I'm interesting in listening to this queue
   function subscribe($queue) {
   }
