@@ -94,6 +94,8 @@ if (count($btLookups)) {
 
 //echo "<pre>", print_r($io['safeCom'], 1), "</pre>\n";
 
+// m is multiline, g is many/multiple matches
+// g isn't available in preg
 $replaces = array(
   // >>>/malform/35@ThreadNum
   '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/(\d+)@(\d+)(\s*)/m' => function ($matches) use ($io) {
@@ -121,7 +123,7 @@ $replaces = array(
 
     return $str;
   },
-  '/' . preg_quote('&gt;&gt;&gt;#') . '\/?(\w+)\/?(\s+)/m' => function ($matches) use ($io) {
+  '/' . preg_quote('&gt;&gt;&gt;#') . '\/?(\w+)\/?(\s+|$)/m' => function ($matches) use ($io) {
     return '<a
       href="' . $io['boardUri'] . '/catalog.html#' . $io['boardUri'] . '-/' .
       $matches[1] . '/">&gt;&gt;&gt;#/' . $matches[1].'/</a>' . $matches[2];
@@ -135,14 +137,17 @@ $replaces = array(
       href="' . $matches[1] . '/thread/' . $threadId . '#' . $matches[2] . '">&gt;&gt;&gt;/' .
       $matches[1] . '/' . $matches[2] . '</a>' . $matches[3];
   },
-  '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/?(\s+)/m' => function ($matches) {
+  '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/?(\s+|$)/m' => function ($matches) {
     // board reference
     return '<a class="quote"
       href="' . $matches[1] . '">&gt;&gt;&gt;/' .
       $matches[1] . '/</a>' . $matches[2];
   },
 // hrm could verify the post exists...
-  '/' . preg_quote('&gt;&gt;') . '(\d+)\/?(\s+)/m' => function ($matches) use ($io) {
+  '/' . preg_quote('&gt;&gt;') . '(\d+)\/?(\s+|$)/m' => function ($matches) use ($io) {
+    //if (DEV_MODE) {
+      //echo 'format hit<pre>', htmlspecialchars(print_r($matches, 1)), '</pre>', "\n";
+    //}
     global $btLookups;
     $threadId = isset($btLookups[$io['boardUri']][$matches[1]]) ? $btLookups[$io['boardUri']][$matches[1]] : '';
     // quote by postid
@@ -159,6 +164,12 @@ $replaces = array(
       $matches[1] . '/' . $matches[2] . '/</a>' . $matches[3];
   },
 );
+
+/*
+if (DEV_MODE) {
+  echo 'format<pre>', htmlspecialchars(print_r($io, 1)), '</pre>', "\n";
+}
+*/
 
 // have to use anonymous functions
 $io['safeCom'] = preg_replace_callback_array($replaces, $io['safeCom']);
