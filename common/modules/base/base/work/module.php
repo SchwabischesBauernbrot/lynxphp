@@ -9,6 +9,16 @@ return array(
         'endpoint' => 'opt/work',
       ),
     ),
+    array(
+      'name' => 'workq_summary',
+      'params' => array(
+        'endpoint' => 'doubleplus/admin/workq',
+        'unwrapData' => true,
+        'requireSession'=> true,
+        //'requires' => array('boardUri'),
+        //'params' => 'querystring',
+      ),
+    ),
   ),
 );
 ?>
