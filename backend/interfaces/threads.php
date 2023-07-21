@@ -241,6 +241,8 @@ function getThreadEngine($boardUri, $threadNum, $options = false) {
 function getThread($boardUri, $threadNum, $options = false) {
 
   $iposts = getThreadEngine($boardUri, $threadNum, $options);
+  if (!$iposts) return false;
+
   $posts = array();
   foreach($iposts as $row) {
     //echo "<pre>", print_r($row, 1), "</pre>\n";
