@@ -413,6 +413,9 @@ class package {
     if (file_exists($this->dir . 'be/data.php')) {
       $bePkgs = include $this->dir . 'be/data.php';
       if (empty($bePkgs) || !is_array($bePkgs)) {
+        // warn because it's confusing when this happens
+        // hard to debug
+        echo $this->name, 'has empty data.php<br>', "\n";
         return;
       }
       // we need to check for the array wrapper..
@@ -524,7 +527,7 @@ class package {
         }
       } else {
         // admin/modules hits this path...
-        //echo "Unknown router[$router]<br>\n";
+        echo "Unknown router[$router]<br>\n";
       }
     }
     $this->backendRoutesAdded = true;
