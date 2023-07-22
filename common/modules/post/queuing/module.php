@@ -46,7 +46,7 @@ return array(
       ),
     ),
     array(
-      'name' => 'queue_list',
+      'name' => 'postq_list',
       'params' => array(
         'endpoint' => 'doubleplus/admin/queues',
         'unwrapData' => true,
