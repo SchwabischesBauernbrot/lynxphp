@@ -435,12 +435,12 @@ function getBoard($boardUri) {
 // maybe a cb system (split control/request plane and process/response plane)
 // we could define in the route potentially usage
 function getBoardPage($boardUri, $page = 1) {
-  $page1 = getExpectJson('4chan/' . $boardUri . '/' . $page . '.json');
+  $result = getExpectJson('4chan/' . $boardUri . '/' . $page . '.json');
   if (isset($result['data']['board']['settings'])) {
     global $board_settings;
     $board_settings = $result['data']['board']['settings'];
   }
-  return $page1;
+  return $result;
 }
 
 function getBoardCatalog($boardUri) {
