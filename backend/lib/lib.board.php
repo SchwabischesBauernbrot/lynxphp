@@ -166,7 +166,15 @@ function getPostsModel($boardUri, $options = false) {
       'sub' => array('type'=>'str', 'length'=>128),
       'com' => array('type'=>'text'),
       'password' => array('type'=>'str'),
-    )
+      // 'replies' => array('type'=>'integer'),
+      // 'images' => array('type'=>'integer'),
+      //'archived' => array('type'=>'bool'),
+      //'archived_on' => array('type'=>'int'),
+      // semantic_url (seo slug)
+      // since4pass
+      //'unique_ips' => array('type'=>'integer'),
+      //'m_img' => array('type'=>'bool'),
+      )
   );
   $db->autoupdate($public_post_model);
   return $public_post_model;
@@ -236,8 +244,10 @@ function getPostFilesModel($boardUri, $options = false) {
     //'indexes' => array('boardUri'),
     'fields' => array(
       'postid' => array('type'=>'int'),
-      'sha256' => array('type'=>'str', 'length'=>255),
       'path' => array('type'=>'str', 'length'=>255),
+      // b64 encoded
+      //'md5' => array('type'=>'str', 'length'=>24),
+      'sha256' => array('type'=>'str', 'length'=>255),
       //'sha512' => array('type'=>'str', 'length'=>255),
       'browser_type' => array('type'=>'str', 'length'=>255),
       'mime_type' => array('type'=>'str', 'length'=>255),
@@ -246,8 +256,6 @@ function getPostFilesModel($boardUri, $options = false) {
       'filename' => array('type'=>'str', 'length'=>128),
       'size' => array('type'=>'int'),
       'ext' => array('type'=>'str', 'length'=>128),
-      // b64 encoded
-      //'md5' => array('type'=>'str', 'length'=>24),
       'w' => array('type'=>'int'),
       'h' => array('type'=>'int'),
       'tn_w' => array('type'=>'int'),
@@ -255,17 +263,7 @@ function getPostFilesModel($boardUri, $options = false) {
       'filedeleted' => array('type'=>'bool'),
       'spoiler' => array('type'=>'bool'),
       // custom_spoiler
-      // 'replies' => array('type'=>'integer'),
-      // 'images' => array('type'=>'integer'),
-      // 'bumplimit' => array('type'=>'boolean'),
-      // 'imagelimit' => array('type'=>'boolean'),
       // tag (.swf category)
-      // semantic_url (seo slug)
-      // since4pass
-      //'unique_ips' => array('type'=>'integer'),
-      //'m_img' => array('type'=>'bool'),
-      //'archived' => array('type'=>'bool'),
-      //'archived_on' => array('type'=>'int'),
     )
   );
   $db->autoupdate($public_post_file_model);
