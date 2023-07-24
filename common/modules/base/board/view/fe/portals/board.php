@@ -48,6 +48,7 @@ function getPortalBoard($opts, $request) {
     $uri = $params['uri'];
   } // else how? which EP
   else {
+    //echo "<pre>opts", print_r($opts, 1), "</pre>\n";
     if (!empty($opts['uri'])) {
       $pageCount = $opts['pageCount'];
       $uri = $opts['uri'];
@@ -158,7 +159,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'boardSettings' => $boardSettings,
     'navItems' => array(
       array('label' => 'Index' , 'destinations' => $boardUri . '/'),
-      array('label' => 'Catalog' , 'destinations' => $boardUri . '/catalog.html'),
+      //array('label' => 'Catalog' , 'destinations' => $boardUri . '/catalog.html'),
       //'Index' => $boardUri . '/',
       //'Catalog' => $boardUri . '/catalog.html',
     ),
