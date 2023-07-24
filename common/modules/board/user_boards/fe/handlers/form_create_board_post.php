@@ -29,7 +29,7 @@ if ($result['data'] === 'ok') {
   //wrapContent('Board created!');
   // FIXME get named route
   global $BASE_HREF;
-  redirectTo($BASE_HREF . 'control_panel');
+  redirectTo($BASE_HREF . 'control_panel.php');
   /*
   $uri = $_POST['uri'];
   redirectTo($uri . '/settings');
