@@ -35,13 +35,11 @@ $fePkgs = array(
       */
     ),
     'modules' => array(
-      /*
-      // add [Banner] to board naviagtion
+      // add [Catalog] to board naviagtion
       array(
         'pipeline' => 'PIPELINE_BOARD_NAV',
         'module' => 'nav',
       ),
-      */
     ),
   ),
 );
