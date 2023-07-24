@@ -3,6 +3,7 @@ return array(
   'name' => 'media_thumbnail',
   'version' => 1,
   'resources' => array(
+    // maybe belongs in post? but it is media related output...
     array(
       'name' => 'thumbnail_ready',
       'params' => array(
