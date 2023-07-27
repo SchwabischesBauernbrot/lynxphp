@@ -190,7 +190,9 @@ function makePostHandlerEngine($request) {
     );
     */
     if (isset($res['handles']['files']) && is_array($res['handles']['files'])) {
+      // res['handles']['files']['error'] needs to be a string not array
       foreach($res['handles']['files'] as $i => $row) {
+        //print_r($row['error']);
         $errors[] = 'file #' . $i . ' had error: ' . $row['error'];
       }
     } else {
@@ -223,10 +225,11 @@ function makePostHandlerEngine($request) {
     'subject'  => getOptionalPostField('subject'),
     'boardUri' => $boardUri,
     'password' => getOptionalPostField('postpassword'),
+    'files'    => json_encode($files),
+    'sage'     => getOptionalPostField('sage'),
+    // flag <= now done in a module (read/injected in PIPELINE_POST_DATA_PREVALIDATION)
     // captcha
     //'spoiler'  => empty($_POST['spoiler_all']) ? '' : $_POST['spoiler_all'],
-    'files'    => json_encode($files),
-    // flag
   );
   // has thread
   if (!empty($_POST['thread'])) {
