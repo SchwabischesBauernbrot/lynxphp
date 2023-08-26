@@ -3,8 +3,6 @@
 // FIXME: we need access to package
 $params = $getHandler();
 
-$boardUri = $request['params']['uri'];
-
 // Array ( [checkedposts] => 79 [postpassword] => [report] => 1 [report_reason] => )
 //wrapContent(print_r($_POST, 1));
 
@@ -18,31 +16,47 @@ $boardUri = $request['params']['uri'];
 // but if there's an error, it's left on the screen...
 //echo "Please wait...<br>\n"; flush();
 
+$postFields = array();
+
+// normalizing checkedposts to ensure an array
+if (!is_array($_POST['checkedposts'])) {
+  if (strpos($_POST['checkedposts'], ',') === false) {
+    // just upgrade this single into an array
+    $_POST['checkedposts'] = array($_POST['checkedposts']);
+  } else {
+    $_POST['checkedposts'] = explode(',', $_POST['checkedposts']);
+  }
+}
+
+// should also be optional in a way...
+$boardUri = $request['params']['uri'];
+
+// process array
+if (is_array($_POST['checkedposts'])) {
+  // we may or may not have thread? why?
+  // well if we're using the - format, we don't need it
+  $threadNum = getOptionalPostField('thread') ? getOptionalPostField('thread') : 'ThreadNum';
+  $postFields = array();
+  foreach($_POST['checkedposts'] as $in) {
+    // overboard will need - format
+    $parts = explode('-', $in);
+    if (count($parts) === 3) {
+      $postFields[$parts[0] . '-' . $parts[1] . '-' . $parts[2]] = true;
+    } else {
+      $postFields[$boardUri . '-' . $threadNum . '-' . $in] = true;
+    }
+  }
+} else {
+  // probably empty or invalid
+  echo "checkedpost is not an array, write me!<br>\n";
+}
+
 // can only prepare one action...
 $action = $_POST['action'];
 switch($action) {
   case 'delete':
-    // FIXME: could be a ban-delete too
-    if (!is_array($_POST['checkedposts'])) {
-      if (strpos($_POST['checkedposts'], ',') === false) {
-        // just upgrade this single into an array
-        $_POST['checkedposts'] = array($_POST['checkedposts']);
-      } else {
-        $_POST['checkedposts'] = explode(',', $_POST['checkedposts']);
-      }
-    }
-    if (is_array($_POST['checkedposts'])) {
-      $threadNum = getOptionalPostField('thread') ? getOptionalPostField('thread') : 'ThreadNum';
-      $postFields = array();
-      foreach($_POST['checkedposts'] as $in) {
-        $parts = explode('-', $in);
-        if (count($parts) === 3) {
-          $postFields[$parts[0] . '-' . $parts[1] . '-' . $parts[2]] = true;
-        } else {
-          $postFields[$boardUri . '-' . $threadNum . '-' . $postNum] = true;
-        }
-      }
-      // how is multiple handled?
+    if (count($postFields)) {
+      // FIXME: could be a ban-delete too
       $result = $pkg->useResource('content_actions',
         array('action' => 'delete', 'password' => getOptionalPostField('postpassword')),
         array('addPostFields' => $postFields)
@@ -64,33 +78,16 @@ switch($action) {
         }
       }
     } else {
-      // probably empty or invalid
-      echo "checkedpost is not an array, write me!<br>\n";
+      wrapContent('no posts given to delete');
+      return;
     }
   break;
   case 'report':
     // send report request to BE
     // is reason required?
-    $postFields = array();
     $threadNum = getOptionalPostField('thread') ? getOptionalPostField('thread') : 'ThreadNum';
     // print_r($_POST);
-    if (is_array($_POST['checkedposts'])) {
-      foreach($_POST['checkedposts'] as $postNum) {
-        if (!$postNum) {
-          wrapContent('Error: missing postNum [' . print_r($_POST['checkedposts'], 1) . ']');
-          return;
-        }
-        // $boardUri . '-' . $threadNum . '-' .
-        $postFields[$postNum] = true;
-      }
-    } else {
-      if (!$_POST['checkedposts']) {
-        wrapContent('Error: empty checkedposts [' . print_r($_POST, 1) . ']');
-        return;
-      }
-      // $boardUri . '-' . $threadNum . '-' .
-      $postFields[$_POST['checkedposts']] = true;
-    }
+
     //echo "<pre>", print_r($postFields, 1), "</pre>\n";
     //echo "level[", $_POST['level'], "]<br>\n";
     // "" => not sure
@@ -109,10 +106,10 @@ switch($action) {
         'action' => 'report',
         'reason' => $_POST['report_reason'],
         'global' => in_array($_POST['level'], $global_enable),
-        'captcha' => $_POST['captcha'],
+        'captcha' => getOptionalPostField('captcha'), // optional for now
         //$_POST['level'],
       ),
-      array('addPostFields' => $postFields)
+      array('addPostFields' => $postFields) // which posts
     );
   break;
   default:
@@ -165,6 +162,7 @@ if ($result['status'] === 'error') {
   // well that's a JS thing
   // for nojs, we just need to re-present the posts and form
   // or just ask for another captcha...
+  //wrapContent('ERROR: ' . print_r($result, 1));
   wrapContent('ERROR: ' . $result['data']);
   return;
 }
