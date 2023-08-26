@@ -132,7 +132,7 @@ variables:
 buildzip:
   tags:
     - docker
-  image: php:8.2.0
+  image: php:8.0.0
   script:
     - exit
   artifacts:
@@ -147,7 +147,7 @@ test:nginx:my:latest:
     - *default-post-database
     - *default-webserver
     - *default-nginx
-  image: php:8.2.0-fpm-alpine
+  image: php:8.0.0-fpm-alpine
   services:
     - name: mysql/mysql-server:latest
       alias: mysql
@@ -165,7 +165,7 @@ test:nginx:pg:latest:
     - *default-post-database
     - *default-webserver
     - *default-nginx
-  image: php:8.2.0-fpm-alpine
+  image: php:8.0.0-fpm-alpine
   services:
     - name: postgres:12.2-alpine
       alias: pgsql
@@ -185,7 +185,7 @@ test:mod:my:latest:
     - *default-post-database
     - *default-webserver
     - *default-apache
-  image: php:8.2.0-apache
+  image: php:8.0.0-apache
   services:
     - name: mysql/mysql-server:latest
       alias: mysql
@@ -203,7 +203,7 @@ test:mod:pg:latest:
     - *default-post-database
     - *default-webserver
     - *default-apache
-  image: php:8.2.0-apache
+  image: php:8.0.0-apache
   services:
     - name: postgres:latest
       alias: pgsql
