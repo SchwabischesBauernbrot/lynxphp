@@ -1,12 +1,10 @@
 <?php
 
-// FIXME: we need access to package
 $params = $getHandler();
 
 $boardUri = $request['params']['uri'];
 
 // Array ( [checkedposts] => 79 [postpassword] => [report] => 1 [report_reason] => )
-//wrapContent(print_r($_POST, 1));
 
 // FIXME: files (delete, spoil)
 // FIXME: captcha
