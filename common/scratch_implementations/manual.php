@@ -2,16 +2,31 @@
 
 include_once 'base.php';
 
+// believe this is based off file.php driver
+
 // its slow
 // but we have to serialize reading/writing ops
 // also can break on normal users
 // makes the site brittle
 // does keep the load down
 // but writes a lot to the disk
+// FIXME: we need to worry about number of files in a directory
+
+// new design idea
+// what if we make a file for every second (or even $now)
+// every sec is fine if we append_only logging...
+// so we bucket for every minute... keep the last hour or so maybe
+// one per day, keep two days, hash the ips
+// record limit hits as hints
+// we read a range, total
+// nuke any that have expired...
+// only need to total the current ip and whether it's a read, write, violation
+//
 class manual_scratch_driver extends scratch_implementation_base_class {
   function __construct($prefix = '') {
     // we need to protect information, such as IP addresses
     // so we'll use the php extension so that only PHP can access this info
+    // why the manual postfix? just to remind a different driver
     $this->file = '../frontend_storage/'.$prefix.'manual.php';
     $this->lock = '../frontend_storage/'.$prefix.'manual.lock';
     if (!file_exists($this->file)) {
@@ -85,6 +100,7 @@ class manual_scratch_driver extends scratch_implementation_base_class {
   function waitForFileExists() {
     if (!file_exists($this->file)) {
       $dne = 1;
+      // up to 3sec wait
       for($i = 0; $i < 30; $i++) {
         if (file_exists($this->file)) {
           return true;
