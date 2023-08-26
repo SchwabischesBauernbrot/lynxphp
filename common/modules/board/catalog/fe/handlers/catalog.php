@@ -8,6 +8,10 @@ $boardUri = $request['params']['uri'];
 // change to resource
 //$data = getBoardCatalog($boardUri);
 $data = $pkg->useResource('catalog', array('boardUri' => $boardUri));
+if (!$data) {
+  return wrapContent("Board error");
+}
+
 $catalog = $data['pages'];
 global $boardData;
 $boardData = $data['board'];
