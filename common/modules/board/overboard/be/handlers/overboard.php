@@ -54,10 +54,20 @@ while($row = $db->get_row($res)) {
     'posts_model' => $model['posts'],
     'post_files_model' => $model['files'],
   ));
+  if (!$posts) {
+    continue;
+  }
   $op = $posts[0];
   if ($op['threadid']) {
     // if someone puts a replyid in here instead of thread, we can catch it
     //echo "There's a problem with ", $uri, ' ', $row['thread_id'], "<br>\n";
+    continue;
+  }
+
+  // hide deleted threads where no replies
+  // this is going to mess with the paging
+  // got warning, why isn't deleted always set?
+  if (count($posts) === 1 && !empty($op['deleted'])) {
     continue;
   }
 
