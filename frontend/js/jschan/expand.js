@@ -193,7 +193,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
           case 'video':
           case 'audio':
             e.preventDefault();
+            console.debug(type + ' media loading')
+            thumbElement.style.opacity = '0.5';
+            thumbElement.style.cursor = 'wait'
+
             expandedElement = document.createElement(type);
+            // expandedElement.onloadeddata
+            expandedElement.addEventListener('loadeddata', function() {
+              console.debug(type + ' media loaded')
+              thumbElement.style.opacity = '';
+              thumbElement.style.cursor = '';
+            })
             const closeSpan = document.createElement('span');
             const openBracket = document.createTextNode('[');
             const closeLink = document.createElement('a');
@@ -230,8 +240,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
               expandedElement.style.paddingTop = thumbElement.height+'px';
               source.alt = "audio for " + fileHref
             } else {
-              expandedElement.style.minWidth = fileAnchor.offsetWidth+'px';
-              expandedElement.style.minHeight = fileAnchor.offsetHeight+'px';
+              // FIXME: we need to set an expect w/h to prevent reflow
+              // because the file takes some time to load
+              // we could keep it the same as the thumbnail
+              // until we get the metadata and then resize to what we need
+              expandedElement.style.width = fileAnchor.offsetWidth+'px';
+              expandedElement.style.height = fileAnchor.offsetHeight+'px';
+              //expandedElement.style.minWidth = fileAnchor.offsetWidth+'px';
+              //expandedElement.style.minHeight = fileAnchor.offsetHeight+'px';
               source.alt = "video for " + fileHref
             }
             pfs.appendChild(expandedElement);
