@@ -258,7 +258,7 @@ function makePostHandlerEngine($request) {
   // basic validation that we have some type of new content of value
   // empty message AND empty file
   $noFiles = (!$row['files'] || $row['files'] === '[]');
-  if (!$row['message'] && $noFiles) {
+  if (!trim($row['message']) && $noFiles) {
     /*
     return array(
       'requestValid' => false,
@@ -363,6 +363,8 @@ function makePostHandlerEngine($request) {
   $results = json_decode($json, true);
 
   $retval = array(
+    // result.data.status = bypassable or result.data = Wrong/Expired Captcha.
+    'row' => $row, // need this for captcha/blockbypass stuffs
     'requestValid' => true,
     'boardUri' => $boardUri,
     'result'   => $results,
@@ -485,11 +487,11 @@ EOB;
       // CAPTCHA is required
       if ($result['data'] === 'Expired captcha.' || $result['data'] === 'Wrong captcha.') {
         //print_r($row);
-        retryCaptcha($boardUri, $row);
+        retryCaptcha($boardUri, $arr['row']);
       } else
       if ($result['data']['status'] === 'bypassable') {
         //wrapContent('Block Bypass Expired');
-        getBlockBypass($boardUri, $row);
+        getBlockBypass($boardUri, $arr['row']);
       } else
       if ($result['data'] === 'Thread not found.') {
         wrapContent('Thread ' . $_POST['thread'] . ' not found' . "\n");
