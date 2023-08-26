@@ -4,10 +4,14 @@ include_once 'base.php';
 
 // the size of the file caused more contention
 // do we need pooling and/or multiple files
+
+// added large value (>1k) memory reduction
+// FIXME: we need to worry about number of files in a directory
 class file_scratch_driver extends scratch_implementation_base_class {
   function __construct($prefix = '') {
     // we need to protect information, such as IP addresses
     // so we'll use the php extension so that only PHP can access this info
+    $this->filebase = '../frontend_storage/'.$prefix.'cache_v2';
     $this->file = '../frontend_storage/'.$prefix.'cache_v2.php';
     $this->lock = '../frontend_storage/'.$prefix.'cache_v2.lock';
     if (!file_exists($this->file)) {
@@ -90,7 +94,16 @@ class file_scratch_driver extends scratch_implementation_base_class {
     return true;
   }
 
+  function singleLargeValueFile($key) {
+    $keyhash = md5($key);
+    return $this->filebase . '_' . $keyhash . '.php';
+  }
+
   function clear($key) {
+    $singleLargeValueFile = $this->singleLargeValueFile($key);
+    if (file_exists($singleLargeValueFile)) {
+      return unlink($singleLargeValueFile);
+    }
     if (!$this->getlock()) {
       return false;
     }
@@ -125,6 +138,10 @@ class file_scratch_driver extends scratch_implementation_base_class {
   }
 
   function get($key) {
+    $singleLargeValueFile = $this->singleLargeValueFile($key);
+    if (file_exists($singleLargeValueFile)) {
+      return file_get_contents($singleLargeValueFile);
+    }
     if (!$this->waitForFileExists()) {
       return false;
     }
@@ -146,6 +163,9 @@ class file_scratch_driver extends scratch_implementation_base_class {
   }
 
   function set($key, $val) {
+    if (sizeof($val) > 1024) {
+      return file_put_contents($this->singleLargeValueFile($key), $val);
+    }
     if (!$this->getlock()) {
       return false;
     }
