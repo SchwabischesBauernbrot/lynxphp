@@ -51,7 +51,7 @@ if (!defined('IN_TEST')) {
 }
 
 chdir('frontend');
-require '../common/lib/lib.http.php';
+require '../common/lib.http.php';
 include '../frontend_lib/lib/lib.perms.php'; // permission helper
 require '../frontend_lib/lib/lib.backend.php';
 chdir('..');
