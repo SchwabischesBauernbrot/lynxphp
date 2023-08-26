@@ -95,7 +95,7 @@ function getPost($boardUri, $postNo, $posts_model) {
   if (!isset($posts[$row['postid']])) {
     //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
     $posts[$row['postid']] = $row;
-    if ($row['threadid'] === $row['postid']) {
+    if (!$row['threadid'] || $row['threadid'] === $row['postid']) {
       threadDBtoAPI($posts[$row['postid']], $boardUri);
     } else {
       postDBtoAPI($posts[$row['postid']]);
