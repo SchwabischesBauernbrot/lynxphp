@@ -37,6 +37,8 @@ class Router {
     $this->methods['HEAD'] = array();
     $this->methods['PUT']  = array();
     $this->methods['DELETE'] = array();
+    // browsers are going to ask this (CORS?)
+    $this->methods['OPTIONS'] = array();
     $this->routeOptions = array();
     $this->debug = array();
     // save time on the backend or frontend?
