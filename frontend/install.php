@@ -104,7 +104,7 @@ if (file_exists('backend') && is_dir('backend')) {
 // backend detection
 include 'config.php';
 echo "Backend configured URL: ", BACKEND_BASE_URL, "<br>\n";
-include '../frontend_lib/lib/lib.http.php';
+include '../common/lib.http.php';
 $json = curlHelper(BACKEND_BASE_URL);
 $result = json_decode($json, true);
 if ($result === false) {
