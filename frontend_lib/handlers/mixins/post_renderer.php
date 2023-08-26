@@ -212,8 +212,10 @@ function renderPost($boardUri, $p, $options = false) {
     'icons' => array(),
   );
   if ($isOP) {
+    // sticky, bumplocked, locked, cyclic
     $pipelines[PIPELINE_THREAD_ICONS]->execute($icon_io);
   }
+  // jschan doesn't have any post icons, only thread ones
   $pipelines[PIPELINE_POST_ICONS]->execute($icon_io);
   $icons = $icon_io['icons'];
   if (count($icons)) {
@@ -237,11 +239,24 @@ function renderPost($boardUri, $p, $options = false) {
     $defaultName = true;
     $p['name'] = 'anonymous';
   }
-  if (!empty($p['name'])) {
-    // less bytes than a small tag and give BO/theme/custom css better control over look
-    $defaultClass = $defaultName ? ' default-name' : '';
-    // FIXME: email?
-    $postmeta .= '<address style="display: inline-block" class="post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</address>';
+  // jschan goes icons, subject, email/name, flag, trip, cap, datetime, userId, links
+  // less bytes than a small tag and give BO/theme/custom css better control over look
+
+  // consider https://developers.google.com/search/docs/appearance/structured-data/article
+  // only turn on for seobot though...
+  $defaultClass = $defaultName ? ' default-name' : '';
+  if (!empty($p['email']) && !empty($p['name'])) {
+      $postmeta .= '<a href="mailto:' . $p['email'] . '"  rel="author" class="author post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</a>';
+  } else  {
+    // al la cart
+    if (!empty($p['email'])) {
+      // https://stackoverflow.com/questions/7290504/which-html5-tag-should-i-use-to-mark-up-an-author-s-name
+      // class author is a microformat thingy
+      $postmeta .= '<a rel="author" class="author post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</address>';
+    } else
+    if (!empty($p['name'])) {
+      $postmeta .= '<address style="display: inline-block" class="author post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</address>';
+    }
   }
   //echo "<pre>", print_r($p['flag_cc'], 1), "</pre>\n";
   // lynxchan doesn't need flag to set flag_cc / flagName
