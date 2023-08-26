@@ -60,12 +60,23 @@ function getPortalBoard($opts, $request) {
       // should already auto-matically add it... right?
       $boardThreads = $packages['base_board_view']->useResource('board_page', array('uri' => $params['uri'], 'page' => $options['pagenum']));
       //echo "<pre>boardThreads", print_r($boardThreads, 1), "</pre>\n";
+
+      // doesn't look like anything uses boardData past this point...
       global $boardData;
+      // overboard doesn't have board or pageCount set
       if (!$boardData) {
-        $boardData = $boardThreads['board'];
+        if (isset($boardThreads['board'])) {
+          $boardData = $boardThreads['board'];
+        } else {
+          // overboard
+          $boardData = array(
+            'uri' => 'overboard',
+            'description' => 'overboard',
+          );
+        }
       }
       //echo "<pre>boardThreads", print_r($boardThreads, 1), "</pre>\n";
-      $pageCount = $boardThreads['pageCount'];
+      $pageCount = empty($boardThreads['pageCount']) ? 0 : $boardThreads['pageCount'];
       $uri = $params['uri'];
     }
   }
