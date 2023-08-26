@@ -8,10 +8,14 @@ include_once 'base.php';
 // file2: reduce time waiting for locks by using more disk space
 // cache is less effective
 // also we're a bit faster for reading/write because we're using a memory cache
+
+// added large value (>1k) memory reduction
+// FIXME: we need to worry about number of files in a directory
 class file2_scratch_driver extends scratch_implementation_base_class {
-  function __construct() {
+  function __construct($prefix = '') {
+    $this->filebase = '../frontend_storage/' . $prefix . 'cache2_v1';
     // FIXME: on startup - do a write test check
-    $file = realpath('../frontend_storage') . '/cache2';
+    $file = realpath('../frontend_storage') . '/' . $prefix . 'cache2';
     $this->changed = false;
     $res = $this->openFileInPool($file);
     $this->data = false;
@@ -28,6 +32,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
   function commit() {
     if (!$this->data) return;
     if ($this->changed) {
+      // huh can run out of memory here...
       file_put_contents($this->filepath, serialize($this->data));
     }
     // probably want to retain this lock
@@ -98,6 +103,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
   }
   */
 
+  // find a suitable non-lock cache file
   function openFileInPool($filepath) {
     $i = 0;
     while($i < 100) {
@@ -120,16 +126,34 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     return false;
   }
 
+  function singleLargeValueFile($key) {
+    $keyhash = md5($key);
+    return $this->filebase . '_' . $keyhash . '.php';
+  }
+
   function clear($key) {
+    $singleLargeValueFile = $this->singleLargeValueFile($key);
+    if (file_exists($singleLargeValueFile)) {
+      return unlink($singleLargeValueFile);
+    }
     unset($this->data[$key]);
     return true;
   }
 
   function get($key) {
+    $singleLargeValueFile = $this->singleLargeValueFile($key);
+    // a tad slow because of the io
+    // but
+    if (file_exists($singleLargeValueFile)) {
+      return file_get_contents($singleLargeValueFile);
+    }
     return empty($this->data[$key]) ? '' : $this->data[$key];
   }
 
   function set($key, $val) {
+    if (sizeof($val) > 1024) {
+      return file_put_contents($this->singleLargeValueFile($key), $val);
+    }
     $this->changed = true;
     $this->data[$key] = $val;
     return true;
