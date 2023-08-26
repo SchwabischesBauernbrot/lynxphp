@@ -217,6 +217,7 @@ function consume_beRsrc($options, $params = '') {
       // how do we get headers from this...
       //echo "saving[$key]<br>\n";
       // we should require ($outTs || $outEtag)
+      // we need to expire this data too, we can't have eTag stick around forever
       $scratch->set('consume_beRsrc_' . $key, array(
         'ts'   => $outTs,
         'etag' => $outEtag,
