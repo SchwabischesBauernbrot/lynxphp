@@ -91,8 +91,10 @@ global $tpp;
 //echo "<pre>", print_r($boardData, 1), "</pre>\n";
 if ($boardUri) {
   $posts_model = getPostsModel($boardUri);
-  $tc = getBoardThreadCount($boardUri, $posts_model);
-  $io['out']['board']['pageCount'] = ceil($tc / $tpp);
+  if ($posts_model) {
+    $tc = getBoardThreadCount($boardUri, $posts_model);
+    $io['out']['board']['pageCount'] = ceil($tc / $tpp);
+  } // the board doesn't exist
 }
 
 // bandwidth saver
