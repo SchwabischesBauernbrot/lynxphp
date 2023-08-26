@@ -23,6 +23,10 @@ $BASE_HREF = BASE_HREF;
 
 // set up backend url, cache
 
+// needs $now, getip() from lib.http.server, USER and DEV_MODE defined
+include '../frontend_lib/lib/lib.request.php';
+logRequest(getip());
+
 // if OPTIONS
 
 // dispatch form data through post processing pipeline
@@ -40,6 +44,7 @@ if (SCRATCH_DRIVER !== 'file') {
   include '../common/scratch_implementations/file.php';
 }
 // so users don't get logged out
+// FIXME: make configurable
 $persist_scratch = new file_scratch_driver;
 
 // nav, pages
