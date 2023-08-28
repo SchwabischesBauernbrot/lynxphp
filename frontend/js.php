@@ -1,4 +1,5 @@
 <?php
+ob_start();
 include '../common/lib.loader.php';
 ldr_require('../common/lib.http.server.php');
 ldr_require('../common/lib.http.response.php');
@@ -75,6 +76,7 @@ foreach($pkg->frontend_packages as $fe_pkg) {
 }
 
 if (checkCacheHeaders($max, array('contentType' => 'text/javascript', 'fileSize' => $size))) return;
+ob_end_clean();
 
 // generate content
 foreach($paths as $p) {
