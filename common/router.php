@@ -904,6 +904,7 @@ class Router {
         }
       }
       //echo "key[", $method . '_' . $match['cond'], "]<br>\n";
+      // all routes with routeOptions
       //echo "<pre>[", print_r($this->routeOptions, 1), "]</pre>\n";
       $routeOptions = isset($this->routeOptions[$method . '_' . $match['cond']]) ? $this->routeOptions[$method . '_' . $match['cond']] : array();
       $selected = array(
