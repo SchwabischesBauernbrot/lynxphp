@@ -194,6 +194,8 @@ getBoardThreadListingRender($boardUri, $boardThreads, 1, array(
   */
   'overrideTheme' => $theme,
   'noWork' => true,
+  // noWork.js or any increased api calls
+  'enableJs' => false
 ));
 
 ?>
