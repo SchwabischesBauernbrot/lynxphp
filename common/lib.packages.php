@@ -415,8 +415,8 @@ class package {
       if (empty($bePkgs) || !is_array($bePkgs)) {
         // warn because it's confusing when this happens
         // hard to debug
-        echo $this->name, 'has empty data.php<br>', "\n";
-        return;
+        //echo $this->name, 'has empty data.php<br>', "\n";
+        goto loadRoutes;
       }
       // we need to check for the array wrapper..
       if (isset($bePkgs['models']) || isset($bePkgs['modules'])) {
@@ -474,6 +474,7 @@ class package {
         }
       }
     }
+    loadRoutes:
 
     // delay loading of this unless the route is actually called
     /*
@@ -527,7 +528,10 @@ class package {
         }
       } else {
         // admin/modules hits this path...
-        echo "Unknown router[$router]<br>\n";
+        // FIXME: enable
+        // admin area, fe when loading the be routes will trigger this...
+        // if you want to enable, actually set those up
+        //echo "Unknown router[$router]<br>\n";
       }
     }
     $this->backendRoutesAdded = true;
