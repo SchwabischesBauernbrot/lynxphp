@@ -142,6 +142,9 @@ function action_getExpandHtml($actions, $options = false) {
   extract(ensureOptions(array(
     'label' => 'Actions',
     'float' => true,
+    // boardUri used in action_decodePerms for BO checks
+    // where used in action_getLinkHTML
+    'nojs' => false,
   ), $options));
   $permitted = action_decodePerms($actions, $options);
   $cnt = count($permitted);
@@ -175,7 +178,7 @@ function action_getExpandHtml($actions, $options = false) {
         $classes []= 'non-float';
       }
       $wrap = '<nav class="doubleplus-actions">' .  $inner . '</nav>';
-      return getExpander($label, $wrap, array('classes' => $classes,));
+      return getExpander($label, $wrap, array('classes' => $classes, 'nojs' => $nojs));
     }
   }
 }
