@@ -90,6 +90,7 @@ EOB;
   */
 }
 
+// unpack options into data/row
 function wrapContentData($options = false) {
   global $packages, $router;
   // how do we hook in our admin group?
@@ -110,6 +111,8 @@ function wrapContentData($options = false) {
     'canonical'    => false,
     'userSettings' => false,
     'addToHead'    => '',
+    'moreStyles'   => '',
+    'enableJs'     => true,
   ), $options));
   // key this?
 
@@ -173,7 +176,7 @@ function wrapContentData($options = false) {
 
   $enableJs = empty($userSettings['nojs']);
   */
-  $enableJs = true;
+  //$enableJs = true;
 
   /*
   // this now gets called early for head/bump
@@ -214,6 +217,7 @@ function wrapContentData($options = false) {
   if (DISABLE_WORK) {
     $noWork = true;
   }
+  //echo "enableJs[$enableJs]<br>\n";
 
   return array(
     // this currently drives the title tag
@@ -233,6 +237,7 @@ function wrapContentData($options = false) {
     'doWork'        => !$noWork,
     'overrideTheme' => $overrideTheme,
     'addToHead'     => $addToHead,
+    'moreStyles'    => $moreStyles,
     //'mtime' => $mtime,
   );
 }
@@ -262,6 +267,8 @@ function wrapContentData($options = false) {
 // fullHead means include <head>template&css</head> or not
 function wrapContentGetHeadHTML($row, $fullHead = false) {
   global $pipelines;
+
+  //echo "<pre>wrapContentGetHeadHTML", print_r($row, 1), "</pre>\n";
 
   //$siteSettings = $row['siteSettings'];
   //$userSettings = $row['userSettings'];
@@ -316,7 +323,8 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       $styles_io['styles'][] = 'css/mobile.css';
     }
     $pipelines[PIPELINE_SITE_HEAD_STYLES]->execute($styles_io);
-
+    //echo "<pre>wrapContentGetHeadHTML", print_r($styles_io, 1), "</pre>\n";
+    
     $styles_html = '';
     foreach($styles_io['styles'] as $p) {
       if (is_array($p)) {
@@ -339,107 +347,117 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       'basehref' => $BASE_HREF,
       'footer' => $footer,
       'stylesheets' => $styles_html,
+      'more_styles' => $row['moreStyles'],
     );
     $head_html .= '<head>' . $term;
     $head_html .= replace_tags($templates['header'], $tags) . $term;
   }
 
-  // a script could be
-  // - a relative url
-  // - a file in a module
-  // ordering of the script can be important too
-  // so a single list is preferred
-  // however that doesn't let us group load a module...
-  // so we have scenarios where we want to combine
-  // and others we don't
-  // we'd have to compile it...
-  // well for now, we'll add an option
-  // and deal with it when we have a need for ordering...
-  $script_io = array(
-    'scripts' => array(
-      // lynxphp and jschan both use this
-      'js/url.js',
-      // jschan
-      // and modal before settings.js
-      // i think js/settings.js is expected to be before localStorage
-      //'js/settings.js',
-      // quote requires localstorage
-      'js/localstorage.js',
-      // click to reply
-      'js/jschan/quote.js',
-      // preview quotes on hover
-      'js/jschan/hover.js',
-      // make top form draggable
-      'js/jschan/dragable.js',
-      // post form message character counter
-      // you need to set message limits
-      'js/jschan/counter.js',
-      // expand media
-      'js/jschan/expand.js',
-      // yous
-      'js/jschan/yous.js',
-      // forms
-      // broken because it doesn't handle the output of new posts
-      // queues, refused, success, error...
-      // breaks post actions (can't handle array checkboxes)
-      'js/jschan/forms.js',
-      // upload item template
-      'js/uploaditem.js',
-      // probably needs some work
-      //'js/jschan/hideimages.js',
-      // password?
-      // threadstat?
-      'js/jschan/threadstat.js',
-      // time?
-      'js/jschan/time.js',
-      // viewfulltext
-      'js/jschan/viewfulltext.js',
-      // theme
-      // filters
+  $head_html .= $io['head_html'] . "\n";
 
-      // lynxphp
-      'js/lynxphp/user_settings.js',
-      'js/lynxphp/embed.js',
-      'js/lynxphp/refresh.js',
-      'js/lynxphp/expander_thread.js',
-      'js/lynxphp/expander_hover_media.js',
-      //'js/lynxphp/expander_media.js',
-      'js/lynxphp/work.js',
-      // only need this on the settings page...
-      'js/lynxphp/volume_upgrade.js',
-      //'js/lynxphp/lazy_audit.js',
-    ),
-  );
-  // THINK: how do we let JS live in module directories
-  // but be efficiently servered by web server?
-  // so that we don't have to fire up php each time
-  // make the static generation engine can copy them
-  // and then we have PHP fallback
-  $pipelines[PIPELINE_SITE_HEAD_SCRIPTS]->execute($script_io);
-  $scripts = $script_io['scripts'];
+  if ($row['enableJs']) {
+    // a script could be
+    // - a relative url
+    // - a file in a module
+    // ordering of the script can be important too
+    // so a single list is preferred
+    // however that doesn't let us group load a module...
+    // so we have scenarios where we want to combine
+    // and others we don't
+    // we'd have to compile it...
+    // well for now, we'll add an option
+    // and deal with it when we have a need for ordering...
+    $script_io = array(
+      'scripts' => array(
+        // lynxphp and jschan both use this
+        'js/url.js',
+        // jschan
+        // and modal before settings.js
+        // i think js/settings.js is expected to be before localStorage
+        //'js/settings.js',
+        // quote requires localstorage
+        'js/localstorage.js',
+        // click to reply
+        'js/jschan/quote.js',
+        // preview quotes on hover
+        'js/jschan/hover.js',
+        // make top form draggable
+        'js/jschan/dragable.js',
+        // post form message character counter
+        // you need to set message limits
+        'js/jschan/counter.js',
+        // expand media
+        'js/jschan/expand.js',
+        // yous
+        'js/jschan/yous.js',
+        // forms
+        // broken because it doesn't handle the output of new posts
+        // queues, refused, success, error...
+        // breaks post actions (can't handle array checkboxes)
+        'js/jschan/forms.js',
+        // upload item template
+        'js/uploaditem.js',
+        // probably needs some work
+        //'js/jschan/hideimages.js',
+        'js/jschan/password.js',
+        'js/jschan/threadstat.js',
+        'js/jschan/time.js',
+        // viewfulltext
+        'js/jschan/viewfulltext.js',
+        // theme
+        // filters
 
-  // THINK: how to use a pipeline to override this behavior?
-  // maybe fallback if pipeline has no hooks
-  $scripts_html = '';
-  foreach($scripts as $p) {
-    if (is_array($p)) {
-      // can add a type/version key later
-      // FIXME: support multiple scripts on one module
-      // FIXME: generate support to drop the need for php call
-      // make all the scripts local to webroot
-      $p = 'js.php?module=' .$p['module'] . '&scripts=' . $p['script'];
+        // lynxphp
+        'js/lynxphp/user_settings.js',
+        'js/lynxphp/embed.js',
+        'js/lynxphp/refresh.js',
+        'js/lynxphp/expander_thread.js',
+        'js/lynxphp/expander_hover_media.js',
+        //'js/lynxphp/expander_media.js',
+        'js/lynxphp/work.js',
+        // only need this on the settings page...
+        'js/lynxphp/volume_upgrade.js',
+        //'js/lynxphp/lazy_audit.js',
+      ),
+    );
+    // THINK: how do we let JS live in module directories
+    // but be efficiently servered by web server?
+    // so that we don't have to fire up php each time
+    // make the static generation engine can copy them
+    // and then we have PHP fallback
+    $pipelines[PIPELINE_SITE_HEAD_SCRIPTS]->execute($script_io);
+    $scripts = $script_io['scripts'];
+
+    // THINK: how to use a pipeline to override this behavior?
+    // maybe fallback if pipeline has no hooks
+    $scripts_html = '';
+    foreach($scripts as $p) {
+      if (is_array($p)) {
+        // can add a type/version key later
+        // FIXME: support multiple scripts on one module
+        // FIXME: generate support to drop the need for php call
+        // make all the scripts local to webroot
+        $p = 'js.php?module=' .$p['module'] . '&scripts=' . $p['script'];
+      }
+      // integrity, nomodule=false,type
+      // async allows them to run out of order...
+      $scripts_html .= '<script src="' . $p . '" defer></script>' . "\n";
     }
-    // integrity, nomodule=false,type
-    // async allows them to run out of order...
-    $scripts_html .= '<script src="' . $p . '" defer></script>' . "\n";
-  }
 
-  $head_html .= $io['head_html'] . "\n" . '<script>
-    const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
-    const DISABLE_JS = false
-    // assume UTC for now
-    const SERVER_TIMEZONE = "UTC"
-  </script>' . "\n" . $scripts_html;
+    $head_html .= '<script>
+      const BACKEND_PUBLIC_URL = \'' . BACKEND_PUBLIC_URL . '\'
+      const DISABLE_JS = false
+      // assume UTC for now
+      const SERVER_TIMEZONE = "UTC"
+    </script>' . "\n" . $scripts_html;
+  } else {
+    // if we don't include the js files, this shouldn't be needed at all
+    /*
+    $head_html .= '<script>
+    const DISABLE_JS = true
+    </script>' . "\n";
+    */
+  }
 
   if (!empty($row['canonical'])) {
     $head_html .= '<link rel="canonical" href="' . $row['canonical'] . '" />';
@@ -461,7 +479,7 @@ function wrapContentHeader($row) {
   //$siteSettings = $row['siteSettings'];
   //$userSettings = $row['userSettings'];
   $enableJs = $row['enableJs'];
-
+  //echo "enableJsHeader[$enableJs]<br>\n";
   /*
   $io = array(
     'siteSettings' => $siteSettings,
@@ -563,13 +581,15 @@ EOB;
     'rightNav' => $rightNav_html,
     'boards'   => $boards_html,
     'basehref' => $BASE_HREF,
-    'title' => empty($siteSettings['siteName']) ? '': $siteSettings['siteName'],
+    // FIXME: siteSettings isn't defined..
+    'title' => '', //empty($siteSettings['siteName']) ? '': $siteSettings['siteName'],
     // maybe head insertions is better?
     // not used
     //'head' => $head_html,
     'jsenable' => $enableJs ? '' : '<!-- ',
     'jsenable2' => $enableJs ? '' : ' -->',
   );
+  //print_r($tags);
   $header_io = array(
     'headers' => array(
       'content-type' => 'text/html',
@@ -617,27 +637,29 @@ function wrapContentFooter($row) {
     }
   }
 
-  $io = array('scripts' => array());
-  // THINK: how do we let JS live in module directories
-  // but be efficently servered by web server?
-  // so that we don't have to fire up php each time
-  // make the static generation engine can copy them
-  // and then we have PHP fallback
-  $pipelines[PIPELINE_SITE_END_SCRIPTS]->execute($io);
-  $scripts = $io['scripts'];
-
-  // THINK: how to use a pipeline to override this behavior?
-  // maybe fallback if pipeline has no hooks
   $scripts_html = '';
-  foreach($scripts as $p) {
-    if (is_array($p)) {
-      // can add a type/version key later
-      // FIXME: support multiple scripts on one module
-      // FIXME: generate support to drop the need for php call
-      // make all the scripts local to webroot
-      $p = 'js.php?module=' .$p['module'] . '&scripts=' . $p['script'];
+  if ($enableJs) {
+    $io = array('scripts' => array());
+    // THINK: how do we let JS live in module directories
+    // but be efficently servered by web server?
+    // so that we don't have to fire up php each time
+    // make the static generation engine can copy them
+    // and then we have PHP fallback
+    $pipelines[PIPELINE_SITE_END_SCRIPTS]->execute($io);
+    $scripts = $io['scripts'];
+
+    // THINK: how to use a pipeline to override this behavior?
+    // maybe fallback if pipeline has no hooks
+    foreach($scripts as $p) {
+      if (is_array($p)) {
+        // can add a type/version key later
+        // FIXME: support multiple scripts on one module
+        // FIXME: generate support to drop the need for php call
+        // make all the scripts local to webroot
+        $p = 'js.php?module=' .$p['module'] . '&scripts=' . $p['script'];
+      }
+      $scripts_html .= '<script src="' . $p . '" defer></script>' . "\n";
     }
-    $scripts_html .= '<script src="' . $p . '" defer></script>' . "\n";
   }
 
   $footerNavItems = array(
@@ -699,7 +721,6 @@ function wrapContentFooter($row) {
     echo $footer['header'];
   }
   echo replace_tags($footer['loop0'], $tags);
-  flush();
   // lets put this before the report, so we can profile it
   // call backend worker
   if (DEV_MODE) {
@@ -754,6 +775,8 @@ function wrapContentFooter($row) {
       router_log_report();
     }
   }
+  //echo '</body></html>';
+  flush();
 }
 
 // this is not always called!
