@@ -339,12 +339,16 @@ function expectJson($json, $endpoint = '', $options = array()) {
     // singular
     if (isset($obj['meta']['board'])) {
       global $boardData;
-      $boardData = $obj['meta']['board'];
-      if (isset($obj['meta']['board']['settings'])) {
-        global $board_settings, $boards_settings;
-        $board_settings = $obj['meta']['board']['settings'];
-        $uri = $obj['meta']['board']['uri'];
-        $boards_settings[$uri] = $obj['meta']['board']['settings'];
+      // might just be the board name
+      // don't want to step on it
+      if (is_array($obj['meta']['board'])) {
+        $boardData = $obj['meta']['board'];
+        if (isset($obj['meta']['board']['settings'])) {
+          global $board_settings, $boards_settings;
+          $board_settings = $obj['meta']['board']['settings'];
+          $uri = $obj['meta']['board']['uri'];
+          $boards_settings[$uri] = $obj['meta']['board']['settings'];
+        }
       }
     }
     // multiple for overboards like pages
