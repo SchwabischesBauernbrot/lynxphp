@@ -4,7 +4,7 @@ $fePkgs = array(
   array(
     'handlers' => array(
       array(
-        'route'   => '/admin/queue',
+        'route'   => '/admin/post_queue',
         'handler' => 'admin_queue',
       ),
       /*
