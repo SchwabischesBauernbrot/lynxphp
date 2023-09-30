@@ -169,7 +169,7 @@ function renderBoardSettingsPortalData($boardUri, $options = false) {
   return array(
     'tmpl' => array(
       'header' => $templates['header'],
-      'footer' => $templates['loop0'],
+      'footer' => empty($templates['loop0']) ? '' : $templates['loop0'],
     ),
     'tags' => $p['tags'],
     'isCatalog' => $isCatalog,
