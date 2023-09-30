@@ -49,6 +49,11 @@ function getBoardThreadListing($q, $boardUri, $pagenum = 1) {
   //
   // why aren't we use $pkg->useResource('board_page');
   // because this function could be called from another $pkg
+
+  // wt is getting weird rapid requests from localhost for
+  // "GET /backend/opt/boards/\xf0\x9f\x92\xa9/1 HTTP/1.1" 404 977
+  // we need to log here what's asking about this...
+
   $boardThreads = $packages['base_board_view']->useResource('board_page', array('uri' => $boardUri, 'page' => $pagenum));
 
   if (!$boardThreads) {
