@@ -127,8 +127,6 @@ $p = array(
     'postactions' => renderPostActions($boardUri),
   )
 );
-global $pipelines;
-
 $pipelines[PIPELINE_BOARD_DETAILS_TMPL]->execute($p);
 $tmpl = replace_tags($tmpl, $p['tags']);
 
