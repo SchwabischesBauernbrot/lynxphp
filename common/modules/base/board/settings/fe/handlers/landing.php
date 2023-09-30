@@ -1,6 +1,5 @@
 <?php
 
-// FIXME: we need access to package
 $params = $getHandler();
 
 // do we own this board?
@@ -8,6 +7,7 @@ $params = $getHandler();
 $boardUri = boardOwnerMiddleware($request);
 if (!$boardUri) return;
 
+/*
 global $pipelines;
 $templates = loadTemplates('board_settings');
 $tmpl = $templates['header'];
@@ -22,7 +22,10 @@ $nav_html = getNav($io['navItems'], array(
 ));
 
 $tmpl = str_replace('{{nav}}', $nav_html, $tmpl);
+*/
 //$pipelines['boardSettingTmpl']->execute($tmpl);
-wrapContent($tmpl);
+
+// w/e dashboard we need
+wrapContent('');
 
 ?>
