@@ -136,6 +136,8 @@ function getThreadPostCount($boardUri, $threadNum, $options = false) {
 }
 
 // could be a cacheable getter
+// what's static
+// what's dynamic
 function getThreadEngine($boardUri, $threadNum, $options = false) {
   // unpack options
   extract(ensureOptions(array(
@@ -179,6 +181,9 @@ function getThreadEngine($boardUri, $threadNum, $options = false) {
   );
   global $db;
   // UNION? maybe with subqueries?
+  if ($includeOP && $includeReplies) {
+    // postid = X || (threadid = Y and deleted = 0)
+  }
 
   // get OP
   $posts = array();
