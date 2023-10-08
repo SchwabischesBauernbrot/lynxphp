@@ -69,20 +69,11 @@ $fePkgs = array(
         'module' => 'global_nav',
       ),
       // add checkbox to a list of posts
-      array(
-        'pipeline' => 'PIPELINE_POST_META_PROCESS',
-        'module' => 'post_meta_check',
-      ),
+      array('pipeline' => 'PIPELINE_POST_META_PROCESS', 'module' => 'post_meta_check'),
       // label
-      array(
-        'pipeline' => 'PIPELINE_POST_META_PROCESS',
-        'module' => 'post_meta_label',
-      ),
-      // inject post_actions tags
-      array(
-        'pipeline' => 'PIPELINE_BOARD_FOOTER_TMPL',
-        'module' => 'board_footer',
-      ),
+      array('pipeline' => 'PIPELINE_POST_META_PROCESS', 'module' => 'post_meta_label',),
+      // inject form tag / post_actions into post portal
+      array('pipeline' => 'PIPELINE_PORTAL_POST_EXTENSION', 'module' => 'post_ext',)
     ),
   ),
 );
