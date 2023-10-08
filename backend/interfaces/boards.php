@@ -32,6 +32,7 @@ function listBoards($options = false) {
   if ($options !== false && is_array($options)) {
     // now handle each option
     if (!empty($options['search'])) {
+      $search = $options['search'];
       $qOptions['criteria'] = array(
         '(',
         'or',
