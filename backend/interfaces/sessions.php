@@ -82,11 +82,11 @@ function getSession($sid = '') {
 function sessionSetUserID($ses, $userid) {
   global $db, $models;
   // FIXME: expiration check?
-  $cnt = $db->count($models['session'], array('criteria'=>array('session'=>$session)));
+  $cnt = $db->count($models['session'], array('criteria'=>array('session'=>$ses)));
   if (!$cnt) {
     return false;
   }
-  return $db->update($models['session'], array('user_id' => $userid), array('criteria'=>array('session'=>$session)));
+  return $db->update($models['session'], array('user_id' => $userid), array('criteria'=>array('session'=>$ses)));
 }
 
 function ensureSession($userid = 0) {
