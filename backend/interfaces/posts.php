@@ -57,6 +57,8 @@ function postDBtoAPI(&$row) {
   // decode user_id
 }
 
+// I'm not sure it's our responsibility to format the result set
+// maybe just get it...
 function getPost($boardUri, $postNo, $posts_model) {
   global $db;
   if ($posts_model === false) {
@@ -76,22 +78,22 @@ function getPost($boardUri, $postNo, $posts_model) {
     'type', 'filename', 'size', 'ext', 'w', 'h', 'filedeleted', 'spoiler',
     'tn_w', 'tn_h', 'fileid');
 
-  // get OP
-  // FIXME: only gets first image on OP
-  // why? /:board/thread/:thread uses this too
-  /*
-  $res = $db->find($posts_model, array('criteria'=>array(
-    array('postid', '=', $postNo),
-    array('deleted', '=', 0),
-  )));
-  $row = $db->get_row($res);
-  */
+  $posts_model['children'] = array(
+    array(
+      'type' => 'left',
+      'model' => $post_files_model,
+      'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
+    )
+  );
+
   $posts = array();
   $row = $db->findById($posts_model, $postNo);
   // prevent a bunch of warnings
   if (!$row) return false;
   //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
   if ($db->isTrue($row['deleted'])) return array();
+  
+  // have data
   if (!isset($posts[$row['postid']])) {
     //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
     $posts[$row['postid']] = $row;
@@ -110,30 +112,7 @@ function getPost($boardUri, $postNo, $posts_model) {
       $posts[$row['postid']]['files'][$row['file_fileid']] = $frow;
     }
   }
-  //$db->free($res);
 
-  /*
-  $res = $db->find($posts_model, array('criteria'=>array(
-    array('threadid', '=', $postNo),
-    array('deleted', '=', 0),
-  ), 'order' => 'created_at'));
-  while($row = $db->get_row($res)) {
-    //echo "<pre>", print_r($row, 1), "</pre>\n";
-    $orow = $row;
-    if (!isset($posts[$row['postid']])) {
-      postDBtoAPI($row);
-      $posts[$row['no']] = $row;
-      $posts[$row['no']]['files'] = array();
-    }
-    if (!empty($orow['file_fileid'])) {
-      if (!isset($posts[$orow['postid']]['files'][$orow['file_fileid']])) {
-        $frow = $orow;
-        fileDBtoAPI($frow, $boardUri);
-        $posts[$orow['postid']]['files'][$orow['file_fileid']] = $frow;
-      }
-    }
-  }
-  */
   foreach($posts as $pk => $p) {
     $posts[$pk]['files'] = array_values($posts[$pk]['files']);
   }
@@ -274,7 +253,7 @@ function deletePost($boardUri, $postid, $options = false, $post = false) {
       if (file_exists($f['path'])) {
         unlink($f['path']);
       } else {
-        $issues[$r['board'].'_'.$r['postid']] = 'file missing: ' . $f['path'];
+        $issues[$boardUri.'_'.$postid] = 'file missing: ' . $f['path'];
       }
       $file_ids[]= $f['fileid'];
     }
