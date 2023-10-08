@@ -5,6 +5,13 @@ PIPELINE_BOARD_HEADER_TMPL
 PIPELINE_BOARD_FOOTER_TMPL
   *tags
     tag => value
+
+PIPELINE_PORTAL_POST_EXTENSION
+  *portalExts
+    header
+    post
+    footer
+
 PIPELINE_BOARD_NAV
   boardUri
   boardSettings
@@ -100,6 +107,17 @@ PIPELINE_POST_META_PROCESS
   p
   threadNum
   *meta
+
+PIPELINE_MEDIA_ACTIONS
+  f
+  url
+  downloadUrl
+  id
+  majorMimeType
+  boardUri
+  *actions
+  boardSettings
+  userSettings
 
 PIPELINE_ADMIN_NAV
 PIPELINE_ADMIN_HEADER_TMPL
