@@ -20,11 +20,13 @@ $tmp = str_replace('{{uri}}', $boardUri, $tmp);
 $boardnav_html = $tmp;
 */
 
+//echo "boardUri[$boardUri] / threadNum[$threadNum]<br>\n";
 $boardData = getBoardThread($boardUri, $threadNum);
-//echo "<pre>boardData", print_r($boardData['settings'], 1), "</pre>\n";
+//echo "<pre>boardData", print_r($boardData, 1), "</pre>\n";
 
 foreach($boardData['posts'] as $j => $post) {
-  $boardData['posts'][$j] = $boardUri;
+  $boardData['posts'][$j]['boardUri'] = $boardUri;
+  //echo "<pre>post", print_r($boardData['posts'][$j], 1), "</pre>\n";
   preprocessPost($boardData['posts'][$j]);
 }
 global $pipelines;
