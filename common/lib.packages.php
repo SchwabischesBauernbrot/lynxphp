@@ -189,6 +189,7 @@ class package {
     }
     // handle $params mapping
     //echo "<pre>params[", print_r($rsrc, 1), "]</pre>\n";
+    // querystring, formData, params
     if (isset($rsrc['params'])) {
       // mixed
       if (is_array($rsrc['params'])) {
@@ -222,6 +223,9 @@ class package {
         }
         //print_r($rsrc);
       } else
+      if ($rsrc['params'] === 'params') {
+        // don't need to do anything
+      } else
       if ($rsrc['params'] === 'querystring') {
         if (!isset($rsrc['querystring'])) $rsrc['querystring'] = array();
         if (is_array($params)) {
@@ -250,7 +254,7 @@ class package {
           }
         }
       } else {
-        echo "lib.package:::package::useResource($label) - Unknown parameter type[", $params['params'], "]<br>\n";
+        echo "lib.package:::package::useResource($label) - Unknown parameter type[", $rsrc['params'], "], known types querystring, postdata, individual array<br>\n";
       }
     } else {
       if (!empty($rsrc['requires'])) {
@@ -268,7 +272,13 @@ class package {
       foreach($parts as $part) {
         $parts2 = explode('/', $part);
         $name = array_shift($parts2);
-        $condParams[$name] = $params[$name];
+        // ($name === true || $name === false) || 
+        if (!isset($params[$name])) {
+          echo "Setting [$name] to empty because parameter is not set<br>\n";
+          $condParams[$name] = '';
+        } else {
+          $condParams[$name] = $params[$name];
+        }
         $rsrc['endpoint'] = str_replace(':' . $name, $condParams[$name], $rsrc['endpoint']);
       }
       //print_r($condParams);
