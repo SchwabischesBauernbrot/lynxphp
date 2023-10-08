@@ -19,7 +19,10 @@ global $pipelines;
 $pipelines[PIPELINE_BOARD_SETTING_GENERAL]->execute($fields);
 
 // FIXME: get from formdata...
-$res = processFiles();
+//$res = processFiles();
+//$res = processPostFiles(); // uploads to backend
+// FIXME: we're not doing anything with this data...
+
 // we can't do this because of the cookie settings...
 //wrapContent('Please wait...');
 
