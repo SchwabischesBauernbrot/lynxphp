@@ -131,6 +131,19 @@ $replaces = array(
 // we need the thread number for that post on that board
   '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/(\d+)\/?(\s*)/m' => function ($matches) {
     global $btLookups;
+    // >>>/cumg/36 isnt going to tell us the threadnum...
+    // cumg, 36, ''
+    // bridge should set this...
+    // only when it can't parse something
+    if (!isset($btLookups[$matches[1]])) {
+      echo "<pre>format - board is missing in lookups: [", $matches[1], "]\n";
+      echo "what we have [", print_r($matches, 1), "]</pre>\n";
+    }
+    if (!isset($btLookups[$matches[1]][$matches[2]])) {
+      echo "<pre>format - thread is missing in lookups: [", $matches[1], "][", $matches[2], "]</pre>\n";
+      // well we can't link it
+      return '&gt;&gt;&gt;/' . $matches[1] . '/' . $matches[2] . $matches[3];
+    }
     $threadId = $btLookups[$matches[1]][$matches[2]];
     // quote by threadId/postId
     return '<a class="quote"
@@ -158,6 +171,15 @@ $replaces = array(
   // >>/malform/35
   '/' . preg_quote('&gt;&gt;') . '\/?(\w+)\/(\d+)\/?(\s*)/m' => function ($matches) {
     global $btLookups;
+    if (!isset($btLookups[$matches[1]])) {
+      echo "<pre>format - board is missing in lookups: [", $matches[1], "]\n";
+      echo "what we have [", print_r($matches, 1), "]</pre>\n";
+    }
+    if (!isset($btLookups[$matches[1]][$matches[2]])) {
+      echo "<pre>format - thread is missing in lookups: [", $matches[1], "][", $matches[2], "]</pre>\n";
+      // well we can't link it
+      return '&gt;&gt;/' . $matches[1] . '/' . $matches[2] . $matches[3];
+    }
     $threadId = $btLookups[$matches[1]][$matches[2]];
     return '<a class="quote"
       href="' . $matches[1] . '/thread/' . $threadId . '#' . $matches[2] . '">&gt;&gt;/' .
