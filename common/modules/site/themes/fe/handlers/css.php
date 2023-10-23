@@ -14,6 +14,12 @@ $result = $packages['user_setting']->useResource('settings');
 //echo "<pre>", print_r($result, 1), "</pre>\n";
 if (!$result) {
   $userSettings = array();
+  // backend can't/didn't respond (in time)
+  // not sure if this will work
+  // retry
+  sleep(1); // if we loop, lets not do it fast
+  header('location: css.php');
+  return;
 } else {
   $userSettings = $result['settings'];
 }

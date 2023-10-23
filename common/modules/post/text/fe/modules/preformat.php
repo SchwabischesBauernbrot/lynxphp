@@ -6,6 +6,14 @@ if (0 && DEV_MODE) {
   echo "<pre>processing post data", print_r($io, 1), "</pre>\n";
 }
 
+if (!isset($io['com'])) {
+  // no comment to operate on
+  if (DEV_MODE) {
+    echo "<pre>preformat missing comment?[", print_r($io, 1), "]</pre>\n";
+  }
+  return; // avoid warnings
+}
+
 if (strpos($io['com'], '>>') === false) {
   return;
 }
@@ -38,10 +46,8 @@ foreach($quotes as $i=>$q) {
   //echo "<pre>$i => ", print_r($q, 1), "</pre>\n";
   $btLookups[$q[1]][$q[2]] = true;
 }
-/*
-if (count($btLookups)) {
+if (0 && count($btLookups)) {
   echo "<pre>", print_r($btLookups, 1), "</pre>\n";
 }
-*/
 
 ?>

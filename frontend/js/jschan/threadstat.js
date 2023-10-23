@@ -20,6 +20,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   }
 
   const updateCounts = (updateId) => {
+    console.log('trying to update counts')
     for (let i = 0; i < idElems.length; i++) {
       const idString = idElems[i].innerText;
       if (updateId && updateId !== idString) { continue; }
@@ -60,6 +61,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
         return; //dont need to handle hovered posts for this
       }
       const newFiles = e.detail.json.files.length;
+      if (!statsElem) {
+        console.warn('#threadstats is missing, cant update totals')
+        return
+      }
       const numPosts = +statsElem.children[0].innerText.match(/^(\d+)/g);
       const numFiles = +statsElem.children[1].innerText.match(/^(\d+)/g);
       const filesTotal = numFiles + newFiles;

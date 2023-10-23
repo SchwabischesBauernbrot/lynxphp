@@ -92,6 +92,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
     $this->hostname = $host;
     $this->username = $user;
     $this->password = $pass;
+    mysqli_set_charset($this->conn, "utf8mb4");
     mysqli_report(MYSQLI_REPORT_OFF);
     return true;
   }
@@ -168,6 +169,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
         // 8.x still has Field and Type
         // was getting a lot of warnings about last param...
         $haveFields[ $row['Field'] ] = sqlToType($row['Type'], $row['Field'], empty($model['fields'][$row['Field']]) ? '' : $model['fields'][$row['Field']]);
+
       }
       mysqli_free_result($res);
       $haveAll = true;
@@ -207,6 +209,23 @@ class mysql_driver extends database_driver_base_class implements database_driver
         }
       }
 
+      // now check collation
+      if (1) {
+        $createTableResult = mysqli_query($this->conn, "SHOW CREATE TABLE `$tableName`");
+        $createTableRow = mysqli_fetch_row($createTableResult);
+        $createTableStatement = $createTableRow[1];
+
+        // Check if the table is already using utf8mb4 character set
+        if (strpos($createTableStatement, "CHARSET=utf8mb4") === false) {
+          // If not, alter the table
+          $alterTableQuery = "ALTER TABLE `$tableName` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+          if (!mysqli_query($this->conn, $alterTableQuery)) {
+            $err = mysqli_error($this->conn);
+            echo "<pre>mysql::autoupdate - update err[$err]<br>\nSQL[$sql]</pre>\n";
+          }
+        }
+      }
+
       // everything in sync?
       if ($haveAll && $noChanges) {
         return true;
@@ -229,12 +248,14 @@ class mysql_driver extends database_driver_base_class implements database_driver
       }
       $sql .= '';
       //echo "mysql::autoupdate - sql[$sql]<br>\n";
-      $res = mysqli_query($this->conn, $sql);
-      $err = mysqli_error($this->conn);
-      if ($err) {
-        echo "<pre>mysql::autoupdate - update err[$err]<br>\nSQL[$sql]</pre>\n";
-        return false;
+      if (!mysqli_query($this->conn, $sql)) {
+        $err = mysqli_error($this->conn);
+        if ($err) {
+          echo "<pre>mysql::autoupdate - update err[$err]<br>\nSQL[$sql]</pre>\n";
+          return false;
+        }
       }
+
       return true;
     }
   }
