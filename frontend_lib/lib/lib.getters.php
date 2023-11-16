@@ -9,7 +9,7 @@ function getter_getBoard($uri) {
   global $boardData;
   $out = $boardData;
   //print_r($boardData);
-  if (!$boardData || $boardData['uri'] !== $uri) {
+  if (!$boardData || !isset($boardData['uri']) || $boardData['uri'] !== $uri) {
     $out = getBoard($uri);
     $boardData = $out; // put it back in cache
   }
