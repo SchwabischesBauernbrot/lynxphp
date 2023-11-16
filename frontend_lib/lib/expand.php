@@ -6,6 +6,216 @@ function makeIframeContents($aHref, $aLabel) {
   return $html;
 }
 
+function getExpander_css($label, $content, $options = array()) {
+  extract(ensureOptions(array(
+    'type' => 'media', // media/iframe
+    'hover' => false,
+    'parentContainerId' => '', // needed for hover
+    'majorMimeType' => 'unknown',
+    // sizes are required to position / size correctly
+    'tn_sz' => array(),
+    'sz'    => array(),
+    'labelId' => false, // similar to detailsId
+      'styleContentUrl' => false, // url for media
+  ), $options));
+
+  $style = '';
+  // why labelId?
+  // $labelId && 
+  // going to remove the labelId requirement since it doesn't make much sense here with the hover changes
+  if ($styleContentUrl && $type !== 'iframe') {
+    // handle media expander
+
+    // parentContainerId/lableId, sz, styleContentUrl
+
+    // calculate aspect ratio
+    $r = 1;
+    if ($sz[1]) {
+      if ($sz[1] < $sz[0]) {
+        $r = ($sz[1] / $sz[0]) * 100;
+      } else {
+        $r = ($sz[0] / $sz[1]) * 100;
+      }
+    }
+    // ' . $sz[1] . 'px
+
+    if ($hover) {
+      if ($majorMimeType === 'img') {
+        // parentContainerId, sz, styleContentUrl
+        $style = '
+#'.$parentContainerId.':hover ~ .viewer {
+  background: url("' . $styleContentUrl . '") no-repeat;
+  background-size: contain;
+  width:  ' . $sz[0] . 'px;
+  height: ' . $sz[1] . 'px;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+        ';
+      }
+    } else {
+      // lableId, sz, styleContentUrl
+      if ($labelId) {
+        // does content let you display videos? no
+        /*
+            $style = '<style>
+        details[open].img#' . $labelId . ' > summary::after {
+          content: url(' . $styleContentUrl . ');
+        }
+        </style>';
+        */
+
+        // only after click will collapse it
+        // background-image: url(' . $styleContentUrl . ');
+        $style = '
+details[open].img#' . $labelId . ' > summary::after {
+  content: \'\';
+  background-color: #00000000;
+  background-size: ' . $sz[0] . 'px ' . $sz[1]. 'px;
+  display: inline-block;
+  width: ' . $sz[0] . 'px;
+  height: ' . $sz[1] . 'px;
+  position: absolute;
+  top: 0;
+}
+details.img#' . $labelId . ' .contentarea {
+  width: 95vw;
+  padding-bottom: ' . $r . '%;
+}
+details[open].img#' . $labelId . ' .contentarea {
+  background: url(' . $styleContentUrl . ');
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+';
+      } else {
+        // should we warn, media expander without css for making it expand?
+        if (DEV_MODE) {
+          echo "getExpander_css - labelId option is required and missing<br>\n";
+        }
+      }
+    }
+  }
+  // no css needed for iframe expander
+  return $style;
+}
+
+function getExpander_html($label, $content, $options = array()) {
+  extract(ensureOptions(array(
+    'type' => 'media', // media/iframe
+    'hover' => false,
+    'parentContainerId' => '', // needed for hover
+    'majorMimeType' => 'unknown',
+    // dedundant with classes
+    // when do we need more than one
+    'detailsClass' => false,
+    'detailsId' => false,
+    'summaryClass' => false,
+    'divId' => false,
+    // use proper css...
+    //'divStyle' => false,
+    'iframeId' => false,
+    'iframeName' => '', // js? targeting?
+    'iframeTitle' => '', // accessibility score
+    // probably could leave this off and let css style it
+    'iframeBorder' => true, // maybe 0 or 1?
+    // I think this can be always hard coded
+    //'aId' = false,
+    // when would this not be iframeName?
+    'target' => false, // has to be unique per page...
+    // these two could be moved into $content tbh
+    'aLabel' => 'Please click to load all the full html for this section',
+    'aHref'  => '/', // almost required
+    // sizes are required to position / size correctly
+    //'tn_sz' => array(),
+    //'sz'    => array(),
+
+    'classes' => array(),
+    'labelId' => false, // similar to detailsId
+      'styleContentUrl' => false,
+  ), $options));
+
+  if ($detailsClass) $classes []= $detailsClass;
+
+  // latest chrome won't let you slip it under
+/*
+  position: absolute;
+  top: 0;
+  z-index: -1;
+*/
+  $id = $labelId !== false ? ' id="' . $labelId . '"' : '';
+
+  if ($type === 'iframe') {
+    // iframe type
+    /*
+    meta tag refresh loads the content onload, instead of waiting for it to be used
+    iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" src="/boards_cacheable.html"></iframe
+    what so bad if it's always loading from the cache?
+    #div is a js loading destination zone
+    #boardsSubpage 50% is weird, maybe 1/3 or just go full screen... ?
+    #boardsSubpageFrame class="nojsonly-block"  display: block;
+    */
+    // FIXME: base class
+    // FIXME: class for details/div/iframe (remove style)
+    
+    // details/summary to avoid loading the contents until click
+    $html = '
+    <details id="' . $detailsId . '" class="detailsClass" style="display: inline-block">
+      <summary class="' . $summaryClass . '">' . $label . '</summary>
+      <div id="' . $divId . '" style="position: absolute; top: 32px; left: 0; z-index: 1; padding: 5px; background-color: var(--background-rest);">
+        <iframe title="' . $iframeTitle . '" id="' . $iframeId . '" frameborder=0 name="' . $iframeName . '" style="width: 100vw; height: 50vh;" srcdoc=\'<a class="nojsonly-block" style="line-height: 100vh; text-align: center; width: 100vw; height: 100vh;" target="' . $target . '" href="' . $aHref .'">' . $aLabel . '</a>\'></iframe>
+      </div>
+    </details>
+    ';
+  } else {
+    // media
+
+    if ($hover) {
+      $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
+      //echo "styleContentUrl[$styleContentUrl]<br>\n";
+
+      if ($majorMimeType === 'img') {
+        // id is need or the auto-generated css above to put the content in
+        $html = '<span' . $id . $class . '><span>' . $label . '</span>';
+        $html .= '</span>';
+      } else {
+        // audio / video
+        // css can't play these...
+        $html = $label;
+        /*
+        $html .= '<span' . $class . '><span>' . $label . '</span></span>';
+        // autoplay loading=lazy poster="' . $thumbUrl . '"
+        // <source src="' . $styleContentUrl . '" type="video/webm" loading=lazy>
+        $html .= '<span class="videoPlayer">
+        </span>
+        ';
+        */
+        // <video src="' . $styleContentUrl . '"></video>
+      }
+    } else {
+      // nojs
+      if ($styleContentUrl) {
+        $classes[] = 'nojsonly-block';
+      }
+      $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
+      $html = '<details' . $id . $class . '>' . "\n";
+      $html .= '<summary>' . $label . '</summary>' . "\n";
+      // why don't we just use an img tag here?
+      $html .= $content . "\n";
+      $html .= '<div class="contentarea"></div></details>' . "\n";
+
+      // for js
+      // we need to reserve the space to avoid relayout
+      // we can't just have JS insert these later...
+      // or manipulate the html above...
+      if ($styleContentUrl) {
+        $html .= '<a class="jsonly" href="' . $styleContentUrl . '">' . $label . '</a>';
+      }
+    }
+  }
+  return $html;
+}
+
 /*
 <details id="boardsNav">
   <summary class="nav-item">Boards</a></summary>
@@ -28,6 +238,7 @@ function makeIframeContents($aHref, $aLabel) {
 // label is basically thumbnail tag (getThumbnail)
 // too maybe ids and targets, should have one key drive them all
 function getExpander($label, $content, $options = array()) {
+/*
   extract(ensureOptions(array(
     'type' => 'media', // media/iframe
     'hover' => false,
@@ -56,154 +267,17 @@ function getExpander($label, $content, $options = array()) {
     // sizes are required to position / size correctly
     'tn_sz' => array(),
     'sz'    => array(),
-
     'classes' => array(),
     'labelId' => false, // similar to detailsId
       'styleContentUrl' => false,
   ), $options));
-
-  if ($detailsClass) $classes []= $detailsClass;
-
-  $style = '';
-  if ($labelId && $styleContentUrl && $type !== 'iframe') {
-    $r = 1;
-    if ($sz[1]) {
-      if ($sz[1] < $sz[0]) {
-        $r = ($sz[1] / $sz[0]) * 100;
-      } else {
-        $r = ($sz[0] / $sz[1]) * 100;
-      }
-    }
-    // ' . $sz[1] . 'px
-
-    if ($hover) {
-      if ($majorMimeType === 'img') {
-        $style = '<style>
-#'.$parentContainerId.':hover ~ .viewer {
-  background: url("' . $styleContentUrl . '") no-repeat;
-  background-size: contain;
-  width:  ' . $sz[0] . 'px;
-  height: ' . $sz[1] . 'px;
-  max-width: 90vw;
-  max-height: 90vh;
-}
-
-</style>
-        ';
-      }
-    } else {
-      // does content let you display videos? no
-      /*
-          $style = '<style>
-      details[open].img#' . $labelId . ' > summary::after {
-        content: url(' . $styleContentUrl . ');
-      }
-      </style>';
-      */
-
-      // only after click will collapse it
-      // background-image: url(' . $styleContentUrl . ');
-      $style = '<style>
-details[open].img#' . $labelId . ' > summary::after {
-  content: \'\';
-  background-color: #00000000;
-  background-size: ' . $sz[0] . 'px ' . $sz[1]. 'px;
-  display: inline-block;
-  width: ' . $sz[0] . 'px;
-  height: ' . $sz[1] . 'px;
-  position: absolute;
-  top: 0;
-}
-details.img#' . $labelId . ' .contentarea {
-  width: 95vw;
-  padding-bottom: ' . $r . '%;
-}
-details[open].img#' . $labelId . ' .contentarea {
-  background: url(' . $styleContentUrl . ');
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-</style>';
-    }
-  }
-  // latest chrome won't let you slip it under
-/*
-  position: absolute;
-  top: 0;
-  z-index: -1;
 */
-  $id = $labelId !== false ? ' id="' . $labelId . '"' : '';
-
-  if ($type === 'iframe') {
-    // iframe type
-    /*
-    meta tag refresh loads the content onload, instead of waiting for it to be used
-    iframe title="boards list subframe" id="boardsSubpageFrame" frameborder=0 name="boardFrame" style="width: 100vw; height: 50vh;" src="/boards_cacheable.html"></iframe
-    what so bad if it's always loading from the cache?
-    #div is a js loading destination zone
-    #boardsSubpage 50% is weird, maybe 1/3 or just go full screen... ?
-    #boardsSubpageFrame class="nojsonly-block"  display: block;
-    */
-    // FIXME: base class
-    // FIXME: class for details/div/iframe (remove style)
-    $html = '
-    <details id="' . $detailsId . '" class="detailsClass" style="display: inline-block">
-      <summary class="' . $summaryClass . '">' . $label . '</summary>
-      <div id="' . $divId . '" style="position: absolute; top: 32px; left: 0; z-index: 1; padding: 5px; background-color: var(--background-rest);">
-        <iframe title="' . $iframeTitle . '" id="' . $iframeId . '" frameborder=0 name="' . $iframeName . '" style="width: 100vw; height: 50vh;" srcdoc=\'<a class="nojsonly-block" style="line-height: 100vh; text-align: center; width: 100vw; height: 100vh;" target="' . $target . '" href="' . $aHref .'">' . $aLabel . '</a>\'></iframe>
-      </div>
-    </details>
-    ';
-  } else {
-    // media
-
-    if ($hover) {
-      $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
-      if ($majorMimeType === 'img') {
-        $html = $style;
-        // id is need or the auto-generated css above to put the content in
-        $html .= '<span' . $id . $class . '><span>' . $label . '</span>';
-        $html .= '</span>';
-      } else {
-        // audio / video
-        // css can't play these...
-        $html = $style;
-        $html .= $label;
-        /*
-        $html .= '<span' . $class . '><span>' . $label . '</span></span>';
-        // autoplay loading=lazy poster="' . $thumbUrl . '"
-        // <source src="' . $styleContentUrl . '" type="video/webm" loading=lazy>
-        $html .= '<span class="videoPlayer">
-        </span>
-        ';
-        */
-        // <video src="' . $styleContentUrl . '"></video>
-      }
-    } else {
-      // nojs
-      if ($styleContentUrl) {
-        $classes[] = 'nojsonly-block';
-      }
-      $class = count($classes) ? ' class="' . join(' ', $classes) . '"' : '';
-      $html = $style;
-      $html .= '<details' . $id . $class . '>' . "\n";
-      $html .= '<summary>' . $label . '</summary>' . "\n";
-      // why don't we just use an img tag here?
-      $html .= $content . "\n";
-      $html .= '<div class="contentarea"></div></details>' . "\n";
-
-      // for js
-      // we need to reserve the space to avoid relayout
-      // we can't just have JS insert these later...
-      // or manipulate the html above...
-      if ($styleContentUrl) {
-        $html .= '<a class="jsonly" href="' . $styleContentUrl . '">' . $label . '</a>';
-      }
-    }
-  }
+  $html = '<style>' . getExpander_css($label, $content, $options) . '</style>' . "\n";
+  $html .= getExpander_html($label, $content, $options);
   return $html;
 }
 
+// not used but a good development harness
 function getHoverExpander($label, $content, $options = array()) {
   extract(ensureOptions(array(
     'type' => 'media', // media/iframe
@@ -212,7 +286,7 @@ function getHoverExpander($label, $content, $options = array()) {
     'summaryClass' => false,
     'divId' => false,
     'majorMimeType' => 'unknown',
-    'thumbUrl' => false,
+    //'thumbUrl' => false,
     // use proper css...
     //'divStyle' => false,
     'iframeId' => false,

@@ -451,7 +451,7 @@ function registerPackages() {
 
   // data
   $groups = array(
-    'base/base', 'base/board', 'base/user', 'base/site', 'base/thread',
+    'base/admin', 'base/base', 'base/board', 'base/user', 'base/site', 'base/thread',
     'board', 'thread', 'post', 'media', 'user', 'admin', 'global', 'site', 'protection');
   foreach($groups as $group) {
     registerPackageGroup($group);

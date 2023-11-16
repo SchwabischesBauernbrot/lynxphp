@@ -209,17 +209,23 @@ function make_thumbnail($fileData, $duration = 1) {
     $h *= 0.9;
   }
   */
+  // FIXME: get major mime type could should be unified in common
   $m6 = substr($fileData['mime_type'], 0, 6);
 
   $isImage = $m6 === 'image/';
   $isVideo = $m6 === 'video/';
   $isAudio = $m6 === 'audio/';
 
+  // maybe we have a mime_type mapping?
+  // major maybe a good middle-step...
+  // always can add a fine layer mapping later...
+
   //echo "isImage[$isImage]<br>\n";
   //echo "<pre>", print_r($fileData, 1), "</pre>\n";
 
   $updateThumbSize = false;
   $sizes = getThumbnailSize($fileData);
+  // FIXME: iff the values are different...
   if (empty($fileData['tn_w']) || empty($fileData['tn_h'])) {
     $updateThumbSize = true;
   }
@@ -253,6 +259,8 @@ function make_thumbnail($fileData, $duration = 1) {
       echo "Failed<br>\n";
       return;
     }
+  } else {
+    // not an image/audio/video...
   }
   // get final size?
   // may not save any writes at all if the size differences
@@ -320,6 +328,17 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
     // php 5.3+ has this by default...
     $mime = finfo_file($finfo, $srcPath);
+
+    global $pipelines;
+    $io_fixmime = array(
+      'f' => $file,
+      'p' => $srcPath,
+      'm' => $mime,
+    );
+    $pipelines[PIPELINE_BE_FILE_FIX_MIME]->execute($io_fixmime);
+    $mime = $io_fixmime['m'];
+    //echo "post-fix mime[$mime]<br>\n";
+
     $m6 = substr($mime, 0, 6);
 
     $isImage = $m6 === 'image/';
@@ -327,6 +346,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
     $isAudio = $m6 === 'audio/';
 
     // FIXME: escape ext?
+    // FIXME: rename php to phps
     $finalPath = $threadPath . '/' . $postid . '_' . $num . '.' . $ext;
 
     if ($isImage) {
@@ -377,6 +397,8 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       'ext'    => $ext,
       'browser_type' => $file['type'],
       'mime_type'    => $mime,
+      // type known on upload (system could get smarter over time)
+      // do we want to calculate this and not store? maybe cache?
       'type'         => $type,
       'filename'     => $file['name'],
       'size' => $size,
@@ -387,6 +409,7 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
       'filedeleted' => 0,
       'spoiler' => empty($file['spoiler']) ? false : true,
     );
+    $pipelines[PIPELINE_BE_FILE_FIX_FILEDATA]->execute($fileData);
 
     $id = $db->insert($post_files_model, array($fileData));
     if (!$id) {

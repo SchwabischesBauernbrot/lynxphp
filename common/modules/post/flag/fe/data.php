@@ -37,6 +37,11 @@ $fePkgs = array(
         'pipeline' => 'PIPELINE_POST_FORM_FIELDS',
         'module' => 'post_field',
       ),
+      // add flags to post form
+      array(
+        'pipeline' => 'PIPELINE_POST_DATA_PREVALIDATION',
+        'module' => 'prevalidation',
+      ),
     ),
   ),
 );

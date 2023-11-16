@@ -554,10 +554,12 @@ class formHandler {
               console.log('isThread', isThread)
               if (!isThread) {
                 // we end up here if we're making a new thread from board page
-                console.debug('redirect to', json.redirect)
+                console.debug('new thread - redirect to?', json.redirect, 'just going to reload page for now')
                 // stay on board thread listing and refresh?
                 // or do we jump to the new thread you made?
                 //window.location = json.redirect;
+                window.location.href = window.location.href
+                this.reset()
                 return
               }
               // used to set hash

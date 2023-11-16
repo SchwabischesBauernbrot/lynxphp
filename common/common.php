@@ -44,6 +44,11 @@ function modelToString($model) {
   return $s;
 }
 
+// do we need a db version?
+function isFalsish($value) {
+  return !$value || $value === 'f' || $value === 'false';
+}
+
 // remap keys of a hash
 function key_map($func, $arr) {
   $nArr = array();
@@ -59,7 +64,8 @@ function gettrace() {
   array_shift($calls); // remove the call to self
   $trace = '';
   foreach($calls as $i => $call) {
-    if ($i > 3) break;
+    // generally 3 is fine but sometimes I've needed 7
+    if ($i > 17) break;
     $trace .= ' <- ' . $call['file'] . ':' . $call['line'];
   }
   return $trace;

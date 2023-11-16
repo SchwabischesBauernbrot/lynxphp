@@ -8,6 +8,18 @@ PIPELINE_NEWPOST_PROCESS - controls what happens to new posts
   createPostOptions
     bumpBoard [bool]
 
+PIPELINE_BE_FILE_FIX_MIME - improves the default PHP mime detection
+  f tmp upload data
+    meta
+    hash
+    name
+    size
+  p (srcPath)
+  *m (mime)
+
+PIPELINE_BE_FILE_FIX_FILEDATA
+  *fileData
+
 PIPELINE_POSTTAG_REGISTER
   *tags [array of tag objects] (has a key)
 

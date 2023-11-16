@@ -74,12 +74,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
       // should be flexible enough for css/design changes
       const postFileSrcElem = thumb.closest('.post-file-src')
+      let videoRealSize = false
       if (postFileSrcElem) {
         const nojsVideoElem = postFileSrcElem.querySelector('video')
         if (nojsVideoElem) {
           // load nojs setting
 
           //console.log('nojsVideoElem', nojsVideoElem, nojsVideoElem.loop, nojsVideoElem.muted)
+          videoRealSize = [nojsVideoElem.width, nojsVideoElem.height]
           loopEnabled = nojsVideoElem.loop
         }
       }
@@ -89,6 +91,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
       if (close) {
         expanded.loop = loopEnabled;
         expanded.volume = volumeLevel/100;
+        if (videoRealSize) {
+          // but these are capped by viewport
+          expanded.width = videoRealSize[0]
+          expanded.height = videoRealSize[1]
+        }
         //console.debug('expand.js - volume set to', expanded.volume)
         if (src.style.visibility === 'hidden') {
           src.style.visibility = 'visible';
@@ -244,8 +251,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
               // because the file takes some time to load
               // we could keep it the same as the thumbnail
               // until we get the metadata and then resize to what we need
-              expandedElement.style.width = fileAnchor.offsetWidth+'px';
-              expandedElement.style.height = fileAnchor.offsetHeight+'px';
+              // wouldn't that also trigger a reflow
+
+              //expandedElement.style.width = fileAnchor.offsetWidth+'px';
+              //expandedElement.style.height = fileAnchor.offsetHeight+'px';
+              // just inform what we know for now
+              // reflow if needed as I don't think it can be avoided
+              // UNTIL we know the final size...
+              // which is in the span & details tag
               //expandedElement.style.minWidth = fileAnchor.offsetWidth+'px';
               //expandedElement.style.minHeight = fileAnchor.offsetHeight+'px';
               source.alt = "video for " + fileHref

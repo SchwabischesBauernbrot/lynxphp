@@ -9,6 +9,233 @@ function snippet($text, $size = 10, $tail='...') {
   return $text;
 }
 
+// $boardSettings, $userSettings are in $options
+// but aren't required like they are here...
+// but aren't really required because we can add getters
+function getMediaTags($file, $boardUri, $options) {
+  // unpack options (these really aren't options though...)
+  extract(ensureOptions(array(
+    'isOP' => false,
+    'where' => '',
+    'noActions' => false,
+    'boardSettings' => false,
+    'userSettings' => false,
+  ), $options));
+
+  // we use array() for mock boards (theme demo)
+  if ($boardSettings === false) {
+    if (DEV_MODE) {
+      echo "getMediaTags - boardSettings not passed<br>\n";
+    }
+    $boardSettings = getter_getBoardSettings($boardUri);
+  }
+  if ($userSettings === false) {
+    if (DEV_MODE) {
+      echo "getMediaTags - userSettings not passed<br>\n";
+    }
+    $userSettings = getUserSettings();
+  }
+  // filename, path, thumbnail_path, mime_type, type, size, w, h
+  // tn_w, tn_h
+  //echo "<pre>file[", print_r($file, 1), "]</pre>\n";
+  //echo "file type[", $file['type'], "]<br>\n";
+
+  $path = $file['path'];
+  // filename is the original filename
+  $ext = fileExtension($file['filename']); //  (from router)
+  $noext = str_replace('.'.$ext, '', $file['filename']);
+  $downloadPath = 'download/' . $path;
+  //$watchLink = 'watch/' . $path;
+
+  // if not an absolute URL
+  if (strpos($path, '://') === false) {
+    $path = BACKEND_PUBLIC_URL . $path;
+    $downloadPath = BACKEND_PUBLIC_URL . $downloadPath;
+    //$watchLink = BACKEND_PUBLIC_URL . $watchLink;
+  }
+  $majorMimeType = getFileType($file);
+  //echo "majorMimeType[", $majorMimeType, "]<br>\n";
+  $fileSha256 = 'f' . uniqid();
+  $thumbUrl = $file['path'];
+  if (isset($file['thumbnail_path'])) {
+    $thumbUrl = $file['thumbnail_path'];
+  }
+  if (strpos($thumbUrl, '://') === false) {
+    $thumbUrl = BACKEND_PUBLIC_URL . $thumbUrl;
+  }
+
+  $thumb = getThumbnail($file, array(
+    'type' => $majorMimeType, 'alt' => 'thumbnail of ' . $file['filename'],
+    // FIXME: db falsish check (isFalsish)
+    'spoiler' => (empty($file['spoiler']) || $file['spoiler'] === 'f') ? false : $spoiler,
+    // if a list of threads, any way to tell if this is the first?
+    // && $firstThread
+    'noLazyLoad' => $isOP,
+  ));
+
+  $mute = empty($userSettings['mute']) ? false : true;
+  $loop = false;
+  //echo "majorMimeType[$majorMimeType]<br>\n";
+  if ($majorMimeType === 'video') {
+    $loop = empty($userSettings['videoloop']) ? false : true;
+  } else
+  if ($majorMimeType === 'audio') {
+    $loop = empty($userSettings['audioloop']) ? false : true;
+  }
+  $avmedia = getAudioVideo($file, array(
+    'type' => $majorMimeType,
+    'mute' => $mute,
+    'loop' => $loop,
+  ));
+  // first clause was a hard fought for war... 2nd is just backup
+  if ($file['type'] === 'glb' || strpos($file['path'], '.glb') !== false) {
+    $avmedia = '';
+    // I think if we just make the t_xxx_xxx.avif or .webp
+    echo "thumbnail_path[", isset($file['thumbnail_path']) ? $file['thumbnail_path'] : '', "]<br>\n";
+    $thumb = getThumbnail(array(
+      'path' => $file['path'],
+      'type' => 'image',
+      'thumbnail_path' => 'https://www.flowkit.app/s/demo/r/rh:-45,rv:15,s:255,var:street/u/' . urlencode(BACKEND_PUBLIC_URL . $file['path']),
+      'tn_w' => 255,
+      'tn_h' => 255,
+    ), array(
+      // can't pass in glb, expecting nothing but img basically
+      'type' => 'img', 'alt' => 'thumbnail of ' . $file['filename'],
+      // FIXME: db falsish check (isFalsish)
+      'spoiler' => (empty($file['spoiler']) || $file['spoiler'] === 'f') ? false : $spoiler,
+      // if a list of threads, any way to tell if this is the first?
+      // && $firstThread
+      'noLazyLoad' => $isOP,
+    ));
+    //echo "<pre>", htmlspecialchars(print_r($thumb, 1)), "</pre>\n";
+    // only needed for the backwards compat it seems
+    // we need to set this, for the js
+    $majorMimeType = 'glb';
+  }
+
+  $shortenSize = 10;
+  if (!empty($file['tn_w'])) {
+    //$shortenSize = max($shortenSize, (int)($file['tn_w'] / 8));
+    // we can make some estimate off the aspect ratio...
+    $w = getThumbnailWidth($file, array('type' => $majorMimeType));
+    //echo "w[$w]<Br>\n";
+    // 154 / 8 = 20190419-_DSF2773.j... ~20 chars
+    $shortenSize = max($shortenSize, (int)($w / 8) - 10);
+  }
+  //echo "shortenSize[$shortenSize] noext[$noext]<br>\n";
+  $tn_w = empty($file['tn_w']) ? 0 : $file['tn_w'];
+  $tn_h = empty($file['tn_h']) ? 0 : $file['tn_h'];
+
+  $hover = empty($userSettings['hover']) ? false : true;
+  $nojs  = empty($userSettings['nojs'])  ? false : true;
+
+  if (strpos($file['path'], '.glb') !== false) {
+    $hover = false;
+  }
+
+  /*
+  // non-display attributes
+  $fTags = array(
+    // path/filename/size/w/h/codec should be in f
+    //'path' => $file['path'],
+    'url'  => $path,
+    'downloadUrl' => $downloadPath,
+    //'watchUrl' => $watchLink,
+    'id' => $fileSha256, // kinda of display but interactivity for js comms
+    'majorMimeType' => $majorMimeType,
+    // shortfilename? tn_*? seems like a pure display thing
+  );
+  */
+
+  $media_actions_html = '';
+  if (!$noActions) {
+    global $pipelines;
+
+    // storage/BOARDURI/THREADNUM/POSTNUM_MEDIANUM.ext
+    // maybe we parse it
+    $noStorage = str_replace('storage/boards/', '', $file['path']);
+    $parts = explode('/', $noStorage);
+    $bp = $parts[0];
+    $threadnum = $parts[1];
+    $filename  = $parts[2];
+    $parts   = explode('.', $filename);
+    $ext2    = array_pop($parts);
+    $rest    = explode('_', implode('.', $parts));
+    $postno  = $rest[0];
+    $mediano = $rest[1];
+
+
+    $initialActions = action_getLevels();
+    $action_io = array(
+      'f' => $file,
+      'path' => array(
+        'boardUri'  => $bp,
+        'threadNum' => $threadnum,
+        'filename'  => $filename,
+        'ext'       => $ext,
+        'postNum'   => $postno,
+        'mediaNum'  => $mediano,
+      ),
+      'url' => $path,
+      'downloadUrl' => $downloadPath,
+      //'watchUrl' => $watchLink,
+      'id' => $fileSha256,
+      'majorMimeType' => $majorMimeType,
+      //'p' => $p,
+      'boardUri' => $boardUri,
+      'actions'  => $initialActions,
+      // what uses this and what data does it need?
+      // probably to see if things like reacts are enabled...
+      'boardSettings' => $boardSettings,
+      'userSettings'  => $userSettings,
+    );
+    $pipelines[PIPELINE_MEDIA_ACTIONS]->execute($action_io);
+    $media_actions_html = action_getExpandHtml($action_io['actions'], array(
+      'boardUri' => $boardUri, 'where' => $where, 'nojs' => $nojs));
+  }
+
+  $containerId = 'container_' . $fileSha256;
+  $expanderOptions = array(
+    //'thumbUrl' => $thumbUrl, // didn't use
+    'hover' => $hover,
+    'parentContainerId' => $containerId, // needed for hover
+    'majorMimeType' => $majorMimeType,
+    'classes' => array('postFile', $majorMimeType),
+    'tn_sz' => array($tn_w, $tn_h),
+    'sz' => array($file['w'], $file['h']),
+    'labelId' => 'details_' . $fileSha256,
+    'styleContentUrl' => $path,
+    'nojs' => $nojs,
+  );
+  //echo "hover[$hover]<br>\n";
+  $fTags = array(
+    'path' => $path,
+    // but matter if audio/video, we can handle that in css
+    'postFileClasses' => $hover ? ' useViewer ' : '',
+    'downloadLink' => $downloadPath,
+    //'watchLink' => $watchLink,
+    'expanderCss' => getExpander_css($thumb, $avmedia, $expanderOptions),
+    'expander' => getExpander_html($thumb, $avmedia, $expanderOptions),
+    'fileid' => $fileSha256,
+    'fileId' => ' id="' . $containerId . '"',
+    'filename' => $file['filename'],
+    'majorMimeType' => $majorMimeType,
+    'shortfilename' => snippet($noext, $shortenSize) . ' ' . $ext,
+    'size' => empty($file['size']) ? 'Unknown' : formatBytes($file['size']),
+    'width' => $file['w'],
+    'height' => $file['h'],
+    'thumb' => $thumb,
+    //'viewer' => getViewer($file, array('type' => $majorMimeType)),
+    // not currently used but we'll include it in case they want to do something different
+    'avmedia' => $avmedia,
+    'codec' => empty($file['codec']) ? '' : $file['codec'],
+    'codecSpace' => empty($file['codec']) ? '' : ' ',
+    'tn_w' => $tn_w,
+    'tn_h' => $tn_h,
+    'actions' => $media_actions_html,
+  );
+  return $fTags;
+}
 
 // the 4chan format is p. shitty
 // missing threadid and boardUri...
@@ -30,14 +257,15 @@ function renderPost($boardUri, $p, $options = false) {
 
   // unpack options
   extract(ensureOptions(array(
-    'checkable'  => false,
-    'postCount'  => false, // for omit & pipeline (actions)
-    'noOmit'   => false,
+    'checkable' => false,
+    'postCount' => false, // for omit & pipeline (actions)
+    'noOmit'    => false,
     //'topReply' => false, // related to noOmit
     //'inMixedBoards' => false, // ?
+    // maybe convert to lazyLoad?
     'firstThread' => false, // for adjusting loading=lazy
     'where' => '',
-    'userSettings' => false,
+    'userSettings'  => false,
     'boardSettings' => false,
     'noActions' => false, // for themes to reduce BE calls
   ), $options));
@@ -51,16 +279,6 @@ function renderPost($boardUri, $p, $options = false) {
   }
   $threadId = $p['threadid'] ? $p['threadid'] : $p['no'];
   $isOP = $threadId === $p['no'];
-
-  $post_actions = action_getLevels();
-  // FIXME: post/actions should provide this
-  $post_actions['all'][] = array('link' => '/' . $boardUri . '/report/' . $p['no'], 'label' => 'report');
-  // hide
-  // filter ID/name
-  // moderate
-  if (!$p['no']) {
-    $post_actions['all'] = array(); // remove report
-  }
 
   /*
   if ($postCount !== false) {
@@ -105,13 +323,24 @@ function renderPost($boardUri, $p, $options = false) {
     $spoiler = $boardSettings['customSpoiler'];
   }
 
+  $post_actions = action_getLevels();
+  // FIXME: post/actions should provide this
+  $post_actions['all'][] = array('link' => '/' . $boardUri . '/report/' . $p['no'], 'label' => 'report');
+  // hide
+  // filter ID/name
+  // moderate
+  if (!$p['no']) {
+    $post_actions['all'] = array(); // remove report
+  }
   global $pipelines;
   // pretext processing...
   $action_io = array(
     'boardUri' => $boardUri,
     'p' => $p,
     'actions'  => $post_actions,
-    // FIXME: pass post count...
+    // disable because?
+    // use because?
+    //'postCount' => $postCount, // # of posts in thread, pass it if we have it
     // what uses this and what data does it need?
     // probably to see if things like reacts are enabled...
     'boardSettings' => $boardSettings,
@@ -122,31 +351,9 @@ function renderPost($boardUri, $p, $options = false) {
   if ($isOP && !$noActions) {
     $pipelines[PIPELINE_THREAD_ACTIONS]->execute($action_io);
   }
+  // can't noactions this because of the pretext?
   $pipelines[PIPELINE_POST_ACTIONS]->execute($action_io);
-  // remap output over the top of the input
-  $post_actions = $action_io['actions'];
-  //print_r($post_actions);
-  //
-
-  /*
-  $post_actions_html_parts = array();
-  if (count($post_actions['all'])) {
-    foreach($post_actions['all'] as &$a) {
-      //$post_actions_html_parts[] = '<a href="dynamic.php?boardUri=' . urlencode($boardUri) .
-      //  '&action=' . urlencode($a). '&id=' . $p['no']. '">' . $l . '</a>';
-      $post_actions_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
-    }
-    unset($a);
-  }
-  if (count($post_actions['bo']) && perms_isBO($boardUri)) {
-    foreach($post_actions['bo'] as &$a) {
-      $post_actions_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
-    }
-    unset($a);
-  }
-  $post_actions_html = join('<br>' . "\n", $post_actions_html_parts);
-  */
-
+  $post_actions = $action_io['actions']; // pipeline output
   //echo "<pre>", print_r($post_actions, 1), "</pre>\n";
 
   // when is includeWhere not needed?
@@ -165,8 +372,8 @@ function renderPost($boardUri, $p, $options = false) {
   }
   */
 
-  // how do we set where?
-  // what does nojs do?
+  // $where is an option above, good to document that more...
+  // what does nojs do? it's a usersetting that reduces the amount of HTML produced
   $post_actions_html = action_getExpandHtml($post_actions, array(
     'boardUri' => $boardUri, 'where' => $where, 'nojs' => $nojs));
 
@@ -191,7 +398,12 @@ function renderPost($boardUri, $p, $options = false) {
   $post_links_html = join(' ' . "\n", $post_link_html_parts);
 
   // os disk cache will handle caching
-  $templates = loadTemplates('mixins/post_detail');
+  // but not the parsing tbh
+  static $templates; // this will use more memory over the request lifetime
+                     // but only if it's called once..
+  if (!is_array($templates)) {
+    $templates = loadTemplates('mixins/post_detail');
+  }
   //$checkable_template = $templates['loop0'];
   $posticons_template = $templates['loop0'];
   // icon, title
@@ -344,113 +556,15 @@ function renderPost($boardUri, $p, $options = false) {
 
   //echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
 
-  // tn_w, tn_h aren't enabled yet
+  //$files_style = '';
   $files_html = '';
   if (isset($p['files']) && is_array($p['files'])) {
     foreach($p['files'] as $file) {
-      // filename, path, thumbnail_path, mime_type, type, size, w, h
-      // tn_w, tn_h
-      //echo "<pre>file[", print_r($file, 1), "]</pre>\n";
       $ftmpl = $file_template;
-      //$ftmpl = str_replace('{{path}}', 'backend/' . $file['path'], $ftmpl);
-
-      $path = $file['path'];
-      $ext = pathinfo($file['filename'], PATHINFO_EXTENSION);
-      $noext = str_replace('.'.$ext, '', $file['filename']);
-      $downloadPath = 'download/' . $path;
-      //$watchLink = 'watch/' . $path;
-      // if not an absolute URL
-      if (strpos($path, '://') === false) {
-        $path = BACKEND_PUBLIC_URL . $path;
-        $downloadPath = BACKEND_PUBLIC_URL . $downloadPath;
-        //$watchLink = BACKEND_PUBLIC_URL . $watchLink;
-      }
-      $majorMimeType = getFileType($file);
-      $fileSha256 = 'f' . uniqid();
-      $thumbUrl = $file['path'];
-      if (isset($file['thumbnail_path'])) {
-        $thumbUrl = $file['thumbnail_path'];
-      }
-      if (strpos($thumbUrl, '://') === false) {
-        $thumbUrl = BACKEND_PUBLIC_URL . $thumbUrl;
-      }
-
-      $thumb   = getThumbnail($file, array(
-        'type' => $majorMimeType, 'alt' => 'thumbnail of ' . $file['filename'],
-        // FIXME: db falsish check
-        'spoiler' => (empty($file['spoiler']) || $file['spoiler'] === 'f') ? false : $spoiler,
-        // if a list of threads, any way to tell if this is the first?
-        // && $firstThread
-        'noLazyLoad' => $isOP));
-      $mute = empty($userSettings['mute']) ? false : true;
-      $loop = false;
-      //echo "majorMimeType[$majorMimeType]<br>\n";
-      if ($majorMimeType === 'video') {
-        $loop = empty($userSettings['videoloop']) ? false : true;
-      } else
-      if ($majorMimeType === 'audio') {
-        $loop = empty($userSettings['audioloop']) ? false : true;
-      }
-      $avmedia = getAudioVideo($file, array(
-        'type' => $majorMimeType,
-        'mute' => $mute,
-        'loop' => $loop,
-      ));
-      $shortenSize = 10;
-      if (!empty($file['tn_w'])) {
-        //$shortenSize = max($shortenSize, (int)($file['tn_w'] / 8));
-        // we can make some estimate off the aspect ratio...
-        $w = getThumbnailWidth($file, array('type' => $majorMimeType));
-        //echo "w[$w]<Br>\n";
-        // 154 / 8 = 20190419-_DSF2773.j... ~20 chars
-        $shortenSize = max($shortenSize, (int)($w / 8) - 10);
-      }
-      //echo "shortenSize[$shortenSize] noext[$noext]<br>\n";
-      $tn_w = empty($file['tn_w']) ? 0 : $file['tn_w'];
-      $tn_h = empty($file['tn_h']) ? 0 : $file['tn_h'];
-      $hover = empty($userSettings['hover']) ? false : true;
-      $containerId = 'container_' . $fileSha256;
-      //echo "hover[$hover]<br>\n";
-      $fTags = array(
-        'path' => $path,
-        // but matter if audio/video, we can handle that in css
-        'postFileClasses' => $hover ? ' useViewer ' : '',
-        'downloadLink' => $downloadPath,
-        //'watchLink' => $watchLink,
-        'expander' => getExpander($thumb, $avmedia, array(
-          'thumbUrl' => $thumbUrl, // didn't use
-          'hover' => $hover,
-          'parentContainerId' => $containerId, // needed for hover
-          'majorMimeType' => $majorMimeType,
-          'classes' => array('postFile', $majorMimeType),
-          'tn_sz' => array($tn_w, $tn_h),
-          'sz' => array($file['w'], $file['h']),
-          'labelId' => 'details_' . $fileSha256,
-          'styleContentUrl' => $path,
-          'nojs' => $nojs,
-        )),
-        'fileid' => $fileSha256,
-        'fileId' => ' id="' . $containerId . '"',
-        'filename' => $file['filename'],
-        'majorMimeType' => $majorMimeType,
-        'shortfilename' => snippet($noext, $shortenSize) . ' ' . $ext,
-        'size' => empty($file['size']) ? 'Unknown' : formatBytes($file['size']),
-        'width' => $file['w'],
-        'height' => $file['h'],
-        'majorMimeType' => $majorMimeType,
-        'thumb' => $thumb,
-        //'viewer' => getViewer($file, array('type' => $majorMimeType)),
-        // not currently used but we'll include it in case they want to do something different
-        'avmedia' => $avmedia,
-        'codec' => empty($file['codec']) ? '' : $file['codec'],
-        'codecSpace' => empty($file['codec']) ? '' : ' ',
-        'path' => $path,
-        'tn_w' => $tn_w,
-        'tn_h' => $tn_h,
-      );
-
-      $ftmpl = replace_tags($file_template, $fTags);
-      $files_html .= $ftmpl;
+      // check cache that might have been set in the top loop
+      $mediaTags = isset($file['mediaTags']) ? $file['mediaTags'] : getMediaTags($file, $boardUri, $options);
+      //$files_style .= $mediaTags['expanderCss'];
+      $files_html .= replace_tags($file_template, $mediaTags);
     }
   }
 
@@ -492,6 +606,7 @@ function renderPost($boardUri, $p, $options = false) {
     'name'      => empty($p['name']) ? '' : htmlspecialchars($p['name']),
     'postmeta'  => $postmeta,
     'userid'    => $userid_html,
+    //'fileStyles' => $files_style,
     'files'     => $files_html,
     'replies'   => $replies_html,
     // for actions details/summary
