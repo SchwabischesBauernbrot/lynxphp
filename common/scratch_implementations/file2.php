@@ -144,15 +144,17 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     $singleLargeValueFile = $this->singleLargeValueFile($key);
     // a tad slow because of the io
     // but
+    // maybe only do this if the key is not set
     if (file_exists($singleLargeValueFile)) {
-      return file_get_contents($singleLargeValueFile);
+      return unserialize(file_get_contents($singleLargeValueFile));
     }
     return empty($this->data[$key]) ? '' : $this->data[$key];
   }
 
   function set($key, $val) {
-    if (sizeof($val) > 1024) {
-      return file_put_contents($this->singleLargeValueFile($key), $val);
+    $sval = serialize($val);
+    if (strlen($sval) > 4 * 1024) {
+      return file_put_contents($this->singleLargeValueFile($key), $sval);
     }
     $this->changed = true;
     $this->data[$key] = $val;
