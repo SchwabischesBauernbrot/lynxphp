@@ -88,7 +88,6 @@ function getPortalPosts($opts, $request) {
     'threadClosed' => $options['threadClosed'],
     'boardSettings' => $boardSettings,
     'noPosts' => $options['noPosts'],
-    'threadNum' => empty($params['num']) ? 0 : $params['num'],
   ));
   if (!empty($portalData['posts']['threadPostCnt'])) {
     $row['postCount'] = $portalData['posts']['threadPostCnt'];
@@ -151,6 +150,26 @@ function renderPostsPortalData($boardUri, $options = false) {
     //$pipelines[PIPELINE_BOARD_HEADER_TMPL]->execute($p);
   }
 
+  global $pipelines;
+  $io_postext = array(
+    'boardUri' => $boardUri,
+    'threadNum' => $threadNum,
+    'pageNum' => $pagenum,
+    'portalExts' => array(),
+  );
+  $pipelines[PIPELINE_PORTAL_POST_EXTENSION]->execute($io_postext);
+
+  // header, footer. post
+  $ext_header_html = '';
+  $ext_footer_html = '';
+  // the order here matters
+  foreach($io_postext['portalExts'] as $ext) {
+    // is this the right order?
+    $ext_header_html .= $ext['header']; // append
+    $ext_footer_html = $ext['footer'] . $ext_footer_html; // prepend
+    // FIXME ignoreing post (every)
+  }
+
   // if threadNum, is it locked?
   $form_html = '';
   if (!$noPosts) {
@@ -168,6 +187,8 @@ function renderPostsPortalData($boardUri, $options = false) {
     'pagenum' => $pagenum,
     'threadClosed' => $threadClosed,
     'threadSaged'  => $threadSaged,
+    'header' => $ext_header_html,
+    'footer' => $ext_footer_html,
     // used in footer
     //'boardNav' => $boardNav,
     'postForm' => $form_html,
@@ -221,7 +242,7 @@ function renderPostsPortalHeaderEngine($row, $boardUri, $boardData) {
   if (!isset($boardData['title'])) $boardData['title'] = 'Communication problem';
   if (!isset($boardData['description'])) $boardData['description'] = 'try again in a bit';
 
-  return replace_tags($row['tmpl'], array_merge($row['tags'], array(
+  return $row['header'] . replace_tags($row['tmpl'], array_merge($row['tags'], array(
     'uri' => $boardUri,
     'url' => $_SERVER['REQUEST_URI'],
     'title' => $isCatalog ? '' : ' - ' . htmlspecialchars($boardData['title']),
@@ -318,7 +339,9 @@ function renderPostsPortalFooterEngine($row, $boardUri, $boardData) {
     ));
   }
 
-  return replace_tags($tmpl, array_merge($p['tags'], array(
+  // footer has to go before
+  // because new thread form comes from this block I guess
+  return $row['footer'] . replace_tags($tmpl, array_merge($p['tags'], array(
     'uri' => $boardUri,
     'url' => $_SERVER['REQUEST_URI'],
     //'boardNav' => $row['boardNav'],
@@ -352,7 +375,7 @@ function getPostsPortal($boardUri, $boardData = false, $options = false) {
       $options['boardSettings'] = $boardData['settings'];
     }
   }
-  $row = renderPostsPortalData($boardUri, $boardData['pageCount'], $options);
+  $row = renderPostsPortalData($boardUri, $options);
   return array(
     'header' => renderPostsPortalHeaderEngine($row, $boardUri, $boardData),
     'footer' => renderPostsPortalFooterEngine($row, $boardUri, $boardData)
@@ -374,7 +397,7 @@ function renderPostsPortalHeader($boardUri, $boardData = false, $options = false
       }
     }
   }
-  $row = renderPostsPortalData($boardUri, $boardData['pageCount'], $options);
+  $row = renderPostsPortalData($boardUri, $options);
   return renderPostsPortalHeaderEngine($row, $boardUri, $boardData);
 }
 
@@ -384,7 +407,7 @@ function renderPostsPortalFooter($boardUri, $boardData = false, $options = false
     // FIXME: probably should bitch
     $boardData = getter_getBoard($boardUri);
   }
-  $row = renderPostsPortalData($boardUri, $boardData['pageCount'], $options);
+  $row = renderPostsPortalData($boardUri, $options);
   echo renderPostsPortalFooterEngine($row, $boardUri, $boardData);
 }
 
