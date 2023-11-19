@@ -177,6 +177,13 @@ function processFilesVar($filter_fields = false) {
     // for every field we're interested in
     foreach($fields as $field) {
       $files[$field] = array();
+      // handle when the form doesn't include it
+      // like always have to process FUPs for logo
+      // when the section might not have logo
+      if (!isset($_FILES[$field])) {
+        $files[$field][] = array('error' => 'no field');
+        continue;
+      }
       // each field could have multiple file support...
       if (is_array($_FILES[$field]['tmp_name'])) {
         foreach($_FILES[$field]['tmp_name'] as $i=>$path) {
