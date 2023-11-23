@@ -113,6 +113,7 @@ function wrapContentData($options = false) {
     'addToHead'    => '',
     'moreStyles'   => '',
     'enableJs'     => true,
+    'title'        => '',
   ), $options));
   // key this?
 
@@ -238,6 +239,7 @@ function wrapContentData($options = false) {
     'overrideTheme' => $overrideTheme,
     'addToHead'     => $addToHead,
     'moreStyles'    => $moreStyles,
+    'title'         => $title,
     //'mtime' => $mtime,
   );
 }
@@ -324,7 +326,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
     }
     $pipelines[PIPELINE_SITE_HEAD_STYLES]->execute($styles_io);
     //echo "<pre>wrapContentGetHeadHTML", print_r($styles_io, 1), "</pre>\n";
-    
+
     $styles_html = '';
     foreach($styles_io['styles'] as $p) {
       if (is_array($p)) {
@@ -339,12 +341,18 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       $styles_html .= '<link rel="stylesheet" href="' . $p . '">' . "\n";
     }
 
+    $title = $row['title'];
+    if (SITE_TITLE) {
+      $title .= ' - ' . SITE_TITLE;
+    }
+
     global $BASE_HREF;
     $footer = '';
     // FIXME:footer pipeline
     $tags = array(
       'backend_url' => BACKEND_PUBLIC_URL,
       'basehref' => $BASE_HREF,
+      'title'  => $title,
       'footer' => $footer,
       'stylesheets' => $styles_html,
       'more_styles' => $row['moreStyles'],
@@ -783,6 +791,7 @@ function wrapContentFooter($row) {
 function wrapContent($content, $options = false) {
   extract(ensureOptions(array(
     'header' => true,
+    //'title'  => '',
   ), $options));
   $row = wrapContentData($options);
   if ($header) {
