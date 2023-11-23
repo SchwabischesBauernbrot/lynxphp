@@ -119,4 +119,4 @@ $tags = array(
 
 $content = replace_tags($templates['header'], $tags);
 
-wrapContent($boardPortal['header'] . $content . $boardPortal['footer']);
+wrapContent($boardPortal['header'] . $content . $boardPortal['footer'], array('title' => 'Overboard'));
