@@ -48,6 +48,8 @@ if (!defined('BASE_HREF')) {
   define('BASE_HREF', rtrim(dirname(getServerField('SCRIPT_NAME', __FILE__)), '/') . '/');
 }
 
+if (!defined('SITE_TITLE')) define('SITE_TITLE', '');
+
 // BASE_PATH is basically BASE_HREF
 if (!defined('DEV_MODE')) define('DEV_MODE', false);
 if (!defined('SCRATCH_DRIVER')) define('SCRATCH_DRIVER', 'auto');
