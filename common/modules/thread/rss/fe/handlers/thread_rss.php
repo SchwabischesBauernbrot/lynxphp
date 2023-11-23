@@ -43,7 +43,7 @@ foreach($boardData['posts'] as $post) {
   $link = 'https://' . $_SERVER['HTTP_HOST'] . '/' . $boardUri . '/thread/' . $threadNum . '.html#' . $post['no'];
   $post_xml = '<item>' . "\n";
   $post_xml .= '  <guid>' . $link . '</guid>' . "\n";
-  $title = $post['sub'];
+  $title = empty($post['sub']) ? '' : htmlspecialchars($post['sub']);
   // can't have &gt;
   $escapedCom = $post['com'];
   if (!$title) $title = '<![CDATA[' . $escapedCom . ']]>';
