@@ -24,6 +24,9 @@ $boardnav_html = $tmp;
 $boardData = getBoardThread($boardUri, $threadNum);
 //echo "<pre>boardData", print_r($boardData, 1), "</pre>\n";
 
+if (!isset($boardData['posts'])) {
+  return;
+}
 foreach($boardData['posts'] as $j => $post) {
   $boardData['posts'][$j]['boardUri'] = $boardUri;
   //echo "<pre>post", print_r($boardData['posts'][$j], 1), "</pre>\n";
@@ -70,7 +73,7 @@ $p = array(
     'files' => $files,
     // mixins
     //'postform' => renderPostForm($boardUri, $boardUri . '/catalog'),
-    'postactions' => renderPostActions($boardUri),
+    //'postactions' => renderPostActions($boardUri),
   )
 );
 global $pipelines;
