@@ -165,6 +165,9 @@ if ($result['status'] === 'error') {
   return;
 }
 
+http_response_code(410); // for gone (since it'll like be expired captcha)
+wrapContent('RESULT ERROR: ' . print_r($result, 1));
+
 /*
 if (is_array($result) && count($result['issues'])) {
   wrapContent(print_r($result['issues'], 1)."<br>\n<pre>".print_r($result, 1)."</pre>\n");
