@@ -142,5 +142,16 @@ $boardPortal = getBoardPortal($boardUri, $boardData, array(
 
 // this will include all scripts, not just this one...
 js_add_script($pkg, 'refresh_thread.js');
+
+//echo "<pre>", print_r($boardData['posts'][0], 1), "</pre>\n";
+$title = ''; // -
+if (!empty($boardData['posts'][0]['sub'])) {
+  $title .= $boardData['posts'][0]['sub'] . ' - ';
+}
+if ($boardData['title']) {
+  $title .= $boardData['title'];
+}
+// then site title
+
 // $boardPortal['header'] .  . $boardPortal['footer']
-wrapContent($tmpl);
+wrapContent($tmpl, array('title' => $title));
