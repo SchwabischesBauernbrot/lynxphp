@@ -20,6 +20,7 @@ function getMediaTags($file, $boardUri, $options) {
     'noActions' => false,
     'boardSettings' => false,
     'userSettings' => false,
+    'spoiler' => '',
   ), $options));
 
   // we use array() for mock boards (theme demo)
@@ -156,13 +157,13 @@ function getMediaTags($file, $boardUri, $options) {
     $noStorage = str_replace('storage/boards/', '', $file['path']);
     $parts = explode('/', $noStorage);
     $bp = $parts[0];
-    $threadnum = $parts[1];
-    $filename  = $parts[2];
+    $threadnum = empty($parts[1]) ? '' : $parts[1];
+    $filename  = empty($parts[2]) ? '' : $parts[2];
     $parts   = explode('.', $filename);
     $ext2    = array_pop($parts);
     $rest    = explode('_', implode('.', $parts));
     $postno  = $rest[0];
-    $mediano = $rest[1];
+    $mediano = empty($rest[1]) ? '' : $rest[1];
 
 
     $initialActions = action_getLevels();
@@ -322,6 +323,8 @@ function renderPost($boardUri, $p, $options = false) {
   if (isset($boardSettings['customSpoiler'])) {
     $spoiler = $boardSettings['customSpoiler'];
   }
+  // upgrade to option for getMediaTags
+  $options['spoiler'] = $spoiler;
 
   $post_actions = action_getLevels();
   // FIXME: post/actions should provide this
