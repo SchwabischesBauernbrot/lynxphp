@@ -74,7 +74,7 @@ $p = array(
     'files' => $files,
     // mixins
     //'postform' => renderPostForm($boardUri, $boardUri . '/catalog'),
-    'postactions' => renderPostActions($boardUri),
+    //'postactions' => renderPostActions($boardUri),
   )
 );
 global $pipelines;
