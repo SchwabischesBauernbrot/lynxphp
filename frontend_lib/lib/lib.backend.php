@@ -622,7 +622,21 @@ function backendLynxAccount($redirect = true) {
   $json = backendAuthedGet('lynx/account');
   // means not logged in...
   if (!$json) return false;
-  return expectJson($json, 'lynx/account', array('redirect' => $redirect));
+  $sid = $_COOKIE['session'];
+  $retval = expectJson($json, 'lynx/account', array('redirect' => $redirect));
+  if (isset($retval['meta']['setCookie'])) {
+    $sid = $retval['meta']['setCookie']['value'];
+  }
+  // update cache
+  $key = 'user_session' . $sid;
+  global $now, $persist_scratch;
+  $user = array(
+    'account' => $retval,
+    'account_ts' => $now,
+  );
+  $persist_scratch->set($key, $user);
+
+  return $retval;
 }
 
 function backendOptMyBoards() {
