@@ -622,7 +622,7 @@ function backendLynxAccount($redirect = true) {
   $json = backendAuthedGet('lynx/account');
   // means not logged in...
   if (!$json) return false;
-  $sid = $_COOKIE['session'];
+  $sid = empty($_COOKIE['session']) ? '' : $_COOKIE['session'];
   $retval = expectJson($json, 'lynx/account', array('redirect' => $redirect));
   if (isset($retval['meta']['setCookie'])) {
     $sid = $retval['meta']['setCookie']['value'];
