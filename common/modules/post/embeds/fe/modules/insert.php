@@ -4,9 +4,14 @@ $params = $getModule();
 
 // normalize
 // youtube.com/watch?v= format
-$io['safeCom'] = preg_replace('/(?:^|\s)https?:\/\/(:?www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)[a-zA-Z0-9=&]*(#t=[0-9a-zA-z]+)?(?:(\s)|$)/i', '[youtube]\2[/youtube]\4', $io['safeCom']);
+// (?:^|\s)
+/* These were failing the above
+https://youtube.com/watch?v=qabmngqxPtc
+https://youtube.com/watch?v=XfgDZhknv7g
+*/
+$io['safeCom'] = preg_replace('/https?:\/\/(:?www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)[a-zA-Z0-9=&]*(#t=[0-9a-zA-z]+)?(?:(\s)|$)/i', '[youtube]\2[/youtube]\4', $io['safeCom']);
 // yotu.be format
-$io['safeCom'] = preg_replace('/(?:^|\s)https?:\/\/(:?www\.)?youtu\.be\/([a-zA-Z0-9-_]+)[a-zA-Z0-9=&]*(#t=[0-9a-zA-z]+)?(?:(\s)|$)/i', '[youtube]\2[/youtube]\4', $io['safeCom']);
+$io['safeCom'] = preg_replace('/https?:\/\/(:?www\.)?youtu\.be\/([a-zA-Z0-9-_]+)[a-zA-Z0-9=&]*(#t=[0-9a-zA-z]+)?(?:(\s)|$)/i', '[youtube]\2[/youtube]\4', $io['safeCom']);
 // niconico
 // tiktok
 
