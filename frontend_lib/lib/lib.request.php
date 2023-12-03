@@ -15,6 +15,11 @@ function logRequest($ip) {
   if ($ip === '::1' || $ip === '127.0.0.1') {
     return;
   }
+  // tor will typically come in on a private ip
+  // FIXME: still will need a rate limit...
+  if (isPrivateIP($ip)) {
+    return;
+  }
   global $now;
   $readsPerMinPerIP = 30;
 
