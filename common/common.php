@@ -59,6 +59,10 @@ function key_map($func, $arr) {
   return $nArr;
 }
 
+function isPrivateIP($ip) {
+    return !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE);
+}
+
 function gettrace() {
   $calls = debug_backtrace();
   array_shift($calls); // remove the call to self
