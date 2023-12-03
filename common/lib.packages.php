@@ -151,7 +151,7 @@ class package {
       echo "Resource[$label]'s endpoint should NOT start with a slash<br>\n";
     }
     if (empty($rsrcArr['params']) && !empty($rsrcArr['requires']) && strpos($rsrcArr['endpoint'], '/:') === false) {
-      echo "lib.package:::package::useResource($label) - Unset parameter type for required fields... in [", $this->dir, "]<br>\n";
+      echo "lib.package:::package::addResource($label) - Unset parameter type for required fields... in [", $this->dir, "]<br>\n";
       //print_r($rsrcArr['requires']);
       //print_r($rsrcArr['params']);
     }
