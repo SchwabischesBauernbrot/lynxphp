@@ -4,10 +4,9 @@ function getLoginForm($goto = false) {
   global $BASE_HREF;
   $templates = loadTemplates('login');
   if ($goto === false) $goto = '';
+  $proto = DISABLE_HTTPS ? 'http' : 'https';
   $tags = array(
-    // force TLS
-    // FIXME: NO_TLS support
-    'action' => 'https://' . BASE_HOST . $BASE_HREF . 'forms/login.php',
+    'action' => $proto . '://' . BASE_HOST . $BASE_HREF . 'forms/login.php',
     'goto' => $goto,
     // FIXME get named route
     // we need a pipeline if forgot isn't base
