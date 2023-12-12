@@ -54,7 +54,11 @@ function action_getLinkHTML($a, $options) {
   if (!empty($a['index'])) {
     $index = '';
   }
-  return '<a ' . $index . 'href="' . $link . '">' . $a['label'] . '</a>';
+  $target = '';
+  if (!empty($a['target'])) {
+    $target = 'target="' . $a['target'] . '" ';
+  }
+  return '<a ' . $index . $target . 'href="' . $link . '">' . $a['label'] . '</a>';
 }
 
 // decode permissions
