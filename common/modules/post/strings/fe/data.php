@@ -7,6 +7,7 @@ $fePkgs = array(
         'method'  => 'GET',
         'route'   => '/admin/strings',
         'handler' => 'admin_strings',
+        'portals' => array('admin' => array()),
       ),
       /*
       array(
