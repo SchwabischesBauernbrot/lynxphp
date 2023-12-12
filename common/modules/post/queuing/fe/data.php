@@ -6,6 +6,7 @@ $fePkgs = array(
       array(
         'route'   => '/admin/post_queue',
         'handler' => 'admin_queue',
+        'portals' => array('admin' => array()),
       ),
       /*
       // these aren't cacheable period.
