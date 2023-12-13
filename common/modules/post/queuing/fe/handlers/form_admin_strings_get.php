@@ -8,7 +8,7 @@ if (!perms_inGroups(array('admin'))) {
   return;
 }
 
-$data = $pkg->useResource('queue_list');
+$data = $pkg->useResource('postq_list');
 // queue_posts, boards
 
 $strings = array_filter($data['queue_posts'], function($item) {
