@@ -98,6 +98,7 @@ while($row = $db->get_row($res)) {
   }
   $threads[]= $thread;
 }
+// free result?
 
 sendResponse2(array(
   'threads' => $threads,
