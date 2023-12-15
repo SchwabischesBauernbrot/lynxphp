@@ -41,6 +41,7 @@ function renderAdminPortal() {
   );
   $adminSettings = getCompiledSettings('admin');
 
+  // this function isn't in lib.portal, where is it?
   return renderPortalHeader('admin', array(
     'headerPipeline' => PIPELINE_ADMIN_HEADER_TMPL,
     'navPipeline'    => PIPELINE_ADMIN_NAV,
@@ -54,7 +55,7 @@ function getPortalAdminHeader($row) {
 }
 
 function getPortalAdminFooter($row) {
-
+  echo renderPortalFooter('admin');
 }
 
 
