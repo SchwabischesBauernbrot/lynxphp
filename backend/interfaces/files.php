@@ -90,6 +90,8 @@ function fileDBtoAPI(&$row, $boardUri) {
       //echo "Requesting generation of [", $row['path'], "]<br>\n";
       global $workqueue;
       $row['boardUri'] = $boardUri;
+      // maybe record existence and filesize in this...
+      // we still seem to be ffmpeging 0 byte files
       $workqueue->addWork(PIPELINE_WQ_FILE_ADD, $row);
     }
   }
