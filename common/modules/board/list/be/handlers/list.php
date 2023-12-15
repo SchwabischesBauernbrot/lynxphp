@@ -6,6 +6,7 @@ global $db;
 // default is popularity (desc)
 $search = empty($_GET['search']) ? '' : $_GET['search'];
 $sort = empty($_GET['sort']) ? 'activity' : $_GET['sort'];
+$showInactive = empty($_GET['showInactive']) ? false : true;
 
 // updated_at isn't good enough, last
 $sortByField = $sort === 'popularity' ? 'posts' : 'last_post';
@@ -14,6 +15,7 @@ $boards = listBoards(array(
   'search'     => $search,
   'sort'       => $sort,
   'publicOnly' => true,
+  'showInactive' => $showInactive,
 ));
 $res = array();
 $noLast = array();
