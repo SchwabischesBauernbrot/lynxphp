@@ -42,6 +42,8 @@ function threadDBtoAPI(&$row, $boardUri) {
   // prevent a bunch of warnings
   if (!$row) return false;
 
+  // call postToDB here?
+
   $row['no'] = empty($row['postid']) ? 0 : $row['postid'];
   unset($row['postid']);
   //unset($row['ip']);
@@ -259,7 +261,7 @@ function getThread($boardUri, $threadNum, $options = false) {
         //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
         threadDBtoAPI($posts[$pid], $boardUri);
       } else {
-        postDBtoAPI($posts[$pid]);
+        postDBtoAPI($posts[$pid], $boardUri);
       }
       $posts[$pid]['files'] = array();
     }
