@@ -24,10 +24,11 @@ function boardDBtoAPI(&$row) {
 // get list of boards
 // $sort = 'popularity', $search = ''
 function listBoards($options = false) {
-  global $db, $models;
+  global $db, $models, $now;
 
   $qOptions = array();
   $filterPublic = false;
+  $showInactive = false;
   // check for options
   if ($options !== false && is_array($options)) {
     // now handle each option
@@ -45,11 +46,33 @@ function listBoards($options = false) {
     // don't need to do this here?
     //if (!empty($options['sort'])) { }
     // this will fuck with the paging...
+    // if the backend is managing this
+    // we can requery... and prep things for the frontend...
+    // why publicOnly?
     if (!empty($options['publicOnly'])) {
       $filterPublic = true;
     }
+    if (!empty($options['showInactive'])) {
+      $showInactive = true;
+    }
   }
   $boardsModel = $models['board'];
+
+  if (1) {
+    // this is for driving claimable
+    // and maybe hiding inactive boards...
+    $boardsModel['children'] = array(
+      array(
+        'type' => 'left',
+        'model' => $models['user'],
+        'useField' => 'userid',
+        'srcField' => 'owner_id',
+        //'alias' => 'owner',
+        // could also get publickey
+        'pluck' => array('last_login'),
+      )
+    );
+  }
   /*
   if ($sort === 'popularity') {
     $options['order'] = 'updated_at desc';
@@ -65,6 +88,15 @@ function listBoards($options = false) {
     if ($filterPublic) {
       $json = json_decode($row['json'], true);
     }
+    // how many days since BO logged in
+    $boDaysAgo = ($now - $row['last_login']) / 86400;
+    $boInactive = $boDaysAgo > 30 ? 1 : 0;
+    $boardLastContentDaysAgo = ($now - max($row['last_thread'], $row['last_post'])) / 86400;
+    $boardInactive = $boardLastContentDaysAgo > 30 ? 1 : 0;
+    $row['inactive'] = $boardInactive;
+    if (!$showInactive && $row['inactive']) {
+      continue;
+    }
     boardDBtoAPI($row);
     if ($json) {
       // handle notpublic
@@ -76,6 +108,7 @@ function listBoards($options = false) {
     }
   }
   $db->free($res);
+  // if less than target (rpp) run it again...
   return $boards;
 }
 
@@ -389,7 +422,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
           return $f5 === 'post_';
         }, ARRAY_FILTER_USE_BOTH));
         // process post
-        postDBtoAPI($threads[$row['thread_postid']]['posts'][$row['post_postid']]);
+        postDBtoAPI($threads[$row['thread_postid']]['posts'][$row['post_postid']], $boardUri);
         $threads[$row['thread_postid']]['posts'][$row['post_postid']]['files'] = array();
       }
       if ($row['file_fileid']) {
@@ -521,7 +554,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
       // do we have this post
       if (!isset($threads[$orow['postid']]['posts'][$post['postid']])) {
         $threads[$orow['postid']]['posts'][$post['postid']] = $post;
-        postDBtoAPI($threads[$orow['postid']]['posts'][$post['postid']]);
+        postDBtoAPI($threads[$orow['postid']]['posts'][$post['postid']], $boardUri);
         // set up files
         $threads[$orow['postid']]['posts'][$post['postid']]['files'] = array();
       }
