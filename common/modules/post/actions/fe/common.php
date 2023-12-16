@@ -46,6 +46,8 @@ function renderPostActions($boardUri, $options = false) {
   }
 
   $reportHtml = replace_tags($templates['loop1'], array('levels' => $levelsHtml));
+
+  // stomps tabs above
   $tabs = array(
     'Delete' => $templates['loop0'],
     'Report' => $reportHtml,
