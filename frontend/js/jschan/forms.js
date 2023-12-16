@@ -581,6 +581,7 @@ class formHandler {
             this.reset();
           }
         } else {
+          // FIXME: unlock form
           if (xhr.status === 413) {
             // maybe not clear all of them...
             // let them decide
@@ -594,6 +595,16 @@ class formHandler {
               'message': 'Your upload was too large',
             });
             */
+          } else if (xhr.status === 400) {
+            // post validation error
+            alert('Post validation error')
+          } else if (xhr.status === 500) {
+            // maybe a backend error
+            // did we get json though?
+            alert('Backend error: ')
+          } else if (xhr.status === 429) {
+            alert('Hit rate limit, retry in a bit')
+            // FIXME: schedule a resubmit?
           } else if (json) {
             var ref = this
             function checkMsg(err) {
