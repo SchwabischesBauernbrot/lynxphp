@@ -649,7 +649,7 @@ function wrapContentFooter($row) {
   if ($enableJs) {
     $io = array('scripts' => array());
     // THINK: how do we let JS live in module directories
-    // but be efficently servered by web server?
+    // but be efficiently servered by web server?
     // so that we don't have to fire up php each time
     // make the static generation engine can copy them
     // and then we have PHP fallback
