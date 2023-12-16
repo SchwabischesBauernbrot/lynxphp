@@ -17,6 +17,12 @@ PIPELINE_BE_FILE_FIX_MIME - improves the default PHP mime detection
   p (srcPath)
   *m (mime)
 
+PIPELINE_BE_POST_EXPOSE_DATA_FIELD - exposing json field data from posts
+  fields
+
+PIPELINE_BE_POST_FILTER_DATA_FIELD - transform post exposed json field values
+  fields
+
 PIPELINE_BE_FILE_FIX_FILEDATA
   *fileData
 
