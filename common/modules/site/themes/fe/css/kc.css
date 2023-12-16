@@ -82,7 +82,7 @@ input[type="text"],input[type="password"], input[type="number"], textarea {
 
 #tab_delete.tab + label {
   color: black;
-  background-color: #8e86b9; !important;
+  background-color: #8e86b9 !important;
   border: 1px solid #30363d !important;
     font-weight: bold;
 }
@@ -99,7 +99,7 @@ the hover elements are to make it easier on mods and users */
 
 #tab_report.tab + label {
   color: black;
-  background-color: #8e86b9; !important;
+  background-color: #8e86b9 !important;
   border: 1px solid #30363d !important;
     font-weight: bold;
  }
@@ -113,7 +113,7 @@ border: 1px solid black !important;
 
 #tab_media.tab + label {
   color: black;
-  background-color: #8e86b9; !important;
+  background-color: #8e86b9 !important;
   border: 1px solid #30363d !important;
     font-weight: bold;
 }
@@ -127,7 +127,7 @@ border: 1px solid black !important;
 
 #tab_ban.tab + label {
   color: black;
-  background-color: #8e86b9; !important;
+  background-color: #8e86b9 !important;
   border: 1px solid #30363d !important;
     font-weight: bold;
 }
@@ -141,7 +141,7 @@ border: 1px solid black !important;
 
 
 .stickynav {
-  background-color: #8e86b9; !important;
+  background-color: #8e86b9 !important;
   border: 1px solid black;
 }
 
