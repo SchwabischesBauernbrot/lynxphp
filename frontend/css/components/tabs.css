@@ -1,3 +1,11 @@
-.tabs {
+div.tabs {
   display: inline;
+}
+
+div.tabs input[type=radio].tab {
+  display: none;
+}
+
+div.tabs div.tab {
+  display: none;
 }
