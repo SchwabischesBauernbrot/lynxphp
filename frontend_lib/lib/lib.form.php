@@ -109,6 +109,7 @@ function generateField($field, $value, $details, $labelId) {
     case 'email':
       $html .= '<input type=email name="'.$field.'" value="' . $value . '"'.$ac.$ph.'>';
     break;
+    // FIXME: url
     case 'textpass':
       // always blank and can't be cleared
       $html .= '<input type=text name="'.$field.'">';
@@ -193,7 +194,7 @@ function generateField($field, $value, $details, $labelId) {
                     <input type="file" id="' . $labelId . '" name="' . $field . '[]" multiple>
                     <span class="fileLabelText">Select/Drop/Paste files</span>
                   </label>
-                  <div class="upload-list" data-spoilers="true"></div>
+                  <span class="upload-list" data-spoilers="true"></span>
                 </span>
                 <noscript>
                   <label class="postform-style ph-5 ml-1 fh">
