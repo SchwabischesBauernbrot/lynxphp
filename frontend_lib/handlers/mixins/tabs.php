@@ -23,15 +23,8 @@ function renderTabs($tabs, $options = array()) {
     if (!empty($options['name'])) {
       $name = $options['name'];
     }
-
-    $html = '<style>
-  input[type=radio].tab {
-    display: none;
-  }
-  div.tab {
-    display: none;
-  }
-  </style>';
+    // maybe should use visibility hidden to reduce the jumpiness
+    $html = '<div class="tabs">';
     $c = 0;
     $selectFirst = true;
     if (!empty($options['defaultNone'])) {
@@ -134,6 +127,7 @@ function renderTabs($tabs, $options = array()) {
       $html .= '<div class="tab" id="tabGroup' . $tabGroup . '">' . $options['any'] . '</div>';
     }
   }
+  $html .= '</div><!-- end tabs -->';
   return $html;
 }
 
