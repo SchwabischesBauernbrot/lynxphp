@@ -29,7 +29,7 @@ class syncedField {
     if (settingsModal) {
       settingsFields = settingsModal.querySelectorAll(this.selector)
     } else {
-      console.log('password.js - settingsmodal')
+      console.log('password.js - settingsmodal is missing')
     }
 
     for(var i in settingsFields) {
@@ -100,7 +100,7 @@ class syncedField {
 
 //window.addEventListener('settingsReady', () => {
 window.addEventListener('DOMContentLoaded', (event) => {
-  console.log('password.js - start')
+  //console.log('password.js - start')
   new syncedField('input[name="postpassword"]', 'postpassword')
   new syncedField('input[name="name"]', 'name')
 })
