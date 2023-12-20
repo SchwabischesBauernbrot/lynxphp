@@ -333,7 +333,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
         postNum = href.split(/#/)[1]
       }
     } else {
-      console.warn('unhandled quote href', href)
+      // it's usually a board quote...
+      console.warn('unhandled quote href (probably a board quote)', href)
     }
 
     //const parts = quotes[i].href.split(/\/#?/)
@@ -348,11 +349,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
       const repliesElem = elem.querySelector('.replies')
       //console.log('replies', repliesElem)
       const newSpan = document.createElement('span')
-      const postData = quotes[i].parentNode.parentNode.parentNode.dataset
+      // we need to scan upwards to locate the article.post-container to get the dataset
+      // we can be inside another tag...
+      //const postData = quotes[i].parentNode.parentNode.parentNode.dataset
+      const articleElem = quotes[i].closest('.post-container')
+      // .dataset
+      let postData = {}
+      if (articleElem) {
+        postData = articleElem.dataset
+      } else {
+        console.log('not found quotes[i]', i, quotes[i])
+        console.log('quotes[i]', i, quotes[i], quotes[i].closest('.post-container'))
+      }
       const parts2 = (window.location.pathname).split('#')
       //console.log('postData', postData, window.location.pathname, parts2[0])
       const link = parts2[0] + '#' + postData.postId
       newSpan.innerHTML = '&nbsp;<a class="quote" href="' + link + '">&gt;&gt;' + postData.postId + '</a>';
+      // we're going to add newSpan to repliesElem
+      // and then tweak a in newSpan events
+      // why is this 2 phases?
       toAdd.push([repliesElem, newSpan])
       //repliesElem.appendChild(newSpan)
     } else {
