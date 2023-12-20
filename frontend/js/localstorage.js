@@ -8,26 +8,30 @@ const isRecent = isGlobalRecent || window.location.pathname.endsWith('/manage/re
 
 function setLocalStorage(key, value) {
   try {
-    localStorage.setItem(key, value);
+    localStorage.setItem(key, value)
   } catch (e) {
-    deleteStartsWith();
+    //console.error('localstorage::setLocalStorage - err', e)
+    deleteStartsWith()
   } finally {
-    localStorage.setItem(key, value);
+    // this can throw too
+    localStorage.setItem(key, value)
   }
 }
 
 function appendLocalStorageArray(key, value) {
-  const storedArray = JSON.parse(localStorage.getItem(key));
-  storedArray.push(value);
-  setLocalStorage(key, JSON.stringify(storedArray));
+  const storedArray = JSON.parse(localStorage.getItem(key))
+  storedArray.push(value)
+  setLocalStorage(key, JSON.stringify(storedArray))
 }
 
-function deleteStartsWith(startString='hovercache') {
+function deleteStartsWith(startString='hoverhtmlcache') {
+  //console.log('localstorage::deleteStartsWith - start', startString)
   //clears cache when localstorage gets full
   const hoverCaches = Object.keys(localStorage).filter(k => k.startsWith(startString));
   for(let i = 0; i < hoverCaches.length; i++) {
     localStorage.removeItem(hoverCaches[i]);
   }
+  //console.log('localstorage::deleteStartsWith - done')
 }
 
 function setDefaultLocalStorage(key, value) {
