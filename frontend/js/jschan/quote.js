@@ -78,6 +78,7 @@ const addQuote = function(number) {
 
 
 function quote_onHashChange() {
+  if (!location.hash) return
   console.log('quote.js - location.hash', location.hash)
   if (location.hash.match(/_postform/)) {
     // has to be before openPostForm
@@ -137,13 +138,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
   if (isThread) {
     //add quote to postform if link clicked with quote
     const quoteNum = localStorage.getItem('clickedQuote')
-    console.debug('quote.js - clickedQuote process', quoteNum)
-    if (quoteNum != null) {
-      addQuote(quoteNum)
-      //scroll to the post you quoted
-      const quotingPost = document.getElementById(quoteNum)
-      if (quotingPost) {
-        quotingPost.scrollIntoView()
+    if (quoteNum) {
+      console.debug('quote.js - clickedQuote process', quoteNum)
+      if (quoteNum != null) {
+        addQuote(quoteNum)
+        //scroll to the post you quoted
+        const quotingPost = document.getElementById(quoteNum)
+        if (quotingPost) {
+          quotingPost.scrollIntoView()
+        }
       }
     }
     localStorage.removeItem('clickedQuote')
