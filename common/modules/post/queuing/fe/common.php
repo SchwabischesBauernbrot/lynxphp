@@ -13,34 +13,48 @@ function post_queue_display($qposts) {
   $str .= '<table width=100%>';
   // could but a check all here...
   $fields = array(
-    '', 'uri', 'id', 'created', 'thread', 'type', 'ip', 'post', 'votes',
+    // 'id',
+    '', 'uri', 'created', 'thread', 'type', 'ip', 'post', 'votes',
   );
   $str .= '<tr><th><nobr>' . join('</nobr><th><nobr>', $fields) . '</nobr>';
   foreach($addFields as $f) {
     $str .= '<th>' . $f['label'];
   }
   $str .= '<th>Actions';
-  foreach($qposts as $s) {
+
+  $userSettings = getUserSettings();
+
+  foreach($qposts as $c3 => $s) {
+    if ($c3 > 50) break;
     $uri = $s['board_uri'];
+
+    $boardSettings = getter_getBoardSettings($uri);
+
     $d = json_decode($s['data'], true);
     $str .= '<tr>';
     $str .= '<td><input type=checkbox name="list[]" value="' . $s['queueid'] . '">';
-    $str .= '<th><a href="/' . $uri . '" target=_blank>' . $uri;
-    $str .= '<td>' . $s['queueid'];
+    $str .= '<th><a href="/' . $uri . '/" target=_blank>' . $uri;
+    //$str .= '<td>' . $s['queueid'];
     // age would be better...
     $str .= '<td>' . date('Y-m-d H:i:s', $s['created_at']);
+    // there's no post number because they don't exist yet
+    // <a href="' . $uri . '/thread/' . $s['post']['no'] . '.html" target=_blank>
     $str .= '<td>' . (!$s['thread_id'] ? 'new' : ('<a href="' . $uri . '/thread/' . $s['thread_id'] . '.html" target=_blank>' . $s['thread_id'] . '</a>'));
     $str .= '<td>' . $s['type'];
-    $str .= '<td>' . $s['ip'] . '<td>' . renderPost($uri, $s['post']);
+    $str .= '<td>' . $s['ip'] . '<td>' . renderPost($uri, $s['post'], array('userSettings' => $userSettings, 'boardSettings' => $boardSettings));
     $str .= '<td>' . $s['votes'];
-    foreach($addFields as $f) {
+    foreach($addFields as $c => $f) {
       $field = $f['field'];
       $val = $s[$field];
       if (!empty($f['type'])) {
         switch($f['type']) {
           case 'compact_informative':
             $str .= '<td>';
-            foreach($val as $l) {
+            foreach($val as $c2 => $l) {
+              if ($c2 > 10) {
+                $str .= '...';
+                break;
+              }
               $str .= '<a href="' . $l . '">X</a>' . "\n";
             }
           break;

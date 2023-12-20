@@ -68,7 +68,13 @@ if (!$boardSettings && isset($io['meta']['board']['settings'])) {
 if (!$boardSettings) {
   $board = getBoard($boardUri, array('jsonFields' => array('settings')));
   if ($board) {
-    $boardSettings = $board['settings'];
+    if (isset($board['settings'])) {
+      $boardSettings = $board['settings'];
+    } else {
+      // FIXME: why not, how do we output this
+      // collect later
+      // without showing the user
+    }
   }
 }
 $io['board'] = $boardSettings;

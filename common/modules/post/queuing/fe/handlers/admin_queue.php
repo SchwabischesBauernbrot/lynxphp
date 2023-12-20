@@ -8,13 +8,18 @@ if (!perms_inGroups(array('admin'))) {
   return;
 }
 
-$data = $pkg->useResource('queue_list');
+// remove duplicates
+// multiple deletes...
+// paging
+
+$data = $pkg->useResource('postq_list');
 
 // votes? list of IDs that voted
 // logs?
 
 $str = '';
 
+if (!is_array($data['queue_posts'])) $data['queue_posts'] = array();
 $str .= 'posts: ' . count($data['queue_posts']) . "<br>\n";
 
 // FIXME: add a link to clear all with (updated) strings?
@@ -31,6 +36,6 @@ foreach($data['boards'] as $b => $s) {
 }
 $str .= '</table>';
 
-wrapContent(renderAdminPortal() . $str);
+wrapContent($str);
 
 ?>

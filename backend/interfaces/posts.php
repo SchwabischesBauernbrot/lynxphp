@@ -3,8 +3,8 @@
 // thread or reply...
 // should be thread AND reply, right?
 
-function postDBtoAPI(&$row) {
-  global $db, $models;
+function postDBtoAPI(&$row, $boardUri) {
+  global $db;
 
   // filter out any file_ or post_ field
   $row = array_filter($row, function($v, $k) {
@@ -49,11 +49,40 @@ function postDBtoAPI(&$row) {
       unset($row[$f]);
     }
   }
-  // FIXME: should be a pipeline
+  // old fix me: should be a pipeline
   // don't like this N+1 but we don't always need capcode
+
+  // the frontend just needs to send what's public
+  // and we'll just pass that through
+  /*
   if ($row['capcode']) {
+    //echo "<pre>row", print_r($row, 1), "</pre>\n";
     // decode value
+    if ($row['capcode'] === 'useName' || $row['capcode'] === 'admin' || $row['capcode'] === 'global') {
+      // simple don't need lookups
+    } else {
+      // N+1 time
+      //$posts_priv_model = getPrivatePostsModel($boardUri);
+      // it's not being saved...
+      //echo "no[", $row['no'], "]<br>\n";
+      //echo "boardUri[$boardUri]<br>\n";
+
+      $res = $db->find($posts_priv_model, array('criteria'=> array('post_id' => $row['no'])), 'json');
+      $priv_row = $db->get_row($res);
+      $db->free($res);
+      if ($priv_row) {
+        $privData = json_decode($priv_row['json'], true);
+        //echo "<pre>", $row['no'], ": privData[", print_r($privData, 1), "]</pre><br>\n";
+        // session is worthless in capcode
+        //'identity'  => $privData['identity'],
+        $row['capcode'] = array(
+          'type' => $row['capcode'],
+          'publickey' => $privData['publickey'],
+        );
+      }
+    }
   }
+  */
   // decode user_id
 }
 
@@ -100,7 +129,7 @@ function getPost($boardUri, $postNo, $posts_model) {
     if (!$row['threadid'] || $row['threadid'] === $row['postid']) {
       threadDBtoAPI($posts[$row['postid']], $boardUri);
     } else {
-      postDBtoAPI($posts[$row['postid']]);
+      postDBtoAPI($posts[$row['postid']], $boardUri);
     }
     //echo "<pre>4chan", print_r($row, 1), "</pre>\n";
     $posts[$row['postid']]['files'] = array();
@@ -158,8 +187,31 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
   //echo "boardUri[$boardUri]<br>\n";
   $posts_priv_model = getPrivatePostsModel($boardUri);
   $privPost['post_id'] = $id; // update postid
+  if (!isset($privPost['json'])) $privPost['json'] = array();
+  // would be good to record the userAgent too
+  $privPost['json']['identity'] = getIdentity();
+  $user_id = getUserID();
+  if ($user_id) {
+    $userRes = getAccount($user_id);
+    $privPost['json']['publickey'] = $userRes['publickey'];
+  }
   //print_r($privPost);
-  $db->insert($posts_priv_model, array($privPost));
+  // there's an ip field and that's it atm
+  $safePrivPost = array(
+    'post_id' => $privPost['post_id'],
+    'ip' => $privPost['ip'],
+    'json' => $privPost['json'],
+  );
+  foreach($privPost as $k => $v) {
+    if ($k === 'post_id') continue;
+    if ($k === 'ip') continue;
+    if ($k === 'json') continue;
+    if (!isset($safePrivPost['json'][$k])) {
+      // missing, need to upgrade
+      $safePrivPost['json'][$k] = $v;
+    }
+  }
+  $db->insert($posts_priv_model, array($safePrivPost));
 
   // handle files
   $issues = processFiles($boardUri, $files, $io['threadNum'], $id);

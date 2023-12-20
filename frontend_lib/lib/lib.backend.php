@@ -336,6 +336,14 @@ function expectJson($json, $endpoint = '', $options = array()) {
       }
       */
     }
+    // FIXME: shouldn't have this branch every
+    // there should be a pipeline here
+    // mapable...
+    // maybe better in the route/module definition
+    if (isset($obj['meta']['menus'])) {
+      global $menusData;
+      $menusData = $obj['meta']['menus'];
+    }
     // singular
     if (isset($obj['meta']['board'])) {
       global $boardData;

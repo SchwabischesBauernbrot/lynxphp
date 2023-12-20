@@ -19,6 +19,6 @@ if ($data) {
   $str .= '</table>';
 }
 
-wrapContent(renderAdminPortal() . $str);
+wrapContent($str);
 
 ?>

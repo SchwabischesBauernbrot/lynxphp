@@ -23,13 +23,11 @@ return array(
       */
     ),
     'modules' => array(
-      /*
-      // add post queuing to boards settings
+      // add debug to media actions
       array(
-        'pipeline' => 'PIPELINE_BOARD_SETTING_NAV',
-        'module' => 'setting_nav',
+        'pipeline' => 'PIPELINE_MEDIA_ACTIONS',
+        'module' => 'media_actions',
       ),
-      */
     ),
   ),
 );

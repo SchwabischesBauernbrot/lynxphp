@@ -50,6 +50,8 @@ if (!defined('BASE_HREF')) {
 
 if (!defined('SITE_TITLE')) define('SITE_TITLE', '');
 
+if (!defined('DISABLE_HTTPS')) define('DISABLE_HTTPS', false);
+
 // BASE_PATH is basically BASE_HREF
 if (!defined('DEV_MODE')) define('DEV_MODE', false);
 if (!defined('SCRATCH_DRIVER')) define('SCRATCH_DRIVER', 'auto');

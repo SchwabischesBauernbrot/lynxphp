@@ -92,6 +92,7 @@ function getMediaTags($file, $boardUri, $options) {
   if ($file['type'] === 'glb' || strpos($file['path'], '.glb') !== false) {
     $avmedia = '';
     // I think if we just make the t_xxx_xxx.avif or .webp
+    // we need the backend to send this
     echo "thumbnail_path[", isset($file['thumbnail_path']) ? $file['thumbnail_path'] : '', "]<br>\n";
     $thumb = getThumbnail(array(
       'path' => $file['path'],
@@ -447,6 +448,7 @@ function renderPost($boardUri, $p, $options = false) {
   // why was this subject? the field is sub...
   if (!empty($p['sub'])) {
     // needs trailing space to let name breathe on it's own
+    // could put a label tag inside or around...
     $postmeta .= '<span class="post-subject">' . htmlspecialchars($p['sub']) . '</span> ';
   }
   $defaultName = false;
@@ -470,7 +472,9 @@ function renderPost($boardUri, $p, $options = false) {
       $postmeta .= '<a rel="author" class="author post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</address>';
     } else
     if (!empty($p['name'])) {
-      $postmeta .= '<address style="display: inline-block" class="author post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</address>';
+      // moved style="display: inline-block" into lynxphp.css
+      // could put a label tag inside
+      $postmeta .= '<address class="author post-name' . $defaultClass . '">' . htmlspecialchars($p['name']) . '</address>';
     }
   }
   //echo "<pre>", print_r($p['flag_cc'], 1), "</pre>\n";

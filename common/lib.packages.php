@@ -151,7 +151,7 @@ class package {
       echo "Resource[$label]'s endpoint should NOT start with a slash<br>\n";
     }
     if (empty($rsrcArr['params']) && !empty($rsrcArr['requires']) && strpos($rsrcArr['endpoint'], '/:') === false) {
-      echo "lib.package:::package::useResource($label) - Unset parameter type for required fields... in [", $this->dir, "]<br>\n";
+      echo "lib.package:::package::addResource($label) - Unset parameter type for required fields... in [", $this->dir, "]<br>\n";
       //print_r($rsrcArr['requires']);
       //print_r($rsrcArr['params']);
     }
@@ -272,7 +272,7 @@ class package {
       foreach($parts as $part) {
         $parts2 = explode('/', $part);
         $name = array_shift($parts2);
-        // ($name === true || $name === false) || 
+        // ($name === true || $name === false) ||
         if (!isset($params[$name])) {
           echo "Setting [$name] to empty because parameter is not set<br>\n";
           $condParams[$name] = '';
@@ -660,6 +660,7 @@ class backend_package {
   // how to set dependencies/preempt?
   // FIXME: key caching...
   function addModule($pipeline_name, $file = false) {
+    //echo "addingModule[$pipeline_name]<br>\n";
     $bsn = new pipeline_module($this->pkg->name. '_' . $pipeline_name);
     if ($file === false) $file = $pipeline_name;
     $pkg = &$this->pkg;
@@ -808,6 +809,13 @@ class frontend_package {
       $this->css = $pData['css'];
       // unpack it into pipelines if we're on this page?
     }
+    // lets define these before modules incase a module uses these
+    if ($loadPipelines && isset($pData['pipelines'])) {
+      foreach($pData['pipelines'] as $m) {
+        // name has to be a string
+        $this->addPipeline($m);
+      }
+    }
     if ($loadModules && isset($pData['modules'])) {
       foreach($pData['modules'] as $i => $m) {
         if (!defined($m['pipeline'])) {
@@ -815,12 +823,6 @@ class frontend_package {
         } else {
           $this->addModule(constant($m['pipeline']), $i, $m['module']);
         }
-      }
-    }
-    if ($loadPipelines && isset($pData['pipelines'])) {
-      foreach($pData['pipelines'] as $m) {
-        // name has to be a string
-        $this->addPipeline($m);
       }
     }
   }
@@ -957,6 +959,7 @@ class frontend_package {
 
   function addPipeline($pipeline) {
     // name has to be a string
+    //echo "defining[", $pipeline['name'], "]<br>\n";
     definePipeline($pipeline['name']);
   }
 

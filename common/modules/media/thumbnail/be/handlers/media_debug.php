@@ -16,7 +16,7 @@ foreach($files as $i => $f) {
     'source' => array(
       'path' => $f['path'],
       's' => filesize($path['path']),
-      'm' => md5_file($path['path']),
+      'm' => $path['path'] && md5_file($path['path']),
       'w' => $f['w'],
       'h' => $f['h'],
     ),

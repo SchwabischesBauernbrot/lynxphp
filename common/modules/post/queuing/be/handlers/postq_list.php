@@ -21,6 +21,9 @@ $qposts = $db->toArray($res);
 $post_files = array();
 // FIXME: simulate thumbnail sizes...
 
+// there can be 2k of these
+// maybe segment by board?
+
 foreach($qposts as $i => $qp) {
   // row from qposts passes through
   $data = json_decode($qp['data'], true);

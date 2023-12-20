@@ -171,6 +171,15 @@ function makePostHandlerEngine($request) {
   //echo '<pre>_SERVER: ', print_r($_SERVER, 1), "</pre>\n";
   //echo '<pre>_FILES: ', print_r($_FILES, 1), "</pre>\n";
 
+  $retval = array(
+    'row' => array(),
+    'requestValid' => false,
+    'responseValid' => false, // json valid
+    'boardUri' => $boardUri,
+    'result'   => array(),
+    'errors'   => array(),
+  );
+
   //$res = processFiles();
   $res = processPostFiles();
   //echo '<pre>res: ', print_r($res, 1), "</pre>\n";
@@ -309,6 +318,7 @@ function makePostHandlerEngine($request) {
   if (count($errors)) {
     return array(
       'requestValid' => false,
+      'responseValid' => false,
       'boardUri' => $boardUri,
       'row'      => $row,
       'errors'   => $errors,
@@ -319,6 +329,7 @@ function makePostHandlerEngine($request) {
   if (!empty($io['redirNow'])) {
     return array(
       'requestValid' => false,
+      'responseValid' => false,
       'boardUri' => $boardUri,
       'row'      => $row,
       'redirect' => $io['redirNow'],
@@ -335,21 +346,26 @@ function makePostHandlerEngine($request) {
     'headers' => $headers,
   );
   $pipelines[PIPELINE_POST_DATA_POSTVALIDATION]->execute($io);
+  
+  // FIXME: relay user-agent
 
   // make post...
   // we could queue this for a worker but then any BE validation couldn't be passed to the user
-  $json = request(array(
+  $request = array(
     'url' => $io['url'],
     'body' => $io['row'], // an array
     'headers' => $io['headers'],
-  ));
+  );
+  $json = request($request);
   if (!$json) {
     // this means something...
     // ok this CAN mean backend had a FATAL error (before any output?)
     return array(
       'requestValid' => true, // can be retried
+      'responseValid' => false, // backend 500?
       'boardUri' => $boardUri,
       'row' => $row,
+      'request' => $request,
       'errors' => array('Unknown engine error, tell admin to check their error logs')
       //'redirect' => $io['redirNow'],
     );
@@ -362,10 +378,27 @@ function makePostHandlerEngine($request) {
   //echo "json[$json]<br>\n";
   $results = json_decode($json, true);
 
+  if ($results === null) {
+    // backend didn't send JSON or had an error
+    // maybe push onto errors
+    return array(
+      'row' => $row,
+      'request' => $request,
+      'response' => $json,
+      'requestValid' => true, // can be retried
+      'responseValid' => false, // backend error or warning
+      'boardUri' => $boardUri,
+      // by including this, the user only sees this in an alert (atm)
+      'errors' => array('Backend did not return valid json error, tell admin to check their error logs')
+    );
+  }
+
   $retval = array(
     // result.data.status = bypassable or result.data = Wrong/Expired Captcha.
     'row' => $row, // need this for captcha/blockbypass stuffs
     'requestValid' => true,
+    // json will be invalid if SQL error
+    'responseValid' => $results !== null, // json valid
     'boardUri' => $boardUri,
     'result'   => $results,
   );
@@ -386,10 +419,11 @@ function makePostHandlerEngine($request) {
       //'filesDebugs' => $res,
       //'_FILES' => $_FILES,
       // good for debug/dev
-      'url' => $io['url'],
-      'headers' => $io['headers'],
       'validated' => $row, // exact data that passed validation
-      'backendInput' => $io['row'], // validation and what's sent to the BE
+      'backendInput' => $request,
+      //'url' => $io['url'],
+      //'headers' => $io['headers'],
+      //'backendInput' => $io['row'], // validation and what's sent to the BE
       'backendOutput' => $json,
       'filesForBE' => $files, // should be in row but it'll be jsonencoded, so less useful
     );
@@ -506,7 +540,7 @@ EOB;
 // just different output...
 function makePostHandlerJson($request) {
   $arr = makePostHandlerEngine($request);
-  $code = $arr['requestValid'] ? 200 : 400;
+  $code = $arr['requestValid'] ? ($arr['responseValid'] ? 200 : 500) : 400;
   // postId
   if (!empty($arr['result'])) {
     $result = $arr['result'];
@@ -524,6 +558,7 @@ function makePostHandlerJson($request) {
   }
   // the status code is enough
   unset($arr['requestValid']);
+  unset($arr['responseValid']);
   sendJson($arr, array('code' => $code));
 }
 

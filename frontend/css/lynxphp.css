@@ -109,3 +109,8 @@ any modifications to existing will go directly into style.css with notes
 .post-name.default-name {
   font-size: smaller;
 }
+
+/* make post address tag inline-block */
+article header address {
+  display: inline-block;
+}

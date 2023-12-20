@@ -48,5 +48,7 @@ $id = $row['userid'];
 $row['last_login'] = (int)$now;
 $db->updateById($models['user'], $id, $row);
 
+// loop over boards they own
+
 loginResponseMaker($id, $upgradedAccount);
 ?>

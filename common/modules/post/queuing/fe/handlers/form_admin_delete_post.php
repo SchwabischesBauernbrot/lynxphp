@@ -15,7 +15,7 @@ $result = $pkg->useResource('admin_del', array(
 if ($result && $result['success']) {
   // success
   global $BASE_HREF;
-  redirectTo($BASE_HREF . 'admin/queue');
+  redirectTo($BASE_HREF . 'admin/post_queue');
 } else {
   wrapContent('Something went wrong... Error: ' . print_r($result, 1));
 }

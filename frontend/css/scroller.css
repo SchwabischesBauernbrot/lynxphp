@@ -1,0 +1,19 @@
+/*  https://stackoverflow.com/questions/17295219/overflow-scroll-css-is-not-working-in-the-div */
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  /* chrome needs this */
+  overflow-y: auto;
+}
+
+#scroller {
+  overflow-y: auto;
+  /* the nav bar is 50px tall */
+  height: calc(100% - 50px);
+  flex-shrink: 0; /* deal with flex crap */
+  padding: 10px; /* emulate container */ 
+}

@@ -77,6 +77,11 @@ function getBoardsParams() {
   if (!empty($_GET['page'])) {
     $pageNum = (int)$_GET['page'];
   }
+
+  if (!empty($_REQUEST['showInactive'])) {
+    $params['showInactive'] = 1;
+  }
+
   $params['page'] = $pageNum;
   $params['direction'] = $reverse_list ? 'desc' : 'asc';
 
@@ -255,10 +260,12 @@ function renderBoardsTemplate($res, $templates, $params) {
   );
 }
 
+/*
 function getBoardsHandlerEngine($res) {
   $templates = moduleLoadTemplates('board_listing', __DIR__ . '/common');
-  return renderBoardsTemplate($res, $templates);
+  return renderBoardsTemplate($res, $templates, array());
 }
+*/
 
 // FIXME: solve custom sheetstyle issues in these...
 
