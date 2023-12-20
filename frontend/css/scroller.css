@@ -13,7 +13,7 @@ body {
 #scroller {
   overflow-y: auto;
   /* the nav bar is 50px tall */
-  height: calc(100% - 50px);
+  height: calc(100% - 100px);
   flex-shrink: 0; /* deal with flex crap */
-  padding: 10px; /* emulate container */ 
+  padding: 10px; /* emulate container */
 }
