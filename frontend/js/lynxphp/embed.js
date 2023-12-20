@@ -300,6 +300,8 @@ if (!isCatalog) { //dont show embed buttons in catalog
           //const videoId = searchParams.get('v') || (urlObject.hostname === 'youtu.be' ? urlObject.pathname.substring(1) : null);
           const videoId = searchParams['v']
           //console.log('videoId', videoId)
+
+          // it's not always 11 I think...
           if (videoId && videoId.length === 11) {
             return {
               // maybe these should be functions for maximum flexibility
@@ -341,6 +343,8 @@ if (!isCatalog) { //dont show embed buttons in catalog
                 return iframeElem
               }
             };
+          } else {
+            console.error('toEmbedder', videoId, 'length', videoId.length)
           }
         },
         toHtml: (url) => {
@@ -404,6 +408,10 @@ if (!isCatalog) { //dont show embed buttons in catalog
           continue;
         }
         const embedder = embedHandler.toEmbedder(l[i].href)
+        if (!embedder) {
+          console.warn('toEmbedder failure, link', l[i].href)
+          continue
+        }
         addToPostMedia(l[i].parentNode.parentNode.parentNode.parentNode, embedder)
         pl.addtracks(embedder)
         //const embedHtml = embedHandler.toHtml(l[i].href);
