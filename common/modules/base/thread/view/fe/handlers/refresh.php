@@ -21,6 +21,13 @@ $result = $pkg->useResource('refresh', array(
 //$res = json_decode($result, true);
 //echo "<pre>", htmlspecialchars(print_r($res, 1)), "</pre>\n";
 
+// likely means no replies
+if ($result === false) {
+  header("HTTP/1.1 204 NO CONTENT");
+  cachePageNever();
+  return;
+}
+
 // has final
 if (is_array($result)) {
   // without the wrap it's not very SEO friendly...
