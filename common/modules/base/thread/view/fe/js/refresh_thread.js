@@ -1,7 +1,13 @@
 var lastReplyId = 0
 
 function updateLastReply() {
-  var threadElem = document.getElementById('threadsContainer')
+  //var threadElem = document.getElementById('threadsContainer')
+  // threadsContainer is now a class
+  var threadElem = document.querySelector('.threadsContainer')
+  if (!threadElem) {
+    console.debug('refresh_thread.js - could not update last reply', lastReplyId, '#threadsContainer missing')
+    return
+  }
   // just get last on the page
   if (threadElem.children.length && threadElem.children[threadElem.children.length - 1]) {
     if (threadElem.children[threadElem.children.length - 1].dataset.postId) {
@@ -49,7 +55,8 @@ function refreshCallback(error, html) {
 
   foundPosts = true
 
-  var threadElem = document.getElementById('threadsContainer')
+  //var threadElem = document.getElementById('threadsContainer')
+  var threadElem = document.querySelector('.threadsContainer')
   var divElem = document.createElement('div')
   divElem.innerHTML = html
 
