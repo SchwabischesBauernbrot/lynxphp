@@ -139,6 +139,12 @@ function _doHeaders($mtime, $options = false) {
 
 }
 
+function cachePageNever() {
+  header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
+  header("Pragma: no-cache"); // HTTP 1.0.
+  header("Expires: 0"); // Proxies.
+}
+
 // when version is specified in the URL
 function cachePageContentsForever($mtime = 0) {
   global $now;
