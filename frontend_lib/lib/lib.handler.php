@@ -426,6 +426,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
         // only need this on the settings page...
         'js/lynxphp/volume_upgrade.js',
         //'js/lynxphp/lazy_audit.js',
+        'js/lynxphp/modal.js',
       ),
     );
     // THINK: how do we let JS live in module directories
