@@ -29,7 +29,7 @@ function loggedIn() {
     return false;
   }
   //echo "logged[" , gettype($res), print_r($res, 1), "]<br>\n";
-  $loggedIn = 'true';
+  $loggedIn = 'true'; // why a string?
   return true;
 }
 
@@ -44,7 +44,7 @@ function loggedIn() {
   }
 */
 
-// getter
+// getter (not really doesn't fetch if empty...)
 function getUserData() {
   global $persist_scratch;
   $key = 'user_session' . $_COOKIE['session'];
