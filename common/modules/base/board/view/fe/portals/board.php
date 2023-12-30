@@ -32,6 +32,7 @@ function getPortalBoard($opts, $request) {
     // FIXME: this should default to on tbh
     'noPosts' => empty($opts['noPosts']) ? false : true,
   );
+  //echo "<pre>board portal options", print_r($options, 1), "</pre>\n";
   // get page count
   // so on board_view this comes from a specific custom endpoint
   // maybe better solved by a portal linkage...
@@ -87,6 +88,7 @@ function getPortalBoard($opts, $request) {
     $boardSettings = array();
   }
   $row = renderBoardPortalData($uri, $pageCount, array(
+    'pagenum' => $options['pagenum'],
     'noBoardHeaderTmpl' => $options['noBoardHeaderTmpl'],
     'isThread' => $options['isThread'],
     'threadClosed' => $options['threadClosed'],
@@ -196,6 +198,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     // do pages
     $pages_html = '';
     $pgTags = array('uri' => $boardUri);
+    //echo "pagenum[$pagenum]<br>\n";
     if ($pagenum == 1 || !$pagenum) {
       // current prev
       $pages_html .= replace_tags($boardNavPrevCurrentLink_tmpl, $pgTags);
