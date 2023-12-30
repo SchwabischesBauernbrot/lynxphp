@@ -27,6 +27,9 @@ $tmpl = '<form action="' . $params['action'] . '" method="POST">';
 $tmpl .= '<input type=hidden name=userid value="' . $user['userid'] . '">';
 $tmpl .= 'Public Key: ' . $user['publickey'] . "<br>\n";
 $tmpl .= 'Groups:<ul>';
+//echo "<pre>[", print_r($user['groupnames'], 1), "]</pre>\n";
+// most users are without groups and are null
+if ($user['groupnames'] === null) $user['groupnames'] = '';
 $user_groups = explode(',', $user['groupnames']);
 foreach($groups as $g) {
   $value = in_array($g['name'], $user_groups) ? ' CHECKED' : '';
