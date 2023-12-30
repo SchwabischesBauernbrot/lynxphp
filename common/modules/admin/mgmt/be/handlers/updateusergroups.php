@@ -16,6 +16,8 @@ $res = $db->find($models['usergroup'], array('criteria' => array(
 )));
 $inGroups = json_decode($_POST['groups'], true);
 //echo "inGroups[", print_r($inGroups, 1), "]<br>\n";
+// allow unchecking them all
+if (!is_array($inGroups)) $inGroups = array();
 $toAdd  = array();
 $toKeep = array();
 $toDel  = array();
