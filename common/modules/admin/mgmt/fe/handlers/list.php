@@ -33,6 +33,7 @@ $users_html = '';
 $formFields = array();
 if (is_array($users)) {
   foreach($users as $user) {
+    if ($user['groupnames'] === null) $user['groupnames'] = '';
     $tmp = $user_tmpl;
     $tmp = str_replace('{{id}}',         $user['userid'],     $tmp);
     $tmp = str_replace('{{publickey}}',  $user['publickey'] ? $user['publickey'] : 'not migrated yet',  $tmp);
