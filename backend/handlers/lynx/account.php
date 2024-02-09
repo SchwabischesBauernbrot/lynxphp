@@ -7,8 +7,9 @@ if (!$user_id) {
 //echo "user_id[$user_id]<br>\n";
 $userRes = getAccount($user_id);
 if (!$userRes) {
-  //return sendResponse(array(), 400, 'user_id has been deleted');
-  return sendResponse2(array(), array('code' => 400, 'err' => 'user_id has been deleted'));
+  // sendJson for consistency
+  return sendJson(array('err' => 'user_id has been deleted'), array('code' => 400));
+  //return sendResponse2(array(), array('code' => 400, 'err' => 'user_id has been deleted'));
 }
 $ownedBoards = userBoards($user_id);
 $groups = getUserGroups($user_id);
@@ -37,8 +38,7 @@ $io = array(
   'userid' => $user_id,
   'account' => $account,
 );
+// roles uses this
 $pipelines[PIPELINE_ACCOUNT_DATA]->execute($io);
 
-//sendJson($io['account']));
-sendRawResponse($io['account']);
-//sendResponse2($io['account']);
+sendJson($io['account']);
