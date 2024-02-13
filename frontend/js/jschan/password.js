@@ -89,7 +89,7 @@ class syncedField {
   }
   update(e) {
     if (this.persistent) {
-      console.log('syncedField - setting', this.key, 'to', e.target.value)
+      //console.log('syncedField - setting', this.key, 'to', e.target.value)
       setLocalStorage(this.key, e.target.value)
     }
     for (let field of this.fields) {
@@ -101,6 +101,11 @@ class syncedField {
 //window.addEventListener('settingsReady', () => {
 window.addEventListener('DOMContentLoaded', (event) => {
   //console.log('password.js - start')
-  new syncedField('input[name="postpassword"]', 'postpassword')
   new syncedField('input[name="name"]', 'name')
+  new syncedField('input[name="email"]', 'email')
+  // sage?
+  new syncedField('input[name="subject"]', 'subject')
+  new syncedField('textarea[name="message"]', 'message')
+  // files?
+  new syncedField('input[name="postpassword"]', 'postpassword')
 })
