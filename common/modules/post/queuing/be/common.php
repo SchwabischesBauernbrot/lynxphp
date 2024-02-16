@@ -64,6 +64,7 @@ function getYourNextQueue($boardUri, $votes = false) {
 
 // post -> queue
 // why notthread_id here too?
+// what's type here?
 function post_queue($boardUri, $ip, $thread_id, $data, $type) {
   global $db, $models;
   $id = $db->insert($models['post_queue'], array(array(
