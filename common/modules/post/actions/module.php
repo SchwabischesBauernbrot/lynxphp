@@ -23,6 +23,7 @@ return array(
         'sendIP' => true,
         'sendSession' => true,
         'requires' => array('action'),
+        // is this lynxchan compat (probably not)
         'params' => 'querystring',
       ),
     ),
