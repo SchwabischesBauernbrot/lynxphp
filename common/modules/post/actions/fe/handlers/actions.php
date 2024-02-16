@@ -83,7 +83,7 @@ switch($action) {
   case 'report':
     // send report request to BE
     // is reason required?
-    $threadNum = getOptionalPostField('thread') ? getOptionalPostField('thread') : 'ThreadNum';
+    //$threadNum = getOptionalPostField('thread') ? getOptionalPostField('thread') : 'ThreadNum';
     // print_r($_POST);
 
     //echo "<pre>", print_r($postFields, 1), "</pre>\n";
@@ -110,6 +110,19 @@ switch($action) {
       array('addPostFields' => $postFields) // which posts
     );
   break;
+  case 'ban':
+    print_r($_POST);
+    $result = $pkg->useResource('content_actions',
+      array(
+        'action' => 'ban',
+        'reason' => $_POST['ban_message'],
+        //'global' => in_array($_POST['level'], $global_enable),
+        'captcha' => getOptionalPostField('captcha'), // optional for now
+        //$_POST['level'],
+      ),
+      array('addPostFields' => $postFields) // which posts
+    );
+  break;
   default:
     wrapContent('Error: unknown action [' . $action . ']');
     return;
@@ -117,6 +130,7 @@ switch($action) {
 }
 
 /*
+// additional report
 if (getOptionalPostField('global_report')) {
   // send report request to BE
   // is reason required?
@@ -143,6 +157,11 @@ if (getOptionalPostField('global_report')) {
 // and then we can have a meta and/or debug added if we want...
 
 if ($result['status'] === 'ok') {
+  // how can overboard hook this
+  // without hardcoding overboard here
+  // maybe it's something we can pass in
+  // but those other forms don't know about overboard and shouldn't...
+  // overboard page will be '0'
   if (!empty($_POST['page'])) {
     redirectTo('/' . $boardUri . '/page/' . $_POST['page'] . '.html');
   } else
