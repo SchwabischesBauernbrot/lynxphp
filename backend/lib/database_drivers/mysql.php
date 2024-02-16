@@ -221,7 +221,7 @@ class mysql_driver extends database_driver_base_class implements database_driver
           $alterTableQuery = "ALTER TABLE `$tableName` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
           if (!mysqli_query($this->conn, $alterTableQuery)) {
             $err = mysqli_error($this->conn);
-            echo "<pre>mysql::autoupdate - update err[$err]<br>\nSQL[$sql]</pre>\n";
+            echo "<pre>mysql::autoupdate - update err[$err]<br>\nSQL[$alterTableQuery]</pre>\n";
           }
         }
       }
