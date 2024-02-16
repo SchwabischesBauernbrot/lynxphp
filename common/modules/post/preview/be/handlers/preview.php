@@ -45,6 +45,6 @@ $res = array(
   'postCount' => 0, // FIXME:
   'boardSettings' => empty($boardData['settings']) ? array() : $boardData['settings'],
 );
-sendRawResponse($res);
+sendJson($res);
 
 ?>
