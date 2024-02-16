@@ -255,7 +255,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       $res = pg_query($this->conn, $sqls[0]);
       $err = pg_last_error($this->conn);
       if ($err) {
-        echo "pgsql::insert - err[$err] [$sql]<br>\n";
+        echo "pgsql::insert - err[$err] [", $sqls[0], "]<br>\n";
         return false;
       }
       return $res;
@@ -375,12 +375,11 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   */
 
   // options
-  //   fields = if not set, give all fields, else expect an array
+  //   fields = if not set, give all fields, else expect an comma separate string
   //   criteria = if set, an array
   //              array(field, comparison, field/constant)
   public function find($rootModel, $options = false, $fields = '*') {
     $sql = $this->makeSelectQuery($rootModel, $options, $fields);
-    //echo "<pre>pgsql::find sql[$sql]</pre>\n";
     $res = pg_query($this->conn, $sql);
     //$err = pg_result_error($res);
     $err = pg_last_error($this->conn);
@@ -441,6 +440,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
   public function groupAgg($field) {
     return 'string_agg(' . $field . ', \',\')';
   }
+
   public function unixtime($val = '') {
     if ($val === '') $val = 'CURRENT_TIMESTAMP';
     return 'cast(extract(epoch from ' . $val . ') as integer)';
