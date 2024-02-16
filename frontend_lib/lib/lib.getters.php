@@ -29,6 +29,7 @@ function getter_getBoardSettings($uri) {
     // upload to cache too
     $boards_settings[$uri] = $boardData['settings'];
   } else {
+    // a freshly created board doesn't have these yet...
     echo "getter_getBoardSettings[$uri] - boardData missing settings[<pre>", print_r($boardData, 1), "</pre>]\n";
     // if we get 404 we should cache that...
     $boards_settings[$uri] = array(array());
