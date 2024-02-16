@@ -3,6 +3,7 @@ $params = $get();
 
 $action = getQueryField('action');
 
+$issues = array();
 // board-threadnum-postnum is the name...
 $posts = array();
 $boards = array();
@@ -37,22 +38,26 @@ foreach($_POST as $k => $v) {
       'postid'   => $parts[2],
     );
     $boards[$parts[0]] = true;
+  } else {
+    // FIXME put in issues...
   }
 }
 
 // are they logged in?
 $user_id = getUserID();
 
-$hasDeleteAccess = array();
+$hasBoardPostDeletionAccess = array();
 foreach($boards as $uri => $t) {
-  $hasDeleteAccess[$uri] = isUserPermitted($user_id, 'delete_post', 'b/' . $uri);
+  // b means board permission check
+  $hasBoardPostDeletionAccess[$uri] = isUserPermitted($user_id, 'delete_post', 'b/' . $uri);
 }
 
 $removedThreads = 0;
 $removedPosts   = 0;
 $added  = 0;
-$issues = array();
 $data = array();
+
+global $pipelines;
 
 switch($action) {
   case 'delete':
@@ -61,46 +66,70 @@ switch($action) {
     foreach($posts as $r) {
       // FIXME: call once per r['board']
       //print_r($r);
-      $board = $r['board'];
-      $posts_model = getPostsModel($r['board']);
+      $uri = $r['board'];
+      $posts_model = getPostsModel($uri);
       // no all _s are .s
-      if (!$posts_model && strpos($r['board'], '_')!==false) {
-        $board = str_replace('_', '.', $r['board']);
+      if (!$posts_model && strpos($uri, '_')!==false) {
+        $board = str_replace('_', '.', $uri);
         //echo "test[$newUri]<br>\n";
-        $posts_model = getPostsModel($board);
+        $posts_model = getPostsModel($uri);
       }
       //echo "test[", gettype($posts_model), "]<br>\n";
       if (!$posts_model) {
         //echo "No post [", $r['postid'], "]<br>\n";
         // is this key enough?
-        $issues[$r['board']] = 'board not found';
+        $issues[$uri] = 'board not found';
         continue;
       }
       $post = $db->findById($posts_model, $r['postid']);
       if (!$post) {
         //echo "No post [", $r['postid'], "]<br>\n";
         // is this key enough?
-        $issues[$r['board'].'_'.$r['postid']] = 'post not found';
+        $issues[$uri.'_'.$r['postid']] = 'post not found';
         continue;
       }
-      if ($hasDeleteAccess[$r['board']] || ($post['password'] && $post['password'] === $password)) {
+      
+      $allowDelete = false;
+      if ($hasBoardPostDeletionAccess[$uri] || ($post['password'] && $post['password'] === md5(BACKEND_KEY . $password))) {
+        $allowDelete = true;
+      } else 
+      if (isUserPermitted($user_id, 'delete_post', 'p/' . $uri . '/' . $r['postid'])) {
+        $allowDelete = true;
+      } else {
+        // we need a pipeline here that handles password
+        $io = array(
+          'uri' => $r['board'],
+          'threadid' => $r['threadid'],
+          'postid' => $r['postid'],
+          'post' => $post,
+          'posts_model' => $posts_model,
+          'password' => $password,
+          'allowDelete' => $allowDelete,
+        );
+        $pipelines[PIPELINE_BE_CONTENTACTIONS_DELETE]->execute($io);
+        $allowDelete = $io['allowDelete'];
+      }
+
+      if ($allowDelete) {
         // try to delete it
-        if (!deletePost($board, $r['postid'], false, $post)) {
+        if (!deletePost($uri, $r['postid'], array('post' => $post, 'posts_model' => $posts_model))) {
           // FIXME: log error?
-          $issues[$r['board'].'_'.$r['postid']] = 'deletion failed';
+          $issues[$uri . '_' . $r['postid']] = 'deletion failed';
           continue;
         }
         // what are these supposed to be according to spec?
         // form doesn't say output
         // and since not api, I'm not sure it matters
         // looks like counts though
+
+        // is reply or thread?
         if ($post['threadid']) {
           $removedPosts++;
         } else {
           $removedThreads++;
         }
       } else {
-        $issues[$r['board'].'_'.$r['postid']] = 'access denied';
+        $issues[$uri . '_' . $r['postid']] = 'access denied';
       }
     }
     //
@@ -175,8 +204,11 @@ switch($action) {
       // also make a global report
     //}
   break;
+  case 'ban':
+    $removedPosts = 1;
+  break;
   default:
-    // FIXME:
+    $issues[] = 'Unknown Action';
   break;
 }
 
@@ -184,7 +216,7 @@ switch($action) {
 
 $didSomething = $removedThreads + $removedPosts + $added;
 
-sendRawResponse(array(
+sendJson(array(
   'auth' => null,
   'status' => $didSomething ? 'ok' : 'error',
   'data' => $didSomething ? null : join("\n", $issues),
@@ -192,6 +224,7 @@ sendRawResponse(array(
   // which means we need to return it somewhere...
   // tough because there maybe multiple
   'request' => $posts,
+  'issues' => $issues,
   // the rest can be debug
   'debug'=> array(
     'added' => $added,
@@ -200,8 +233,10 @@ sendRawResponse(array(
     'removedThreads' => $removedThreads,
     'removedPosts' => $removedPosts,
     'reportsAdded' => $added,
-    'hasDeleteAccess' => $hasDeleteAccess,
-    'issues' => $issues,
+    'password' => $password,
+    'saltpassword' => md5(BACKEND_KEY . $password),
+    'postpasswod' => $post['password'],
+    'hasDeleteAccess' => $hasBoardPostDeletionAccess,
     // you get this from dev tools...
     //'_POST' => $_POST,
   )
@@ -213,7 +248,7 @@ sendResponse(array(
   'removedPosts' => $removedPosts,
   'reportsAdded' => $added,
   'request' => $posts,
-  'hasDeleteAccess' => $hasDeleteAccess,
+  'hasDeleteAccess' => $hasBoardPostDeletionAccess,
   'issues' => $issues,
 ));
 */
