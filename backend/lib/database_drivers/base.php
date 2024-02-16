@@ -214,20 +214,78 @@ class database_driver_base_class {
     global $now;
     $tableName = modelToTableName($rootModel);
     $date = (int)$now;
-    $recs[0]['json'] = '{}';
+    // ensure recs[0] has all potential columns we want
+    if (isset($recs[0]['json'])) {
+      // ensure json
+      $c = $recs[0]['json'][0];
+      if ($c !== '[' && $c !== '{') {
+        $recs[0]['json'] = json_encode($recs[0]['json']);
+      }
+    } else {
+      $recs[0]['json'] = '{}';
+    }
     $recs[0]['created_at'] = $date;
     $recs[0]['updated_at'] = $date;
-    $fields = join(',', array_keys($recs[0]));
+    // why off input instead of the model...
+    // well because we might not have them all set...
+    // so it would be a subset
+    // while perserving order inside recs
+    //$fields = join(',', array_keys($recs[0]));
+    $fieldsArr = array();
+    $firstRecFields = array_keys($recs[0]);
+    foreach($firstRecFields as $nf) {
+      // forced fields
+      if ($nf === 'json' || $nf === 'created_at' || $nf === 'updated_at') {
+        $fieldsArr[] = $nf;
+        continue;
+      }
+      // make sure it's a valid field
+      $found = false;
+      foreach($rootModel['fields'] as $fieldName => $f) {
+        if ($nf === $fieldName) {
+          $fieldsArr[] = $nf;
+          $found = true;
+          break;
+        }
+      }
+      if (!$found) {
+        // warn if dev mode...
+      }
+    }
+    $fields = join(',', $fieldsArr);
     $sTableName = $this->btTables ? '`' . $tableName . '`' : $tableName;
     $sql = 'insert into ' . $sTableName . ' (' . $fields . ') values';
     $sets = array();
     foreach($recs as $rec) {
       $cleanArr = array();
-      $rec['json'] = '{}';
+      if (isset($rec['json'])) {
+        // ensure json
+        if (!empty($rec['json'])) {
+          $c = $rec['json'][0];
+          if ($c !== '[' && $c !== '{') {
+            $rec['json'] = json_encode($rec['json']);
+          }
+        } else {
+          $rec['json'] = '{}';
+        }
+      } else {
+        $rec['json'] = '{}';
+      }
       $rec['created_at'] = $date;
       $rec['updated_at'] = $date;
+      /*
       foreach($rec as $val) {
         $cleanArr[] = is_array($val) ? $val[0] : $this->make_constant($val);
+      }
+      */
+      foreach($fieldsArr as $f) {
+        if (isset($rec[$f])) {
+          $val = $rec[$f];
+          $cleanArr[] = is_array($val) ? $val[0] : $this->make_constant($val);
+        } else {
+          // if we don't have this set, we can't just put '', null or 0 here
+          //
+        }
       }
       $sets[] = '(' . join(',', $cleanArr) . ')';
     }
@@ -471,6 +529,7 @@ class database_driver_base_class {
     $data = $this->expandJoin($rootModel, $data);
     // FIXME: renaming support
     if ($fields === false) {
+      // FIXME: make fields take an array
       $useFields = $data['fields'];
     } else {
       $useFields = array_merge(array_map(function($f) use ($data, $tableAlias) {
