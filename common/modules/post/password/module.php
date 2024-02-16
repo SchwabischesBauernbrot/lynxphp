@@ -9,7 +9,7 @@ return array(
       'location' => 'board', // /tab/group
       'addFields' => array(
         'delete_disallow' => array(
-          'label' => 'Disallow user to delete their posts',
+          'label' => 'Disallow users to delete their posts',
           'type'  => 'checkbox',
         ),
       )
