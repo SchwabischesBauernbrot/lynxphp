@@ -86,6 +86,23 @@ function postDBtoAPI(&$row, $boardUri) {
   // decode user_id
 }
 
+function getThreadNum($boardUri, $pno) {
+  //echo "getThreadNum - boardUri[$boardUri]<br>\n";
+  $posts_model = getPostsModel($boardUri);
+  if ($posts_model === false) {
+    return false;
+  }  
+  global $db;
+  // has password
+  // but no userid
+  $row = $db->findById($posts_model, $pno);
+  $tno = $pno;
+  if ($row['threadid']) {
+    $tno = $row['threadid'];
+  }
+  return $tno;
+}
+
 // I'm not sure it's our responsibility to format the result set
 // maybe just get it...
 function getPost($boardUri, $postNo, $posts_model) {
@@ -185,6 +202,7 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
 
   // handle priv
   //echo "boardUri[$boardUri]<br>\n";
+  // can't use findById on posts_priv_model
   $posts_priv_model = getPrivatePostsModel($boardUri);
   $privPost['post_id'] = $id; // update postid
   if (!isset($privPost['json'])) $privPost['json'] = array();
@@ -202,6 +220,7 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
     'ip' => $privPost['ip'],
     'json' => $privPost['json'],
   );
+  // promote anything not these 3 (schema/hardcoded) fields to json fields
   foreach($privPost as $k => $v) {
     if ($k === 'post_id') continue;
     if ($k === 'ip') continue;
@@ -249,16 +268,31 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
   );
 }
 
+// could consider taking post through postid
+// option.post
+// option.posts_model
 // option.deleteReplies:bool
-function deletePost($boardUri, $postid, $options = false, $post = false) {
+function deletePost($boardUri, $postid, $options = false) {
   global $db, $now, $models;
+
+  extract(ensureOptions(array(
+    'deleteReplies' => false,
+    'posts_model' => false,
+    'post' => false,
+  ), $options));
 
   //echo "deletePost[$boardUri]<br>\n";
 
+  // ensure $posts_model
+  if (!$posts_model) {
+    $posts_model = getPostsModel($boardUri);
+  }
+
   // ensure post
-  $posts_model = getPostsModel($boardUri);
-  if ($posts_model !== false) {
-    $post = $db->findById($posts_model, $postid);
+  if (!$post) {
+    if ($posts_model !== false) {
+      $post = $db->findById($posts_model, $postid);
+    }
   }
 
   $inow = (int)$now;
@@ -266,8 +300,9 @@ function deletePost($boardUri, $postid, $options = false, $post = false) {
 
   // is this a thread...
   if (!$post['threadid']) {
+    // is thread
     $urow['last_thread'] = $inow;
-    if ($options && $options['deleteReplies']) {
+    if ($deleteReplies) {
       // thread deletion request
       //$res = $db->find($posts_model, array('criteria' => array('threadid' => $postid)));
       // FIXME: write me!
@@ -281,6 +316,7 @@ function deletePost($boardUri, $postid, $options = false, $post = false) {
       }
     }
   } else {
+    // is reply
     // try to delete it
     if (!$db->deleteById($posts_model, $postid)) {
       // FIXME: log error?
@@ -289,7 +325,7 @@ function deletePost($boardUri, $postid, $options = false, $post = false) {
   }
 
   // communicate it to the caches
-  $db->update($models['board'], $urow, array('criteria'=>array(
+  $db->update($models['board'], $urow, array('criteria' => array(
     array('uri', '=', $boardUri),
   )));
 
@@ -305,7 +341,7 @@ function deletePost($boardUri, $postid, $options = false, $post = false) {
       if (file_exists($f['path'])) {
         unlink($f['path']);
       } else {
-        $issues[$boardUri.'_'.$postid] = 'file missing: ' . $f['path'];
+        $issues[$boardUri . '_' . $postid] = 'file missing: ' . $f['path'];
       }
       $file_ids[]= $f['fileid'];
     }
