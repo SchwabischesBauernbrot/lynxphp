@@ -58,7 +58,7 @@ while($row = $db->get_row($res)) {
     if (!$row['threadid']) {
       threadDBtoAPI($prow, $boardUri);
     } else {
-      postDBtoAPI($prow);
+      postDBtoAPI($prow, $boardUri);
     }
     $posts[$pid]= $prow;
     $posts[$pid]['files'] = array();
