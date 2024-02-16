@@ -37,7 +37,6 @@ if (isset($_GET['sheets'])) {
   $sheets = explode(',', $_GET['sheets']);
 }
 
-
 $pkg = $packages[$module];
 // can only be a fe folder
 $dir = $pkg->dir . 'fe/css/';
