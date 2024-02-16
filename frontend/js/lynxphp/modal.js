@@ -146,52 +146,9 @@ function createModal(options = {}) {
   document.body.appendChild(modal)
 
   // Make the modal draggable
+  var dragHandle
   if (options.draggable) {
-    let isDragging = false
-    let offsetX, offsetY
-    let animationFrameId
-    let h
-
-    modalHeader.style.cursor = 'grab'
-
-    function modal_onmousedown(e) {
-      isDragging = true
-      var r = modal.getBoundingClientRect()
-      offsetX = e.clientX - r.left
-      offsetY = e.clientY - r.top
-      console.log('client', e.clientX, e.clientY, 'modal', r)
-      modalHeader.style.cursor = 'grabbing'
-    }
-
-    function doc_onmouseup() {
-      isDragging = false
-      cancelAnimationFrame(animationFrameId)
-      modalHeader.style.cursor = 'grab'
-    }
-
-    function doc_onmousemove(e) {
-      if (isDragging) {
-        if (animationFrameId) cancelAnimationFrame(animationFrameId)
-        animationFrameId = requestAnimationFrame(() => {
-          let newX = e.clientX - offsetX
-          let newY = e.clientY - offsetY
-          const rect = modal.getBoundingClientRect()
-          //console.log('rect', rect)
-        
-          if (newX < 0) newX = 0
-          if (newY < 26) newY = 26
-          if (newX + rect.width > window.innerWidth) newX = window.innerWidth - rect.width
-          if ((newY + rect.height) > window.innerHeight - 41) newY = (window.innerHeight - 41) - rect.height
-
-          modal.style.left = `${newX}px`
-          modal.style.top = `${newY}px`
-        })
-      }
-    }
-
-    modalHeader.addEventListener('mousedown', modal_onmousedown)
-    document.addEventListener('mouseup', doc_onmouseup)
-    document.addEventListener('mousemove', doc_onmousemove)
+    dragHandle = makeDomDraggable(modalHeader, modal, { bound: 'viewport' })
   }
 
   // Close functionality
@@ -205,10 +162,10 @@ function createModal(options = {}) {
     } else {
       modal.style.display = 'none'
     }
-    modal.removeEventListener('mousedown', modal_onmousedown)
+    if (options.draggable) {
+      dragHandle.cleanUp()
+    }
     document.removeEventListener('keydown', handleEscape)
-    document.removeEventListener('mouseup', doc_onmouseup)
-    document.removeEventListener('mousemove', doc_onmousemove)
     window.removeEventListener('click', win_onclick)
   }
   closeButton.onclick = closeModal
