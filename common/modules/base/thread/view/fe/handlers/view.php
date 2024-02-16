@@ -29,6 +29,7 @@ if ($boardData === false) {
   wrapContent('Board ' . $boardUri . ' does not exist');
   return;
 }
+
 // MISSING_BOARD just means no board key in data...
 // empty may pick up an valid empty array
 if (!isset($boardData['title']) || !isset($boardData['posts']) || $boardData['posts'] === false) {
@@ -73,6 +74,7 @@ foreach($boardData['posts'] as $j => $post) {
   // PIPELINE_POST_PREPROCESS
   preprocessPost($boardData['posts'][$j]);
 }
+
 global $pipelines;
 $data = array(
   'posts' => $boardData['posts'],
@@ -95,6 +97,9 @@ if ($cnt > $replyLimit) {
 $saged = $cnt > $sageLimit;
 //echo "cnt[$cnt / $sageLimit / $replyLimit]<br>\n";
 // hack for now
+// well if we put it in the thread then that's less cachable
+// but what's more costly, multiple (partial) requests or one full request
+// a minimum partial request is like always 100-120ms on galaxy regardless if it's full or not
 $userSettings = getUserSettings();
 //echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
 foreach($boardData['posts'] as $post) {
@@ -139,6 +144,7 @@ $boardPortal = getBoardPortal($boardUri, $boardData, array(
   'maxMessageLength' => $boardData['maxMessageLength'],
 ));
 */
+
 
 // this will include all scripts, not just this one...
 js_add_script($pkg, 'refresh_thread.js');
