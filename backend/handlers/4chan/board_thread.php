@@ -8,7 +8,7 @@ $threadNum = (int)str_replace('.json', '', $request['params']['thread']);
 $posts_model = getPostsModel($boardUri);
 // board doesn't not exist
 if (!$posts_model) {
-  return sendRawResponse(array(), 404, 'Board not found');
+  return sendJson(array('meta' => array('err' => 'Board not found')), array('code' => 404));
 }
 $posts = getThread($boardUri, $threadNum, array('posts_model' => $posts_model));
-sendRawResponse($posts);
+sendJson($posts);

@@ -7,10 +7,10 @@ $boardUri = $request['params']['board'];
 $page = str_replace('.json', '', $request['params']['page']);
 $posts_model = getPostsModel($boardUri);
 if (!$posts_model) {
-  return sendRawResponse(array(), 404, 'Board not found');
+  return sendJson(array('meta' => array('err' => 'Board not found')), array('code' => 404));
 }
 $threads = boardPage($boardUri, $posts_model, $page);
 $res = array(
   'threads' => $threads,
 );
-sendRawResponse($res);
+sendJson($res);
