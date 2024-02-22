@@ -6,7 +6,7 @@ global $tpp;
 $boardUri = $request['params']['board'];
 $page = boardCatalog($boardUri);
 if (!is_array($page)) {
-  return sendRawResponse(array(), 404, 'Board not found');
+  return sendJson(array('meta' => array('err' => 'Board not found')), array('code' => 404));
 }
 $pages = count($page);
 $res = array();
@@ -16,4 +16,4 @@ for($i = 1; $i <= $pages; $i++) {
     'threads' => $page[$i],
   );
 }
-sendRawResponse($res);
+sendJson($res);

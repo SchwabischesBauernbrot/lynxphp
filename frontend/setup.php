@@ -73,6 +73,7 @@ $persist_scratch = new file_scratch_driver;
 require '../common/lib.pipeline.php';
 require '../common/lib.http.php'; // comms lib
 // we could move these into a pipelines.php file...
+require '../common/lib.media.php'; // comms lib
 
 require 'pipelines.php';
 
@@ -129,20 +130,21 @@ function css_add_style($pkg, $sheet, $options = false) {
   extract(ensureOptions(array(
     'orderConstraints' => false,
   ), $options));
-
-  $bsn = new pipeline_module(PIPELINE_SITE_END_SCRIPTS . '_' . $pkg->name . '_' . $sheet);
-  $bsn->attach(PIPELINE_SITE_END_SCRIPTS,
+  //echo "setup::css_add_style - pkg[", $pkg->name, "] stylesheet[", $sheet, "]<br>\n";
+  $bsn = new pipeline_module(PIPELINE_SITE_HEAD_SCRIPTS . '_' . $pkg->name . '_' . $sheet);
+  $bsn->attach(PIPELINE_SITE_HEAD_SCRIPTS,
     function(&$io, $options = false) use ($pkg, $sheet) {
       $io['styles'][] = array('module' => $pkg->name, 'sheet' => $sheet);
   });
 }
 
 // add this module/fe/data script to this pipeline on the current page load
+// what's the advantage of this over just adding it to the route meta data?
 function js_add_script($pkg, $script, $options = false) {
   extract(ensureOptions(array(
     'orderConstraints' => false,
   ), $options));
-
+  //echo "setup::js_add_script - pkg", $pkg->name, "script", $script, "<br>\n";
   $bsn = new pipeline_module(PIPELINE_SITE_END_SCRIPTS . '_' . $pkg->name . '_' . $script);
   $bsn->attach(PIPELINE_SITE_END_SCRIPTS,
     function(&$io, $options = false) use ($pkg, $script) {

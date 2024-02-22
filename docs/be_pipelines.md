@@ -26,6 +26,13 @@ PIPELINE_BE_POST_FILTER_DATA_FIELD - transform post exposed json field values
 PIPELINE_BE_FILE_FIX_FILEDATA
   *fileData
 
+PIPELINE_BE_USER_PERMITTED - adjust permissions
+  user_id
+  target (b/URI p/URI/POSTID)
+  permission (delete_post)
+  *access
+  boardUri (optional)
+
 PIPELINE_POSTTAG_REGISTER
   *tags [array of tag objects] (has a key)
 

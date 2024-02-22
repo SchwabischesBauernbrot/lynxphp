@@ -163,8 +163,10 @@ function getMediaTags($file, $boardUri, $options) {
     $parts   = explode('.', $filename);
     $ext2    = array_pop($parts);
     $rest    = explode('_', implode('.', $parts));
+    //echo "<pre>rest[", print_r($rest, 1), "]</pre>\n";
     $postno  = $rest[0];
-    $mediano = empty($rest[1]) ? '' : $rest[1];
+    // can't use empty because 0 will be considered empty
+    $mediano = isset($rest[1]) ? $rest[1] : '';
 
 
     $initialActions = action_getLevels();

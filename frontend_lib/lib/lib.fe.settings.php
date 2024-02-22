@@ -39,20 +39,21 @@ function getUserSettings() {
       // /opt/session
       $userSettings = $data['settings'];
     }
-    if (isset($data['ownedBoards']) || isset($data['groups'])) {
+    if (isset($data['account']['ownedBoards']) || isset($data['account']['groups'])) {
       global $persist_scratch, $now;
       $key = 'user_session' . $_COOKIE['session'];
       $user = $persist_scratch->get($key);
       // emulate full request
       $user['account_ts'] = $now;
+      // why this?
       if (!isset($user['account']['meta'])) {
         $user['account']['meta']['code'] = 200;
       }
       // update the important data
-      if (isset($data['ownedBoards'])) {
+      if (isset($data['account']['ownedBoards'])) {
         $user['account']['ownedBoards'] = $data['ownedBoards'];
       }
-      if (isset($data['groups'])) {
+      if (isset($data['account']['groups'])) {
         $user['account']['groups'] = $data['groups'];
       }
       $persist_scratch->set($key, $user);

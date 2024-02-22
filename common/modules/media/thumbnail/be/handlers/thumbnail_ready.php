@@ -20,6 +20,6 @@ foreach($files as $i => $f) {
 }
 
 // sendResponse2: code, err, mtime, meta
-sendRawResponse($res);
+sendJson($res);
 
 ?>

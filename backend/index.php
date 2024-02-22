@@ -140,6 +140,7 @@ $req_method = getServerField('REQUEST_METHOD', 'GET');
 $req_path   = getServerField('PATH_INFO');
 
 registerPackages();
+
 // build routes (and activate backend_handlers.php/models.php)
 foreach($packages as $pkg) {
   $pkg->buildBackendRoutes();
@@ -305,6 +306,7 @@ function sendResponse2($data, $options = array()) {
     // relevent context hook, it can prove additional lookup tables
     // to reduce bandwidth (like userboard roles)
     $pipelines[PIPELINE_PORTALS_DATA]->execute($io);
+    //print_r($io);
     if ($io['out']) {
       //$resp['meta']['portals'] = $io['out'];
       // strict filter
@@ -351,7 +353,8 @@ function sendResponse2($data, $options = array()) {
   return true;
 }
 
-// deprecate for sendJson
+// deprecate for sendJson($mixed, array('code' => 200))
+/*
 function sendRawResponse($mixed, $code = 200, $err = '') {
   if ($code !== 200) http_response_code($code);
   if (getQueryField('prettyPrint')) {
@@ -365,6 +368,7 @@ function sendRawResponse($mixed, $code = 200, $err = '') {
   }
   return true;
 }
+*/
 
 function sendResponse($data, $code = 200, $err = '', $meta = false) {
   global $response_template;
@@ -379,7 +383,7 @@ function sendResponse($data, $code = 200, $err = '', $meta = false) {
   if ($err) {
     $resp['meta']['err'] = $err;
   }
-  return sendRawResponse($resp, $code, $err);
+  return sendJson($resp, array('code' => $code));
 }
 
 // wrapper for now

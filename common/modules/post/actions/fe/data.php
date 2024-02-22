@@ -75,6 +75,12 @@ $fePkgs = array(
       // inject form tag / post_actions into post portal
       array('pipeline' => 'PIPELINE_PORTAL_POST_EXTENSION', 'module' => 'post_ext',)
     ),
+    'pipelines' => array(
+      array('name' =>'PIPELINE_FE_POST_ACTIONS_DELETE_ADDITIONS'),
+      array('name' =>'PIPELINE_FE_POST_ACTIONS_REPORT_ADDITIONS'),
+      array('name' =>'PIPELINE_FE_POST_ACTIONS_MEDIA_ADDITIONS'),
+      array('name' =>'PIPELINE_FE_POST_ACTIONS_BAN_ADDITIONS'),
+    ),
   ),
 );
 return $fePkgs;

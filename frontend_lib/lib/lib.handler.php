@@ -376,6 +376,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
     // well for now, we'll add an option
     // and deal with it when we have a need for ordering...
     $script_io = array(
+      'styles' => array(),
       'scripts' => array(
         // lynxphp and jschan both use this
         'js/url.js',
@@ -426,6 +427,8 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
         // only need this on the settings page...
         'js/lynxphp/volume_upgrade.js',
         //'js/lynxphp/lazy_audit.js',
+        'js/lynxphp/draggable.js',
+        'js/lynxphp/resizable.js',
         'js/lynxphp/modal.js',
       ),
     );
@@ -435,11 +438,17 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
     // make the static generation engine can copy them
     // and then we have PHP fallback
     $pipelines[PIPELINE_SITE_HEAD_SCRIPTS]->execute($script_io);
+    //echo "<pre>", print_r($script_io, 1), "</pre>\n";
     $scripts = $script_io['scripts'];
+    $sheets  = $script_io['styles'];
 
     // THINK: how to use a pipeline to override this behavior?
     // maybe fallback if pipeline has no hooks
     $scripts_html = '';
+    foreach($sheets as $r) {
+      $p = 'css.php?module=' . $r['module'] . '&sheets=' . $r['sheet'];
+      $scripts_html .= '<link rel="stylesheet" href="' . $p . '">' . "\n";
+    }
     foreach($scripts as $p) {
       if (is_array($p)) {
         // can add a type/version key later
@@ -648,7 +657,9 @@ function wrapContentFooter($row) {
 
   $scripts_html = '';
   if ($enableJs) {
-    $io = array('scripts' => array());
+    $io = array(
+      'scripts' => array()
+    );
     // THINK: how do we let JS live in module directories
     // but be efficiently servered by web server?
     // so that we don't have to fire up php each time
@@ -656,6 +667,7 @@ function wrapContentFooter($row) {
     // and then we have PHP fallback
     $pipelines[PIPELINE_SITE_END_SCRIPTS]->execute($io);
     $scripts = $io['scripts'];
+    //print_r($io);
 
     // THINK: how to use a pipeline to override this behavior?
     // maybe fallback if pipeline has no hooks
@@ -784,6 +796,8 @@ function wrapContentFooter($row) {
       router_log_report();
     }
   }
+  // w95 theme needs this
+  echo '<div class="ending-bump" style="flex-shrink: 0; height: 45px;"></div>';
   //echo '</body></html>';
   flush();
 }

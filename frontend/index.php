@@ -10,6 +10,7 @@ ldr_require('../common/lib.http.server.php');
 $req_path   = getServerField('PATH_INFO', getServerField('REQUEST_URI'));
 $req_method = getServerField('REQUEST_METHOD', 'GET');
 
+
 require 'setup.php';
 require 'setup.router.php';
 ldr_done(); // free memory
@@ -30,7 +31,7 @@ if (!$res) {
   http_response_code(404);
   echo "404 Page not found<br>\n";
   if (DEV_MODE) {
-    echo "method[$req_method] path[$req_path]<br>\n";
+    echo "DEV: method[$req_method] path[$req_path]<br>\n";
     //echo "<pre>method routes:", print_r($router->methods[$req_method], 1), "</pre>\n";
     /*
     foreach($router->methods[$req_method] as $r => $f) {

@@ -18,7 +18,7 @@ if ($ip === '::1' || $ip === '127.0.0.1') {
   return sendResponse2(false, array(
     'code' => 400, 'meta' => array('ip' => $ip, 'server' => $_SERVER), 'err' => 'invalid ip',
   ));
-  return sendResponse(array(), 400, array('ip' => $ip));
+  //return sendResponse(array(), 400, array('ip' => $ip));
 }
 
 $votes = getYourVotes();
@@ -61,7 +61,7 @@ foreach($in_files as $f) {
 }
 
 $post = $data['post'];
-postDBtoAPI($post);
+postDBtoAPI($post, $boardData['uri']);
 $qp['post'] = $post;
 // simulate post date
 $qp['post']['created_at'] = $qp['created_at'];

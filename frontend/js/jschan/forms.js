@@ -9,6 +9,7 @@ function pad(n, width, z) {
   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
+// data is title, message OR json
 function doModal(data, postcallback) {
   //console.log('doModal', data)
   try {

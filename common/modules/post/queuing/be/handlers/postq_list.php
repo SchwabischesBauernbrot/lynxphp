@@ -28,7 +28,7 @@ foreach($qposts as $i => $qp) {
   // row from qposts passes through
   $data = json_decode($qp['data'], true);
   $post = $data['post'];
-  postDBtoAPI($post);
+  postDBtoAPI($post, $qp['board_uri']);
   $qposts[$i]['post'] = $post;
   $qposts[$i]['post']['created_at'] = $qp['created_at'];
   $qposts[$i]['post']['files'] = $post_files;

@@ -368,6 +368,16 @@ function expectJson($json, $endpoint = '', $options = array()) {
         $boards_settings[$b] = $s;
       }
     }
+    if (isset($obj['meta']['session'])) {
+      global $loggedIn;
+      if (!$loggedIn) {
+        // if there's a pk, we're logged in and have a valid session (if we sent one...)
+        if (!empty($obj['meta']['session']['pk'])) {
+          // consider session checked
+          $loggedIn = 'true';
+        }
+      }
+    }
     if (isset($obj['meta']['setCookie'])) {
       setcookie($obj['meta']['setCookie']['name'], $obj['meta']['setCookie']['value'], $obj['meta']['setCookie']['ttl'], '/');
     }

@@ -81,6 +81,7 @@ function isUserPermitted($user_id, $target = false, $permission = '') {
   }
 
   $access = false;
+  $boardUri = false;
   // does target object include boardUri (check for BO)
   if ($target) {
     $parts = explode('/', $target);
@@ -102,6 +103,17 @@ function isUserPermitted($user_id, $target = false, $permission = '') {
       }
     }
   }
+
+  global $pipelines;
+  $io = array(
+    'user_id' => $user_id,
+    'target' => $target,
+    'permission' => $permission,
+    'access' => $access,
+    'boardUri' => $boardUri,
+  );
+  $pipelines[PIPELINE_BE_USER_PERMITTED]->execute($io);
+  $access = $io['access'];
 
   return $access;
 }

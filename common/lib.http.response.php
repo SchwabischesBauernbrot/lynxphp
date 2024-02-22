@@ -19,6 +19,9 @@ function sendJson($arr, $options = false) {
   ), $options));
   if ($code !== 200) http_response_code($code);
 
+  // should we handle 404 like an HTML page? or meta envelope
+  // meta envelope is at least better for the code expecting JSON
+
   // 304 should check should have already happened...
   /*
   // just a last stop, to prevent just in case we already have this

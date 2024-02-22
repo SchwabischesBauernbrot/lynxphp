@@ -32,6 +32,7 @@ $backEndPipelines = array(
   'PIPELINE_REPLY_ALLOWED',
   'PIPELINE_POST_ADD',
   'PIPELINE_POSTTAG_REGISTER',
+  'PIPELINE_BE_USER_PERMITTED',
   //'PIPELINE_DELETE_POST', // not needed/implemented yet but not a bad idea
   'PIPELINE_THREAD_PRE_DELETE',
   'PIPELINE_THREAD_POST_DELETE',

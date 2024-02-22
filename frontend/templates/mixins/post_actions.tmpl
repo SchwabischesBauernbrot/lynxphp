@@ -7,6 +7,7 @@ Post(s) action: {{actions}}
       <label>
         <input id="password" type="password" name="postpassword" placeholder="Post password" autocomplete="chrome-off">
       </label>
+      {{additional}}
     </div>
 <!-- loop -->
     <div class="actions">
@@ -20,6 +21,7 @@ Post(s) action: {{actions}}
         <!-- id="report" -->
         <input type="text" name="report_reason" placeholder="Report reason" autocomplete="chrome-off">
       </label>
+      {{additional}}
     </div>
 <!-- loop -->
     <div class="actions">
@@ -35,17 +37,31 @@ Post(s) action: {{actions}}
         <input class="post-check" type="radio" name="media" value="ban">
         Ban Files
       </label>
+      {{additional}}
     </div>
 <!-- loop -->
     <div class="actions">
       <a href="moderation_help.html">Moderation Help</a>
-      <label>
-        Scope: Site-Wide, Board-Wide<br>
-        Duration<br>
-        Days / Hours / Minutes<br>
+      <div>
+        Scope: 
+        <!-- FIXME check perms -->
+        <label><input type="radio" name="scope" value="site">Site-Wide</label>
+        <label><input type="radio" name="scope" value="board" checked>Board-Wide</label>
+        <!-- select name="scope">
+          <option value="site">Site-Wide
+          <option value="board">Board-Wide
+        </select>
+        Site-Wide, Board-Wide<br -->
+        <br>
+        Duration:
+        <input type="number" name="days" value="1">Days <!-- / Hours / Minutes --><br>
         <input type="text" name="ban_message" placeholder="Ban Message" autocomplete="chrome-off"><br>
-        Ban Type (Single IP, Narrow Range, Wide Range)<br>
-      </label>
+        Ban Type:
+        <label><input type="radio" name="range" value="32" checked>Single IP</label>
+        <label><input type="radio" name="range" value="24">Narrow Range</label>
+        <label><input type="radio" name="range" value="16">Wide Range</label>
+        {{additional}}
+      </div>
     </div>
 <!-- loop -->
 {{captcha}}

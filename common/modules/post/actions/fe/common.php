@@ -40,21 +40,46 @@ function renderPostActions($boardUri, $options = false) {
     //array('name'=>'Ban', 'content' => $templates['loop3']),
   }
 
+  $html_delete_additions = '';
+  $pipelines[PIPELINE_FE_POST_ACTIONS_DELETE_ADDITIONS]->execute($html_delete_additions);
+
+  /*
+  <label>
+  <!-- scrub won't be a thing because no dedupe but magrathea will need it -->
+  <!-- remove single file only, all files only, remove text, scrub files -->
+  </label>
+  */
+  $deleteHtml = replace_tags($templates['loop0'], array('additional' => $html_delete_additions));
+
+
   $levelsHtml = '';
   foreach($levels as $lbl => $v) {
     $levelsHtml .= '<option value="' . $v . '">' .  $lbl . "\n";
   }
 
-  $reportHtml = replace_tags($templates['loop1'], array('levels' => $levelsHtml));
+  $html_report_additions = '';
+  $pipelines[PIPELINE_FE_POST_ACTIONS_REPORT_ADDITIONS]->execute($html_report_additions);
+
+  $reportHtml = replace_tags($templates['loop1'], array('levels' => $levelsHtml, 'additional' => $html_report_additions));
+
+  $html_media_additions = '';
+  $pipelines[PIPELINE_FE_POST_ACTIONS_MEDIA_ADDITIONS]->execute($html_media_additions);
+
+  $mediaHtml = replace_tags($templates['loop2'], array('additional' => $html_media_additions));
+
+  $html_ban_additions = '';
+  $pipelines[PIPELINE_FE_POST_ACTIONS_BAN_ADDITIONS]->execute($html_ban_additions);
+
+  $banHtml = replace_tags($templates['loop3'], array('additional' => $html_ban_additions));
 
   // stomps tabs above
   $tabs = array(
-    'Delete' => $templates['loop0'],
+    'Delete' => $deleteHtml,
     'Report' => $reportHtml,
     // BO, Global or Admin only actions:
-    'Media' => $templates['loop2'],
+    'Media' => $mediaHtml,
     // BO, Global or Admin only actions:
-    'Ban' => $templates['loop3'],
+    'Ban' => $banHtml,
   );
   $bottomHtml = $templates['loop4']; // captcha
 
