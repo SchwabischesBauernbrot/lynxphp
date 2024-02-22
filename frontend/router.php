@@ -144,13 +144,15 @@ function router_log_report() {
     echo '<div style="height: 50px;" id="bump"></div>', "\n"; flush();
     return;
   }
-  echo '<details>
-    <summary>matched route</summary>
-  <ul>', "\n";
-  foreach($router->debugLog['matching'] as $m) {
-    echo '<li>', $m['cond'], '<pre>', print_r($m['params'], 1), '</pre>', "\n";
+  if (isset($router->debugLog['matching'])) {
+    echo '<details>
+      <summary>matched route</summary>
+    <ul>', "\n";
+    foreach($router->debugLog['matching'] as $m) {
+      echo '<li>', $m['cond'], '<pre>', print_r($m['params'], 1), '</pre>', "\n";
+    }
+    echo '</ul></details>', "\n";
   }
-  echo '</ul></details>', "\n";
   echo '<h3>Choosen route</h3>';
   // match: cond, params, func
   // isHead: bool?
@@ -160,14 +162,16 @@ function router_log_report() {
   //echo "<pre>isHead", print_r(array_keys($router->debugLog['match']['isHead']), 1), "</pre>\n";
   //echo "<pre>request", print_r(array_keys($router->debugLog['match']['request']), 1), "</pre>\n";
   //echo "<pre>request", print_r($router->debugLog['match']['request'], 1), "</pre>\n";
-  $name = $router->debugLog['match']['routeOptions']['module'];
-  echo "Module: ", $name, "<br>\n";
-  echo "File: ", $router->debugLog['match']['routeOptions']['address'], "<br>\n";
-  global $packages;
-  if (!empty($packages[$name])) {
-    echo $packages[$name]->toString();
-  } else {
-    echo "Unknown module<br>\n";
+  if (isset($router->debugLog['match'])) {
+    $name = $router->debugLog['match']['routeOptions']['module'];
+    echo "Module: ", $name, "<br>\n";
+    echo "File: ", $router->debugLog['match']['routeOptions']['address'], "<br>\n";
+    global $packages;
+    if (!empty($packages[$name])) {
+      echo $packages[$name]->toString();
+    } else {
+      echo "Unknown module<br>\n";
+    }
   }
   //echo "<pre>routeOptions", print_r(($router->debugLog['match']['routeOptions']), 1), "</pre>\n";
   // user should hook into the footer system
