@@ -70,7 +70,7 @@ $jpeg = array(
   ),
   'be' => array(
     'verifyFile' => false,
-    'getMeta' => false, // exif  
+    'getMeta' => false, // exif
     'thumbnail' => array(
       // sizing?
       'generateFile' => false, // ffmpeg image nailer
@@ -87,7 +87,7 @@ $jpeg = array(
       'viewer' => 'htmlimg',
     ),
     'consume' => array(
-    ),  
+    ),
   ),
 );
 
@@ -106,7 +106,7 @@ $media_registry = array(
         'viewer' => 'htmlimg',
       ),
       'consume' => array(
-      ),  
+      ),
     )
   ),
   'image/webp' => array(
@@ -120,9 +120,39 @@ $media_registry = array(
         'viewer' => 'htmlimg',
       ),
       'consume' => array(
-      ),  
+      ),
     )
   ),
+  'video/webm' => array(
+    'common' => array(
+    ),
+    'be' => array(
+
+    ),
+    'fe' => array(
+      'thumbnail' => array(
+        'viewer' => 'html5video',
+      ),
+      'consume' => array(
+      ),
+    )
+  ),
+  // mp3?
+  'audio/mpeg' => array(
+    'common' => array(
+    ),
+    'be' => array(
+
+    ),
+    'fe' => array(
+      'thumbnail' => array(
+        'viewer' => 'html5video',
+      ),
+      'consume' => array(
+      ),
+    )
+  ),
+
   'application/octet-stream' => array(
     'common' => array(
     ),
@@ -134,7 +164,7 @@ $media_registry = array(
         'viewer' => 'none',
       ),
       'consume' => array(
-      ),  
+      ),
     )
   ),
   'model/gltf-binary' => array(
@@ -148,7 +178,7 @@ $media_registry = array(
         'viewer' => 'gltf',
       ),
       'consume' => array(
-      ),  
+      ),
     )
   ),
 );
