@@ -51,10 +51,10 @@ function getUserSettings() {
       }
       // update the important data
       if (isset($data['account']['ownedBoards'])) {
-        $user['account']['ownedBoards'] = $data['ownedBoards'];
+        $user['account']['ownedBoards'] = $data['account']['ownedBoards'];
       }
       if (isset($data['account']['groups'])) {
-        $user['account']['groups'] = $data['groups'];
+        $user['account']['groups'] = $data['account']['groups'];
       }
       $persist_scratch->set($key, $user);
     }
