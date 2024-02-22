@@ -76,10 +76,10 @@ if (file_exists('backend') && is_dir('backend')) {
   // check backend override...
   $old = getcwd();
   chdir('backend/');
-  include 'backend/config.php';
+  include 'config.php';
 
   $db_driver = DB_DRIVER;
-  include 'backend/lib/database_drivers/'.$db_driver.'.php';
+  include 'lib/database_drivers/'.$db_driver.'.php';
   $driver_name = DB_DRIVER . '_driver';
   $db = new $driver_name;
 
