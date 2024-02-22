@@ -429,4 +429,103 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
   return $issues;
 }
 
+// check thread function?
+
+function buildPath($boardUri, $threadNum, $postNum, $mediaNum) {
+  $threadPath = 'storage/boards/' . $boardUri . '/' . $threadNum;
+  $filebase = $postNum . '_' . $mediaNum;
+
+  // how do we get ext?
+  //$arr = explode('.', $file['name']);
+  //$ext = end($arr);
+
+  return array(
+    'file' => $filebase . '.' . $ext,
+    'dir'  => $threadPath,
+    'thumb' => $threadPath . '/t_' . $filebase . '.jpg',
+  );
+
+  $parts = explode('/', $filePath);
+  $filename = array_pop($parts);
+  $path = join('/', $parts);
+
+  // ensure jpg thumbnail output
+  $parts = explode('.', $filename);
+  $ext = array_pop($parts);
+  $filename = join('.', $parts) . '.jpg';
+
+  return array(
+    'file' => $filename,
+    'thumb' => $path . '/t_' . $filename,
+    // this isn't the full source path
+    // this is the directory of storage
+    // maybe should be dir
+    'dir' => $path,
+  );
+}
+
+function deleteFile($boardUri, $threadNum, $postNum, $mediaNum, $options = false) {
+  // delete from disk
+  $path = buildPath($boardUri, $threadNum, $postNum, $mediaNum);
+  $thumb = $path['thumb'];
+  // thumb (path)
+  echo "would delete[$thumb]";
+  //unlink($thumb);
+  // original (path)
+  $fp = $path['dir'] . '/'. $path['file'];
+  //unlink($fp);
+  echo " and [$fp]";
+  // is it last file in this thread?
+  $filecount = count(glob($path['dir'] . '*'));
+  echo " leaving [$filecount]files";
+  // then clean up directory
+  if (!$filecount) {
+    //rmdir($path['dir']);
+    echo " and would remove directory";
+  }
+  echo "<br>\n";
+}
+
+// options.posts_model
+function deletePostFiles($boardUri, $postid, $options = false) {
+  // unpack options
+  extract(ensureOptions(array(
+    'posts_model' => false,
+    'post_files_model' => false,
+    'threadid' => 0,
+  ), $options));
+
+  // options.posts_model
+  //$options['includeFiles'] = true;
+  if ($threadid) {
+    $files = getPostFiles($boardUri, $postNum);
+  } else {
+    $post = getPostEngine($boardUri, $postid, $options);
+    print_r($post);
+  }
+  /*
+  if ($posts_model === false) {
+    $posts_model = getPostsModel($boardUri);
+    if ($posts_model === false) {
+      // this board does not exist
+      return false;
+    }
+  }
+  $post = $db->findById($posts_model, $postNum);
+  $tno = empty($post['threadid']) ? $postNum : $post['threadid'];
+
+  // get list of files for this post
+  // could pass post_files_model in as option (3rd param)
+  $files = getPostFiles($boardUri, $postNum);
+  */
+
+  // nuke file
+  foreach($files as $mn => $f) {
+    //$f['path']
+    //storage/BOARDURI/THREADNUM/POSTID_MEDIANUM.EXT
+    //$f['ext']
+    deleteFile($boardUri, $tno, $postNum, $mn);
+  }
+}
+
 ?>
