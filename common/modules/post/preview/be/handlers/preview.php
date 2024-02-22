@@ -4,6 +4,10 @@
 
 $params = $get();
 
+if (empty($params['params']['board'])) {
+  sendResponse(array(), 400, 'Invalid Board');
+  return;
+}
 $boardUri = $params['params']['board'];
 /*
 $boardData = getBoardByUri($boardUri);
