@@ -382,7 +382,7 @@ function expectJson($json, $endpoint = '', $options = array()) {
       setcookie($obj['meta']['setCookie']['name'], $obj['meta']['setCookie']['value'], $obj['meta']['setCookie']['ttl'], '/');
     }
     if (DEV_MODE) {
-      if ($obj['meta']['code'] === 404) {
+      if (isset($obj['meta']['code']) && $obj['meta']['code'] === 404) {
         if (DEV_MODE) {
           echo "<pre>BE gave 404 [", print_r($obj['data'], 1), "]</pre>\n";
         }
@@ -390,7 +390,7 @@ function expectJson($json, $endpoint = '', $options = array()) {
       }
     }
     // let's just handle 401s globally here
-    if ($obj['meta']['code'] === 401) {
+    if (isset($obj['meta']['code']) && $obj['meta']['code'] === 401) {
       //echo "<hr><hr><hr>\n";
       if (IN_TEST) {
         return $obj;
