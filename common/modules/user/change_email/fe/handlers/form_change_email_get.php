@@ -2,7 +2,8 @@
 
 $params = $getHandler();
 
-$accountPortal = getAccountPortal();
-wrapContent($accountPortal['header'] . getChangeEmailForm() . $accountPortal['footer']);
+//$accountPortal = getAccountPortal();
+// $accountPortal['header'] .  . $accountPortal['footer']
+wrapContent(getChangeEmailForm());
 
 ?>
