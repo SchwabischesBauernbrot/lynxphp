@@ -1,5 +1,7 @@
 <?php
 
+// move to lib.http.response?
+// but it's a very frontend util...
 function redirectTo($url, $options = false) {
   if (DEV_MODE) {
     wrapContent('DEV_MODE is enabled, <a href="' . $url . '">click here to continue</a>', $options);
@@ -303,6 +305,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
   // as some extension only are active on certain pages
   // no need to polluate all pages...
 
+  // theme inserts here
   $pipelines[PIPELINE_SITE_HEAD]->execute($io);
 
   $term = DEV_MODE ? "\n" : '';
@@ -340,6 +343,8 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
       }
       $styles_html .= '<link rel="stylesheet" href="' . $p . '">' . "\n";
     }
+    //echo "styles[", htmlspecialchars($styles_html), "]<br>\n";
+    //echo "row[", htmlspecialchars(print_r($row, 1)), "]<br>\n";
 
     $title = $row['title'];
     if (SITE_TITLE) {
@@ -348,6 +353,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
 
     global $BASE_HREF;
     $footer = '';
+    //echo "footer[", htmlspecialchars($footer), "]<br>\n";
     // FIXME:footer pipeline
     $tags = array(
       'backend_url' => BACKEND_PUBLIC_URL,
@@ -361,7 +367,9 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
     $head_html .= replace_tags($templates['header'], $tags) . $term;
   }
 
+  // theme inserts here
   $head_html .= $io['head_html'] . "\n";
+  //echo "head_html[", htmlspecialchars(print_r($io['head_html'], 1)), "]<br>\n";
 
   if ($row['enableJs']) {
     // a script could be
