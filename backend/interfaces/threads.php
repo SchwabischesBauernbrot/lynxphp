@@ -284,6 +284,7 @@ function getThread($boardUri, $threadNum, $options = false) {
   return $posts;
 }
 
+// board/thread_list uses this
 function requestDeleteThread($boardUri, $threadNum, $options = false) {
   // unpack options
   extract(ensureOptions(array(
