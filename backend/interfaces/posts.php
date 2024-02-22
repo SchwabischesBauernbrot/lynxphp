@@ -86,14 +86,66 @@ function postDBtoAPI(&$row, $boardUri) {
   // decode user_id
 }
 
-// I'm not sure it's our responsibility to format the result set
-// maybe just get it...
-function getPost($boardUri, $postNo, $posts_model) {
-  global $db;
+// could be a cacheable getter
+// what's static
+// what's dynamic
+// false = board 404
+function getPostEngine($boardUri, $postNo, $options = false) {
+  // unpack options
+  extract(ensureOptions(array(
+    'posts_model' => false,
+    'includeFiles' => true,
+    'post_files_model' => false,
+  ), $options));
+
   if ($posts_model === false) {
     $posts_model = getPostsModel($boardUri);
     if ($posts_model === false) {
       // this board does not exist
+      return false;
+    }
+  }
+  if ($includeFiles) {
+    if ($post_files_model === false) {
+      $post_files_model = getPostFilesModel($boardUri);
+      if ($post_files_model === false) {
+        // this board does not exist
+        return false;
+      }
+    }
+
+    $filesFields = array('postid', 'sha256', 'path', 'browser_type', 'mime_type',
+      'type', 'filename', 'size', 'ext', 'w', 'h', 'filedeleted', 'spoiler',
+      'tn_w', 'tn_h', 'fileid');
+
+    $posts_model['children'] = array(
+      array(
+        'type' => 'left',
+        'model' => $post_files_model,
+        'pluck' => array_map(function ($f) { return 'ALIAS.' . $f . ' as file_' . $f; }, $filesFields)
+      )
+    );
+  }
+  global $db;
+  $row = $db->findById($posts_model, $postNo);
+  // prevent a bunch of warnings
+  if (!$row) return false;
+  //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
+
+}
+
+// I'm not sure it's our responsibility to format the result set
+// maybe just get it...
+function getPost($boardUri, $postNo, $posts_model) {
+  global $db;
+
+  /*
+  if ($posts_model === false) {
+    $posts_model = getPostsModel($boardUri);
+    if ($posts_model === false) {
+      // this board does not exist
+
+      // FIXME: we probably shouldn't be doing UI
       sendResponse(array(), 404, 'Board not found');
       return;
     }
@@ -115,13 +167,16 @@ function getPost($boardUri, $postNo, $posts_model) {
     )
   );
 
-  $posts = array();
   $row = $db->findById($posts_model, $postNo);
+  */
+  $row = getPostEngine($boardUri, $postNo, array('posts_model' => $posts_model));
+
+  $posts = array();
   // prevent a bunch of warnings
   if (!$row) return false;
   //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
   if ($db->isTrue($row['deleted'])) return array();
-  
+
   // have data
   if (!isset($posts[$row['postid']])) {
     //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
