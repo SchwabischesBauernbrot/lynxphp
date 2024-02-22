@@ -11,15 +11,6 @@ function getPortalAdmin($opts) {
 
 // FIXME: split into header/footer functions
 function renderAdminPortal() {
-  $navItems = array(
-    'Settings' => 'admin/settings.html',
-    'FE Routes' => 'admin/fe_routes.php',
-    'BE Routes' => 'admin/be_routes.php',
-    'Modules' => 'admin/modules.php',
-    // should be iframe'd or more integrated...
-    'System' => 'admin/install.php',
-  );
-
   $adminSettings = getCompiledSettings('admin');
   $settingSubItems = array(
     //array('label' => 'site', 'destinations' => 'admin/settings/site.html')
@@ -38,6 +29,7 @@ function renderAdminPortal() {
     array('label' => 'Modules', 'destinations' => 'admin/modules.php'),
     // should be iframe'd or more integrated...
     array('label' => 'System', 'destinations' => 'admin/install.php'),
+    array('label' => 'Config', 'destinations' => 'admin/config.php'),
   );
   $adminSettings = getCompiledSettings('admin');
 
@@ -45,7 +37,6 @@ function renderAdminPortal() {
   return renderPortalHeader('admin', array(
     'headerPipeline' => PIPELINE_ADMIN_HEADER_TMPL,
     'navPipeline'    => PIPELINE_ADMIN_NAV,
-    //'navItems'       => $navItems,
     'navItems2'       => $navItems2,
   ));
 }
