@@ -53,6 +53,7 @@ function getUserSettings($userid = 'default') {
 
   return array(
     'settings' => $values,
+    'userid' => $userid,
     'loggedin' => $userid ? true : false,
     'session' => getServerField('HTTP_SID') ? getServerField('HTTP_SID') : $sesRow['session'],
     //'setCookie' => $setCookie,
