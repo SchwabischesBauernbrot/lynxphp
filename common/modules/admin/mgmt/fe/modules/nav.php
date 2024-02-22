@@ -1,7 +1,8 @@
 <?php
 
-// FIXME: we need access to package
 $params = $getModule();
+
+// why aren't these in admin.php?
 
 // io is navItems
 $io['Users'] = 'admin/users';
