@@ -18,7 +18,8 @@ if (!$result) {
   // not sure if this will work
   // retry
   sleep(1); // if we loop, lets not do it fast
-  header('location: css.php');
+  //header('location: css.php');
+  redirectTo('css.php');
   return;
 } else {
   $userSettings = $result['settings'];
