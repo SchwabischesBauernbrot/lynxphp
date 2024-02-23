@@ -3,6 +3,7 @@
 return array(
   'name'    => 'site_themes',
   'version' => 1,
+  // fe/css handler is dependent upon opt/user/settings
   'settings' => array(
     array(
       'level' => 'admin', // constant?
