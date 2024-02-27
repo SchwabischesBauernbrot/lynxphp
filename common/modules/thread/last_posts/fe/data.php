@@ -44,7 +44,7 @@ $fePkgs = array(
       ),
     ),
     'js' => array(
-      array('module' => 'thread_view', 'file' => 'refresh_thread.js')
+      array('module' => 'base_thread_view', 'file' => 'refresh_thread.js')
     ),
     'forms' => array(
       /*
