@@ -1,6 +1,6 @@
 <?php
 return array(
-  'name' => 'thread_view',
+  'name' => 'base_thread_view',
   'version' => 1,
   'resources' => array(
     array(
