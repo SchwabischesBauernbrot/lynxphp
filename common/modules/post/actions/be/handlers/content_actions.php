@@ -43,6 +43,8 @@ foreach($_POST as $k => $v) {
   }
 }
 
+$io = array('log' => array());
+
 // are they logged in?
 $user_id = getUserID();
 
@@ -90,24 +92,27 @@ switch($action) {
       }
       
       $allowDelete = false;
-      if ($hasBoardPostDeletionAccess[$uri] || ($post['password'] && $post['password'] === md5(BACKEND_KEY . $password))) {
+      if ($hasBoardPostDeletionAccess[$uri]) {
         $allowDelete = true;
       } else 
       if (isUserPermitted($user_id, 'delete_post', 'p/' . $uri . '/' . $r['postid'])) {
         $allowDelete = true;
       } else {
-        // we need a pipeline here that handles password
-        $io = array(
-          'uri' => $r['board'],
-          'threadid' => $r['threadid'],
-          'postid' => $r['postid'],
-          'post' => $post,
-          'posts_model' => $posts_model,
-          'password' => $password,
-          'allowDelete' => $allowDelete,
-        );
-        $pipelines[PIPELINE_BE_CONTENTACTIONS_DELETE]->execute($io);
-        $allowDelete = $io['allowDelete'];
+          // we need a pipeline here that handles password
+          // well password is kind core... maybe not...
+          $io = array(
+            'uri' => $r['board'],
+            'threadid' => $r['threadid'],
+            'postid' => $r['postid'],
+            'post' => $post,
+            'posts_model' => $posts_model,
+            'password' => $password,
+            'allowDelete' => $allowDelete,
+            'log' => array(),
+          );
+          $pipelines[PIPELINE_BE_CONTENTACTIONS_DELETE]->execute($io);
+          $allowDelete = $io['allowDelete'];
+        //}
       }
 
       if ($allowDelete) {
@@ -235,8 +240,9 @@ sendJson(array(
     'reportsAdded' => $added,
     'password' => $password,
     'saltpassword' => md5(BACKEND_KEY . $password),
-    'postpasswod' => $post['password'],
+    //'postpasswod' => $post['password'],
     'hasDeleteAccess' => $hasBoardPostDeletionAccess,
+    'ioLog' => $io['log'],
     // you get this from dev tools...
     //'_POST' => $_POST,
   )
