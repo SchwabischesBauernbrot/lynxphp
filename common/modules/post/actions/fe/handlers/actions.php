@@ -164,11 +164,16 @@ if ($result['status'] === 'ok') {
   // overboard page will be '0'
   if (!empty($_POST['page'])) {
     redirectTo('/' . $boardUri . '/page/' . $_POST['page'] . '.html');
-  } else
-  if ($result['request'][0]['threadid'] !== 'ThreadNum') {
-    redirectTo('/'. $boardUri . '/thread/' . $result['request'][0]['threadid'] . '.html');
   } else {
-    redirectTo('/'. $boardUri . '/');
+    if ($result['debug']['removedThreads']) {
+      redirectTo('/'. $boardUri . '/');
+      return;
+    }
+    if ($result['request'][0]['threadid'] !== 'ThreadNum') {
+      redirectTo('/'. $boardUri . '/thread/' . $result['request'][0]['threadid'] . '.html');
+    } else {
+      redirectTo('/'. $boardUri . '/');
+    }
   }
   return;
 }
