@@ -7,7 +7,11 @@ $boardUri = $params['request']['params']['uri'];
 // backend will verify if BO
 
 $res = $pkg->useResource('list', array('uri' => $boardUri));
-
+if (!$res) {
+  // maybe a 401
+  wrapContent('Access denied or backend error');
+  return;
+}
 global $pipelines;
 
 // should probably list like normal but ?
@@ -26,7 +30,10 @@ $nojs  = empty($userSettings['nojs'])  ? false : true;
 foreach($res['threads'] as $t) {
   $wtd = $t['deleted'] && $t['replies'] === $t['del_replies'];
   // maybe a param for the link to expose content in deleted posts?
+  
+  // /:uri/threads/deleted/:num.html
   $link = $boardUri. '/thread/' . $t['postid'] . '.html';
+  $link = $boardUri. '/threads/deleted/' . $t['postid'] . '.html';
   // pinned/cyclic? file count?
   $html .= '<tr><td><a href="' . $link . '" target=_blank>' . $t['postid'] . '</a><td>' . $t['sub'] . ($wtd ? ' (DELETED)' : '') . '<td>' . $t['replies'] . '<td>' . $t['deleted'] . '<td>' . $t['del_replies'];
   // FIXME: thread actions...
