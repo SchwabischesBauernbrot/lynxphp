@@ -476,7 +476,11 @@ class package {
 
               // we can't attach if it doesn't exist I think
               //echo "deps[", print_r($this->dependencies, 1), "]<bR>\n";
-              echo "<pre>[", $this->dir . 'be/data.php', "]pipeline[", $m['pipeline'], "] is not defined in module[", $m['module'], "] complete entry:[", print_r($m, 1), "]</pre>\n" . gettrace();
+              
+              // could be already defined in another module
+              if (!defined($m['pipeline'])) {
+                echo "<pre>[", $this->dir . 'be/data.php', "]pipeline[", $m['pipeline'], "] is not defined yet for module[", $m['module'], "] complete entry:[", print_r($m, 1), "]</pre>\n" . gettrace();
+              }
               // this output is causing a loop
               //echo "<pre>Missing[", $m['pipeline'], "] [", print_r($pipelines, 1), "]</pre>\n";
             }
