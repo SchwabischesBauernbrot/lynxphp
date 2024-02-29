@@ -39,6 +39,14 @@ interface database_driver_base {
 }
 
 class database_driver_base_class {
+  var $conn;
+  var $modelToSQL;
+  var $sqlToModel;
+  var $subselectCounter;
+  var $registeredTables;
+  var $dontTrackTables;
+  var $btTables;
+  var $joinCount;
   function __construct() {
     $this->conn = null;
     $this->modelToSQL = array();
@@ -46,6 +54,7 @@ class database_driver_base_class {
     $this->subselectCounter = 0;
     $this->registeredTables = array();
     $this->dontTrackTables = array('table_tracker');
+    $this->btTables = false;
   }
   public function connect_db($host, $user, $pass, $db, $port = 0) {
     if (!$this->connect($host, $user, $pass, $port)) {
@@ -213,13 +222,19 @@ class database_driver_base_class {
   protected function makeInsertQuery($rootModel, $recs) {
     global $now;
     $tableName = modelToTableName($rootModel);
+    //print_r($recs);
     $date = (int)$now;
     // ensure recs[0] has all potential columns we want
     if (isset($recs[0]['json'])) {
-      // ensure json
-      $c = $recs[0]['json'][0];
-      if ($c !== '[' && $c !== '{') {
+      if (is_array($recs[0]['json'])) {
         $recs[0]['json'] = json_encode($recs[0]['json']);
+      } else {
+        // ensure json
+        //echo "[", print_r($recs[0]['json']), "]<br>\n";
+        $c = $recs[0]['json'][0];
+        if ($c !== '[' && $c !== '{') {
+          $recs[0]['json'] = json_encode($recs[0]['json']);
+        }
       }
     } else {
       $recs[0]['json'] = '{}';
@@ -233,12 +248,20 @@ class database_driver_base_class {
     //$fields = join(',', array_keys($recs[0]));
     $fieldsArr = array();
     $firstRecFields = array_keys($recs[0]);
+    //$idf = modelToId($rootModel);
     foreach($firstRecFields as $nf) {
       // forced fields
       if ($nf === 'json' || $nf === 'created_at' || $nf === 'updated_at') {
         $fieldsArr[] = $nf;
         continue;
       }
+      // pg won't allow this
+      /*
+      if ($nf === $idf) {
+        $fieldsArr[] = $nf;
+        continue;
+      }
+      */
       // make sure it's a valid field
       $found = false;
       foreach($rootModel['fields'] as $fieldName => $f) {
@@ -599,7 +622,13 @@ class database_driver_base_class {
         array(modelToId($rootModel) , '=', $id)
       )
     );
-    return $this->find($rootModel, $options);
+    // single row, we should get and free the result right?
+    // we do these in the db wrappers apparently
+    $res = $this->find($rootModel, $options);
+    return $res;
+    //$row = $this->get_row($res);
+    //$this->free($res);
+    //return $row;
   }
   // options doesn't look to be used...
   public function updateById($rootModel, $id, $row, $options = false) {
