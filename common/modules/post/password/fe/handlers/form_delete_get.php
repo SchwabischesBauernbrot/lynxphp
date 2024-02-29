@@ -30,7 +30,7 @@ $pno = $p['pno'];
   var elem = document.querySelector('input[type=password]')
   if (elem) {
     elem.value = localStorage.getItem('postpassword')
-    console.log('raw', elem.value)
+    //console.log('raw', elem.value)
   }
   </script>
   ";
