@@ -5,6 +5,7 @@ PIPELINE_NEWPOST_PROCESS - controls what happens to new posts
   bumpThread [bool]
   returnId [mixed]
   issues [array]
+  log [array]
   createPostOptions
     bumpBoard [bool]
 
