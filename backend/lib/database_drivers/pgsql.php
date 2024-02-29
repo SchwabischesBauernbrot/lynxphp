@@ -25,6 +25,15 @@ function sqlToType($sqlType) {
 */
 
 class pgsql_driver extends database_driver_base_class implements database_driver_base {
+  /*
+  var $modelToSQL;
+  var $changeModelToSQL;
+  var $sqlToModel;
+  var $joinCount;
+  var $btTables;
+  var $forceUnsetIdOnUpdate;
+  */
+  var $changeModelToSQL;
   function __construct() {
     parent::__construct();
     // datetime would have been nice to have to make database easier to work with
@@ -116,6 +125,7 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     $rows = pg_num_rows($res);
     //echo "rows[$rows] for [$tableName]<br>\n";
     // do we need to create table?
+    $idf = modelToId($model);
     if (!$rows) {
       pg_free_result($res);
       // create sequence
@@ -128,7 +138,6 @@ class pgsql_driver extends database_driver_base_class implements database_driver
       // create table
       //echo "creating table ", $tableName, "\n";
       $sql = 'create table ' . $tableName. ' (';
-      $idf = modelToId($model);
       $sql .= $idf.' BIGINT generated always as identity PRIMARY KEY, ';
       //$sql .= 'json MEDIUMTEXT NOT NULL, ';
       foreach($model['fields'] as $fieldName => $f) {
@@ -158,6 +167,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
         echo "pgsql::autoupdate - existing table, didn't like describe?!<br>\n";
         return;
       }
+      $removed = array();
+      $hasRemoves = false;
       while($row = pg_fetch_assoc($res)) {
         // column_name, data_type
         //echo '<pre>', print_r($row, 1), "</pre>\n";
@@ -165,6 +176,12 @@ class pgsql_driver extends database_driver_base_class implements database_driver
           echo "pgsql::autoupdate - sql type[", $row['data_type'], "] is missing<br>\n";
         }
         $haveFields[ $row['column_name'] ] = $this->sqlToModel[$row['data_type']];
+        if (!isset($model['fields'][$row['column_name']])) {
+          if ($row['column_name'] !== 'created_at' && $row['column_name'] !== 'updated_at' &&  $row['column_name'] !== $idf) {
+            $removed[] = $row['column_name'];
+            $hasRemoves = true;
+          }
+        }
       }
       pg_free_result($res);
       $haveAll = true;
@@ -187,26 +204,10 @@ class pgsql_driver extends database_driver_base_class implements database_driver
           }
         }
       }
-      // FIXME: delete scan
       //echo "<pre>$tableName: Changes", print_r($changes, 1), "</pre>\n";
 
-      if (isset($model['seed']) && is_array($model['seed'])) {
-        $inserts = array();
-        // FIXME: optimize to IN query ...
-        foreach($model['seed'] as $row) {
-          $cnt = $this->count($model, array('criteria'=>$row));
-          if (!$cnt) {
-            //echo "need to insert: ", print_r($row, 1), "<br>\n";
-            $inserts[] = $row;
-          }
-        }
-        if (count($inserts)) {
-          $this->insert($model, $inserts);
-        }
-      }
-
       // everything in sync?
-      if ($haveAll && $noChanges) {
+      if ($haveAll && $noChanges && !$hasRemoves) {
         //echo "done - no changes\n";
         return true;
       }
@@ -217,9 +218,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
         foreach($missing as $fieldName => $f) {
           // ADD
           //echo "field[$fieldName]<br>\n";
-          $sql .= 'ADD COLUMN ' . $fieldName . ' ' . $this->modelToSQL[$f['type']]. ' ';
+          $sql .= 'ADD COLUMN ' . $fieldName . ' ' . $this->modelToSQL[$f['type']]. ' '; // . ', ';
         }
-        $sql = substr($sql, 0, -2);
       }
       if (!$noChanges) {
         //echo "pgsql::autoupdate - Need to change<br>\n";
@@ -231,18 +231,41 @@ class pgsql_driver extends database_driver_base_class implements database_driver
               $sql .= 'ALTER COLUMN ' . $fieldName . ' ' . $f . ', ';
             }
           } else {
-            $sql .= 'ALTER COLUMN ' . $fieldName . ' TYPE ' . $this->changeModelToSQL[$f['type']] . ' ';
+            $sql .= 'ALTER COLUMN ' . $fieldName . ' TYPE ' . $this->changeModelToSQL[$f['type']] . ', ';
           }
         }
-        $sql = substr($sql, 0, -2);
       }
-      $sql .= '';
+      if ($hasRemoves) {
+        //echo "<pre>$tableName: removed columns", print_r($removed, 1), "</pre>\n";
+        foreach($removed as $f) {
+          // DROP
+          //echo "field[$fieldName]<br>\n";
+          $sql .= 'DROP COLUMN ' . $f . ', ';
+        }
+      }
+      $sql = substr($sql, 0, -2);
+      //$sql .= '';
       //echo "sql[$sql]<br>\n";
       $res = pg_query($this->conn, $sql);
       $err = pg_last_error($this->conn);
       if ($err) {
         echo "pgsql::autoupdate - change err[$err]<br>\nSQL[$sql]<br>\n";
         return false;
+      }
+      // now sync seeds
+      if (isset($model['seed']) && is_array($model['seed'])) {
+        $inserts = array();
+        // FIXME: optimize to IN query ...
+        foreach($model['seed'] as $row) {
+          $cnt = $this->count($model, array('criteria' => $row));
+          if (!$cnt) {
+            //echo "need to insert: ", print_r($row, 1), "<br>\n";
+            $inserts[] = $row;
+          }
+        }
+        if (count($inserts)) {
+          $this->insert($model, $inserts);
+        }
       }
       return true;
     }
@@ -454,6 +477,8 @@ class pgsql_driver extends database_driver_base_class implements database_driver
     return '(\'epoch\'::timestamptz + ' . $val . ' * \'1 second\'::interval)';
   }
   */
+  // how about something that just returns 't' so we can use it in queries too
+  // tho 1 seems to work for both mysql/pgsql bools
   public function isTrue($val) {
     return $val === 't';
   }
