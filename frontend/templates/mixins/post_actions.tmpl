@@ -9,6 +9,13 @@ Post(s) action: {{actions}}
       </label>
       {{additional}}
     </div>
+    <script>
+      var elem = document.querySelector('#password')
+      if (elem) {
+        elem.value = localStorage.getItem('postpassword')
+        //console.log('raw', elem.value)
+      }
+    </script>    
 <!-- loop -->
     <div class="actions">
       <label>
