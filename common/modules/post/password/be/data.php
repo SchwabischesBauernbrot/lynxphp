@@ -17,14 +17,10 @@ return array(
       */
     ),
     'modules' => array(
-      /*
-      // is this needed?
-      // well we could inject this data into some other endpoints...
-      array('pipeline' => PIPELINE_BOARD_DATA, 'module' => 'boardData'),
-      */
+      // allow post deletions
+      array('pipeline' => 'PIPELINE_BE_CONTENTACTIONS_DELETE', 'module' => 'passcheck',),
     ),
   ),
 );
-
 
 ?>
