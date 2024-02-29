@@ -602,7 +602,10 @@ class formHandler {
           } else if (xhr.status === 500) {
             // maybe a backend error
             // did we get json though?
-            alert('Backend error: ')
+            console.error('backend error...', json)
+            // could only show the backend response if dev
+            // it is public info...
+            alert('Backend error: ' + json.errors[0] + ' backend response:' + json.response)
           } else if (xhr.status === 429) {
             alert('Hit rate limit, retry in a bit')
             // FIXME: schedule a resubmit?
