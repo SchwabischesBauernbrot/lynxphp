@@ -67,6 +67,18 @@ function sqlToType($sqlType, $f, $desired) {
 }
 
 class mysql_driver extends database_driver_base_class implements database_driver_base {
+  /*
+  var $modelToSQL;
+  var $sqlToModel;
+  var $joinCount;
+  var $btTables;
+  var $forceUnsetIdOnUpdate;
+  */
+  var $conn;
+  var $hostname;
+  var $username;
+  var $password;
+  var $sql_current_db;
   function __construct() {
     parent::__construct();
     $this->modelToSQL = array();
@@ -234,19 +246,15 @@ class mysql_driver extends database_driver_base_class implements database_driver
       $sql = 'alter table `' . $tableName . '` ';
       if (!$haveAll) {
         foreach($missing as $fieldName => $f) {
-          $sql .= 'ADD ' . $fieldName . modelToSQL($f['type']);
-        }
-        if ($noChanges) {
-          $sql = substr($sql, 0, -2); // strip last ", "
+          $sql .= 'ADD ' . $fieldName . modelToSQL($f['type']); //. ', ';
         }
       }
       if (!$noChanges) {
         foreach($changes as $fieldName => $f) {
-          $sql .= 'MODIFY ' . $fieldName . modelToSQL($f['type']);
+          $sql .= 'MODIFY ' . $fieldName . modelToSQL($f['type']); //. ', ';
         }
-        $sql = substr($sql, 0, -2); // strip last ", "
       }
-      $sql .= '';
+      $sql = substr($sql, 0, -2); // strip last ", "
       //echo "mysql::autoupdate - sql[$sql]<br>\n";
       if (!mysqli_query($this->conn, $sql)) {
         $err = mysqli_error($this->conn);
