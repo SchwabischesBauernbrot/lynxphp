@@ -87,6 +87,7 @@ function threadDBtoAPI(&$row, $boardUri) {
   }
 
   unset($row['json']);
+  // should be able to remove this in the future
   unset($row['password']); //never send password field...
   // ensure frontend doesn't have to worry about database differences
   $bools = array('deleted', 'sticky', 'closed');
@@ -148,6 +149,8 @@ function getThreadEngine($boardUri, $threadNum, $options = false) {
     'since_id'    => false,
     'includeOP'   => true,
     'includeReplies' => true,
+    'includeDeleted' => false,
+    'sortField' => 'created_at',
   ), $options));
 
   if ($posts_model === false) {
@@ -214,16 +217,18 @@ function getThreadEngine($boardUri, $threadNum, $options = false) {
   if ($includeReplies) {
     $crit = array(
       array('threadid', '=', $threadNum),
-      array('deleted', '=', 0),
+      
     );
+    if (!$includeDeleted) {
+      $crit[] = array('deleted', '=', 0);
+    }
     if ($since_id !== false) {
       $crit[] = array('postid', '>', $since_id);
     }
 
-    // FIXME: make sort an option
     // deletion gather doesn't need it
     $res = $db->find($posts_model, array(
-      'criteria' => $crit, 'order' => 'created_at')
+      'criteria' => $crit, 'order' => $sortField),
     );
     // no OP and no replies, consider 404
     if (($includeOP && !count($posts)) && ($since_id === false && !$db->num_rows($res))) {
@@ -246,22 +251,31 @@ function getThreadEngine($boardUri, $threadNum, $options = false) {
 // - no replies since array()
 // board/thread not found needs to be separate from results like no post
 function getThread($boardUri, $threadNum, $options = false) {
-
   $iposts = getThreadEngine($boardUri, $threadNum, $options);
   if (!$iposts) return false;
 
   $posts = array();
+  global $db;
   foreach($iposts as $row) {
     //echo "<pre>", print_r($row, 1), "</pre>\n";
     // ensure we don't already have ot
     $pid = $row['postid'];
     if (!isset($posts[$pid])) {
       $posts[$pid] = $row;
+      $isDeleted = $db->isTrue($row['deleted']);
+      if (!empty($options['includeDeleted'])) {
+        $posts[$pid]['deleted'] = false;
+      }
       if (!$row['threadid']) {
         //echo "<pre>Thread", print_r($row, 1), "</pre>\n";
         threadDBtoAPI($posts[$pid], $boardUri);
       } else {
         postDBtoAPI($posts[$pid], $boardUri);
+      }
+      if (!empty($options['includeDeleted'])) {
+        if ($isDeleted) {
+          $posts[$pid]['deleted'] = '1';
+        }
       }
       $posts[$pid]['files'] = array();
     }
