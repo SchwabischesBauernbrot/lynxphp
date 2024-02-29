@@ -37,12 +37,17 @@ $removedThreads = empty($result['removedThreads']) ? 0 : $result['removedThreads
 if ($result['status'] === 'ok') {
   echo "Successful!<bR>\n"; flush();
 
+
   if (!empty($_POST['page'])) {
     return redirectTo('/' . $boardUri . '/page/' . $_POST['page']);
   } else
   if ($threadNum === 'ThreadNum') {
     return redirectTo('/' . $boardUri . '/');
   } else {
+    // FIXME: if it's a thread with no replies, then we should redirect back to the catalog
+    if ($removedThreads) {
+      return redirectTo('/' . $boardUri);
+    }
     return redirectTo('/' . $boardUri . '/thread/' . $threadNum . '.html');
   }
 } else {
