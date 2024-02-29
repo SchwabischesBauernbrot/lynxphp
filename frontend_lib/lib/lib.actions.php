@@ -1,5 +1,9 @@
 <?php
 
+// idea: star icons like for favorites
+// so it doesn't take so much space (horzonitally: mobile or just really long lists)
+// font awesome or heroicons?
+
 // action
 //   link
 //   label
@@ -58,7 +62,7 @@ function action_getLinkHTML($a, $options) {
   if (!empty($a['target'])) {
     $target = 'target="' . $a['target'] . '" ';
   }
-  return '<a ' . $index . $target . 'href="' . $link . '">' . $a['label'] . '</a>';
+  return '<a ' . $index . $target . 'href="' . $link . '"><nobr>' . $a['label'] . '</nobr></a>';
 }
 
 // decode permissions
@@ -145,6 +149,8 @@ function action_getHtml($actions, $options = false) {
 function action_getExpandHtml($actions, $options = false) {
   extract(ensureOptions(array(
     'label' => 'Actions',
+    // FIXME: width option?
+    // how would you know how wide... would depend on the contents...
     'float' => true,
     // boardUri used in action_decodePerms for BO checks
     // where used in action_getLinkHTML
