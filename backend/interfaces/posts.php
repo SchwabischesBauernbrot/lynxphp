@@ -37,6 +37,7 @@ function postDBtoAPI(&$row, $boardUri) {
   $pipelines[PIPELINE_BE_POST_FILTER_DATA_FIELD]->execute($public_fields_io);
   $row['exposedFields'] = $public_fields_io['fields'];
 
+  // should be able to remove this in the future
   unset($row['password']); //never send password field...
   unset($row['json']);
   // ensure frontend doesn't have to worry about database differences
@@ -93,8 +94,6 @@ function getThreadNum($boardUri, $pno) {
     return false;
   }
   global $db;
-  // has password
-  // but no userid
   $row = $db->findById($posts_model, $pno);
   $tno = $pno;
   if ($row['threadid']) {
@@ -148,7 +147,7 @@ function getPostEngine($boardUri, $postNo, $options = false) {
   // prevent a bunch of warnings
   if (!$row) return false;
   //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
-
+ return $row;
 }
 
 // I'm not sure it's our responsibility to format the result set
@@ -187,10 +186,10 @@ function getPost($boardUri, $postNo, $posts_model) {
   $row = $db->findById($posts_model, $postNo);
   */
   $row = getPostEngine($boardUri, $postNo, array('posts_model' => $posts_model));
-
-  $posts = array();
   // prevent a bunch of warnings
   if (!$row) return false;
+
+  $posts = array();
   //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
   if ($db->isTrue($row['deleted'])) return array();
 
@@ -273,19 +272,24 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
   $safePrivPost = array(
     'post_id' => $privPost['post_id'],
     'ip' => $privPost['ip'],
+    'password' => $privPost['password'],
     'json' => $privPost['json'],
   );
   // promote anything not these 3 (schema/hardcoded) fields to json fields
   foreach($privPost as $k => $v) {
     if ($k === 'post_id') continue;
     if ($k === 'ip') continue;
+    if ($k === 'password') continue;
     if ($k === 'json') continue;
     if (!isset($safePrivPost['json'][$k])) {
       // missing, need to upgrade
       $safePrivPost['json'][$k] = $v;
     }
   }
-  $db->insert($posts_priv_model, array($safePrivPost));
+  $res = $db->insert($posts_priv_model, array($safePrivPost));
+  if (!$res) {
+    return false;
+  }
 
   // handle files
   $issues = processFiles($boardUri, $files, $io['threadNum'], $id);
@@ -315,6 +319,10 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
     return array(
       'issues' => $issues,
       'id' => (int)$id,
+      'debug' => array(
+        'post' => $post,
+        'safePrivPost' => $safePrivPost,
+      ),
     );
   }
 
