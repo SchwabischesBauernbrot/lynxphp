@@ -268,7 +268,7 @@ function renderPost($boardUri, $p, $options = false) {
     //'inMixedBoards' => false, // ?
     // maybe convert to lazyLoad?
     'firstThread' => false, // for adjusting loading=lazy
-    'where' => '',
+    'where' => '', // what is in this?
     'userSettings'  => false,
     'boardSettings' => false,
     'noActions' => false, // for themes to reduce BE calls
