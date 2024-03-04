@@ -226,6 +226,7 @@ class database_driver_base_class {
     $date = (int)$now;
     // ensure recs[0] has all potential columns we want
     if (isset($recs[0]['json'])) {
+      // if they're set, if not string, encode
       if (is_array($recs[0]['json'])) {
         $recs[0]['json'] = json_encode($recs[0]['json']);
       } else {
