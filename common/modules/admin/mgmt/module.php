@@ -79,6 +79,18 @@ return array(
         //'requires' => array('groups'),
         //'params' => 'postdata',
       ),
-    ),  ),
+    ),
+    array(
+      'name' => 'get_config',
+      'params' => array(
+        'endpoint' => 'opt/admin/config',
+        'unwrapData' => true,
+        'requireSession'=> true,
+        //'requires' => array('boardUri'),
+        //'params' => 'querystring',
+      ),
+    ),
+
+  ),
 );
 ?>
