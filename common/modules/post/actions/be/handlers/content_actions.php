@@ -51,7 +51,7 @@ $user_id = getUserID();
 $hasBoardPostDeletionAccess = array();
 foreach($boards as $uri => $t) {
   // b means board permission check
-  $hasBoardPostDeletionAccess[$uri] = isUserPermitted($user_id, 'delete_post', 'b/' . $uri);
+  $hasBoardPostDeletionAccess[$uri] = isUserPermitted($user_id, 'b/' . $uri);
 }
 
 $removedThreads = 0;
@@ -98,8 +98,12 @@ switch($action) {
       if (isUserPermitted($user_id, 'delete_post', 'p/' . $uri . '/' . $r['postid'])) {
         $allowDelete = true;
       } else {
-          // we need a pipeline here that handles password
+          // a pipeline here that handles extended cases
           // well password is kind core... maybe not...
+          //
+          // do we abort if $password === ''
+          // guessing some BOs may want that...
+          // or an OP that wants any one to be able to delete this
           $io = array(
             'uri' => $r['board'],
             'threadid' => $r['threadid'],
@@ -235,6 +239,7 @@ sendJson(array(
     'added' => $added,
     'data' => $data,
     'action' => $action,
+    'userid' => $user_id,
     'removedThreads' => $removedThreads,
     'removedPosts' => $removedPosts,
     'reportsAdded' => $added,
