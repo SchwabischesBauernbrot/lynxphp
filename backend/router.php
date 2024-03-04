@@ -3,6 +3,8 @@
 include '../common/router.php';
 
 class BackendRouter extends Router {
+  var $methods;
+  var $routeOptions;
   function __construct() {
     parent::__construct();
     $this->defaultContentType = 'application/json';
@@ -11,7 +13,19 @@ class BackendRouter extends Router {
   function import($routes, $module = 'backend', $dir = 'handlers') {
     return parent::import($routes, $module);
   }
+
+  // so sometimes bepkg is actually a bepkg class
+  // othertimes we're getting package...
+  // see buildBackendRoutes in lib.packages
   function fromResource($name, $res, $bePkg) {
+    //echo "test[", get_class($bePkg), "]<br>\n";
+    $isBePkg = property_exists($bePkg, 'pkg');
+    // by design (not a problem)
+    /*
+    if (get_class($bePkg) === 'package') {
+      echo "BackendRouter::fromResource - bePkg is a package: ", gettrace(), "<br>\n";
+    }
+    */
     // DEV_MODE is not available on backend...
     if (!isset($res['handlerFile'])) {
       return 'handlerFile is not set';
@@ -31,7 +45,7 @@ class BackendRouter extends Router {
       }
     }
 
-    $func = function($request) use ($res, $bePkg) {
+    $func = function($request) use ($res, $bePkg, $isBePkg) {
       // get session
       $user_id = null;
       if (!empty($res['sendSession'])) {
@@ -48,9 +62,11 @@ class BackendRouter extends Router {
       if (!empty($res['sendIP'])) {
         $ip = getip();
       }
-
-      $moduleDir = $bePkg->dir;
-      $shared = $bePkg->shared;
+      
+      // handle the lib.package buildBackendRoutes bullshit
+      
+      $moduleDir = $isBePkg ? $bePkg->pkg->dir : $bePkg->dir;
+      $shared = $isBePkg ? $bePkg->pkg->shared : $bePkg->shared;
       $module_path = $moduleDir;
       // coordinate with bePkg
       if (!$bePkg->ranOnce) {
