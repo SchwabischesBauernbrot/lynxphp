@@ -284,7 +284,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
 
   $postFields = array(
     'postid', 'threadid', 'resto', 'sticky', 'closed', 'name', 'trip',
-    'capcode', 'country', 'sub', 'com', 'deleted', 'json', 'created_at', 'updated_at',
+    'capcode', 'country', 'sub', 'com', 'deleted', 'type', 'json', 'created_at', 'updated_at',
   );
   $filesFields = array_keys($post_files_model['fields']);
   $filesFields[] = 'fileid';
@@ -355,9 +355,9 @@ function boardPage($boardUri, $posts_model, $page = 1) {
     // order of non-sticky, replies aren't bumping...
     $sql = 'select '.join(',', array_map(function ($f) { return 'f.' . $f . ' as file_' . $f; }, $filesFields)).', ranked_post.*
               from'.
-              // ranking post for threads
+              // ranking post for threads (we only seem to use t1.postid or is it thread_postid)
               '(
-                select t1.*, t1.json as thread_json, tf.*, t1.created_at as thread_created_at, p.postid as replyid, t.postid as thread_postid, rank() OVER (PARTITION BY p.threadid ORDER BY p.created_at DESC) AS "rank",
+                select t1.type as thread_type, t1.*, t1.json as thread_json, tf.*, t1.created_at as thread_created_at, p.postid as replyid, t.postid as thread_postid, rank() OVER (PARTITION BY p.threadid ORDER BY p.created_at DESC) AS "rank",
                   '.join(',', array_map(function ($f) { return 'p.' . $f . ' as post_' . $f; }, $postFields)).',
                   '.join(',', array_map(function ($f) { return 'tf.' . $f . ' as threadfile_' . $f; }, $filesFields)).'
                 from ('.
@@ -379,7 +379,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
             where rank <= ' . $lastXreplies . '
             order by sticky desc, ranked_post.thread_postid desc, ranked_post.replyid asc
             limit ' . $tpp . ($limitPage ? ' OFFSET ' . ($limitPage * $tpp) : '');
-    //echo "sql[$sql]<br>\n";
+   // echo "sql[$sql]<br>\n";
     $res = pg_query($db->conn, $sql);
     $err = pg_last_error($db->conn);
     if ($err) {
@@ -388,6 +388,8 @@ function boardPage($boardUri, $posts_model, $page = 1) {
     $data = array();
     $threads = array();
     while($row = $db->get_row($res)) {
+      // so we get 91 but not type with it
+      // the t1.postid must be handled differently than t1.type
       //echo '<pre>row', print_r($row, 1), "</pre>\n";
 
       // don't stomp posts from last record
@@ -396,8 +398,11 @@ function boardPage($boardUri, $posts_model, $page = 1) {
           $f5 = substr($k, 0, 5);
           return $f5 !== 'post_' && $f5 !=='file_' && $f5 !== 'threa';
         }, ARRAY_FILTER_USE_BOTH);
+        //echo '<pre>thread', print_r($threads[$row['thread_postid']], 1), "</pre>\n";
         // process op
+        // why these thread overrrides? I think it's pointing to a bigger problem
         $threads[$row['thread_postid']]['postid'] = $row['thread_postid'];
+        $threads[$row['thread_postid']]['type'] = $row['thread_type'];
         $threads[$row['thread_postid']]['json']   = $row['thread_json'];
         $threads[$row['thread_postid']]['created_at'] = $row['thread_created_at'];
         threadDBtoAPI($threads[$row['thread_postid']], $boardUri);
@@ -455,6 +460,7 @@ function boardPage($boardUri, $posts_model, $page = 1) {
       unset($op['posts']); // remove replies
       $op['threadid'] = $op['no'];
       $op['files'] = array_values($t['files']); // restore files
+      //echo '<pre>' . $tk . 'op', print_r($op, 1), "</pre>\n";
       // put at top
       //array_unshift($threads[$tk]['posts'], $op);
       $threads[$tk] = array(
