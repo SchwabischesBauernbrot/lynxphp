@@ -86,6 +86,12 @@ class package {
     $this->common = array(); // optional common data
     $this->backendRoutesAdded = false;
     $this->frontendPackagesLoaded = false;
+
+    // makes sense if package was extended but it's not
+    // common in fe/be
+    //$this->modules = array();
+    //$this->pipelines = array();
+
     // backend and frontend deps are likely to be different...
     // but we may need to do it in module.php before we get to data...
     // why? we don't...
@@ -634,15 +640,26 @@ class package {
 }
 
 class backend_package {
+  var $pkg;
+  var $models;
+  var $ranOnce;
+  var $modules;
+  var $pipelines;
+  //var $shared;
+  //var $dir;
   function __construct($meta_pkg) {
     $this->pkg = $meta_pkg;
     $this->pkg->registerBackendPackage($this);
+    // maybe a static would be more efficient
+    $this->ranOnce = false;
+    // maybe only store these in special load circumstances
     $this->models = array();
     $this->modules = array();
-    $this->ranOnce = false;
-    //
-    $this->shared = false;
-    $this->dir = $this->pkg->dir;
+    $this->pipelines = array();
+
+    //$this->shared = false;
+    // why localize it?
+    //$this->dir = $this->pkg->dir;
   }
 
   function addModel($model, $potentialName) {
@@ -670,7 +687,7 @@ class backend_package {
     $pkg = &$this->pkg;
     $module_path = strtolower($pkg->dir);
     $path = $module_path . 'be/modules/' . strtolower($file) . '.php';
-    $this->modules[] = $file;
+    $this->modules[$file] = $pipeline_name;
     $ref = &$this;
     //echo "adding [$path]<br>\n";
     $bsn->attach($pipeline_name, function(&$io) use ($pipeline_name, $path, $pkg, $module_path, &$ref) {
@@ -709,6 +726,7 @@ class backend_package {
   function addPipeline($pipeline) {
     // has to be a string...
     //echo "backend_package::addPipeline [", $pipeline['name'], "]<br>\n";
+    $this->pipelines[] = $pipeline['name'];
     definePipeline($pipeline['name']);
   }
   // FIXME: addScheduledTask
@@ -722,11 +740,17 @@ class backend_package {
       }
       $content .= '</ul>';
     }
+    if (is_array($this->pipelines) && count($this->pipelines)) {
+      $content .= '<li>Pipelines provided<ul>';
+      foreach($this->pipelines as $pname) {
+        $content .= '<li>' . $pname;
+      }
+      $content .= '</ul>';
+    }
     if (is_array($this->modules) && count($this->modules)) {
-      global $models;
       $content .= '<li>Modules<ul>';
-      foreach($this->modules as $mname) {
-        $content .= '<li>' . $mname;
+      foreach($this->modules as $mname => $pname) {
+        $content .= '<li>' . $mname . ' to ' . strtoupper($pname);
       }
       $content .= '</ul>';
     }
