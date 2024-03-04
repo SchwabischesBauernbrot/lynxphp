@@ -16,6 +16,9 @@ return array(
       ),
       */
     ),
+    'pipelines' => array(
+      array('name' => 'PIPELINE_BOARD_PAGE_DATA'), // modify our response
+    ),
     'modules' => array(
       /*
       // is this needed?
