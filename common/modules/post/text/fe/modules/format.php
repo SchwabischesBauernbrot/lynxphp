@@ -116,19 +116,20 @@ $replaces = array(
       $board = $targetUri . '&sol;';
     }
     // &sol; is /
-    $str = '<a class="quote"
+    $str = '<a class="quote format_full"
       href="' . $targetUri . '/thread/' . $matches[3] . '.html#' . $matches[2] . '">&gt;&gt;&sol;' .
       $board . $matches[2] . '/</a>' . $matches[4];
     //echo "<pre>matches[", htmlspecialchars($str), "]", print_r($matches, 1), "</pre>\n";
 
     return $str;
   },
+  // catalog search
   '/' . preg_quote('&gt;&gt;&gt;#') . '\/?(\w+)\/?(\s+|$)/m' => function ($matches) use ($io) {
     return '<a
       href="' . $io['boardUri'] . '/catalog.html#' . $io['boardUri'] . '-/' .
       $matches[1] . '/">&gt;&gt;&gt;#/' . $matches[1].'/</a>' . $matches[2];
   },
-// we need the thread number for that post on that board
+  // we need the thread number for that post on that board
   '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/(\d+)\/?(\s*)/m' => function ($matches) {
     global $btLookups;
     // >>>/cumg/36 isnt going to tell us the threadnum...
@@ -146,17 +147,17 @@ $replaces = array(
     }
     $threadId = $btLookups[$matches[1]][$matches[2]];
     // quote by threadId/postId
-    return '<a class="quote"
+    return '<a class="quote format_board_thread"
       href="' . $matches[1] . '/thread/' . $threadId . '#' . $matches[2] . '">&gt;&gt;&gt;/' .
       $matches[1] . '/' . $matches[2] . '</a>' . $matches[3];
   },
   '/' . preg_quote('&gt;&gt;&gt;') . '\/?(\w+)\/?(\s+|$)/m' => function ($matches) {
     // board reference
-    return '<a class="quote"
+    return '<a class="quote format_board"
       href="' . $matches[1] . '">&gt;&gt;&gt;/' .
       $matches[1] . '/</a>' . $matches[2];
   },
-// hrm could verify the post exists...
+  // hrm could verify the post exists...
   '/' . preg_quote('&gt;&gt;') . '(\d+)\/?(\s+|$)/m' => function ($matches) use ($io) {
     //if (DEV_MODE) {
       //echo 'format hit<pre>', htmlspecialchars(print_r($matches, 1)), '</pre>', "\n";
@@ -164,7 +165,7 @@ $replaces = array(
     global $btLookups;
     $threadId = isset($btLookups[$io['boardUri']][$matches[1]]) ? $btLookups[$io['boardUri']][$matches[1]] : '';
     // quote by postid
-    return '<a class="quote"
+    return '<a class="quote format_inthread_post"
       href="' . $io['boardUri'] . '/thread/' . $threadId . '#' . $matches[1] . '">&gt;&gt;' .
       $matches[1] . '</a>' . $matches[2];
   },
@@ -181,7 +182,7 @@ $replaces = array(
       return '&gt;&gt;/' . $matches[1] . '/' . $matches[2] . $matches[3];
     }
     $threadId = $btLookups[$matches[1]][$matches[2]];
-    return '<a class="quote"
+    return '<a class="quote format_post"
       href="' . $matches[1] . '/thread/' . $threadId . '#' . $matches[2] . '">&gt;&gt;/' .
       $matches[1] . '/' . $matches[2] . '/</a>' . $matches[3];
   },
