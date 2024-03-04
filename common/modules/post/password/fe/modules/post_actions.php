@@ -33,6 +33,7 @@ if (empty($settings['delete_disallow'])) {
       // '/:uri/posts/:pno/delete',
       'link' => $io['boardUri'].'/posts/' .  $io['p']['no'] . '/delete.html',
       'label' => 'delete',
+      'includeWhere' => true,
     );
   }
 }
