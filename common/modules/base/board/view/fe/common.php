@@ -150,9 +150,11 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
   $threads_html = '';
   // hack for now
   if ($userSettings === false) {
+    //echo "getting user settings<br>\n";
     $userSettings = getUserSettings();
   }
-  //echo "<pre>userSettings:", print_r($userSettings, 1), "</pre>\n";
+  //echo "<pre>userSettings: [", print_r($userSettings, 1), "]</pre>\n";
+  //echo "pagenum[$pagenum]<br>\n";
   foreach($pageData as $thread) {
     //echo "<pre>", print_r($thread, 1), "</pre>\n";
     //echo "[", $thread['posts'][0]['no'], "] replies[", $thread['thread_reply_count'], "]<br>\n";
@@ -175,7 +177,8 @@ function getBoardThreadListingRender($boardUri, $boardThreads, $pagenum, $wrapOp
       $topReply = isset($posts[1]) ? $posts[1]['no'] : false;
       $threads_html .= renderPost($boardUri, $post, array(
         'checkable' => true, 'postCount' => empty($thread['thread_reply_count']) ? -1 : $thread['thread_reply_count'],
-        'topReply' => $topReply, 'where' => $boardUri . '/', 'boardSettings' => isset($boardData['settings']) ? $boardData['settings'] : false,
+        // FIXME: include anchor on where (if there's one...)
+        'topReply' => $topReply, 'where' => $boardUri . '/' . ($pagenum > 1 ? ('page/' . $pagenum)  : ''), 'boardSettings' => isset($boardData['settings']) ? $boardData['settings'] : false,
         'userSettings' => $userSettings, 'noActions' => $noActions,
       ));
       //if ($i === count($posts) - 1) $threads_html .= $threadFtr_tmpl;
