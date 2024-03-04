@@ -430,12 +430,12 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
 }
 
 // check thread function?
-
+// why are we uses these addressing paths? for scrub?
 function buildPath($boardUri, $threadNum, $postNum, $mediaNum) {
   $threadPath = 'storage/boards/' . $boardUri . '/' . $threadNum;
   $filebase = $postNum . '_' . $mediaNum;
 
-  // how do we get ext?
+  // FIXME: how do we get ext?
   //$arr = explode('.', $file['name']);
   //$ext = end($arr);
 
