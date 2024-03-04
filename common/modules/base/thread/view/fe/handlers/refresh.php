@@ -61,7 +61,7 @@ if (is_array($result)) {
   // but we do need the porting....
   // no wrap since we're embedded
   if (DEV_MODE) {
-    wrapContent("<pre>BE Error, params since[$last] thread[$threadNum] board[$boardUri] DEBUG:", htmlspecialchars(print_r($result, 1)), "</pre>\n");
+    wrapContent("<pre>BE Error, params since[$last] thread[$threadNum] board[$boardUri] DEBUG:" . htmlspecialchars(print_r($result, 1)) . "</pre>\n");
   } else {
     // json envelope for meta information?
     echo "Error rendering updates since[$last] to thread[$threadNum] on board[$boardUri]<br>\n";
