@@ -166,7 +166,9 @@ function getPostsModel($boardUri, $options = false) {
       //'country_name' => array('type'=>'string', 'length'=>128),
       'sub' => array('type'=>'str', 'length'=>128),
       'com' => array('type'=>'text'),
-      'email'    => array('type'=>'str', 'length'=>255), // public option to reduce extra query
+      'type' => array('type'=>'str', 'length'=>255),
+      'email' => array('type'=>'str', 'length'=>255), // public option to reduce extra query
+      'deleted_by' => array('type'=>'str', 'length'=> 12), // password or specific user
       // this is private, not public info
       //'password' => array('type'=>'str'),
       // 'replies' => array('type'=>'integer'),
@@ -177,6 +179,10 @@ function getPostsModel($boardUri, $options = false) {
       // since4pass
       //'unique_ips' => array('type'=>'integer'),
       //'m_img' => array('type'=>'bool'),
+
+      // RT
+      // thread/reply (uri, postid) can all be done in JSON tbh
+      // maybe a post.type (like adn annotation type) that can drive modular post viewing
       )
   );
   $db->autoupdate($public_post_model);
