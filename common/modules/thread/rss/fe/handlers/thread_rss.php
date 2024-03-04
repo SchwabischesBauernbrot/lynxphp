@@ -49,7 +49,9 @@ foreach($boardData['posts'] as $post) {
   if (!$title) $title = '<![CDATA[' . $escapedCom . ']]>';
   $post_xml .= '  <title>' . $title . '</title>' . "\n";
   $post_xml .= '  <link>' . $link . '</link>' . "\n";
-  $post_xml .= '  <description><![CDATA[' . $escapedCom . ']]></description>' . "\n";
+  // FIXME: dump <img> thumbnails into escapedDescr...
+  $escapedDescr = $escapedCom;
+  $post_xml .= '  <description><![CDATA[' . $escapedDescr . ']]></description>' . "\n";
   $post_xml .= '  <pubDate>' . date("D, d M Y H:i:s", $post['created_at']) . ' GMT</pubDate>' . "\n";
   $post_xml .= '</item>' . "\n";
   $posts_xml .= $post_xml;
