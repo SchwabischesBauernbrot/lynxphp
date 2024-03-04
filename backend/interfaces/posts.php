@@ -147,7 +147,7 @@ function getPostEngine($boardUri, $postNo, $options = false) {
   // prevent a bunch of warnings
   if (!$row) return false;
   //echo "<pre>Thread/File", print_r($row, 1), "</pre>\n";
- return $row;
+  return $row;
 }
 
 // I'm not sure it's our responsibility to format the result set
@@ -308,9 +308,11 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
     )));
   }
 
+  // immediate work
   global $pipelines;
   $pipelines[PIPELINE_POST_ADD]->execute($io);
 
+  // background work
   // create an option for some tasks to be backgrounded
   global $workqueue;
   $workqueue->addWork(PIPELINE_WQ_POST_ADD, $io);
@@ -331,6 +333,7 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
   );
 }
 
+// this scrubs it
 // could consider taking post through postid
 // option.post
 // option.posts_model
@@ -393,6 +396,9 @@ function deletePost($boardUri, $postid, $options = false) {
   )));
 
   // check files
+  // FIXME: use deletePostFiles
+  // function deletePostFiles($boardUri, $postid, $options = false) {
+  // deletePostFiles($boardUri, $postid);
   $files_model = getPostFilesModel($boardUri);
   $res = $db->find($files_model, array('criteria' => array('postid' => $postid)));
   $files = $db->toArray($res);
