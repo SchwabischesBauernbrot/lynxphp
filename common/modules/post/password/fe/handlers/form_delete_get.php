@@ -7,6 +7,8 @@ $p = $params['request']['params'];
 $uri = $p['uri'];
 $pno = $p['pno'];
 
+$from = urldecode(getQueryField('from'));
+
 // get post data
 //global $packages;
 //$result = $packages['post_preview']->useResource('preview', array('board' => $uri, 'id' => $pno . '.json'));
@@ -16,12 +18,20 @@ $pno = $p['pno'];
 //$ourPost = $result['data'];
 //$showPass = !$ourPost;
 //if ($showPass) {
+
+  // we could do a quick check to see if we own this board or have perms
+  // if so we, can just skip these screen
+
   // present form asking for password
   // could include page to remember where to return too...
   $fields = array(
     'password' => array('label' => 'Password', 'type' => 'password'),
   );
   $values = array();
+  if ($from) {
+    $fields['from'] = array('type' => 'hidden');
+    $values['from'] = $from;
+  }
   // action has uri and pno in it
   $html = generateForm($params['action'], $fields, $values, array('buttonLabel' => 'Delete Post'));
   // we neeed to access load storage
