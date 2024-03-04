@@ -61,6 +61,13 @@ return array(
           'admin' => array()
         ),
       ),
+      array(
+        'route'   => '/admin/config.php',
+        'handler' => 'config',
+        'portals' => array(
+          'admin' => array()
+        ),
+      ),
     ),
     'forms' => array(
       // not built yet:
