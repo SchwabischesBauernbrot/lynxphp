@@ -177,7 +177,33 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
       //'Catalog' => $boardUri . '/catalog.html',
     ),
   );
+  // these are really board actions...
   $pipelines[PIPELINE_BOARD_NAV]->execute($nav_io);
+
+  $board_actions = action_getLevels();
+  // we need to unify these defaults...
+  // probably should live somewhere else and filter on where
+  //$board_actions['all'][] = array('link' => '/' . $boardUri . '/', 'label' => 'View');
+  // probably should live in base/board/settings
+  $board_actions['bo'][] = array('link' => '/' . $boardUri . '/board_settings.php', 'label' => 'Settings');
+
+  $action_io = array(
+    'boardUri' => $boardUri,
+    'b' => array(),
+    'where' => $boardUri . '/',
+    'actions'  => $board_actions,
+  );
+  // where does view come from
+  $pipelines[PIPELINE_BOARD_ACTIONS]->execute($action_io);
+  // remap output over the top of the input
+  $board_actions = $action_io['actions'];
+  // FIXME: expander?
+  $board_actions_html1 = action_getHtml($board_actions, array(
+    'boardUri' => $boardUri, 'where' => 'boards', 'join' => " | \n",
+  ));
+  // , 'nojs' => $nojs
+  $board_actions_html2 = action_getExpandHtml($board_actions, array(
+    'boardUri' => $boardUri, 'where' => $boardUri . '/'));
 
   $nav_html = getNav2($nav_io['navItems'], array(
     'list' => false,
@@ -191,6 +217,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     //'prelabel' => '[',
     //'postlabel' => ']',
   ));
+  $nav_html .= $board_actions_html1;
 
   $boardNav = '';
   if (!$isThread) {
