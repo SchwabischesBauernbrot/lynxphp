@@ -32,6 +32,14 @@ foreach($packages as $name => $pkg) {
     }
     $content .= '</table>';
   }
+  if (is_array($pkg->backend_packages)) {
+    $content .= '<li>Backend Packages: '. count($pkg->backend_packages);
+    $content .= '<ul>';
+    foreach($pkg->backend_packages as $bepkg) {
+      $content .= '<li>' . $bepkg->toString();
+    }
+    $content .= '</ul>';
+  }
   if (is_array($pkg->frontend_packages)) {
     $content .= '<li>Frontend Packages: '. count($pkg->frontend_packages);
     $content .= '<ul>';
