@@ -32,6 +32,8 @@ if (isset($boardData['settings'])) {
 }
 
 foreach($boardData['posts'] as $j => $post) {
+  $boardData['posts'][$j]['boardUri'] = $boardUri;
+  //echo "<pre>test[", print_r($boardData, 1), "]</pre>\n";
   preprocessPost($boardData['posts'][$j]);
 }
 global $pipelines;
