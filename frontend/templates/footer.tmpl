@@ -1,7 +1,11 @@
+    <!-- a name="bottom"></a --><!-- chrome49 requires anchor inside scroller -->
+    <!-- this also works in FF48 -->
+    <div id="bottom"></div><!-- name doesn't work in chrome 49 -->
   </div><!-- close scroller -->
 <!-- a loop is here so footer can be included when there's no header -->
 <!-- loop -->
-  <footer class="footer" id="bottom">
+  <!-- id="bottom" -->
+  <footer class="footer">
     {{footer_header}}
     {{footer_nav}}
     Powered by <a rel=noreferrer target=_blank href="https://gitgud.io/odilitime/lynxphp/">Double Plus</a>
