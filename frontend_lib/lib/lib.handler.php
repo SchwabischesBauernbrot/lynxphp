@@ -804,8 +804,10 @@ function wrapContentFooter($row) {
       router_log_report();
     }
   }
-  // w95 theme needs this
-  echo '<div class="ending-bump" style="flex-shrink: 0; height: 45px;"></div>';
+  // w95 theme needs this. Why does it need this?
+  // but this is causing vertical scroll bars on pages that don't need them
+  //echo '<div class="ending-bump" style="flex-shrink: 0; height: 45px;"></div>';
+
   //echo '</body></html>';
   flush();
 }
