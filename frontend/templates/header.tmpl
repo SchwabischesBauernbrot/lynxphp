@@ -2,7 +2,7 @@
 <body>
 <!-- span class="jsonly">JS is enabled</span>
 <span class="nojsonly-block">JS is disabled</span -->
-  <a name="top"></a><!-- ff requires anchor at very top -->
+  <!-- a name="top"></a --><!-- ff requires anchor at very top -->
   <nav class="navbar" id="navbar">
     <!-- items should not be out of order... -->
     <!-- a class="nav-item" href="." title="Home">Home</a -->
@@ -29,3 +29,5 @@
   </nav>
 <!-- scroll only below the nav: simulate fixed nav -->
 <div id="scroller">
+  <!-- this also works in FF48 -->
+  <a name="top"></a><!-- chrome49 requires anchor inside scroller -->
