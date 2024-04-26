@@ -5,7 +5,8 @@
     <!-- why isn't the date part of the label? because then it wouldn't be in the template -->
     <time class="post-date reltime" datetime="{{jstime}}">{{human_created_at}}</time>
     <!-- span class="post-links" -->
-    <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}" title="Externally link to this specific post">No. {{no}}</a>
+    <!-- only want open on thread list and OPs -->
+    <a class="noselect no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}" title="Externally link to this specific post">No. {{no}} {{threadOpen}}</a>
     <!-- a class="no-decoration" href="/{{uri}}/thread/{{threadNum}}.html#{{no}}_postform" title="Reply in this thread"></a -->
     {{userid}}
     <span class="post-quoters"></span>
