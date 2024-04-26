@@ -10,9 +10,11 @@ function setLocalStorage(key, value) {
   try {
     localStorage.setItem(key, value)
   } catch (e) {
+    // mostly likely failure is out of space
     //console.error('localstorage::setLocalStorage - err', e)
-    deleteStartsWith()
+    deleteStartsWith() // free space on fail
   } finally {
+    // retry
     // this can throw too
     localStorage.setItem(key, value)
   }

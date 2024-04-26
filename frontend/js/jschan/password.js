@@ -22,6 +22,13 @@ class syncedField {
     this.oneWay = oneWay
     this.persistent = persistent
     this.init()
+    // listener
+    if (persistent) {
+      window.addEventListener('formReset', (event) => {
+        //console.log('on formReset', key)
+        localStorage.removeItem(key)
+      })
+    }
   }
   init() {
     const settingsModal = document.getElementById('settingsmodal')
@@ -89,9 +96,11 @@ class syncedField {
   }
   update(e) {
     if (this.persistent) {
+      // save the value to local storage
       //console.log('syncedField - setting', this.key, 'to', e.target.value)
       setLocalStorage(this.key, e.target.value)
     }
+    // sync the fields
     for (let field of this.fields) {
       field.value = e.target.value
     }

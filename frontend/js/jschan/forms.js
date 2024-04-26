@@ -54,6 +54,7 @@ function isCheckBox(element) {
   return checkTypes.includes(element.type)
 }
 
+// what uses this?
 function formToJSON(form) {
   const data = {};
   for (element of form.elements) {
@@ -127,21 +128,31 @@ class formHandler {
   }
 
   reset() {
-    const savedName = this.form.elements.name && this.form.elements.name.value;
-    this.form.reset();
+    //console.log('reset start')
+    const savedName = this.form.elements.name && this.form.elements.name.value
+    //console.log('savedName', savedName)
+    this.form.reset()
     if (this.form.elements.name) {
       this.form.elements.name.value = savedName
     }
     if (this.form.elements.postpassword) {
       this.form.elements.postpassword.value = localStorage.getItem('postpassword');
     }
-    this.updateMessageBox();
-    this.files = [];
-    this.updateFilesText();
+    this.updateMessageBox()
+    this.files = []
+    // maybe clearFiles is better
+    this.updateFilesText()
+    // extend (password unsaves posted data)
+    //console.log('send formReset')
+    window.dispatchEvent(new CustomEvent('formReset', {
+     detail: {}
+    }))
+    /*
     const captcha = this.form.querySelector('.captcharefresh');
     if (captcha) {
       captcha.dispatchEvent(new Event('click'));
     }
+    */
     // ensure it's unlocked
     this.setFormLock(false)
   }
@@ -567,6 +578,8 @@ class formHandler {
               setLocalStorage('myPostId', json.postId);
               // live.js
               //forceUpdate();
+              //console.log('asking for reset')
+              this.reset() // refresh localstorage
 
               // we need to trigger a JS refresh
               // do this last because BE (lynxchan) needs some time to write the files
@@ -638,6 +651,7 @@ class formHandler {
             }
             //this.formSubmit(e)
           } else {
+            // non-200, no json
             // call it at least once per file tbh
             for(var i = 0; i < this.files.length; i++) {
               doWork() // generate thumb

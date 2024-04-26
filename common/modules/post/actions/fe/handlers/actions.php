@@ -162,17 +162,23 @@ if ($result['status'] === 'ok') {
   // maybe it's something we can pass in
   // but those other forms don't know about overboard and shouldn't...
   // overboard page will be '0'
+
+  // these don't fix overboard
   if (!empty($_POST['page'])) {
     redirectTo('/' . $boardUri . '/page/' . $_POST['page'] . '.html');
   } else {
-    if ($result['debug']['removedThreads']) {
+    if (!empty($result['debug']['removedThreads'])) {
       redirectTo('/'. $boardUri . '/');
       return;
     }
-    if ($result['request'][0]['threadid'] !== 'ThreadNum') {
-      redirectTo('/'. $boardUri . '/thread/' . $result['request'][0]['threadid'] . '.html');
-    } else {
+    if (empty($result['request'][0]['threadid'])) {
       redirectTo('/'. $boardUri . '/');
+    } else {
+      if ($result['request'][0]['threadid'] !== 'ThreadNum') {
+        redirectTo('/'. $boardUri . '/thread/' . $result['request'][0]['threadid'] . '.html');
+      } else {
+        redirectTo('/'. $boardUri . '/');
+      }
     }
   }
   return;

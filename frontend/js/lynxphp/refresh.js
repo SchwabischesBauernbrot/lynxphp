@@ -261,14 +261,19 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      var threadElem = document.getElementById('threadsContainer')
-      var rect = threadElem.children[threadElem.children.length - 1].getBoundingClientRect()
+      // it's a class
+      var threadElem = document.querySelector('.threadsContainer')
+      if (threadElem) {
+        var rect = threadElem.children[threadElem.children.length - 1].getBoundingClientRect()
 
-      if (rect.bottom < window.innerHeight) {
-        // refresh post would set this...
-        unreadPosts = 0
-        console.log('refresh - restoring original title')
-        document.title = originalTitle
+        if (rect.bottom < window.innerHeight) {
+          // refresh post would set this...
+          unreadPosts = 0
+          console.log('refresh - restoring original title')
+          document.title = originalTitle
+        }
+      } else {
+        console.warn('refresh - no .threadsContainer')
       }
 
     }
