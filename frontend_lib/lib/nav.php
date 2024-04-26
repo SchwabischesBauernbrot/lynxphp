@@ -20,6 +20,9 @@
 // or join htmls?
 // well one goal is to have some defined
 function getNav2($navItems, $options = array()) {
+  if (!is_array($navItems)) {
+    return '';
+  }
   extract(ensureOptions(array(
     'type' => 'list', // none, list, nav
     'list' => true,
