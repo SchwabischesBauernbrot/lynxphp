@@ -130,11 +130,13 @@ function generateField($field, $value, $details, $labelId) {
       $html .= '<textarea name="'.$field.'"'.$ac.$mnl.$mxl.'>'.$value.'</textarea>';
     break;
     case 'select':
+      //$html .= '[' . $value . gettype($value) . ']<select name="' . $field . '">';
       $html .= '<select name="' . $field . '">';
       foreach($details['options'] as $v => $l) {
-        $sel  = $v === $value ? ' selected' : '';
+        // json is making === impossible here
+        $sel  = $v == $value ? ' selected' : '';
         //echo "v[$v] value[$value] = [$sel] field[$field]<br>\n";
-        $html .= '<option value="' . $v . '"' . $sel . '>' . $l;
+        $html .= '<option value="' . $v . '"' . $sel . '>' . $l; // . ' (' . $v . gettype($v) . ')';
       }
       $html .= '</select>';
     break;
@@ -212,6 +214,13 @@ function generateField($field, $value, $details, $labelId) {
   }
   return $html;
 }
+
+/*
+$fields = array(
+  'fieldName' => array('type' => 'bob', 'label' => 'Name:')
+);
+wrapContent(generateForm('goHere', $fields, $values, array()));
+*/
 
 // fields (keyed by field name)
 // - type
@@ -318,7 +327,8 @@ function generateForm($action, $fields, $values, $options = false) {
       echo "values[", print_r($values, 1), "]</pre>\n";
     }
     */
-    $value = empty($values[$field]) ? '' : $values[$field];
+    // probably want to allow values of 0 and '' to be distinct
+    $value = !isset($values[$field]) ? '' : $values[$field];
     $fieldOptions['labelId'] = empty($details['uniqueId']) ? $field : uniqid();
     $rowHdr = generateRowHeader($details, $fieldOptions);
     $html .= $rowHdr . generateField($field, $value, $details, $fieldOptions['labelId']) . $footerHtml;
