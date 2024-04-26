@@ -48,6 +48,46 @@ if (!empty($settings['site']['logo'])) {
   if (!empty($logo['alt'])) $logoAlt = $logo['alt'];
 }
 
+$posts_html = '';
+if (is_array($homepage['newPosts'])) {
+  foreach($homepage['newPosts'] as $i => $p) {
+    $tno = $p['threadid'] ? $p['threadid'] : $p['no'];
+    $url = '/' . $p['boardUri'] . '/thread/' . $tno . '.html#' . $p['no'];
+    $posts_html .= '<tr><td><a href="' . $url . '">' . $p['com'] . '</a>';
+    if ($i === 5) break;
+  }
+}
+
+$images_html = '';
+if (is_array($homepage['newFiles'])) {
+  $icnt = 0;
+  foreach($homepage['newFiles'] as $p) {
+    if (!isset($p['thumbnail_path'])) continue;
+    $tno = $p['tno'] ? $p['tno'] : $p['pno'];
+    $url = '/' . $p['uri'] . '/thread/' . $tno . '.html#' . $p['pno'];
+    $images_html .= '<td><a href="' . $url . '"><img height=100 src="' . BACKEND_PUBLIC_URL . $p['thumbnail_path'] . '"></a>';
+    $icnt++; if ($icnt === 5) break;
+  }
+}
+
+$showShortlist = !empty($settings['site']['shortlistMode']);
+$shortlist_html = '';
+if ($showShortlist) {
+  if (!empty($settings['site']['customBoardShortlistList'])) {
+    $uris = preg_split('/, ?/', $settings['site']['customBoardShortlistList']);
+    $sllu = $homepage['shortlist']; // short list look up
+    $list = array();
+    foreach($uris as $buri) {
+      $data = $sllu[$buri];
+      // escape quotes out of the description
+      $list[]= '<a href="/' . $buri .'/" title="' . addslashes($data['description']) . '">' . $data['title'] . '</a>';
+      // maybe go wide or square?
+      // wide with dots as seperators, let wrap if bigger than screen
+    }
+    $shortlist_html = '<tr><td>' . join(" &bull; ", $list);
+  }
+}
+
 $tags = array(
   'siteName' => empty($settings['site']['siteName']) ? 'New PHPLynx Site' : $settings['site']['siteName'],
   'slogan' => empty($settings['site']['slogan']) ? 'Go into <a href="admin/settings.html">Account > Admin interface > Settings</a> to set Name/Slogan' : $settings['site']['slogan'],
@@ -61,15 +101,22 @@ $tags = array(
   'showWelcome' => empty($settings['site']['showWelcome']) ? ' style="display: none"' : '',
   'showSlogan' => empty($settings['site']['showSlogan']) ? ' style="display: none"' : '',
   'showLogo' => empty($settings['site']['showLogo']) ? 'none' : 'block',
-  'showShortlist' => empty($settings['site']['showShortlist']) ? ' style="display: none"' : '',
+  // shortlistMode = 0 don't show
+  'showShortlist' => $showShortlist ? '' : ' style="display: none"',
+  //'showShortlist' => empty($settings['site']['showShortlist']) ? ' style="display: none"' : '',
   'showRecentImages' => empty($settings['site']['showRecentImages']) ? ' style="display: none"' : '',
   'showRecentPosts' => empty($settings['site']['showRecentPosts']) ? ' style="display: none"' : '',
+  'showRecent' => empty($settings['site']['showRecent']) ? ' style="display: none"' : '',
+  'shortlist' => $shortlist_html,
+  'images' => $images_html,
+  'posts' => $posts_html,
 );
 
 $content = replace_tags($templates['header'], $tags);
 if (count($boards) > 10) {
   $content .= $moreBoards;
 }
+$content .= $templates['loop2'];
 
 // , array('settings' => array('user'=>$settings, 'site'=>))
 wrapContent($content, array('settings' => $settings));
