@@ -57,6 +57,22 @@ $fePkgs = array(
           ),
         ),
       ),
+      array(
+        'route'   => '/:uri/posts/:pno/scrub.html',
+        'handler' => 'scrub_post',
+      ),
+      array(
+        'route'   => '/:uri/threads/:tno/scrub.html',
+        'handler' => 'scrub_thread',
+      ),
+      array(
+        'route'   => '/:uri/posts/:pno/undelete.html',
+        'handler' => 'undel_post',
+      ),
+      array(
+        'route'   => '/:uri/threads/:tno/undelete.html',
+        'handler' => 'undel_thread',
+      ),
     ),
     'forms' => array(
       /*
@@ -79,6 +95,9 @@ $fePkgs = array(
       // maybe this should be like a board nav thing...
       // insert scrub post action
       // insert scrub entire thread action
+      
+      // maybe remove [Delete] to post actions
+      array('pipeline' => 'PIPELINE_POST_ACTIONS', 'module' => 'post_actions',),
     ),
   ),
 );
