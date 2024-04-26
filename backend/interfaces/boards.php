@@ -783,7 +783,7 @@ function getBoardPostCount($boardUri, $posts_model) {
   return $postCount;
 }
 
-function createBoard($uri, $title, $desc, $user_id) {
+function uriIsOk($uri) {
   $uri = strtolower($uri);
   // RFC1738: a-z0-9 $-_.~+!*'(),
   // RFC3986: a-z0-9 -_.~
@@ -804,12 +804,19 @@ function createBoard($uri, $title, $desc, $user_id) {
       continue;
     }
     if (!in_array($uri[$p], $allowedChars)) {
-      // not allowed
-      return array(
-        'code' => 400,
-        'errors' => array('boardUri has invalid characters: [' . $uri[$p] . ']'. $uri)
-      );
+      return false;
     }
+  }
+  return true;
+}
+
+function createBoard($uri, $title, $desc, $user_id) {
+  if (!uriIsOk($uri)) {
+    // not allowed
+    return array(
+      'code' => 400,
+      'errors' => array('boardUri has invalid characters: [' . $uri[$p] . ']'. $uri)
+    );
   }
   global $db, $models;
   $res = $db->find($models['board'], array('criteria'=>array(
