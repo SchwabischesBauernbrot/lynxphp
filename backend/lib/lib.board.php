@@ -289,8 +289,14 @@ function getPostFilesModel($boardUri, $options = false) {
 // privPost could just be passing the optional password and then we'd have to do the getIP here...
 function precreatePost($boardUri, $post, $files, $privPost) {
 
-  // tag post
+  // tag post (common/lib.post_tags.php)
+  // tagPost and newpost both get board data for settings (could reduce queries)
+  // actually which newpost needs getBoardData?
   $post['tags'] = tagPost($boardUri, $post, $files, $privPost);
+
+  // now other systems can react to the tags
+  // PIPELINE_REPLY_ALLOWED
+  // PIPELINE_NEWPOST_PROCESS
 
   // FIXME: is board locked? is thread locked?
   global $pipelines;
