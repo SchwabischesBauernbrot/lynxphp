@@ -431,59 +431,51 @@ function processFiles($boardUri, $files_json, $threadid, $postid) {
 
 // check thread function?
 // why are we uses these addressing paths? for scrub?
-function buildPath($boardUri, $threadNum, $postNum, $mediaNum) {
+function buildPath($boardUri, $threadNum, $postNum, $mediaNum, $ext = false) {
   $threadPath = 'storage/boards/' . $boardUri . '/' . $threadNum;
   $filebase = $postNum . '_' . $mediaNum;
 
   // FIXME: how do we get ext?
+  // from db, if not passed
+  // or we could just read the fs
   //$arr = explode('.', $file['name']);
   //$ext = end($arr);
 
   return array(
     'file' => $filebase . '.' . $ext,
-    'dir'  => $threadPath,
-    'thumb' => $threadPath . '/t_' . $filebase . '.jpg',
-  );
-
-  $parts = explode('/', $filePath);
-  $filename = array_pop($parts);
-  $path = join('/', $parts);
-
-  // ensure jpg thumbnail output
-  $parts = explode('.', $filename);
-  $ext = array_pop($parts);
-  $filename = join('.', $parts) . '.jpg';
-
-  return array(
-    'file' => $filename,
-    'thumb' => $path . '/t_' . $filename,
     // this isn't the full source path
     // this is the directory of storage
-    // maybe should be dir
-    'dir' => $path,
+    'dir'  => $threadPath,
+    'thumb' => $threadPath . '/t_' . $filebase . '.jpg',
   );
 }
 
 function deleteFile($boardUri, $threadNum, $postNum, $mediaNum, $options = false) {
+  // unpack options
+  extract(ensureOptions(array(
+    'ext' => false,
+  ), $options));
   // delete from disk
-  $path = buildPath($boardUri, $threadNum, $postNum, $mediaNum);
+  $path = buildPath($boardUri, $threadNum, $postNum, $mediaNum, $ext);
   $thumb = $path['thumb'];
   // thumb (path)
-  echo "would delete[$thumb]";
-  //unlink($thumb);
+  //echo "would delete[$thumb]";
+  unlink($thumb);
   // original (path)
   $fp = $path['dir'] . '/'. $path['file'];
-  //unlink($fp);
-  echo " and [$fp]";
+  unlink($fp);
+  //echo " and [$fp]";
+  
   // is it last file in this thread?
   $filecount = count(glob($path['dir'] . '*'));
-  echo " leaving [$filecount]files";
+  //echo " leaving [$filecount]files";
   // then clean up directory
   if (!$filecount) {
-    //rmdir($path['dir']);
-    echo " and would remove directory";
+    rmdir($path['dir']);
+    //echo " and would remove directory";
   }
-  echo "<br>\n";
+  //echo "<br>\n";
+  return true;
 }
 
 // options.posts_model
@@ -492,40 +484,37 @@ function deletePostFiles($boardUri, $postid, $options = false) {
   extract(ensureOptions(array(
     'posts_model' => false,
     'post_files_model' => false,
-    'threadid' => 0,
+    'threadid' => false,
   ), $options));
 
-  // options.posts_model
-  //$options['includeFiles'] = true;
-  if ($threadid) {
-    $files = getPostFiles($boardUri, $postNum);
-  } else {
+  // ensure threadid
+  if ($threadid === false) {
+    // options.posts_model
+    //$options['includeFiles'] = true;
     $post = getPostEngine($boardUri, $postid, $options);
-    print_r($post);
-  }
-  /*
-  if ($posts_model === false) {
-    $posts_model = getPostsModel($boardUri);
-    if ($posts_model === false) {
-      // this board does not exist
+    if ($post) {
+      $threadid = $post['threadid'] ? $post['threadid'] : $postid;
+    } else {
+      // likely asking to nuke a nuked post
+
+      // without a thread number no way to clean up those files...
       return false;
     }
   }
-  $post = $db->findById($posts_model, $postNum);
-  $tno = empty($post['threadid']) ? $postNum : $post['threadid'];
 
-  // get list of files for this post
-  // could pass post_files_model in as option (3rd param)
-  $files = getPostFiles($boardUri, $postNum);
-  */
+  // options.post_files_model
+  $files = getPostFiles($boardUri, $postid, $options);
 
-  // nuke file
+  // nuke files
   foreach($files as $mn => $f) {
     //$f['path']
     //storage/BOARDURI/THREADNUM/POSTID_MEDIANUM.EXT
     //$f['ext']
-    deleteFile($boardUri, $tno, $postNum, $mn);
+    // delete file
+    deleteFile($boardUri, $threadid, $postid, $mn, array('ext' => $f['ext']));
+    // error handling?
   }
+  return true;
 }
 
 ?>
