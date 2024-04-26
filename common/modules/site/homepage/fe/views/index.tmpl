@@ -6,6 +6,40 @@
     <tr{{showSlogan}}><td><pre class="no-m-p">{{slogan}}</pre>
   </table>
 </div>
+<div {{showShortlist}} class="table-container flex-center mv-10 text-center">
+  <table>
+    <tr>
+      <th>Shortlist
+    <!-- a list of links to boards -->
+    {{shortlist}}
+</table>
+</div>
+
+<div {{showRecentImages}} class="h table-container" style="width: 50%;">
+  <div style="display: inline-block; margin-left: auto;">
+    <table width="80%">
+      <tr>
+        <th colspan="6">New Images
+      <!-- a horizontal list of images -->
+      <tr>{{images}}
+    </table>
+  </div>
+</div>
+
+<div {{showRecentPosts}} class="h table-container" style="width: 50%;">
+  <div style="display: inline-block;">
+    <table width="80%">
+      <tr>
+        <th>New Posts
+        {{posts}}
+    </table>
+  </div>
+  <!-- a vertical list of posts -->
+</div>
+<br clear="both">
+
+<!-- 20 boards by popularity, lazy load -->
+<!-- maybe top3, 3 "growing", 3 random -->
 <div class="table-container flex-center mv-10 text-center">
   <table class="boardtable">
     <tr>
@@ -26,6 +60,7 @@
 <!-- loop -->
   <!-- more boards was here -->
 <!-- end -->
+<!-- loop -->
     <tr>
       <td colspan="5">
         <a class="bold" href="/boards.html">All Boards</a>
