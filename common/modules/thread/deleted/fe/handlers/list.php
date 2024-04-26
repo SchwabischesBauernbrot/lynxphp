@@ -28,6 +28,7 @@ $boardSettings = getter_getBoardSettings($boardUri);
 $userSettings = getUserSettings();
 $nojs  = empty($userSettings['nojs'])  ? false : true;
 foreach($res['threads'] as $t) {
+  // whole thread deleted
   $wtd = $t['deleted'] && $t['replies'] === $t['del_replies'];
   // maybe a param for the link to expose content in deleted posts?
   
@@ -41,6 +42,7 @@ foreach($res['threads'] as $t) {
   $postCount = $t['replies'] - $t['del_replies'];
   $t['no'] = $t['postid'];
   $t['threadid'] = $t['postid'];
+  //echo "<pre>t", print_r($t, 1), "</pre>\n";
   $post_actions = $post_actions_reset;
   if ($wtd) {
     // insert undelete thread
