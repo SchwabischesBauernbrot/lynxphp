@@ -333,7 +333,48 @@ function createPost($boardUri, $post, $files, $privPost, $options = false) {
   );
 }
 
-// this scrubs it
+function scrubPost($boardUri, $postid, $options = false) {
+  global $db, $now, $models;
+
+  extract(ensureOptions(array(
+    'deleteReplies' => false,
+    'posts_model' => false,
+    'post_files_model' => false,
+    //'post' => false,
+  ), $options));
+
+  // ensure $posts_model
+  if (!$posts_model) {
+    $posts_model = getPostsModel($boardUri);
+  }
+  
+  /*
+  // ensure post
+  // why?
+  if (!$post) {
+    //if ($posts_model !== false) {
+    $post = $db->findById($posts_model, $postid);
+    //}
+  }
+  */
+
+  // delete files first
+  // could pass threadid from $post
+  //$threadid = $post['threadid'] ? $post['threadid'] : $postid;
+  deletePostFiles($boardUri, $postid, array('posts_model' => $posts_model, 'post_files_model' => $post_files_model));
+
+  // nuke post
+  if (!$db->deleteById($posts_model, $postid)) {
+    // FIXME: log error?
+    return false;
+  }
+  return true;
+}
+
+// content actions uses this to nuke posts
+// this is a soft delete (OPs are soft deleted)
+// scrub option or separate function?
+// but replies are nuked?
 // could consider taking post through postid
 // option.post
 // option.posts_model
