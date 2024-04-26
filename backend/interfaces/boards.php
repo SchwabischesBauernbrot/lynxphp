@@ -804,6 +804,7 @@ function uriIsOk($uri) {
       continue;
     }
     if (!in_array($uri[$p], $allowedChars)) {
+      // FIXME: return p to create more helpful error messages
       return false;
     }
   }
@@ -815,7 +816,7 @@ function createBoard($uri, $title, $desc, $user_id) {
     // not allowed
     return array(
       'code' => 400,
-      'errors' => array('boardUri has invalid characters: [' . $uri[$p] . ']'. $uri)
+      'errors' => array('boardUri has invalid characters: '. $uri)
     );
   }
   global $db, $models;
