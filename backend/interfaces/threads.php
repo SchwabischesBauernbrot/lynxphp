@@ -89,6 +89,7 @@ function threadDBtoAPI(&$row, $boardUri) {
   unset($row['json']);
   // should be able to remove this in the future
   unset($row['password']); //never send password field...
+
   // ensure frontend doesn't have to worry about database differences
   $bools = array('deleted', 'sticky', 'closed');
   foreach($bools as $f) {
@@ -355,6 +356,7 @@ function requestDeleteThread($boardUri, $threadNum, $options = false) {
   return true;
 }
 
+// maybe should be scrub so not to confuse with the soft delete version?
 function deleteThread($boardUri, $threadNum, $options = false) {
   // unpack options
   extract(ensureOptions(array(
@@ -392,6 +394,7 @@ function deleteThread($boardUri, $threadNum, $options = false) {
 
   // we soft delete posts, do we soft thread threads
   // definitely should be an option (delete vs scrub)
+  // could be used by archive model or cold storage system
   $pipelines[PIPELINE_THREAD_PRE_DELETE]->execute($io);
 
   // could we check thread to see if we have
@@ -409,21 +412,34 @@ function deleteThread($boardUri, $threadNum, $options = false) {
     'posts_model' => $posts_model,
     'post_files_model' => $post_files_model,
   ));
-  $postids = array();
-  $fileids = array();
+  //$postids = array();
+  //$fileids = array();
   foreach($iposts as $row) {
-    $postids[] = $row['postid'];
+    //$postids[] = $row['postid'];
+    // FIXME: overboard cleaning, maybe overboard can hook into PIPELINE_THREAD_PRE_DELETE
+
+    // not as efficient sql-wise
+    // but will clean the files
+    scrubPost($boardUri, $row['postid'], array(
+      'posts_model' => $posts_model,
+      'post_files_model' => $post_files_model,
+    ));
+    /*
     if (!empty($row['file_fileid'])) {
       $fileids[] = $row['file_fileid'];
     }
+    */
   }
+  /*
+  // FIXME: clean disk files
   $fres = $db->delete($post_files_model, array(
     array('fileids', 'IN', $fileids)
   ));
   // clean posts records
-  $pres = $db->delete($post_model, array(
+  $pres = $db->delete($posts_model, array(
     array('postids', 'IN', $postids)
   ));
+  */
   $pipelines[PIPELINE_THREAD_POST_DELETE]->execute($io);
   return true;
 }
