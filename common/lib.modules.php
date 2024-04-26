@@ -12,7 +12,10 @@
 // contains logic for compiling pipelines
 class module_registry {
   /** class its providing */
-  var $instance;
+  //var $instance;
+  var $name;
+  var $registry;
+  var $compiled;
 
   /** make sure it's a singleton */
   /*protected */
@@ -63,13 +66,14 @@ class module_registry {
   function register($name, $object) {
     if (isset($this->registry[$name])) {
       echo "singleton::register - WARNING, overriding [$name]<br>\n";
-      $bt=debug_backtrace();
-      $btcnt=count($bt);
+      // FIXME: convert to gettrace
+      $bt = debug_backtrace();
+      $btcnt = count($bt);
       for($i=1; $i<$btcnt; $i++) {
         echo $i.':'.(is_object($bt[$i]['object'])?get_class($bt[$i]['object']):'').'/'.$bt[$i]['class'].'->'.$bt[$i]['function']."<br>\n";
       }
     }
-    $this->registry[$name]=$object;
+    $this->registry[$name] = $object;
   }
 
   function canXgoBeforeY($list, $x, $y) {
