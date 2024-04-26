@@ -705,9 +705,16 @@ function make_db_field($value) {
 
 // columns
 // https://laravel.com/docs/8.x/collections#method-pluck
+// was thinking this was pick for some reason
 function pluck($rows, $fields) {
+  /*
+  if (is_bool($rows)) {
+    echo "can't pass bool to pluck<br>\n";
+    return $rows;
+  }
+  */
   $res = array();
-  foreach($rows as $row) {
+  foreach($rows as $k => $row) {
     $keys = array();
     if (is_array($fields)) {
       foreach($fields as $f) {
@@ -718,9 +725,9 @@ function pluck($rows, $fields) {
     }
     // might not be able to know how to handle return values...
     if (count($keys) === 1) {
-      $res[] = array_shift($keys);
+      $res[$k] = array_shift($keys); // an 1d array of a single column
     } else {
-      $res[] = $keys;
+      $res[$k] = $keys; // 2d array: recordset
     }
   }
   return $res;
