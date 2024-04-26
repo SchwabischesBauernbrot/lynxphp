@@ -25,6 +25,16 @@ $row = getBoardRaw($boardUri);
 //echo "<pre>shared[", print_r($shared, 1), "]</pre>\n";
 //echo "<pre>FILES[", print_r($_FILES, 1), "]</pre>\n";
 
+// we need to valid uri a lot here
+// can't have any spaces...
+if (!uriIsOk($_POST['uri'])) {
+  // not allowed
+  return array(
+    'code' => 400,
+    'errors' => array('boardUri has invalid characters: [' . $uri[$p] . ']'. $uri)
+  );
+}
+
 //echo "settings[", gettype($settings), "][", print_r($settings, 1), "]<br>\n";
 //echo "json[", gettype($settings['json']), "][", print_r($settings['json'], 1), "]<br>\n";
 $dbFields = array('uri', 'title', 'description');
