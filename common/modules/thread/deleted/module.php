@@ -22,8 +22,6 @@ return array(
         'endpoint' => 'doubleplus/:uri/threads/deleted',
         'unwrapData' => true,
         'sendSession' => true,
-        'requires' => array('uri'),
-        //'params' => 'querystring',
       ),
     ),
     array(
@@ -31,11 +29,7 @@ return array(
       'params' => array(
         'endpoint' => 'doubleplus/:uri/threads/deleted/:num',
         'unwrapData' => true,
-        //'sendSession' => true,
-        'requires' => array('uri', 'num'),
-        'params' => array(
-          'params' => array('uri', 'num'),
-        ),
+        'sendSession' => true,
         'cacheSettings' => array(
           // PIPELINE_BOARD_QUERY_MODEL could modify boards
           // posts/files
@@ -44,6 +38,42 @@ return array(
           'databaseTables' => array('user_sessions', 'board_{{uri}}_public_posts',
             'board_{{uri}}_public_post_files', 'boards'),
         ),
+      ),
+    ),
+    array(
+      'name' => 'scrub_post',
+      'params' => array(
+        'method' => 'DELETE',
+        'endpoint' => 'doubleplus/:uri/posts/:pno',
+        'unwrapData' => true,
+        'sendSession' => true,
+      ),
+    ),
+    array(
+      'name' => 'scrub_thread',
+      'params' => array(
+        'method' => 'DELETE',
+        'endpoint' => 'doubleplus/:uri/threads/:tno',
+        'unwrapData' => true,
+        'sendSession' => true,
+      ),
+    ),
+    array(
+      'name' => 'undel_post',
+      'params' => array(
+        'method' => 'POST',
+        'endpoint' => 'doubleplus/:uri/posts/:pno/undelete',
+        'unwrapData' => true,
+        'sendSession' => true,
+      ),
+    ),
+    array(
+      'name' => 'undel_thread',
+      'params' => array(
+        'method' => 'POST',
+        'endpoint' => 'doubleplus/:uri/threads/:tno/undelete',
+        'unwrapData' => true,
+        'sendSession' => true,
       ),
     ),
   ),
