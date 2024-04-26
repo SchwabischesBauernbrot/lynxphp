@@ -1,5 +1,6 @@
 <?php
 return array(
+  // default homepage module, others could be made
   'name' => 'site_homepage',
   'version' => 1,
   'settings' => array(
@@ -31,11 +32,13 @@ return array(
           'type'  => 'checkbox',
           'default' => true,
         ),
+        /*
         'showShortlist' => array(
           'label' => 'Show Board Short List',
           'type'  => 'checkbox',
           'default' => true,
         ),
+        */
         // SFW/NSFW?
         'showRecentImages' => array(
           'label' => 'Show Recent Images (All)',
@@ -46,6 +49,23 @@ return array(
         'showRecentPosts' => array(
           'label' => 'Show Recent Posts',
           'type'  => 'checkbox',
+          'default' => true,
+        ),
+        'shortlistMode' => array(
+          'label' => 'Short List mode',
+          'type'  => 'select',
+          'options' => array(
+            // have to be strings for select to work
+            '0' => 'Off',
+            '2' => 'donkey',
+            '1' => 'Custom', // use customBoardShortlistList
+            // 2 software driven? 4 (include inactive versions)?
+            // last post (latest activity), most posts (popular)
+          )
+        ),
+        'customBoardShortlistList' => array(
+          'label' => 'Short List Boards (comma separated list of board URIs)',
+          'type'  => 'text',
           'default' => true,
         ),
       )
