@@ -32,9 +32,12 @@ echo 'Please wait...';
 $files = array();
 if (!empty($res['logo'][0])) {
   $f = $res['logo'][0];
-  $res = sendFile($f['tmp_name'], $f['type'], $f['name']);
-  //echo "<pre>files[", print_r($res, 1), "]</pre>\n";
-  $files = $res['data'];
+  // no error OR if error make sure it's no field...
+  if (empty($f['error']) || $f['error'] !== 'no field') {
+    $res = sendFile($f['tmp_name'], $f['type'], $f['name']);
+    //echo "<pre>files[", print_r($res, 1), "]</pre>\n";
+    $files = $res['data'];
+  }
 }
 
 if (0) {
