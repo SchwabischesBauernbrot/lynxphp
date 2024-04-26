@@ -109,11 +109,24 @@ $media_registry = array(
       ),
     )
   ),
+  'image/gif' => array(
+    'common' => array(
+      'commonExt' => array('gif'),
+    ),
+    'be' => array(
+    ),
+    'fe' => array(
+      'thumbnail' => array(
+        'viewer' => 'htmlimg',
+      ),
+      'consume' => array(
+      ),
+    )
+  ),
   'image/webp' => array(
     'common' => array(
     ),
     'be' => array(
-
     ),
     'fe' => array(
       'thumbnail' => array(
@@ -127,10 +140,52 @@ $media_registry = array(
     'common' => array(
     ),
     'be' => array(
+    ),
+    'fe' => array(
+      'thumbnail' => array(
+        'viewer' => 'html5video',
+      ),
+      'consume' => array(
+      ),
+    )
+  ),
+  'video/ogg' => array(
+    'common' => array(
+    ),
+    'be' => array(
 
     ),
     'fe' => array(
       'thumbnail' => array(
+        'viewer' => 'html5video',
+      ),
+      'consume' => array(
+      ),
+    )
+  ),
+  'video/mp4' => array(
+    'common' => array(
+    ),
+    'be' => array(
+
+    ),
+    'fe' => array(
+      'thumbnail' => array(
+        'viewer' => 'html5video',
+      ),
+      'consume' => array(
+      ),
+    )
+  ),
+  'video/x-matroska' => array(
+    'common' => array(
+    ),
+    'be' => array(
+
+    ),
+    'fe' => array(
+      'thumbnail' => array(
+        // uhm...
         'viewer' => 'html5video',
       ),
       'consume' => array(
