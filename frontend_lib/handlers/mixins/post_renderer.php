@@ -256,6 +256,17 @@ function getMediaTags($file, $boardUri, $options) {
 function renderPost($boardUri, $p, $options = false) {
   global $pipelines;
 
+  /*
+  // FIXME: should be a pipeline
+  if ($p['type'] === 'doubleplus.post.repost') {
+    // this works for the board page
+    // but how can we tell which page we're on
+    $origPost = $p;
+    $p = $p['repostOf'];
+    $p['no'] = $origPost['threadid'];
+  }
+  */
+
   //echo "<pre>", print_r($p['files'], 1), "</pre>\n";
   //echo "<pre>", print_r($p, 1), "</pre>\n";
 
@@ -268,7 +279,7 @@ function renderPost($boardUri, $p, $options = false) {
     //'inMixedBoards' => false, // ?
     // maybe convert to lazyLoad?
     'firstThread' => false, // for adjusting loading=lazy
-    'where' => '', // what is in this?
+    'where' => '', // what is in this? for lib.actions for from query
     'userSettings'  => false,
     'boardSettings' => false,
     'noActions' => false, // for themes to reduce BE calls
@@ -398,7 +409,9 @@ function renderPost($boardUri, $p, $options = false) {
   $post_link_html_parts = array();
   if (count($links_io['links'])) {
     foreach($links_io['links'] as &$a) {
-      $post_link_html_parts[] = '<a href="' . $a['link'] . '">' . $a['label'] . '</a>';
+      // FIXME: bracket styling doesn't belong here
+      // definitely doesn't belong inside PIPELINE_POST_LINKS modules
+      $post_link_html_parts[] = '[<a href="' . $a['link'] . '">' . $a['label'] . '</a>]';
     }
   }
   $post_links_html = join(' ' . "\n", $post_link_html_parts);
@@ -626,6 +639,7 @@ function renderPost($boardUri, $p, $options = false) {
     'actions'   => $post_actions_html,
     'postlinks' => $post_links_html,
     'omitted'   => $omitted_html,
+    'threadOpen' => $isOP && !$noOmit ? '[<span style="text-decoration: underline">Open</span>]' : '',
   );
   $tmp = replace_tags($templates['header'], $tags);
 
