@@ -13,8 +13,10 @@ return array(
       ),
     ),
     'modules' => array(
-      // track threads ourself
+      // track threads from post adds
       array('pipeline' => PIPELINE_POST_ADD, 'module' => 'post_add'),
+      // track thread deletions
+      array('pipeline' => PIPELINE_THREAD_PRE_DELETE, 'module' => 'thread_del'),
     ),
   ),
 );
