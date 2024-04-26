@@ -317,6 +317,7 @@ class database_driver_base_class {
     return $sql;
   }
 
+  // options.criteria
   protected function makeUpdateQuery($rootModel, $urow, $options) {
     global $now;
     $tableName = modelToTableName($rootModel);
