@@ -65,7 +65,8 @@ if (is_array($homepage['newFiles'])) {
     if (!isset($p['thumbnail_path'])) continue;
     $tno = $p['tno'] ? $p['tno'] : $p['pno'];
     $url = '/' . $p['uri'] . '/thread/' . $tno . '.html#' . $p['pno'];
-    $images_html .= '<td><a href="' . $url . '"><img height=100 src="' . BACKEND_PUBLIC_URL . $p['thumbnail_path'] . '"></a>';
+    // reflow?
+    $images_html .= '<td><a href="' . $url . '"><img style="max-width: 100px; max-height: 100px" src="' . BACKEND_PUBLIC_URL . $p['thumbnail_path'] . '"></a>';
     $icnt++; if ($icnt === 5) break;
   }
 }
