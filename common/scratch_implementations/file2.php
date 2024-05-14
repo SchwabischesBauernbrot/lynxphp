@@ -2,18 +2,28 @@
 
 include_once 'base.php';
 
+// file2v2: file2v1+expiration-singlelargevalue
+// with the size problem solved with expiration
+// the overhead of singlelargevalue was not worth it
+// especially since they'd need their own expiration system
+
 // the size of the file caused more contention
 // do we need pooling and/or multiple files
 
-// file2: reduce time waiting for locks by using more disk space
+// file2v1: reduce time waiting for locks by using more disk space
 // cache is less effective
 // also we're a bit faster for reading/write because we're using a memory cache
 
 // added large value (>1k) memory reduction
 // FIXME: we need to worry about number of files in a directory
+// FIXME: report, so I can tell from a request which file was used
+// or files for that matter
+// readfile2_v1 && v2 was made for analysis
+
+// expiration of keys would help
 class file2_scratch_driver extends scratch_implementation_base_class {
   function __construct($prefix = '') {
-    $this->filebase = '../frontend_storage/' . $prefix . 'cache2_v1';
+    $this->filebase = '../frontend_storage/' . $prefix . 'cache2_v2';
     // FIXME: on startup - do a write test check
     $file = realpath('../frontend_storage') . '/' . $prefix . 'cache2';
     $this->changed = false;
@@ -33,7 +43,14 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     if (!$this->data) return;
     if ($this->changed) {
       // huh can run out of memory here...
-      file_put_contents($this->filepath, serialize($this->data));
+      $ndata = array();
+      global $now;
+      while($row = array_shift($this->data)) {
+        if ($row['ttl'] >= $now) {
+          $ndata[] = $row;
+        }
+      }
+      file_put_contents($this->filepath, serialize($ndata));
     }
     // probably want to retain this lock
   }
@@ -85,13 +102,13 @@ class file2_scratch_driver extends scratch_implementation_base_class {
 
     // these shouldn't be more than 1mb
     $serializedStr = file_get_contents($filepath);
-    $data = unserialize($serializedStr);
+    $metadata = unserialize($serializedStr);
     $this->changed = false;
     return array(
       'file' => $filepath,
       'lock' => $lockpath,
       'pid'  => $pid,
-      'data' => $data,
+      'data' => $metadata,
     );
   }
 
@@ -126,38 +143,24 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     return false;
   }
 
-  function singleLargeValueFile($key) {
-    $keyhash = md5($key);
-    return $this->filebase . '_' . $keyhash . '.php';
-  }
-
+  // is this even called?
   function clear($key) {
-    $singleLargeValueFile = $this->singleLargeValueFile($key);
-    if (file_exists($singleLargeValueFile)) {
-      return unlink($singleLargeValueFile);
-    }
     unset($this->data[$key]);
     return true;
   }
 
   function get($key) {
-    $singleLargeValueFile = $this->singleLargeValueFile($key);
-    // a tad slow because of the io
-    // but
-    // maybe only do this if the key is not set
-    if (file_exists($singleLargeValueFile)) {
-      return unserialize(file_get_contents($singleLargeValueFile));
-    }
-    return empty($this->data[$key]) ? '' : $this->data[$key];
+    return empty($this->data[$key]) ? '' : $this->data[$key]['data'];
   }
 
-  function set($key, $val) {
-    $sval = serialize($val);
-    if (strlen($sval) > 4 * 1024) {
-      return file_put_contents($this->singleLargeValueFile($key), $sval);
-    }
+  // having a group would be ideal tbh for statistical analysis purposes
+  function set($key, $val, $ttl = 86400) {
+    global $now;
     $this->changed = true;
-    $this->data[$key] = $val;
+    $this->data[$key] = array(
+      'data' => $val,
+      'ttl' => $now + ttl, // absolute point in the future
+    );
     return true;
   }
 }
