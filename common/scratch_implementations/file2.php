@@ -159,7 +159,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     $this->changed = true;
     $this->data[$key] = array(
       'data' => $val,
-      'ttl' => $now + ttl, // absolute point in the future
+      'ttl' => $now + $ttl, // absolute point in the future
     );
     return true;
   }
