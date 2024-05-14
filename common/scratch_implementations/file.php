@@ -82,6 +82,7 @@ class file_scratch_driver extends scratch_implementation_base_class {
   function waitForFileExists() {
     if (!file_exists($this->file)) {
       $dne = 1;
+      // 30 * 100 = 3 secs
       for($i = 0; $i < 30; $i++) {
         if (file_exists($this->file)) {
           return true;
@@ -140,7 +141,7 @@ class file_scratch_driver extends scratch_implementation_base_class {
   function get($key) {
     $singleLargeValueFile = $this->singleLargeValueFile($key);
     if (file_exists($singleLargeValueFile)) {
-      return file_get_contents($singleLargeValueFile);
+      return unserialize(file_get_contents($singleLargeValueFile));
     }
     if (!$this->waitForFileExists()) {
       return false;
@@ -163,8 +164,9 @@ class file_scratch_driver extends scratch_implementation_base_class {
   }
 
   function set($key, $val) {
-    if (sizeof($val) > 1024) {
-      return file_put_contents($this->singleLargeValueFile($key), $val);
+    $sval = serialize($val);
+    if (strlen($sval) > 1024) {
+      return file_put_contents($this->singleLargeValueFile($key), $sval);
     }
     if (!$this->getlock()) {
       return false;
