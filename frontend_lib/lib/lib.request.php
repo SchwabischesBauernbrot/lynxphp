@@ -5,8 +5,7 @@
 include '../common/scratch_implementations/manual.php';
 
 function logRequest_unlock($scratch) {
-  unlink($scratch->lock . '/lock');
-  rmdir($scratch->lock);
+  $scratch->unlock();
 }
 
 function logRequest($ip) {
@@ -28,8 +27,8 @@ function logRequest($ip) {
   // scope this a single user, so shouldn't affect others
   $persist_scratch = new manual_scratch_driver('request_'.$ip.'_');
 
-  // expire all expired
-  $key = 'request_' . $ip;
+  //$key = 'request_' . $ip;
+  $key = '';
   //if (DEV_MODE) echo "key[$key]<br>\n";
 
   // if this lock fails (stays open)
@@ -47,6 +46,7 @@ function logRequest($ip) {
     echo "Could not obtain lock";
     exit();
   }
+  // have lock start
   $last = $persist_scratch->get($key . '_last');
   if ($last) {
     $diff = $now - $last;
@@ -61,6 +61,7 @@ function logRequest($ip) {
   // check
   $cnt = $persist_scratch->get($key . '_count');
   $persist_scratch->set($key . '_last', $now);
+  // write and unlock immediately
   if (!$cnt) {
     //if (DEV_MODE) echo "new count[$cnt]<br>\n";
     $persist_scratch->set($key . '_first', $now);
