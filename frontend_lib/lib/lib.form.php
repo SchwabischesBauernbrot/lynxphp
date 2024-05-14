@@ -185,6 +185,7 @@ function generateField($field, $value, $details, $labelId) {
         $files = json_decode($value, true);
         $html .= '<ul>';
         foreach($files as $file) {
+          // name can be unset...
           $html .= '<li>' . $file['name'] . ' ' . formatBytes($file['size']) . "\n";
         }
         $html .= '</ul>';
