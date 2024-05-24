@@ -8,7 +8,7 @@ class work_queue {
     // I think we're only going to need one queue
     $this->queue = new $queue_type_class;
     $this->queueName = 'queue';
-    $this->subscribed = false;
+    $this->subscribed = array();
   }
   private function checkSub() {
     if (empty($this->subscribed[$this->queueName])) {
