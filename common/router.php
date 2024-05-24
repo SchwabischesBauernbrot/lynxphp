@@ -47,7 +47,11 @@ class Router {
     $this->max_length = 0;
     $this->headersSent = false;
     $this->dev = false;
-    $this->debugLog = false;
+    if (DEV_MODE) {
+      $this->debugLog = array('matching' => array(), 'unmatching' => array());
+    } else {
+      $this->debugLog = false;
+    }
     $this->activeRoute = '';
     $this->foundRoute = false;
   }
@@ -747,6 +751,7 @@ class Router {
 
       // for routes without variables/params (:thingies)
       if ($path === $cond) {
+        //echo "exact match<br>\n";
         // kill warning
         if (!isset($this->routeOptions[$method . '_' . $cond])) $this->routeOptions[$method . '_' . $cond] = false;
         return array(
@@ -851,6 +856,7 @@ class Router {
               echo "segment not match [", $segments[$i], "]==[", $tc, "]<br>\n";
             }
           }
+          $this->debugLog['unmatching'][] = "router - path[$path] did not matched[$cond] at segment $i - ";
           $match = false;
           break; // stop cseg check
         }
@@ -862,7 +868,7 @@ class Router {
           'params' => $params,
           'func' => $func
         );
-      //} else {
+      } else {
         //echo "router - path[$path] not matched[$cond]<br>\n";
       }
     }
