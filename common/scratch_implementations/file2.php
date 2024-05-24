@@ -10,6 +10,9 @@ include_once 'base.php';
 // first line could be the indexes
 // and then we can fseek to those indexes
 
+// file2v3: file2v1+expiration-singlelargevalue+json
+// if we don't actually store json in it (but decoded json), it's actually smaller than serialize too
+
 // file2v2: file2v1+expiration-singlelargevalue
 // with the size problem solved with expiration
 // the overhead of singlelargevalue was not worth it
@@ -31,9 +34,8 @@ include_once 'base.php';
 // expiration of keys would help
 class file2_scratch_driver extends scratch_implementation_base_class {
   function __construct($prefix = '') {
-    $this->filebase = '../frontend_storage/' . $prefix . 'cache2_v2';
     // FIXME: on startup - do a write test check
-    $file = realpath('../frontend_storage') . '/' . $prefix . 'cache2';
+    $file = realpath('../frontend_storage') . '/' . $prefix . 'cache2v3';
     $this->changed = false;
     $res = $this->openFileInPool($file);
     $this->data = false;
@@ -61,7 +63,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
       }
       unset($this->data);
       //echo "<pre>", htmlspecialchars(print_r($ndata, 1)), "</pre>\n";
-      file_put_contents($this->filepath, serialize($ndata));
+      file_put_contents($this->filepath, json_encode($ndata));
       //echo "closed[$this->filepath]<br>\n";
     }
     // probably want to retain this lock
@@ -119,7 +121,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     // these shouldn't be more than 1mb
     $serializedStr = file_get_contents($filepath);
     // json is faster
-    $metadata = unserialize($serializedStr);
+    $metadata = json_decode($serializedStr, true);
     $this->changed = false;
     //echo "opened[$filepath] [", join(',', array_keys($metadata)), "]<br>\n";
     return array(
