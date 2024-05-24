@@ -1,5 +1,8 @@
 <?php
 
+// lib.form
+// tools for building forms
+
 function jsChanStyle() {
   return array(
     'useSections' => true,
