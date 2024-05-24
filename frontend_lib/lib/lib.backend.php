@@ -5,6 +5,12 @@
 
 // FIXME: option for should only work over TLS unless same ip/localhost
 
+function looksLikeJson($string) {
+  return (is_string($string) && 
+          ((strlen($string) > 0 && $string[0] === '{' && $string[strlen($string) - 1] === '}') ||
+           (strlen($string) > 0 && $string[0] === '[' && $string[strlen($string) - 1] === ']')));
+}
+
 /**
  * consume backend resource
  * options
@@ -136,6 +142,9 @@ function consume_beRsrc($options, $params = '') {
         //if (DEV_MODE) echo "<pre>Using head cache key[$hckey] [", print_r($_HEAD_CACHE[$hckey], 1), "]</pre>\n";
         if (doWeHaveHeader($_HEAD_CACHE[$hckey], $check)) {
           //if (DEV_MODE) echo "WeHaveHeader<br>\n";
+          if ($check['wasJson']) {
+            $options['decodedJSON'] = $check['res'];
+          }
           return postProcessJson($check['res'], $options);
         }
         if (DEV_MODE) echo "<pre>WeDontHaveHeader key[$hckey] [", print_r($_HEAD_CACHE[$hckey], 1), "]</pre>\n";
@@ -209,6 +218,9 @@ function consume_beRsrc($options, $params = '') {
     //doWeHaveHeader($respHeaders, $check)
     if ($is304) {
       // basically a 304
+      if ($check['wasJson']) {
+        $options['decodedJSON'] = $check['res'];
+      }
       return postProcessJson($check['res'], $options);
     } else {
       $respHeaders = parseHeaders($rawHeaders);
@@ -216,13 +228,22 @@ function consume_beRsrc($options, $params = '') {
       $outTs = isset($respHeaders['last-modified']) ? strtotime($respHeaders['last-modified']) : $ts;
       $outEtag = isset($respHeaders['etag']) ? $respHeaders['etag'] : $etag;
       // how do we get headers from this...
-      //echo "saving[$key] ts[$outTs] tag[$outEtag]<br>\n";
+      //echo "saving[$key] ts[$outTs] tag[$outEtag] type[", $respHeaders['content-type'], "]<br>\n";
+      $toSave = $responseText;
+      $wasJson = false;
+      if ($respHeaders['content-type'] === 'application/json') {
+        $toSave = json_decode($responseText, true);
+        $options['decodedJSON'] = $toSave;
+        $wasJson = true;
+      }
+      //$isJson = !empty($options['expectJson']) || !empty($options['unwrapData']);
       // we should require ($outTs || $outEtag)
       // we need to expire this data too, we can't have eTag stick around forever
       $scratch->set('consume_beRsrc_' . $key, array(
         'ts'   => $outTs,
         'etag' => $outEtag,
-        'res'  => $responseText
+        'wasJson' => $wasJson,
+        'res'  => $toSave,
       ));
     }
   }
@@ -261,9 +282,15 @@ function expectJson($json, $endpoint = '', $options = array()) {
     'inWrapContent' => false,
     'method' => 'AUTO',
     'redirect' => true,
+    'decodedJSON' => false,
   ), $options));
 
-  $obj = json_decode($json, true);
+  if ($decodedJSON) {
+    $obj = $decodedJSON;
+    unset($decodedJSON);
+  } else {
+    $obj = json_decode($json, true);
+  }
   if ($obj === NULL) {
     if (!empty($inWrapContent)) {
       echo 'Backend error (consume_beRsrc): ' .  $endpoint . ': ' . $json, "\n";
