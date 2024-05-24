@@ -22,6 +22,7 @@ function createSession($userid) {
 
   // schedule expiration check
   global $workqueue;
+  // are we scheduling work on every request?
   $workqueue->addWork(PIPELINE_SESSION_EXPIRATION, array());
 
   // handle db failure
