@@ -1,7 +1,7 @@
 <?php
 
-// is this file going to get huge
-// should we specialize or tie to handler?
+// lib.backend
+// for communicating with the backend
 
 // FIXME: option for should only work over TLS unless same ip/localhost
 
@@ -127,7 +127,7 @@ function consume_beRsrc($options, $params = '') {
     global $scratch;
     $check = $scratch->get('consume_beRsrc_' . $key);
     // still need to see if backend is newer
-    //echo "<pre>check [$key]", htmlspecialchars(print_r($check, 1)), "</pre>\n";
+    //echo "<pre>check [$key] [", htmlspecialchars(print_r($check, 1)), "]</pre>\n";
     if ($check && is_array($check)) {
       global $_HEAD_CACHE;
       //echo "<pre>_HEAD_CACHE", htmlspecialchars(print_r($_HEAD_CACHE, 1)), "</pre>\n";
@@ -180,6 +180,7 @@ function consume_beRsrc($options, $params = '') {
       'serverEtag' => $etag,
       'headCache' => empty($_HEAD_CACHE[$options['endpoint'] . $querystring]) ? '' : $_HEAD_CACHE[$options['endpoint'] . $querystring],
       'headers' => $headers,
+      'feCachable' => $feCachable,
       //'saveCache' => $saveCache,
     );
   }
@@ -215,7 +216,7 @@ function consume_beRsrc($options, $params = '') {
       $outTs = isset($respHeaders['last-modified']) ? strtotime($respHeaders['last-modified']) : $ts;
       $outEtag = isset($respHeaders['etag']) ? $respHeaders['etag'] : $etag;
       // how do we get headers from this...
-      //echo "saving[$key]<br>\n";
+      //echo "saving[$key] ts[$outTs] tag[$outEtag]<br>\n";
       // we should require ($outTs || $outEtag)
       // we need to expire this data too, we can't have eTag stick around forever
       $scratch->set('consume_beRsrc_' . $key, array(
