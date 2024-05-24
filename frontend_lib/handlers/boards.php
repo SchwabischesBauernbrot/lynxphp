@@ -288,7 +288,8 @@ function makePostHandlerEngine($request) {
     'error'    => false,
     'redirNow' => false,
   );
-  // validate results
+  
+  // validate results (usually used for CAPTCHA validation)
   $pipelines[PIPELINE_POST_VALIDATION]->execute($io);
   //print_r($io);
   $row     = $io['values'];
