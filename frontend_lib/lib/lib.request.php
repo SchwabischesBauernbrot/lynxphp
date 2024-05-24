@@ -1,6 +1,6 @@
 <?php
 
-// needs $now, DEV_MODE defined
+// needs $now
 
 include '../common/scratch_implementations/manual.php';
 
