@@ -2,6 +2,14 @@
 
 include_once 'base.php';
 
+// we bring all of these into memory and use very few
+// maybe we should only unserialize when we hit our key
+// but then we're doing more diskio
+// could mmap might be linux only though
+// file()
+// first line could be the indexes
+// and then we can fseek to those indexes
+
 // file2v2: file2v1+expiration-singlelargevalue
 // with the size problem solved with expiration
 // the overhead of singlelargevalue was not worth it
@@ -45,12 +53,16 @@ class file2_scratch_driver extends scratch_implementation_base_class {
       // huh can run out of memory here...
       $ndata = array();
       global $now;
-      while($row = array_shift($this->data)) {
+      foreach($this->data as $k => $row) {
         if ($row['ttl'] >= $now) {
-          $ndata[] = $row;
+          $ndata[$k] = $row;
         }
+        unset($this->data[$k]);
       }
+      unset($this->data);
+      //echo "<pre>", htmlspecialchars(print_r($ndata, 1)), "</pre>\n";
       file_put_contents($this->filepath, serialize($ndata));
+      //echo "closed[$this->filepath]<br>\n";
     }
     // probably want to retain this lock
   }
@@ -58,7 +70,8 @@ class file2_scratch_driver extends scratch_implementation_base_class {
   function __destruct() {
     $this->commit();
     //$this->closeLock($this->lockpath, $this->pid);
-    unlink($this->lockpath);
+    // how does this end up not existing?
+    @unlink($this->lockpath);
   }
 
   function manyFilesGetPath($filename) {
@@ -66,6 +79,10 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     // last X => xx/xx/filename.ext
     // mkdir
     // return directory
+  }
+
+  function isProcessRunning($pid) {
+    return file_exists("/proc/$pid");
   }
 
   function lockAndOpen($filepath) {
@@ -84,7 +101,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
       $diff = $now - (float)$n;
       $clearLock = false;
       //echo "lockAndOpen - [$filepath][$diff]<br>\n";
-      if ($diff > 300) {
+      if ($diff > 300 || $this->isProcessRunning($p)) {
         // clear lock
         $clearLock = true;
       }
@@ -93,17 +110,18 @@ class file2_scratch_driver extends scratch_implementation_base_class {
       //unlink($lockpath);
     }
     $pid = posix_getpid();
-    file_put_contents($lockpath, $now . '_' . $pid);
-    if (!file_exists($lockpath)) {
-      echo "cant create lock[$lock]<br>\n";
+    if (file_put_contents($lockpath, $now . '_' . $pid) === false) {
+      echo "Cannot create lock[$lockpath]<br>\n";
       return false;
     }
     // could check lock to make sure we got it
 
     // these shouldn't be more than 1mb
     $serializedStr = file_get_contents($filepath);
+    // json is faster
     $metadata = unserialize($serializedStr);
     $this->changed = false;
+    //echo "opened[$filepath] [", join(',', array_keys($metadata)), "]<br>\n";
     return array(
       'file' => $filepath,
       'lock' => $lockpath,
@@ -159,7 +177,7 @@ class file2_scratch_driver extends scratch_implementation_base_class {
     $this->changed = true;
     $this->data[$key] = array(
       'data' => $val,
-      'ttl' => $now + $ttl, // absolute point in the future
+      'ttl' => (int)$now + $ttl, // absolute point in the future
     );
     return true;
   }
