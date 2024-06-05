@@ -275,7 +275,7 @@ function wrapContentData($options = false) {
 function wrapContentGetHeadHTML($row, $fullHead = false) {
   global $pipelines;
 
-  //echo "<pre>wrapContentGetHeadHTML", print_r($row, 1), "</pre>\n";
+  //echo "<pre>wrapContentGetHeadHTML", htmlspecialchars(print_r($row, 1)), "</pre>\n";
 
   //$siteSettings = $row['siteSettings'];
   //$userSettings = $row['userSettings'];
@@ -432,7 +432,6 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
         'js/lynxphp/expander_thread.js',
         'js/lynxphp/expander_hover_media.js',
         //'js/lynxphp/expander_media.js',
-        'js/lynxphp/work.js',
         // only need this on the settings page...
         'js/lynxphp/volume_upgrade.js',
         //'js/lynxphp/lazy_audit.js',
@@ -441,6 +440,12 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
         'js/lynxphp/modal.js',
       ),
     );
+
+    //
+    if ($row['doWork']) {
+      $script_io['scripts'][] = 'js/lynxphp/work.js';
+    }
+
     // THINK: how do we let JS live in module directories
     // but be efficiently servered by web server?
     // so that we don't have to fire up php each time
