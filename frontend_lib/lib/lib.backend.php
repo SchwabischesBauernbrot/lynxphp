@@ -6,7 +6,7 @@
 // FIXME: option for should only work over TLS unless same ip/localhost
 
 function looksLikeJson($string) {
-  return (is_string($string) && 
+  return (is_string($string) &&
           ((strlen($string) > 0 && $string[0] === '{' && $string[strlen($string) - 1] === '}') ||
            (strlen($string) > 0 && $string[0] === '[' && $string[strlen($string) - 1] === ']')));
 }
@@ -119,11 +119,17 @@ function consume_beRsrc($options, $params = '') {
   // get can be the URL
   // POST, well... should these be cache?
 
-  $feCachable = empty($options['method']) && empty($options['dontCache']);
+  // hack: enable on POST for boardthreadlookup
+  // FIXME: remove the need for boardthreadlookup
+  $feCachable = (empty($options['method']) || $options['method'] === 'GET' || $options['method'] === 'POST') && empty($options['dontCache']);
   if ($feCachable) {
     // what's our caching key?
     $hckey = $options['endpoint'] . $querystring;
     $key = BACKEND_BASE_URL . $hckey;
+    if (isset($options['method']) && $options['method'] === 'POST') {
+      // this really matters on a POST
+      $key .= json_encode($postData);
+    }
     // uhm this defeats passing SID to backend
     if (!empty($headers['sid'])) {
       // maybe it should be prefixed...
@@ -231,10 +237,18 @@ function consume_beRsrc($options, $params = '') {
       //echo "saving[$key] ts[$outTs] tag[$outEtag] type[", $respHeaders['content-type'], "]<br>\n";
       $toSave = $responseText;
       $wasJson = false;
-      if ($respHeaders['content-type'] === 'application/json') {
-        $toSave = json_decode($responseText, true);
-        $options['decodedJSON'] = $toSave;
-        $wasJson = true;
+      if (!empty($respHeaders['content-type'])) {
+        if ($respHeaders['content-type'] === 'application/json') {
+          $toSave = json_decode($responseText, true);
+          $options['decodedJSON'] = $toSave;
+          $wasJson = true;
+        }
+      /*
+      } else {
+        if (DEV_MODE) {
+          echo "Content-type missing<br>\n";
+        }
+        */
       }
       //$isJson = !empty($options['expectJson']) || !empty($options['unwrapData']);
       // we should require ($outTs || $outEtag)
