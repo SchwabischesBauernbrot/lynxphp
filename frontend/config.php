@@ -66,6 +66,7 @@ if (!defined('IN_GENERATE')) define('IN_GENERATE', false);
 if (!defined('USER')) define('USER', 'www-data'); // debian
 // i.e. site/userbar
 if (!defined('DISABLE_MODULES')) define('DISABLE_MODULES', array());
+// no js or iframe
 if (!defined('DISABLE_WORK')) define('DISABLE_WORK', false);
 if (!defined('AUTH_DIRECT')) define('AUTH_DIRECT', false);
 // has to end with a trailing slash
