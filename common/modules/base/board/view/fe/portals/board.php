@@ -36,7 +36,7 @@ function getPortalBoard($opts, $request) {
     'isThread' => empty($opts['isThread']) ? false : true,
     'threadClosed' => empty($opts['threadClosed']) ? false : true,
     // FIXME: this should default to on tbh
-    'noPosts' => empty($opts['noPosts']) ? false : true,
+    'noPosts' => empty($opts['noPosts']) ? false : $opts['noPosts'],
   );
   //echo "<pre>board portal options", print_r($options, 1), "</pre>\n";
   // get page count
@@ -92,6 +92,7 @@ function getPortalBoard($opts, $request) {
     $boardSettings = getter_getBoardSettings($uri);
   } else {
     $boardSettings = array();
+    $options['noPosts'] = true;
   }
   $row = renderBoardPortalData($uri, $pageCount, array(
     'pagenum' => $options['pagenum'],
@@ -101,7 +102,7 @@ function getPortalBoard($opts, $request) {
     'boardSettings' => $boardSettings,
     'noPosts' => $options['noPosts'],
     'threadNum' => empty($params['num']) ? 0 : $params['num'],
-    'siteSettings' => $portalData['board']['siteSettings']['site'],
+    'siteSettings' => empty($portalData['board']['siteSettings']['site']) ? array() : $portalData['board']['siteSettings']['site'],
     // not used
     //'userSettings' => $portalData['board']['siteSettings']['user'],
   ));
@@ -316,7 +317,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'boardNav' => $boardNav,
     'noPosts'  => $noPosts,
     'maxMessageLength' => $maxMessageLength,
-    'quick_reply' => $siteSettings['quick_reply'],
+    'quick_reply' => isset($siteSettings['quick_reply']) ? $siteSettings['quick_reply'] : '1',
   );
 }
 
