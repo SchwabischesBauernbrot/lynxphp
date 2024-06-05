@@ -2,6 +2,19 @@
 return array(
   'name' => 'base_thread_view',
   'version' => 1,
+  'settings' => array(
+    array(
+      'level' => 'admin', // constant?
+      'location' => 'ui', // /tab/group
+      'addFields' => array(
+        'quick_reply' => array(
+          'label' => 'quick reply',
+          'type'  => 'checkbox',
+          'default' => true,
+        ), // end uri
+      ), // end addFields
+    ), // end setting
+  ),
   'resources' => array(
     array(
       'name' => 'refresh',
