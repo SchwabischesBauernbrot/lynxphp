@@ -15,6 +15,7 @@ const generatePassword = () => {
 setDefaultLocalStorage('postpassword', generatePassword())
 
 class syncedField {
+  // oneWay isn't used
   constructor(selector, key, oneWay=false, persistent=true) {
     this.fields = []
     this.selector = selector
@@ -31,6 +32,7 @@ class syncedField {
     }
   }
   init() {
+    /*
     const settingsModal = document.getElementById('settingsmodal')
     let settingsFields = []
     if (settingsModal) {
@@ -44,6 +46,7 @@ class syncedField {
         this.fields.push(settingsFields[i])
       }
     }
+    */
 
     const postForm = document.getElementById('postform')
     if (postForm) {
@@ -54,11 +57,22 @@ class syncedField {
         }
       }
     } else {
-      console.log('password.js - has no postForm')
+      // non-quick-reply version
+      const topPostForm = document.getElementById('top_postform')
+      if (topPostForm) {
+        const topPostformFields = topPostForm.querySelectorAll(this.selector)
+        for(var i in topPostformFields) {
+          if (topPostformFields.hasOwnProperty(i)) {
+            this.fields.push(topPostformFields[i])
+          }
+        }
+      } else {
+        console.log('password.js - has no postform or top_postform?')
+      }
     }
 
     const bottomPostForm = document.getElementById('bottom_postform')
-    if (postForm) {
+    if (bottomPostForm) {
       const bottomPostformFields = bottomPostForm.querySelectorAll(this.selector)
       for(var i in bottomPostformFields) {
         if (bottomPostformFields.hasOwnProperty(i)) {
@@ -69,6 +83,10 @@ class syncedField {
       console.log('password.js - has no bottom_postform')
     }
 
+    // this is a post list
+    // so I think this is for saving the checkboxes but
+    // nothing clears that
+    /*
     const actionForm = document.getElementById('actionform')
     if (actionForm) {
       const actionFields = actionForm.querySelectorAll(this.selector)
@@ -80,17 +98,22 @@ class syncedField {
     } else {
       console.log('password.js - has no actionform')
     }
+    */
 
     if (this.oneWay) {
       settingsFields[0].addEventListener('input', (e) => { this.update(e) }, false)
     } // else two way (default)
 
     if (!this.fields.length) {
+      // ok not to have the password field when logged in
       console.log('password.js - has no fields', this.key)
     }
-    console.log('password.js - fields', this.fields)
+    //console.log('password.js - fields', this.fields)
+
+    // sync field data with UI
     for (let field of this.fields) {
-      field.value = localStorage.getItem(this.key)
+      field.value = localStorage.getItem(this.key) // load
+      // updateUI to new value
       !this.oneWay && field.addEventListener('input', (e) => { this.update(e) }, false)
     }
   }
