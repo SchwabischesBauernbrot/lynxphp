@@ -11,7 +11,10 @@ function getPortalBoard($opts, $request) {
   global $portalData;
   //echo "<pre>getPortalBoard opts[", print_r($opts, 1), "]</pre>\n";
   //echo "<pre>getPortalBoard request[", print_r($request, 1), "]</pre>\n";
+
+  // from backend portal
   //echo "<pre>getPortalBoard portalData[", print_r($portalData, 1), "]</pre>\n";
+
   //echo "<pre>getPortalBoard paramsCode[", print_r($opts['paramsCode'], 1), "]</pre>\n";
   //$config = getPortalBoardConfig();
   //global $portalsConfig;
@@ -22,10 +25,13 @@ function getPortalBoard($opts, $request) {
   //global $boardData;
   //echo "<pre>getPortalBoard boardData[", print_r($boardData, 1), "]</pre>\n";
 
+  $boardUri = empty($request['params']['uri']) ? '' : $request['params']['uri'];
+  $isPage1 = $_SERVER['REQUEST_URI'] === '/' . $boardUri . '/';
+
   // boardData['pageCount']
   $options = array(
     'board' => '',
-    'pagenum' => empty($params['page']) ? 1 : $params['page'],
+    'pagenum' => empty($params['page']) ? ($isPage1 ? 1 : 0) : $params['page'],
     'noBoardHeaderTmpl' => empty($opts['noBoardHeaderTmpl']) ? false : true,
     'isThread' => empty($opts['isThread']) ? false : true,
     'threadClosed' => empty($opts['threadClosed']) ? false : true,
@@ -95,6 +101,9 @@ function getPortalBoard($opts, $request) {
     'boardSettings' => $boardSettings,
     'noPosts' => $options['noPosts'],
     'threadNum' => empty($params['num']) ? 0 : $params['num'],
+    'siteSettings' => $portalData['board']['siteSettings']['site'],
+    // not used
+    //'userSettings' => $portalData['board']['siteSettings']['user'],
   ));
   return array(
     'uri' => $uri,
@@ -115,10 +124,11 @@ function generateJsBoardInfo($boardUri, $boardSettings, $options = false) {
   // could be passed as data-attributes too
   // not sure this should be embedded
   // since it's JS only maybe an ajax call?
+  // can't use dot notation because we have boardUri starting with numbers
   return <<< EOB
 <script>
 $firstJs
-boardData.$boardUri = $json
+boardData['$boardUri'] = $json
 </script>
 EOB;
 }
@@ -141,6 +151,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'threadSaged'       => false,
     'maxMessageLength'  => false,
     'boardSettings'     => false,
+    'siteSettings'      => false,
   ), $options));
 
   $templates = loadTemplates('mixins/board_header');
@@ -171,7 +182,7 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     // settings_queueing_mode is used
     'boardSettings' => $boardSettings,
     'navItems' => array(
-      array('label' => 'Index' , 'destinations' => $boardUri . '/'),
+      array('label' => 'Index' , 'destinations' => array($boardUri . '/', $boardUri . '/page/1')),
       //array('label' => 'Catalog' , 'destinations' => $boardUri . '/catalog.html'),
       //'Index' => $boardUri . '/',
       //'Catalog' => $boardUri . '/catalog.html',
@@ -287,18 +298,11 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
   //echo "noBoardHeaderTmpl[$noBoardHeaderTmpl]<Br>\n";
   if (!$noBoardHeaderTmpl) {
     // banner is injected here:
-    $pipelines[PIPELINE_BOARD_HEADER_TMPL]->execute($p);
+    //$pipelines[PIPELINE_BOARD_HEADER_TMPL]->execute($p);
   }
 
   // if threadNum, is it locked?
-  $form_html = '';
   //echo "threadNum[$threadNum]<br>\n";
-  if (!$noPosts) {
-    $form_html = $threadClosed ? '' : renderPostFormHTML($boardUri, array(
-      'showClose' => false, 'formId' => 'bottom_postform',
-      'reply' => $threadNum, 'maxMessageLength' => $maxMessageLength,
-    ));
-  }
 
   return array(
     'tmpl' => $tmpl,
@@ -310,9 +314,9 @@ function renderBoardPortalData($boardUri, $pageCount, $options = false) {
     'threadSaged'  => $threadSaged,
     // used in footer
     'boardNav' => $boardNav,
-    'postForm' => $form_html,
     'noPosts'  => $noPosts,
     'maxMessageLength' => $maxMessageLength,
+    'quick_reply' => $siteSettings['quick_reply'],
   );
 }
 
@@ -361,13 +365,29 @@ function renderBoardPortalHeaderEngine($row, $boardUri, $boardData) {
   if (!isset($boardData['title'])) $boardData['title'] = 'Communication problem';
   if (!isset($boardData['description'])) $boardData['description'] = 'try again in a bit';
 
+  //echo "<pre>row[", htmlspecialchars(print_r($row, 1)), "]</pre>\n";
+
+  $form_html = '';
+  // is thread open?
+  if (!$row['noPosts']) {
+    if ($row['quick_reply'] === '1') {
+      $form_html = renderPostForm($boardUri, $renderPostFormUrl, $renderPostFormOptions);
+    } else {
+      //echo "no quick_reply<br>\n";
+      $renderPostFormOptions['formId'] = 'top_postform';
+      $renderPostFormOptions['showLink'] = false;
+      $renderPostFormOptions['showClose'] = false;
+      $form_html = renderPostForm($boardUri, $renderPostFormUrl, $renderPostFormOptions);
+    }
+  }
+
+
   return replace_tags($row['tmpl'], array_merge($row['tags'], array(
     'uri' => $boardUri,
     'url' => $_SERVER['REQUEST_URI'],
     'title' => $isCatalog ? '' : ' - ' . htmlspecialchars($boardData['title']),
     'description' => htmlspecialchars($boardData['description']),
-    // if postForm is set, the thread is not closed
-    'postform' => $row['postForm'] ? renderPostForm($boardUri, $renderPostFormUrl, $renderPostFormOptions) : '',
+    'postform' => $form_html,
     'sticknav' => $stickNav_html,
     'boardNav' => $row['boardNav'],
     'pretitle' => $isCatalog ? 'Catalog(' : '',
