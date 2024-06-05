@@ -405,6 +405,7 @@ function renderPost($boardUri, $p, $options = false) {
       //array('label' => '[Reply]', 'link' => '/' . $boardUri . '/thread/' . $threadId. '.html#postform')
     ),
   );
+  // what is this used for?
   $pipelines[PIPELINE_POST_LINKS]->execute($links_io);
   $post_link_html_parts = array();
   if (count($links_io['links'])) {
@@ -618,6 +619,8 @@ function renderPost($boardUri, $p, $options = false) {
   $pipelines[PIPELINE_POST_ROW_APPEND]->execute($io);
   $links_html = $io['html'];
 
+  $intCreated = (int)$p['created_at'];
+
   $tags = array(
     'op'        => $isOP ? 'op': '',
     'uri'       => $boardUri,
@@ -633,8 +636,8 @@ function renderPost($boardUri, $p, $options = false) {
     'replies'   => $replies_html,
     // for actions details/summary
     //'backgroundColorCSS' => $isOP ? 'var(--background-rest)' : 'var(--post-color)',
-    'jstime'    => gmdate('Y-m-d', $p['created_at']) . 'T' . gmdate('H:i:s.v', $p['created_at']) . 'Z',
-    'human_created_at' => gmdate('n/j/Y H:i:s', $p['created_at']),
+    'jstime'    => gmdate('Y-m-d', $intCreated) . 'T' . gmdate('H:i:s.v', $intCreated) . 'Z',
+    'human_created_at' => gmdate('n/j/Y H:i:s', $intCreated),
     'links'     => $links_html,
     'actions'   => $post_actions_html,
     'postlinks' => $post_links_html,
