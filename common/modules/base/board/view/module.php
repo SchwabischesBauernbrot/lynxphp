@@ -27,7 +27,7 @@ return array(
         ),
         'cacheSettings' => array(
           'databaseTables' => array('user_sessions', 'board_{{uri}}_public_posts',
-            'board_{{uri}}_public_post_files', 'boards'),
+            'board_{{uri}}_public_post_files', 'boards', 'settings'),
         ),
       ),
     ),
