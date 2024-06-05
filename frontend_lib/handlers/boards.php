@@ -281,11 +281,13 @@ function makePostHandlerEngine($request) {
 
   $io = array(
     'boardUri' => $boardUri,
+    // board settings?
+    'boardSettings' => getter_getBoardSettings($boardUri),
     'endpoint' => $endpoint,
     'headers'  => $headers,
     'values'   => $row,
     'redir'    => $redir,
-    'error'    => false,
+    'error'    => false, // array or string
     'redirNow' => false,
   );
   
