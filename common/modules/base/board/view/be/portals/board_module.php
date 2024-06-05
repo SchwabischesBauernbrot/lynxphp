@@ -47,6 +47,9 @@ if ($boardUri) {
   $io['out']['board']['uri'] = $boardUri;
 }
 
+// this also passes user
+$io['out']['board']['siteSettings'] = getSettings();
+
 // well we assume their logged in
 // board settings
 // - settings_queueing_mode is example of what it needs
