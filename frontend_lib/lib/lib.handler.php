@@ -1,5 +1,8 @@
 <?php
 
+// lib.handler
+// utilities for route/enpoint handler, mainly doing with layout
+
 // move to lib.http.response?
 // but it's a very frontend util...
 function redirectTo($url, $options = false) {
@@ -408,9 +411,7 @@ function wrapContentGetHeadHTML($row, $fullHead = false) {
         // yous
         'js/jschan/yous.js',
         // forms
-        // broken because it doesn't handle the output of new posts
         // queues, refused, success, error...
-        // breaks post actions (can't handle array checkboxes)
         'js/jschan/forms.js',
         // upload item template
         'js/uploaditem.js',
