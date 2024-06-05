@@ -88,6 +88,8 @@ function renderPostFormHTML($boardUri, $options = false) {
     'postFormTag' => $postFormHTML,
   ));
 
+  //echo "<pre>", print_r($formOptions, 1), "</pre>\n";
+
   global $pipelines;
   $io = array(
     'boardUri'   => $boardUri,
@@ -117,31 +119,42 @@ function renderPostFormHTML($boardUri, $options = false) {
 function renderPostForm($boardUri, $url, $options = false) {
   global $pipelines;
 
-  $type = 'Thread';
-  if ($options) {
-    if (!empty($options['reply'])) {
-      $type = 'Reply';
-    }
-  }
+  // options is passed through to renderPostFormHTML
+  extract(ensureOptions(array(
+    'reply' => false, // needs to be the threadId
+    'showLink' => true,
+  ), $options));
 
+  $type = $reply ? 'Reply' : 'Thread';
   //echo "type[$type]<br>\n";
 
   $templates = loadTemplates('mixins/post_form');
+  $header    = $templates['header'];
+  $link_tmpl = $templates['loop0'];
+  $footer    = $templates['loop1'];
 
-  $tags = array(
-    'form'   => renderPostFormHTML($boardUri, $options),
-    'type'   => $type,
-    'action' => $url,
-    /*
-    'uri'  => $boardUri,
-    'tagThread'   => $tagThread,
-    'maxlength'   => 4096,
-    'maxfiles'    => $maxfiles,
-    'maxfilesize' => $maxfilesize,
-    */
+  $headerTags = array(
+    'form' => renderPostFormHTML($boardUri, $options),
   );
-  $pipelines[PIPELINE_POST_FORM_TAGS]->execute($tags);
-  return replace_tags($templates['header'], $tags);
+
+  $link_html = '';
+  if ($showLink) {
+    $tags = array(
+      'type'   => $type,
+      'action' => $url,
+      /*
+      'uri'  => $boardUri,
+      'tagThread'   => $tagThread,
+      'maxlength'   => 4096,
+      'maxfiles'    => $maxfiles,
+      'maxfilesize' => $maxfilesize,
+      */
+    );
+    // nothing uses this yet...
+    $pipelines[PIPELINE_POST_FORM_TAGS]->execute($tags);
+    $link_html = replace_tags($link_tmpl, $tags);
+  }
+  return replace_tags($header, $headerTags) . $link_html . $footer;
 }
 
 ?>
